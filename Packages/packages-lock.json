@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.jin5eok.jin5eokframework": {
+      "version": "file:JIN5EOK_Unity_Framework/Assets/JIN5EOK",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.2d.animation": {
       "version": "10.2.1",
       "depth": 1,
