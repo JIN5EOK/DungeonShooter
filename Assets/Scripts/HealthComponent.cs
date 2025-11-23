@@ -8,9 +8,8 @@ public class HealthComponent : MonoBehaviour
 {
     [Header("체력 설정")]
     [SerializeField] private int maxHealth = 100;
-    [SerializeField] private bool startWithFullHealth = true;
-    
-    private int currentHealth;
+    [SerializeField] private bool startWithFullHealth = true; 
+    [SerializeField] private int currentHealth;
 
     // 이벤트 시스템
     public event Action<int, int> OnHealthChanged; // (current, max)
