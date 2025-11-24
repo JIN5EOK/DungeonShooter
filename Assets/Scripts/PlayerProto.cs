@@ -26,8 +26,17 @@ public class PlayerProto : BaseEntity
     [SerializeField] private float jumpDuration = 0.5f;
     [SerializeField] private float jumpHeight = 2f;
 
+    [Header("체력 설정")]
+    [SerializeField] private int maxHealth = 100;
+    [SerializeField] private Color hitColor = Color.red;
+    [SerializeField] private float hitFlashDuration = 0.2f;
+
     private CooldownManager cooldownManager;
+    private HealthComponent healthComponent;
+    private SpriteRenderer spriteRenderer;
+    private Color originalColor;
     private bool isJumping;
+    private bool isDead;
     private CancellationTokenSource jumpCancellationTokenSource;
 
     protected override void Start()
@@ -39,6 +48,29 @@ public class PlayerProto : BaseEntity
         cooldownManager.RegisterCooldown("skill1", skill1Cooldown);
         cooldownManager.RegisterCooldown("skill2", skill2Cooldown);
         cooldownManager.RegisterCooldown("skill3", skill3Cooldown);
+
+        // 체력 컴포넌트 초기화
+        healthComponent = GetComponent<HealthComponent>();
+        if (healthComponent == null)
+        {
+            healthComponent = gameObject.AddComponent<HealthComponent>();
+        }
+
+        // maxHealth 설정
+        healthComponent.SetMaxHealth(maxHealth, true); // healToFull = true로 체력 가득 채움
+
+        // 체력 이벤트 구독
+        healthComponent.OnDamaged += HandleDamaged;
+        healthComponent.OnDeath += HandleDeath;
+
+        // SpriteRenderer 초기화
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            originalColor = spriteRenderer.color;
+        }
+
+        Debug.Log($"[PlayerProto] 체력 시스템 초기화 완료: {healthComponent.CurrentHealth}/{healthComponent.MaxHealth}");
     }
 
     private void OnDestroy()
@@ -46,10 +78,20 @@ public class PlayerProto : BaseEntity
         // 취소 토큰 정리
         jumpCancellationTokenSource?.Cancel();
         jumpCancellationTokenSource?.Dispose();
+
+        // 이벤트 구독 해제
+        if (healthComponent != null)
+        {
+            healthComponent.OnDamaged -= HandleDamaged;
+            healthComponent.OnDeath -= HandleDeath;
+        }
     }
 
     private void Update()
     {
+        // 죽었으면 입력 처리 중지
+        if (isDead) return;
+
         cooldownManager.UpdateCooldowns();
         
         if (!isJumping)
@@ -61,6 +103,9 @@ public class PlayerProto : BaseEntity
 
     private void FixedUpdate()
     {
+        // 죽었으면 물리 처리 중지
+        if (isDead) return;
+
         if (isJumping)
         {
             return;
@@ -313,4 +358,145 @@ public class PlayerProto : BaseEntity
     public float GetSkill1CooldownPercent() => cooldownManager.GetCooldownPercent("skill1");
     public float GetSkill2CooldownPercent() => cooldownManager.GetCooldownPercent("skill2");
     public float GetSkill3CooldownPercent() => cooldownManager.GetCooldownPercent("skill3");
+
+    /// <summary>
+    /// UI에서 쿨다운 매니저 접근용
+    /// </summary>
+    public CooldownManager GetCooldownManager() => cooldownManager;
+
+    // ==================== 체력 이벤트 핸들러 ====================
+
+    /// <summary>
+    /// 데미지를 받았을 때 처리
+    /// </summary>
+    private void HandleDamaged(int damage, int remainingHealth)
+    {
+        Debug.Log($"[PlayerProto] 피격! 데미지: {damage}, 남은 HP: {remainingHealth}");
+
+        // 시각적 피드백
+        StartCoroutine(HitFlashEffect());
+
+        // TODO: 추가 피격 효과
+        // - 피격 사운드
+        // - 화면 흔들림
+        // - 파티클 이펙트
+    }
+
+    /// <summary>
+    /// 피격 시 색상 변경 효과
+    /// </summary>
+    private System.Collections.IEnumerator HitFlashEffect()
+    {
+        if (spriteRenderer == null) yield break;
+
+        // 빨간색으로 변경
+        spriteRenderer.color = hitColor;
+
+        yield return new WaitForSeconds(hitFlashDuration);
+
+        // 원래 색상으로 복구
+        spriteRenderer.color = originalColor;
+    }
+
+    /// <summary>
+    /// 사망 처리
+    /// </summary>
+    private void HandleDeath()
+    {
+        if (isDead) return; // 중복 호출 방지
+
+        isDead = true;
+
+        Debug.Log("[PlayerProto] 플레이어 사망!");
+
+        // 물리 완전 중지
+        rb.linearVelocity = Vector2.zero;
+        rb.constraints = RigidbodyConstraints2D.FreezeAll; // 모든 움직임 고정
+
+        // 모든 입력 및 로직 비활성화
+        enabled = false; // MonoBehaviour 비활성화 (Update, FixedUpdate 중지)
+
+        // Collider 비활성화 (적과 충돌 방지)
+        Collider2D playerCollider = GetComponent<Collider2D>();
+        if (playerCollider != null)
+        {
+            playerCollider.enabled = false;
+        }
+
+        // 사망 시각 효과
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = Color.gray;
+        }
+
+        // TODO: 사망 효과 추가
+        // - 사망 애니메이션
+        // - 사망 사운드
+        // - 게임 오버 UI 표시
+        // - 리스폰 시스템
+
+        // 게임 오버 처리
+        StartCoroutine(GameOverSequence());
+    }
+
+    /// <summary>
+    /// 게임 오버 시퀀스
+    /// </summary>
+    private System.Collections.IEnumerator GameOverSequence()
+    {
+        yield return new WaitForSeconds(1f); // 1초 대기
+
+        // 페이드 아웃 효과 (선택사항)
+        if (spriteRenderer != null)
+        {
+            float fadeTime = 1f;
+            Color startColor = spriteRenderer.color;
+
+            for (float t = 0; t < fadeTime; t += Time.deltaTime)
+            {
+                float alpha = Mathf.Lerp(1f, 0f, t / fadeTime);
+                spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+                yield return null;
+            }
+        }
+
+        yield return new WaitForSeconds(0.5f); // 추가 대기
+
+        Debug.Log("[PlayerProto] 게임 오버! 씬 재시작 중...");
+
+        // 씬 재시작
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
+        );
+    }
+
+    // ==================== 체력 관련 Public 메서드 ====================
+
+    /// <summary>
+    /// 현재 체력 반환
+    /// </summary>
+    public int GetCurrentHealth()
+    {
+        return healthComponent != null ? healthComponent.CurrentHealth : 0;
+    }
+
+    /// <summary>
+    /// 최대 체력 반환
+    /// </summary>
+    public int GetMaxHealth()
+    {
+        return healthComponent != null ? healthComponent.MaxHealth : maxHealth;
+    }
+
+    /// <summary>
+    /// 체력 회복
+    /// </summary>
+    public void Heal(int amount)
+    {
+        if (healthComponent != null && !isDead)
+        {
+            healthComponent.Heal(amount);
+            Debug.Log($"[PlayerProto] 체력 회복: +{amount}");
+        }
+    }
 }

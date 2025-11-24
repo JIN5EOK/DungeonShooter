@@ -44,4 +44,26 @@ public class CooldownManager
 
         return Mathf.Max(0, cooldownTimers[name] / cooldowns[name]);
     }
+
+    /// <summary>
+    /// 남은 쿨다운 시간 반환 (UI용)
+    /// </summary>
+    public float GetRemainingCooldown(string name)
+    {
+        if (!cooldownTimers.ContainsKey(name))
+            return 0f;
+
+        return Mathf.Max(0f, cooldownTimers[name]);
+    }
+
+    /// <summary>
+    /// 총 쿨다운 시간 반환 (UI용)
+    /// </summary>
+    public float GetTotalCooldown(string name)
+    {
+        if (!cooldowns.ContainsKey(name))
+            return 0f;
+
+        return cooldowns[name];
+    }
 }
