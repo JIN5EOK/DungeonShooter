@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.coplaydev.unity-mcp": {
+      "version": "8.0.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2"
+      },
+      "url": "https://package.openupm.com"
+    },
     "com.jin5eok.jin5eokframework": {
       "version": "file:JIN5EOK_Unity_Framework/Assets/JIN5EOK",
       "depth": 0,
@@ -210,6 +219,13 @@
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.5",
       "depth": 3,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.2.1",
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
