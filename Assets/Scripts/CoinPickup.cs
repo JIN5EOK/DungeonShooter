@@ -12,6 +12,9 @@ public class CoinPickup : MonoBehaviour
     [Tooltip("흡수 감지 후 오브젝트를 파괴하기까지의 지연 시간(연출용).")]
     [SerializeField] private float destroyDelay = 0.05f;
 
+    [Header("코인 설정")]
+    [SerializeField, Min(1)] private int coinValue = 1;
+
     [Tooltip("흡수 시 비활성화할 시각 요소")]
     [SerializeField] private SpriteRenderer spriteRenderer;
 
@@ -67,9 +70,23 @@ public class CoinPickup : MonoBehaviour
             Destroy(collectEffect.gameObject, collectEffect.main.duration);
         }
 
+        RewardPlayer(player);
         OnCollected?.Invoke(player);
 
         Destroy(gameObject, destroyDelay);
+    }
+
+    private void RewardPlayer(GameObject player)
+    {
+        GameSession session = GameSession.Instance;
+        if (session?.CoinInventory == null)
+        {
+            Debug.LogWarning("[CoinPickup] GameSession 또는 CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
+            return;
+        }
+
+        session.CoinInventory.AddCoins(coinValue);
+        Debug.Log($"[CoinPickup] {player.name}이(가) 코인 {coinValue}개 획득! 총 {session.CoinInventory.CurrentCoins}");
     }
 }
 
