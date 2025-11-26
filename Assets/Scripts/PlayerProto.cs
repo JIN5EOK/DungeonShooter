@@ -237,7 +237,7 @@ public class PlayerProto : BaseEntity
         
         foreach (Collider2D hit in hits)
         {
-            if (hit.CompareTag("Enemy"))
+            if (hit.CompareTag(GameTags.Enemy))
             {
                 HealthComponent enemyHealth = hit.GetComponent<HealthComponent>();
                 if (enemyHealth != null && !enemyHealth.IsDead)
@@ -262,7 +262,7 @@ public class PlayerProto : BaseEntity
         
         foreach (Collider2D hit in hits)
         {
-            if (hit.CompareTag("Enemy"))
+            if (hit.CompareTag(GameTags.Enemy))
             {
                 HealthComponent enemyHealth = hit.GetComponent<HealthComponent>();
                 if (enemyHealth != null && !enemyHealth.IsDead)
@@ -328,7 +328,7 @@ public class PlayerProto : BaseEntity
             
             foreach (Collider2D hit in hits)
             {
-                if (hit.CompareTag("Enemy"))
+                if (hit.CompareTag(GameTags.Enemy))
                 {
                     HealthComponent enemyHealth = hit.GetComponent<HealthComponent>();
                     if (enemyHealth != null && !enemyHealth.IsDead)
