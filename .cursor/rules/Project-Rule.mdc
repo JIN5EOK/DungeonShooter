@@ -1,0 +1,20 @@
+---
+alwaysApply: true
+---
+## 게임오브젝트 명명 규칙
+- 게임오브젝트의 이름은 해당 컴포넌트가 수행하는 주요 역할을 나타낼 수 있어야 한다
+  - '역할_이름' 형태로 나타낸다
+  - 예) Button_GameStartButton
+- 역할이 너무 디테일한 부분을 나타내지 않도록 주의한다
+  - 잘못된 예시) GameResetButton_OrangeGameResetButton
+  
+## 명명규칙
+- 클래스, 구조체, 인터페이스, 델리게이트 선언은 파스칼케이스를 사용
+- private 변수는 이름 앞에 _를 붙이는 카멜케이스를 사용
+  - Ex) private int _foo
+- const, readonly등의 상수, 불변값들은 파스칼케이스를 사용
+  - Ex) private readonly int FooValue
+    
+  
+## 작업 후 확인
+- 작성/수정한 코드에서 발생하는 컴파일 에러가 없는지 확인한다
