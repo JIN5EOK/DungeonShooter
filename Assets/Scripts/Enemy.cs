@@ -32,6 +32,11 @@ public class Enemy : BaseEntity
     [SerializeField] private float deathDelay = 1f;
     [SerializeField] private bool disableOnDeath = true;
 
+    [Header("공격 범위 시각화")]
+    [Tooltip("공격 범위를 시각적으로 표시할지 여부")]
+    [SerializeField] private bool showAttackRange = true;
+    [SerializeField] private AttackRangeVisualizer attackRangeVisualizer;
+
     [Header("코인 드롭 설정")]
     [Tooltip("사망 시 드롭할 코인 프리팹")]
     [SerializeField] private CoinPickup coinPickupPrefab;
@@ -89,6 +94,30 @@ public class Enemy : BaseEntity
         else
         {
             Debug.LogWarning($"[{gameObject.name}] HealthComponent가 없습니다. 적이 죽지 않습니다!");
+        }
+
+        // 공격 범위 시각화 초기화
+        if (showAttackRange)
+        {
+            if (attackRangeVisualizer == null)
+            {
+                attackRangeVisualizer = GetComponent<AttackRangeVisualizer>();
+                if (attackRangeVisualizer == null)
+                {
+                    // 자동으로 생성 (LineRenderer 먼저 추가 필요)
+                    GameObject visualizerObj = new GameObject("AttackRangeVisualizer");
+                    visualizerObj.transform.SetParent(transform);
+                    visualizerObj.transform.localPosition = Vector3.zero;
+                    visualizerObj.AddComponent<LineRenderer>(); // LineRenderer 먼저 추가
+                    attackRangeVisualizer = visualizerObj.AddComponent<AttackRangeVisualizer>();
+                }
+            }
+            
+            if (attackRangeVisualizer != null)
+            {
+                attackRangeVisualizer.SetRadius(attackRange);
+                attackRangeVisualizer.SetColor(new Color(1f, 0f, 0f, 0.3f)); // 반투명 빨간색
+            }
         }
     }
 
@@ -281,7 +310,14 @@ public class Enemy : BaseEntity
         }
 
         // 공격 범위 시각화
-        DebugDrawCircle(transform.position, attackRange, Color.red, 0.3f);
+        if (showAttackRange && attackRangeVisualizer != null)
+        {
+            attackRangeVisualizer.Show();
+        }
+        else
+        {
+            DebugDrawCircle(transform.position, attackRange, Color.red, 0.3f);
+        }
     }
 
     // ==================== 검사용 함수 ====================

@@ -30,6 +30,13 @@ public class PlayerProto : BaseEntity
     [SerializeField] private Color hitColor = Color.red;
     [SerializeField] private float hitFlashDuration = 0.2f;
 
+    [Header("스킬 범위 시각화")]
+    [Tooltip("스킬 범위를 시각적으로 표시할지 여부")]
+    [SerializeField] private bool showSkillRanges = true;
+    [SerializeField] private AttackRangeVisualizer skill1Visualizer; // 전방 슬래시
+    [SerializeField] private AttackRangeVisualizer skill2Visualizer; // 회전 공격
+    [SerializeField] private AttackRangeVisualizer skill3Visualizer; // 점프 공격
+
     private CooldownManager _cooldownManager;
     private HealthComponent _healthComponent;
     private SpriteRenderer _spriteRenderer;
@@ -70,6 +77,63 @@ public class PlayerProto : BaseEntity
         }
 
         Debug.Log($"[PlayerProto] 체력 시스템 초기화 완료: {_healthComponent.CurrentHealth}/{_healthComponent.MaxHealth}");
+
+        // 스킬 범위 시각화 초기화
+        if (showSkillRanges)
+        {
+            InitializeSkillVisualizers();
+        }
+    }
+
+    /// <summary>
+    /// 스킬 범위 시각화 초기화
+    /// </summary>
+    private void InitializeSkillVisualizers()
+    {
+        // 스킬1 (전방 슬래시) 시각화 - 독립 GameObject (공격 위치에 표시)
+        if (skill1Visualizer == null)
+        {
+            GameObject skill1Obj = new GameObject("Skill1RangeVisualizer");
+            skill1Obj.transform.SetParent(null); // 부모 없이 독립적으로
+            skill1Obj.AddComponent<LineRenderer>();
+            skill1Visualizer = skill1Obj.AddComponent<AttackRangeVisualizer>();
+        }
+        if (skill1Visualizer != null)
+        {
+            skill1Visualizer.SetRadius(1f); // 스킬1 반경
+            skill1Visualizer.SetColor(new Color(1f, 0.5f, 0f, 0.3f)); // 반투명 주황색
+            skill1Visualizer.gameObject.SetActive(false); // 기본적으로 비활성화
+        }
+
+        // 스킬2 (회전 공격) 시각화 - 플레이어 중심
+        if (skill2Visualizer == null)
+        {
+            GameObject skill2Obj = new GameObject("Skill2RangeVisualizer");
+            skill2Obj.transform.SetParent(transform);
+            skill2Obj.transform.localPosition = Vector3.zero;
+            skill2Obj.AddComponent<LineRenderer>();
+            skill2Visualizer = skill2Obj.AddComponent<AttackRangeVisualizer>();
+        }
+        if (skill2Visualizer != null)
+        {
+            skill2Visualizer.SetRadius(2.5f); // 스킬2 반경
+            skill2Visualizer.SetColor(new Color(1f, 1f, 0f, 0.3f)); // 반투명 노란색
+        }
+
+        // 스킬3 (점프 공격) 시각화 - 독립 GameObject (착지 위치에 고정)
+        if (skill3Visualizer == null)
+        {
+            GameObject skill3Obj = new GameObject("Skill3RangeVisualizer");
+            skill3Obj.transform.SetParent(null); // 부모 없이 독립적으로
+            skill3Obj.AddComponent<LineRenderer>();
+            skill3Visualizer = skill3Obj.AddComponent<AttackRangeVisualizer>();
+        }
+        if (skill3Visualizer != null)
+        {
+            skill3Visualizer.SetRadius(2f); // 스킬3 반경
+            skill3Visualizer.SetColor(new Color(1f, 0f, 1f, 0.3f)); // 반투명 마젠타
+            skill3Visualizer.gameObject.SetActive(false); // 기본적으로 비활성화
+        }
     }
 
     private void OnDestroy()
@@ -182,6 +246,19 @@ public class PlayerProto : BaseEntity
         _cooldownManager.StartCooldown("skill1");
 
         Debug.Log("스킬 1 - 전방 슬래시 공격");
+        
+        // 실제 공격 위치 계산 (PerformRangeAttack과 동일한 로직)
+        Vector2 attackPos = (Vector2)transform.position + lastFacingDirection * (3f / 2f);
+        
+        // 스킬 범위 시각화 (실제 공격 위치에 정확히 표시)
+        if (showSkillRanges && skill1Visualizer != null)
+        {
+            skill1Visualizer.transform.position = attackPos;
+            skill1Visualizer.gameObject.SetActive(true);
+            skill1Visualizer.UpdatePosition(); // 위치 변경 후 원 다시 그리기
+            skill1Visualizer.Show();
+        }
+        
         PerformRangeAttack(lastFacingDirection, range: 3f, radius: 1f, damage: skill1Damage);
     }
 
@@ -190,6 +267,13 @@ public class PlayerProto : BaseEntity
         _cooldownManager.StartCooldown("skill2");
 
         Debug.Log("스킬 2 - 회전 공격");
+        
+        // 스킬 범위 시각화
+        if (showSkillRanges && skill2Visualizer != null)
+        {
+            skill2Visualizer.Show();
+        }
+        
         PerformSpinAttack(radius: 2.5f, damage: skill2Damage);
     }
 
@@ -292,6 +376,14 @@ public class PlayerProto : BaseEntity
         Vector2 targetPos = startPos + lastFacingDirection * targetDistance;
         
         Debug.Log($"[스킬3] 점프 시작! {startPos} → {targetPos}");
+        
+        // 스킬 범위 시각화 (착지 지점에 고정 표시) - 점프 시작 시점에 착지 위치 계산
+        if (showSkillRanges && skill3Visualizer != null)
+        {
+            skill3Visualizer.transform.position = targetPos; // 착지 목표 위치에 고정
+            skill3Visualizer.gameObject.SetActive(true);
+            skill3Visualizer.Show();
+        }
         
         float elapsedTime = 0f;
         
