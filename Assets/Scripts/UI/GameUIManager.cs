@@ -14,8 +14,8 @@ public class GameUIManager : MonoBehaviour
     [Header("플레이어 참조")]
     [SerializeField] private PlayerProto player;
 
-    private HealthComponent playerHealth;
-    private CooldownManager playerCooldowns;
+    private HealthComponent _playerHealth;
+    private CooldownManager _playerCooldowns;
 
     private async void Start()
     {
@@ -47,11 +47,11 @@ public class GameUIManager : MonoBehaviour
         }
 
         // 플레이어 컴포넌트 참조
-        playerHealth = player.GetComponent<HealthComponent>();
-        playerCooldowns = player.GetCooldownManager();
+        _playerHealth = player.GetComponent<HealthComponent>();
+        _playerCooldowns = player.GetCooldownManager();
 
         // CooldownManager가 아직 초기화 안 됐으면 재시도
-        if (playerCooldowns == null)
+        if (_playerCooldowns == null)
         {
             Debug.LogWarning("[GameUIManager] CooldownManager가 아직 초기화되지 않음. 재시도 중...");
             await RetryInitializationAsync();
@@ -61,9 +61,9 @@ public class GameUIManager : MonoBehaviour
         Debug.Log("[GameUIManager] 초기화 완료");
 
         // 체력 UI 초기화
-        if (healthBarUI != null && playerHealth != null)
+        if (healthBarUI != null && _playerHealth != null)
         {
-            healthBarUI.Initialize(playerHealth);
+            healthBarUI.Initialize(_playerHealth);
         }
 
         // 스킬 UI 초기화
@@ -84,8 +84,8 @@ public class GameUIManager : MonoBehaviour
 
             if (player != null)
             {
-                playerCooldowns = player.GetCooldownManager();
-                if (playerCooldowns != null)
+                _playerCooldowns = player.GetCooldownManager();
+                if (_playerCooldowns != null)
                 {
                     Debug.Log($"[GameUIManager] CooldownManager 초기화 완료! (재시도: {retryCount + 1}회)");
                     InitializeSkillUIs();
@@ -125,19 +125,19 @@ public class GameUIManager : MonoBehaviour
     private void UpdateUI()
     {
         // 체력 UI 업데이트
-        if (healthBarUI != null && playerHealth != null)
+        if (healthBarUI != null && _playerHealth != null)
         {
             healthBarUI.UpdateUI();
         }
 
         // 스킬 UI 업데이트
-        if (skillUIs != null && playerCooldowns != null)
+        if (skillUIs != null && _playerCooldowns != null)
         {
             for (int i = 0; i < skillUIs.Length; i++)
             {
                 if (skillUIs[i] != null)
                 {
-                    skillUIs[i].UpdateCooldown(playerCooldowns);
+                    skillUIs[i].UpdateCooldown(_playerCooldowns);
                 }
             }
         }

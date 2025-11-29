@@ -27,13 +27,13 @@ public class CoinPickup : MonoBehaviour
     /// </summary>
     public event Action<GameObject> OnCollected;
 
-    private Collider2D coinCollider;
-    private bool collected;
+    private Collider2D _coinCollider;
+    private bool _collected;
 
     private void Awake()
     {
-        coinCollider = GetComponent<Collider2D>();
-        coinCollider.isTrigger = true;
+        _coinCollider = GetComponent<Collider2D>();
+        _coinCollider.isTrigger = true;
 
         // SpriteRenderer를 수동으로 연결하지 않았다면 자동 참조
         if (spriteRenderer == null)
@@ -44,7 +44,7 @@ public class CoinPickup : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (collected)
+        if (_collected)
             return;
 
         if (!other.CompareTag(GameTags.Player))
@@ -55,8 +55,8 @@ public class CoinPickup : MonoBehaviour
 
     private void HandleCollect(GameObject player)
     {
-        collected = true;
-        coinCollider.enabled = false;
+        _collected = true;
+        _coinCollider.enabled = false;
 
         if (spriteRenderer != null)
         {

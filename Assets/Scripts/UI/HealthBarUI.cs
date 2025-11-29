@@ -23,37 +23,37 @@ public class HealthBarUI : MonoBehaviour
     [SerializeField] private bool enablePulseEffect = true;
     [SerializeField] private float pulseSpeed = 2f;
 
-    private HealthComponent healthComponent;
-    private float targetFillAmount;
-    private float currentFillAmount;
+    private HealthComponent _healthComponent;
+    private float _targetFillAmount;
+    private float _currentFillAmount;
 
     /// <summary>
     /// 체력 컴포넌트로 초기화
     /// </summary>
     public void Initialize(HealthComponent health)
     {
-        healthComponent = health;
+        _healthComponent = health;
 
-        if (healthComponent != null)
+        if (_healthComponent != null)
         {
             // 초기 체력 설정
-            int maxHP = healthComponent.MaxHealth;
-            int currentHP = healthComponent.CurrentHealth;
+            int maxHP = _healthComponent.MaxHealth;
+            int currentHP = _healthComponent.CurrentHealth;
 
-            targetFillAmount = (float)currentHP / maxHP;
-            currentFillAmount = targetFillAmount;
+            _targetFillAmount = (float)currentHP / maxHP;
+            _currentFillAmount = _targetFillAmount;
 
             UpdateVisuals();
 
             // 체력 변경 이벤트 구독
-            healthComponent.OnDamaged += OnHealthChanged;
+            _healthComponent.OnDamaged += OnHealthChanged;
             // OnHealed 이벤트가 있다면 구독
         }
     }
 
     private void Update()
     {
-        if (healthComponent == null) return;
+        if (_healthComponent == null) return;
 
         UpdateFillAnimation();
         UpdatePulseEffect();
@@ -64,16 +64,16 @@ public class HealthBarUI : MonoBehaviour
     /// </summary>
     public void UpdateUI()
     {
-        if (healthComponent == null) return;
+        if (_healthComponent == null) return;
 
         // 현재 체력 비율 계산
-        float healthRatio = (float)healthComponent.CurrentHealth / healthComponent.MaxHealth;
-        targetFillAmount = healthRatio;
+        float healthRatio = (float)_healthComponent.CurrentHealth / _healthComponent.MaxHealth;
+        _targetFillAmount = healthRatio;
 
         // 텍스트 업데이트
         if (healthText != null)
         {
-            healthText.text = $"{healthComponent.CurrentHealth} / {healthComponent.MaxHealth}";
+            healthText.text = $"{_healthComponent.CurrentHealth} / {_healthComponent.MaxHealth}";
         }
 
         UpdateVisuals();
@@ -95,8 +95,8 @@ public class HealthBarUI : MonoBehaviour
         if (healthFillImage == null) return;
 
         // 부드럽게 게이지 변경
-        currentFillAmount = Mathf.Lerp(currentFillAmount, targetFillAmount, Time.deltaTime * fillAnimationSpeed);
-        healthFillImage.fillAmount = currentFillAmount;
+        _currentFillAmount = Mathf.Lerp(_currentFillAmount, _targetFillAmount, Time.deltaTime * fillAnimationSpeed);
+        healthFillImage.fillAmount = _currentFillAmount;
     }
 
     /// <summary>
@@ -108,11 +108,11 @@ public class HealthBarUI : MonoBehaviour
 
         // 체력 비율에 따른 색상 변경
         Color targetColor;
-        if (targetFillAmount <= criticalHealthThreshold)
+        if (_targetFillAmount <= criticalHealthThreshold)
         {
             targetColor = criticalHealthColor;
         }
-        else if (targetFillAmount <= lowHealthThreshold)
+        else if (_targetFillAmount <= lowHealthThreshold)
         {
             targetColor = lowHealthColor;
         }
@@ -129,7 +129,7 @@ public class HealthBarUI : MonoBehaviour
     /// </summary>
     private void UpdatePulseEffect()
     {
-        if (!enablePulseEffect || targetFillAmount > criticalHealthThreshold) return;
+        if (!enablePulseEffect || _targetFillAmount > criticalHealthThreshold) return;
 
         if (healthFillImage != null)
         {
@@ -143,9 +143,9 @@ public class HealthBarUI : MonoBehaviour
     private void OnDestroy()
     {
         // 이벤트 구독 해제
-        if (healthComponent != null)
+        if (_healthComponent != null)
         {
-            healthComponent.OnDamaged -= OnHealthChanged;
+            _healthComponent.OnDamaged -= OnHealthChanged;
         }
     }
 }

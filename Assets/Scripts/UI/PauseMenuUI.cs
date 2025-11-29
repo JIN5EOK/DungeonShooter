@@ -20,8 +20,8 @@ public class PauseMenuUI : MonoBehaviour
     [Header("입력 설정")]
     [SerializeField] private KeyCode toggleKey = KeyCode.Escape;
 
-    private bool isPaused;
-    private float cachedTimeScale = 1f;
+    private bool _isPaused;
+    private float _cachedTimeScale = 1f;
 
     private void Awake()
     {
@@ -46,7 +46,7 @@ public class PauseMenuUI : MonoBehaviour
 
     public void TogglePause()
     {
-        if (isPaused)
+        if (_isPaused)
         {
             ResumeGame();
         }
@@ -58,20 +58,20 @@ public class PauseMenuUI : MonoBehaviour
 
     public void PauseGame()
     {
-        if (isPaused) return;
+        if (_isPaused) return;
 
-        cachedTimeScale = Time.timeScale;
+        _cachedTimeScale = Time.timeScale;
         SetTimeScale(0f);
-        isPaused = true;
+        _isPaused = true;
         ApplyCanvasVisibility(1f, true);
     }
 
     public void ResumeGame()
     {
-        if (!isPaused) return;
+        if (!_isPaused) return;
 
-        isPaused = false;
-        SetTimeScale(Mathf.Approximately(cachedTimeScale, 0f) ? 1f : cachedTimeScale);
+        _isPaused = false;
+        SetTimeScale(Mathf.Approximately(_cachedTimeScale, 0f) ? 1f : _cachedTimeScale);
         ApplyCanvasVisibility(0f, false);
     }
 
@@ -159,7 +159,7 @@ public class PauseMenuUI : MonoBehaviour
 
     private void HideImmediate()
     {
-        isPaused = false;
+        _isPaused = false;
         ApplyCanvasVisibility(0f, false);
     }
 

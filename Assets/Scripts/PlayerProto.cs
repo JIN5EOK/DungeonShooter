@@ -1,16 +1,15 @@
 using UnityEngine;
-using System.Threading;
 
 public class PlayerProto : BaseEntity
 {
-    private Vector2 moveInput;
+    private Vector2 _moveInput;
 
     [Header("구르기(회피)")]
     [SerializeField] private float dashSpeed = 15f;
     [SerializeField] private float dashDuration = 0.3f;
     [SerializeField] private float dashCooldown = 0.8f;
-    private bool isDashing;
-    private float dashTimer;
+    private bool _isDashing;
+    private float _dashTimer;
 
     [Header("스킬")]
     [SerializeField] private float skill1Cooldown = 2f;
@@ -31,86 +30,86 @@ public class PlayerProto : BaseEntity
     [SerializeField] private Color hitColor = Color.red;
     [SerializeField] private float hitFlashDuration = 0.2f;
 
-    private CooldownManager cooldownManager;
-    private HealthComponent healthComponent;
-    private SpriteRenderer spriteRenderer;
-    private Color originalColor;
-    private bool isJumping;
-    private bool isDead;
-    private CancellationTokenSource jumpCancellationTokenSource;
+    private CooldownManager _cooldownManager;
+    private HealthComponent _healthComponent;
+    private SpriteRenderer _spriteRenderer;
+    private Color _originalColor;
+    private bool _isJumping;
+    private bool _isDead;
+    private System.Threading.CancellationTokenSource _jumpCancellationTokenSource;
 
     protected override void Start()
     {
         base.Start();
 
-        cooldownManager = new CooldownManager();
-        cooldownManager.RegisterCooldown("dash", dashCooldown);
-        cooldownManager.RegisterCooldown("skill1", skill1Cooldown);
-        cooldownManager.RegisterCooldown("skill2", skill2Cooldown);
-        cooldownManager.RegisterCooldown("skill3", skill3Cooldown);
+        _cooldownManager = new CooldownManager();
+        _cooldownManager.RegisterCooldown("dash", dashCooldown);
+        _cooldownManager.RegisterCooldown("skill1", skill1Cooldown);
+        _cooldownManager.RegisterCooldown("skill2", skill2Cooldown);
+        _cooldownManager.RegisterCooldown("skill3", skill3Cooldown);
 
         // 체력 컴포넌트 초기화
-        healthComponent = GetComponent<HealthComponent>();
-        if (healthComponent == null)
+        _healthComponent = GetComponent<HealthComponent>();
+        if (_healthComponent == null)
         {
-            healthComponent = gameObject.AddComponent<HealthComponent>();
+            _healthComponent = gameObject.AddComponent<HealthComponent>();
         }
 
         // maxHealth 설정
-        healthComponent.SetMaxHealth(maxHealth, true); // healToFull = true로 체력 가득 채움
+        _healthComponent.SetMaxHealth(maxHealth, true); // healToFull = true로 체력 가득 채움
 
         // 체력 이벤트 구독
-        healthComponent.OnDamaged += HandleDamaged;
-        healthComponent.OnDeath += HandleDeath;
+        _healthComponent.OnDamaged += HandleDamaged;
+        _healthComponent.OnDeath += HandleDeath;
 
         // SpriteRenderer 초기화
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null)
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        if (_spriteRenderer != null)
         {
-            originalColor = spriteRenderer.color;
+            _originalColor = _spriteRenderer.color;
         }
 
-        Debug.Log($"[PlayerProto] 체력 시스템 초기화 완료: {healthComponent.CurrentHealth}/{healthComponent.MaxHealth}");
+        Debug.Log($"[PlayerProto] 체력 시스템 초기화 완료: {_healthComponent.CurrentHealth}/{_healthComponent.MaxHealth}");
     }
 
     private void OnDestroy()
     {
         // 취소 토큰 정리
-        jumpCancellationTokenSource?.Cancel();
-        jumpCancellationTokenSource?.Dispose();
+        _jumpCancellationTokenSource?.Cancel();
+        _jumpCancellationTokenSource?.Dispose();
 
         // 이벤트 구독 해제
-        if (healthComponent != null)
+        if (_healthComponent != null)
         {
-            healthComponent.OnDamaged -= HandleDamaged;
-            healthComponent.OnDeath -= HandleDeath;
+            _healthComponent.OnDamaged -= HandleDamaged;
+            _healthComponent.OnDeath -= HandleDeath;
         }
     }
 
     private void Update()
     {
         // 죽었으면 입력 처리 중지
-        if (isDead) return;
+        if (_isDead) return;
 
-        cooldownManager.UpdateCooldowns();
+        _cooldownManager.UpdateCooldowns();
         
-        if (!isJumping)
+        if (!_isJumping)
         {
             HandleInput();
-            UpdateFacingDirection(moveInput);
+            UpdateFacingDirection(_moveInput);
         }
     }
 
     private void FixedUpdate()
     {
         // 죽었으면 물리 처리 중지
-        if (isDead) return;
+        if (_isDead) return;
 
-        if (isJumping)
+        if (_isJumping)
         {
             return;
         }
-        else if (isDashing)
+        else if (_isDashing)
         {
             UpdateDash();
         }
@@ -123,24 +122,24 @@ public class PlayerProto : BaseEntity
     // ==================== 입력 처리 ====================
     private void HandleInput()
     {
-        moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        _moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-        if (Input.GetKeyDown(KeyCode.Space) && cooldownManager.IsReady("dash"))
+        if (Input.GetKeyDown(KeyCode.Space) && _cooldownManager.IsReady("dash"))
         {
             StartDash();
         }
 
-        if (Input.GetKeyDown(KeyCode.J) && cooldownManager.IsReady("skill1"))
+        if (Input.GetKeyDown(KeyCode.J) && _cooldownManager.IsReady("skill1"))
         {
             CastSkill1();
         }
 
-        if (Input.GetKeyDown(KeyCode.K) && cooldownManager.IsReady("skill2"))
+        if (Input.GetKeyDown(KeyCode.K) && _cooldownManager.IsReady("skill2"))
         {
             CastSkill2();
         }
 
-        if (Input.GetKeyDown(KeyCode.L) && cooldownManager.IsReady("skill3"))
+        if (Input.GetKeyDown(KeyCode.L) && _cooldownManager.IsReady("skill3"))
         {
             CastSkill3Async();
         }
@@ -149,30 +148,30 @@ public class PlayerProto : BaseEntity
     // ==================== 이동 ====================
     private void MovePlayer()
     {
-        Vector2 velocity = moveInput.normalized * moveSpeed;
+        Vector2 velocity = _moveInput.normalized * moveSpeed;
         rb.linearVelocity = velocity;
     }
 
     // ==================== 구르기 (회피) ====================
     private void StartDash()
     {
-        isDashing = true;
-        dashTimer = dashDuration;
-        cooldownManager.StartCooldown("dash");
+        _isDashing = true;
+        _dashTimer = dashDuration;
+        _cooldownManager.StartCooldown("dash");
         
         Debug.Log("구르기!");
     }
 
     private void UpdateDash()
     {
-        dashTimer -= Time.fixedDeltaTime;
+        _dashTimer -= Time.fixedDeltaTime;
         
-        Vector2 dashDirection = moveInput.magnitude > 0 ? moveInput.normalized : lastFacingDirection;
+        Vector2 dashDirection = _moveInput.magnitude > 0 ? _moveInput.normalized : lastFacingDirection;
         rb.linearVelocity = dashDirection * dashSpeed;
 
-        if (dashTimer <= 0)
+        if (_dashTimer <= 0)
         {
-            isDashing = false;
+            _isDashing = false;
             rb.linearVelocity = Vector2.zero;
         }
     }
@@ -180,7 +179,7 @@ public class PlayerProto : BaseEntity
     // ==================== 스킬 ====================
     private void CastSkill1()
     {
-        cooldownManager.StartCooldown("skill1");
+        _cooldownManager.StartCooldown("skill1");
 
         Debug.Log("스킬 1 - 전방 슬래시 공격");
         PerformRangeAttack(lastFacingDirection, range: 3f, radius: 1f, damage: skill1Damage);
@@ -188,7 +187,7 @@ public class PlayerProto : BaseEntity
 
     private void CastSkill2()
     {
-        cooldownManager.StartCooldown("skill2");
+        _cooldownManager.StartCooldown("skill2");
 
         Debug.Log("스킬 2 - 회전 공격");
         PerformSpinAttack(radius: 2.5f, damage: skill2Damage);
@@ -196,14 +195,14 @@ public class PlayerProto : BaseEntity
 
     private async void CastSkill3Async()
     {
-        cooldownManager.StartCooldown("skill3");
+        _cooldownManager.StartCooldown("skill3");
         
         Debug.Log("스킬 3 - 점프 공격");
         
         // 기존 점프 취소
-        jumpCancellationTokenSource?.Cancel();
-        jumpCancellationTokenSource?.Dispose();
-        jumpCancellationTokenSource = new CancellationTokenSource();
+        _jumpCancellationTokenSource?.Cancel();
+        _jumpCancellationTokenSource?.Dispose();
+        _jumpCancellationTokenSource = new System.Threading.CancellationTokenSource();
         
         try
         {
@@ -211,7 +210,7 @@ public class PlayerProto : BaseEntity
                 targetDistance: 4f, 
                 radius: 2f, 
                 damage: skill3Damage,
-                jumpCancellationTokenSource.Token
+                _jumpCancellationTokenSource.Token
             );
         }
         catch (System.OperationCanceledException)
@@ -285,9 +284,9 @@ public class PlayerProto : BaseEntity
     /// <summary>
     /// 전방으로 점프한 뒤 착지 지점에 범위 공격
     /// </summary>
-    private async Awaitable PerformJumpAttackAsync(float targetDistance, float radius, int damage, CancellationToken cancellationToken)
+    private async Awaitable PerformJumpAttackAsync(float targetDistance, float radius, int damage, System.Threading.CancellationToken cancellationToken)
     {
-        isJumping = true;
+        _isJumping = true;
         
         Vector2 startPos = transform.position;
         Vector2 targetPos = startPos + lastFacingDirection * targetDistance;
@@ -349,20 +348,20 @@ public class PlayerProto : BaseEntity
         }
         finally
         {
-            isJumping = false;
+            _isJumping = false;
         }
     }
 
     // ==================== UI 표시용 (옵션) ====================
-    public float GetDashCooldownPercent() => cooldownManager.GetCooldownPercent("dash");
-    public float GetSkill1CooldownPercent() => cooldownManager.GetCooldownPercent("skill1");
-    public float GetSkill2CooldownPercent() => cooldownManager.GetCooldownPercent("skill2");
-    public float GetSkill3CooldownPercent() => cooldownManager.GetCooldownPercent("skill3");
+    public float GetDashCooldownPercent() => _cooldownManager.GetCooldownPercent("dash");
+    public float GetSkill1CooldownPercent() => _cooldownManager.GetCooldownPercent("skill1");
+    public float GetSkill2CooldownPercent() => _cooldownManager.GetCooldownPercent("skill2");
+    public float GetSkill3CooldownPercent() => _cooldownManager.GetCooldownPercent("skill3");
 
     /// <summary>
     /// UI에서 쿨다운 매니저 접근용
     /// </summary>
-    public CooldownManager GetCooldownManager() => cooldownManager;
+    public CooldownManager GetCooldownManager() => _cooldownManager;
 
     // ==================== 체력 이벤트 핸들러 ====================
 
@@ -387,15 +386,15 @@ public class PlayerProto : BaseEntity
     /// </summary>
     private System.Collections.IEnumerator HitFlashEffect()
     {
-        if (spriteRenderer == null) yield break;
+        if (_spriteRenderer == null) yield break;
 
         // 빨간색으로 변경
-        spriteRenderer.color = hitColor;
+        _spriteRenderer.color = hitColor;
 
         yield return new WaitForSeconds(hitFlashDuration);
 
         // 원래 색상으로 복구
-        spriteRenderer.color = originalColor;
+        _spriteRenderer.color = _originalColor;
     }
 
     /// <summary>
@@ -403,9 +402,9 @@ public class PlayerProto : BaseEntity
     /// </summary>
     private void HandleDeath()
     {
-        if (isDead) return; // 중복 호출 방지
+        if (_isDead) return; // 중복 호출 방지
 
-        isDead = true;
+        _isDead = true;
 
         Debug.Log("[PlayerProto] 플레이어 사망!");
 
@@ -424,9 +423,9 @@ public class PlayerProto : BaseEntity
         }
 
         // 사망 시각 효과
-        if (spriteRenderer != null)
+        if (_spriteRenderer != null)
         {
-            spriteRenderer.color = Color.gray;
+            _spriteRenderer.color = Color.gray;
         }
 
         // TODO: 사망 효과 추가
@@ -447,15 +446,15 @@ public class PlayerProto : BaseEntity
         yield return new WaitForSeconds(1f); // 1초 대기
 
         // 페이드 아웃 효과 (선택사항)
-        if (spriteRenderer != null)
+        if (_spriteRenderer != null)
         {
             float fadeTime = 1f;
-            Color startColor = spriteRenderer.color;
+            Color startColor = _spriteRenderer.color;
 
             for (float t = 0; t < fadeTime; t += Time.deltaTime)
             {
                 float alpha = Mathf.Lerp(1f, 0f, t / fadeTime);
-                spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+                _spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
                 yield return null;
             }
         }
@@ -477,7 +476,7 @@ public class PlayerProto : BaseEntity
     /// </summary>
     public int GetCurrentHealth()
     {
-        return healthComponent != null ? healthComponent.CurrentHealth : 0;
+        return _healthComponent != null ? _healthComponent.CurrentHealth : 0;
     }
 
     /// <summary>
@@ -485,7 +484,7 @@ public class PlayerProto : BaseEntity
     /// </summary>
     public int GetMaxHealth()
     {
-        return healthComponent != null ? healthComponent.MaxHealth : maxHealth;
+        return _healthComponent != null ? _healthComponent.MaxHealth : maxHealth;
     }
 
     /// <summary>
@@ -493,9 +492,9 @@ public class PlayerProto : BaseEntity
     /// </summary>
     public void Heal(int amount)
     {
-        if (healthComponent != null && !isDead)
+        if (_healthComponent != null && !_isDead)
         {
-            healthComponent.Heal(amount);
+            _healthComponent.Heal(amount);
             Debug.Log($"[PlayerProto] 체력 회복: +{amount}");
         }
     }

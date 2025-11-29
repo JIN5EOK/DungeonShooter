@@ -7,8 +7,8 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class GameSession : MonoSingleton<GameSession>
 {
-    [SerializeField] private CoinInventory coinInventory;
-    public CoinInventory CoinInventory => coinInventory;
+    [SerializeField] private CoinInventory _coinInventory;
+    public CoinInventory CoinInventory => _coinInventory;
 
     protected override void Awake()
     {
@@ -18,12 +18,12 @@ public class GameSession : MonoSingleton<GameSession>
         if (Instance != this)
             return;
 
-        if (coinInventory == null)
+        if (_coinInventory == null)
         {
-            coinInventory = GetComponent<CoinInventory>();
-            if (coinInventory == null)
+            _coinInventory = GetComponent<CoinInventory>();
+            if (_coinInventory == null)
             {
-                coinInventory = gameObject.AddComponent<CoinInventory>();
+                _coinInventory = gameObject.AddComponent<CoinInventory>();
             }
         }
     }

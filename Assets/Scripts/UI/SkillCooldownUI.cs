@@ -22,16 +22,17 @@ public class SkillCooldownUI : MonoBehaviour
     [SerializeField] private float pulseSpeed = 3f;
     [SerializeField] private float pulseIntensity = 0.2f;
 
-    private string skillCooldownKey;
-    private string skillDisplayName;
-    private bool isReady = true;
+    private string _skillCooldownKey;
+    private string _skillDisplayName;
+    private bool _isReady = true;
 
     /// <summary>
     /// 스킬 UI 초기화
     /// </summary>
     public void Initialize(string cooldownKey, string displayName)
     {
-        skillCooldownKey = cooldownKey;
+        _skillCooldownKey = cooldownKey;
+        _skillDisplayName = displayName;
 
         // 초기 상태는 준비 완료
         SetReadyState();
@@ -42,29 +43,29 @@ public class SkillCooldownUI : MonoBehaviour
     /// </summary>
     public void UpdateCooldown(CooldownManager cooldownManager)
     {
-        if (cooldownManager == null || string.IsNullOrEmpty(skillCooldownKey))
+        if (cooldownManager == null || string.IsNullOrEmpty(_skillCooldownKey))
         {
-            Debug.LogWarning($"[SkillCooldownUI] UpdateCooldown 실패: cooldownManager={cooldownManager != null}, key='{skillCooldownKey}'");
+            Debug.LogWarning($"[SkillCooldownUI] UpdateCooldown 실패: cooldownManager={cooldownManager != null}, key='{_skillCooldownKey}'");
             return;
         }
 
-        bool skillReady = cooldownManager.IsReady(skillCooldownKey);
-        float remainingTime = cooldownManager.GetRemainingCooldown(skillCooldownKey);
-        float totalCooldown = cooldownManager.GetTotalCooldown(skillCooldownKey);
+        bool skillReady = cooldownManager.IsReady(_skillCooldownKey);
+        float remainingTime = cooldownManager.GetRemainingCooldown(_skillCooldownKey);
+        float totalCooldown = cooldownManager.GetTotalCooldown(_skillCooldownKey);
 
         // 디버그 로그 (쿨다운 중일 때만)
         if (!skillReady)
         {
-            Debug.Log($"[SkillCooldownUI] {skillCooldownKey}: {remainingTime:F1}s / {totalCooldown:F1}s");
+            Debug.Log($"[SkillCooldownUI] {_skillCooldownKey}: {remainingTime:F1}s / {totalCooldown:F1}s");
         }
 
         if (skillReady)
         {
-            if (!isReady) SetReadyState();
+            if (!_isReady) SetReadyState();
         }
         else
         {
-            if (isReady) SetCooldownState();
+            if (_isReady) SetCooldownState();
             UpdateCooldownProgress(remainingTime, totalCooldown);
         }
     }
@@ -72,7 +73,7 @@ public class SkillCooldownUI : MonoBehaviour
     private void Update()
     {
         // 준비 상태에서 펄스 효과
-        if (isReady && enableReadyPulse && skillIcon != null)
+        if (_isReady && enableReadyPulse && skillIcon != null)
         {
             float pulse = 1f + pulseIntensity * Mathf.Sin(Time.time * pulseSpeed);
             skillIcon.color = readyColor * pulse;
@@ -84,7 +85,7 @@ public class SkillCooldownUI : MonoBehaviour
     /// </summary>
     private void SetReadyState()
     {
-        isReady = true;
+        _isReady = true;
 
         if (skillIcon != null)
         {
@@ -109,7 +110,7 @@ public class SkillCooldownUI : MonoBehaviour
     /// </summary>
     private void SetCooldownState()
     {
-        isReady = false;
+        _isReady = false;
 
         if (skillIcon != null)
         {

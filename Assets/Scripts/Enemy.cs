@@ -42,49 +42,49 @@ public class Enemy : BaseEntity
     [Tooltip("코인 드롭 위치 오프셋 범위")]
     [SerializeField] private float coinDropRadius = 1f;
 
-    private Transform playerTransform;
-    private CooldownManager cooldownManager;
-    private HealthComponent healthComponent;
-    private SpriteRenderer spriteRenderer;
-    private Color originalColor;
+    private Transform _playerTransform;
+    private CooldownManager _cooldownManager;
+    private HealthComponent _healthComponent;
+    private SpriteRenderer _spriteRenderer;
+    private Color _originalColor;
 
     // AI 상태
-    private EnemyState currentState = EnemyState.Idle;
-    private Vector2 patrolStartPos;
-    private Vector2 patrolTargetPos;
-    private bool isPatrolling;
-    private float idleTimer;
+    private EnemyState _currentState = EnemyState.Idle;
+    private Vector2 _patrolStartPos;
+    private Vector2 _patrolTargetPos;
+    private bool _isPatrolling;
+    private float _idleTimer;
 
     // 피격 관련
-    private bool isStunned;
-    private Vector2 knockbackDirection;
+    private bool _isStunned;
+    private Vector2 _knockbackDirection;
 
     protected override void Start()
     {
         base.Start();
-        playerTransform = FindFirstObjectByType<PlayerProto>().transform;
+        _playerTransform = FindFirstObjectByType<PlayerProto>().transform;
 
-        cooldownManager = new CooldownManager();
-        cooldownManager.RegisterCooldown("attack", attackCooldown);
-        cooldownManager.RegisterCooldown("hitStun", hitStunDuration);
+        _cooldownManager = new CooldownManager();
+        _cooldownManager.RegisterCooldown("attack", attackCooldown);
+        _cooldownManager.RegisterCooldown("hitStun", hitStunDuration);
 
         // SpriteRenderer 초기화
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null)
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        if (_spriteRenderer != null)
         {
-            originalColor = spriteRenderer.color;
+            _originalColor = _spriteRenderer.color;
         }
 
         // 순찰 초기화
-        patrolStartPos = transform.position;
+        _patrolStartPos = transform.position;
         SetNewPatrolTarget();
 
         // HealthComponent 찾기 및 이벤트 구독
-        healthComponent = GetComponent<HealthComponent>();
-        if (healthComponent != null)
+        _healthComponent = GetComponent<HealthComponent>();
+        if (_healthComponent != null)
         {
-            healthComponent.OnDeath += HandleDeath;
-            healthComponent.OnDamaged += HandleDamaged;
+            _healthComponent.OnDeath += HandleDeath;
+            _healthComponent.OnDamaged += HandleDamaged;
         }
         else
         {
@@ -95,38 +95,38 @@ public class Enemy : BaseEntity
     private void OnDestroy()
     {
         // 이벤트 구독 해제
-        if (healthComponent != null)
+        if (_healthComponent != null)
         {
-            healthComponent.OnDeath -= HandleDeath;
-            healthComponent.OnDamaged -= HandleDamaged;
+            _healthComponent.OnDeath -= HandleDeath;
+            _healthComponent.OnDamaged -= HandleDamaged;
         }
     }
 
     private void Update()
     {
         // 죽었으면 AI 중지
-        if (currentState == EnemyState.Dead) return;
+        if (_currentState == EnemyState.Dead) return;
 
-        cooldownManager.UpdateCooldowns();
+        _cooldownManager.UpdateCooldowns();
         UpdateAI();
     }
 
     private void UpdateAI()
     {
         // 스턴 상태 확인
-        if (isStunned && cooldownManager.IsReady("hitStun"))
+        if (_isStunned && _cooldownManager.IsReady("hitStun"))
         {
-            isStunned = false;
-            currentState = EnemyState.Idle;
+            _isStunned = false;
+            _currentState = EnemyState.Idle;
         }
 
         // 스턴 중이면 AI 중지
-        if (isStunned) return;
+        if (_isStunned) return;
 
         // 플레이어 감지
         bool playerDetected = IsPlayerInRange(detectionRange);
 
-        switch (currentState)
+        switch (_currentState)
         {
             case EnemyState.Idle:
                 HandleIdleState(playerDetected);
@@ -139,9 +139,9 @@ public class Enemy : BaseEntity
                 break;
             case EnemyState.Hit:
                 // 피격 후 잠시 대기
-                if (cooldownManager.IsReady("hitStun"))
+                if (_cooldownManager.IsReady("hitStun"))
                 {
-                    currentState = playerDetected ? EnemyState.Chase : EnemyState.Idle;
+                    _currentState = playerDetected ? EnemyState.Chase : EnemyState.Idle;
                 }
                 break;
         }
@@ -150,30 +150,30 @@ public class Enemy : BaseEntity
     private void FixedUpdate()
     {
         // 죽었으면 움직임 중지
-        if (currentState == EnemyState.Dead)
+        if (_currentState == EnemyState.Dead)
         {
             rb.linearVelocity = Vector2.zero;
             return;
         }
 
         // 넉백 처리
-        if (isStunned)
+        if (_isStunned)
         {
             rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, Vector2.zero, Time.fixedDeltaTime * 5f);
             return;
         }
 
         // 상태별 움직임
-        switch (currentState)
+        switch (_currentState)
         {
             case EnemyState.Idle:
                 rb.linearVelocity = Vector2.zero;
                 break;
             case EnemyState.Patrol:
-                MoveTowardsTarget(patrolTargetPos, patrolSpeed);
+                MoveTowardsTarget(_patrolTargetPos, patrolSpeed);
                 break;
             case EnemyState.Chase:
-                if (playerTransform != null)
+                if (_playerTransform != null)
                     MoveTowardsPlayer();
                 break;
             case EnemyState.Hit:
@@ -190,15 +190,15 @@ public class Enemy : BaseEntity
     {
         if (playerDetected)
         {
-            currentState = EnemyState.Chase;
+            _currentState = EnemyState.Chase;
             return;
         }
 
-        idleTimer += Time.deltaTime;
-        if (idleTimer >= idleTime)
+        _idleTimer += Time.deltaTime;
+        if (_idleTimer >= idleTime)
         {
-            idleTimer = 0f;
-            currentState = EnemyState.Patrol;
+            _idleTimer = 0f;
+            _currentState = EnemyState.Patrol;
             SetNewPatrolTarget();
         }
     }
@@ -207,15 +207,15 @@ public class Enemy : BaseEntity
     {
         if (playerDetected)
         {
-            currentState = EnemyState.Chase;
+            _currentState = EnemyState.Chase;
             return;
         }
 
         // 목표 지점에 도달했는지 확인
-        if (Vector2.Distance(transform.position, patrolTargetPos) < 0.5f)
+        if (Vector2.Distance(transform.position, _patrolTargetPos) < 0.5f)
         {
-            currentState = EnemyState.Idle;
-            idleTimer = 0f;
+            _currentState = EnemyState.Idle;
+            _idleTimer = 0f;
         }
     }
 
@@ -223,13 +223,13 @@ public class Enemy : BaseEntity
     {
         if (!playerDetected)
         {
-            currentState = EnemyState.Idle;
+            _currentState = EnemyState.Idle;
             return;
         }
 
         // 공격 범위 내인지 확인
-        float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
-        if (distanceToPlayer <= attackRange && cooldownManager.IsReady("attack"))
+        float distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
+        if (distanceToPlayer <= attackRange && _cooldownManager.IsReady("attack"))
         {
             AttackPlayer();
         }
@@ -238,7 +238,7 @@ public class Enemy : BaseEntity
     // ==================== 움직임 ====================
     private void MoveTowardsPlayer()
     {
-        Vector2 directionToPlayer = (playerTransform.position - transform.position).normalized;
+        Vector2 directionToPlayer = (_playerTransform.position - transform.position).normalized;
         UpdateFacingDirection(directionToPlayer);
         rb.linearVelocity = directionToPlayer * moveSpeed;
     }
@@ -253,27 +253,27 @@ public class Enemy : BaseEntity
     // ==================== 유틸리티 ====================
     private bool IsPlayerInRange(float range)
     {
-        if (playerTransform == null) return false;
-        return Vector2.Distance(transform.position, playerTransform.position) <= range;
+        if (_playerTransform == null) return false;
+        return Vector2.Distance(transform.position, _playerTransform.position) <= range;
     }
 
     private void SetNewPatrolTarget()
     {
         Vector2 randomDirection = Random.insideUnitCircle.normalized;
-        patrolTargetPos = patrolStartPos + randomDirection * patrolRange;
+        _patrolTargetPos = _patrolStartPos + randomDirection * patrolRange;
     }
 
     // ==================== 공격 ====================
     private void AttackPlayer()
     {
-        cooldownManager.StartCooldown("attack");
+        _cooldownManager.StartCooldown("attack");
 
         Debug.Log($"적이 플레이어를 공격! 데미지: {attackDamage}");
 
         // 플레이어에게 데미지 주기
-        if (playerTransform != null)
+        if (_playerTransform != null)
         {
-            HealthComponent playerHealth = playerTransform.GetComponent<HealthComponent>();
+            HealthComponent playerHealth = _playerTransform.GetComponent<HealthComponent>();
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(attackDamage);
@@ -285,10 +285,10 @@ public class Enemy : BaseEntity
     }
 
     // ==================== 검사용 함수 ====================
-    public bool IsChasing => currentState == EnemyState.Chase;
-    public bool IsDead => currentState == EnemyState.Dead;
-    public bool IsStunned => isStunned;
-    public EnemyState GetCurrentState() => currentState;
+    public bool IsChasing => _currentState == EnemyState.Chase;
+    public bool IsDead => _currentState == EnemyState.Dead;
+    public bool IsStunned => _isStunned;
+    public EnemyState GetCurrentState() => _currentState;
     public float GetDetectionRange() => detectionRange;
     public float GetAttackRange() => attackRange;
 
@@ -305,14 +305,14 @@ public class Enemy : BaseEntity
 
         // 순찰 범위
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(patrolStartPos, patrolRange);
+        Gizmos.DrawWireSphere(_patrolStartPos, patrolRange);
 
         // 순찰 목표 지점
         if (Application.isPlaying)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(patrolTargetPos, 0.5f);
-            Gizmos.DrawLine(transform.position, patrolTargetPos);
+            Gizmos.DrawWireSphere(_patrolTargetPos, 0.5f);
+            Gizmos.DrawLine(transform.position, _patrolTargetPos);
         }
     }
 
@@ -359,15 +359,15 @@ public class Enemy : BaseEntity
         Debug.Log($"[{gameObject.name}] 피격! 데미지: {damage}, 남은 HP: {remainingHealth}");
 
         // 상태 변경
-        currentState = EnemyState.Hit;
-        isStunned = true;
-        cooldownManager.StartCooldown("hitStun");
+        _currentState = EnemyState.Hit;
+        _isStunned = true;
+        _cooldownManager.StartCooldown("hitStun");
 
         // 넉백 적용
-        if (playerTransform != null)
+        if (_playerTransform != null)
         {
-            knockbackDirection = ((Vector2)transform.position - (Vector2)playerTransform.position).normalized;
-            rb.linearVelocity = knockbackDirection * knockbackForce;
+            _knockbackDirection = ((Vector2)transform.position - (Vector2)_playerTransform.position).normalized;
+            rb.linearVelocity = _knockbackDirection * knockbackForce;
         }
 
         // 시각적 피드백
@@ -383,15 +383,15 @@ public class Enemy : BaseEntity
     /// </summary>
     private System.Collections.IEnumerator HitFlashEffect()
     {
-        if (spriteRenderer == null) yield break;
+        if (_spriteRenderer == null) yield break;
 
         // 빨간색으로 변경
-        spriteRenderer.color = hitColor;
+        _spriteRenderer.color = hitColor;
 
         yield return new WaitForSeconds(hitFlashDuration);
 
         // 원래 색상으로 복구
-        spriteRenderer.color = originalColor;
+        _spriteRenderer.color = _originalColor;
     }
 
     /// <summary>
@@ -399,9 +399,9 @@ public class Enemy : BaseEntity
     /// </summary>
     private void HandleDeath()
     {
-        if (currentState == EnemyState.Dead) return; // 중복 호출 방지
+        if (_currentState == EnemyState.Dead) return; // 중복 호출 방지
 
-        currentState = EnemyState.Dead;
+        _currentState = EnemyState.Dead;
 
         Debug.Log($"[{gameObject.name}] 사망!");
 
@@ -416,9 +416,9 @@ public class Enemy : BaseEntity
         }
 
         // 사망 시각 효과
-        if (spriteRenderer != null)
+        if (_spriteRenderer != null)
         {
-            spriteRenderer.color = Color.gray;
+            _spriteRenderer.color = Color.gray;
         }
 
         // 즉시 비활성화 옵션
