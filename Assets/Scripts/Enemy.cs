@@ -32,6 +32,16 @@ public class Enemy : BaseEntity
     [SerializeField] private float deathDelay = 1f;
     [SerializeField] private bool disableOnDeath = true;
 
+    [Header("코인 드롭 설정")]
+    [Tooltip("사망 시 드롭할 코인 프리팹")]
+    [SerializeField] private CoinPickup coinPickupPrefab;
+    [Tooltip("코인 드롭 확률 (0~1)")]
+    [SerializeField, Range(0f, 1f)] private float coinDropChance = 1f;
+    [Tooltip("드롭할 코인 개수 범위")]
+    [SerializeField] private Vector2Int coinDropRange = new Vector2Int(1, 3);
+    [Tooltip("코인 드롭 위치 오프셋 범위")]
+    [SerializeField] private float coinDropRadius = 1f;
+
     private Transform playerTransform;
     private CooldownManager cooldownManager;
     private HealthComponent healthComponent;
@@ -306,6 +316,39 @@ public class Enemy : BaseEntity
         }
     }
 
+    // ==================== 코인 드롭 ====================
+
+    /// <summary>
+    /// 사망 시 코인을 드롭한다.
+    /// </summary>
+    private void DropCoins()
+    {
+        if (coinPickupPrefab == null)
+        {
+            Debug.LogWarning($"[{gameObject.name}] 코인 프리팹이 설정되지 않아 코인을 드롭하지 않습니다.");
+            return;
+        }
+
+        // 드롭 확률 체크
+        if (Random.value > coinDropChance)
+            return;
+
+        // 드롭할 코인 개수 결정
+        int coinCount = Random.Range(coinDropRange.x, coinDropRange.y + 1);
+
+        // 코인 생성
+        for (int i = 0; i < coinCount; i++)
+        {
+            // 랜덤 위치 계산 (적 위치 주변)
+            Vector2 randomOffset = Random.insideUnitCircle * coinDropRadius;
+            Vector3 dropPosition = transform.position + (Vector3)randomOffset;
+
+            // 코인 인스턴스 생성
+            CoinPickup coin = Instantiate(coinPickupPrefab, dropPosition, Quaternion.identity);
+            Debug.Log($"[{gameObject.name}] 코인 {coinCount}개 드롭!");
+        }
+    }
+
     // ==================== HP 이벤트 핸들러 ====================
 
     /// <summary>
@@ -384,11 +427,13 @@ public class Enemy : BaseEntity
             enabled = false; // MonoBehaviour만 비활성화
         }
 
+        // 코인 드롭
+        DropCoins();
+
         // TODO: 사망 효과 추가
         // - 사망 애니메이션
         // - 사망 사운드
         // - 파티클 이펙트
-        // - 아이템 드롭
 
         // 일정 시간 후 파괴
         Destroy(gameObject, deathDelay);

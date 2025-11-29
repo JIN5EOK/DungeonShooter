@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8223576401328736019
+--- !u!1 &3672217455587223011
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,40 +8,39 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8000194227001901989}
-  - component: {fileID: 5214938083091541001}
-  - component: {fileID: 6682134852837990247}
-  - component: {fileID: 8480333223885060921}
-  - component: {fileID: -4710752342727833568}
+  - component: {fileID: 8358400642655926512}
+  - component: {fileID: 802681987398771577}
+  - component: {fileID: 5619935406539445390}
+  - component: {fileID: 7620543341717877857}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: Coin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8000194227001901989
+--- !u!4 &8358400642655926512
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8223576401328736019}
+  m_GameObject: {fileID: 3672217455587223011}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.46, y: 0.59, z: 0}
+  m_LocalPosition: {x: 1.84, y: 0.75, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &5214938083091541001
+--- !u!212 &802681987398771577
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8223576401328736019}
+  m_GameObject: {fileID: 3672217455587223011}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -78,25 +77,25 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 5998d8e5a080241409d1ec89d5591acd, type: 3}
+  m_SortingOrder: 3
+  m_Sprite: {fileID: -3338749442709606003, guid: c7d1e830286f941c482fd392efbc7fa3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.2, y: 0.2}
+  m_Size: {x: 12, y: 12.38}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &6682134852837990247
-BoxCollider2D:
+--- !u!58 &5619935406539445390
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8223576401328736019}
+  m_GameObject: {fileID: 3672217455587223011}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -120,76 +119,25 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.78125, y: 0.78125}
-    newSize: {x: 0.2, y: 0.2}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 0.78125, y: 0.78125}
-  m_EdgeRadius: 0
---- !u!114 &8480333223885060921
+  m_Radius: 0.5
+--- !u!114 &7620543341717877857
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8223576401328736019}
+  m_GameObject: {fileID: 3672217455587223011}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a144fb34abb7f4440a6be9192bd1a98e, type: 3}
+  m_Script: {fileID: 11500000, guid: d38619782fa1041b3b634af31f0742a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
-  detectionRange: 10
-  attackRange: 1.5
-  attackCooldown: 1.5
-  attackDamage: 10
-  patrolRange: 5
-  patrolSpeed: 2
-  idleTime: 2
-  hitStunDuration: 0.5
-  knockbackForce: 3
-  hitColor: {r: 1, g: 0, b: 0, a: 1}
-  hitFlashDuration: 0.2
-  deathDelay: 1
-  disableOnDeath: 1
-  coinPickupPrefab: {fileID: 7620543341717877857, guid: 589385c9813ba42d5b046860959c8366, type: 3}
-  coinDropChance: 1
-  coinDropRange: {x: 1, y: 3}
-  coinDropRadius: 1
---- !u!50 &-4710752342727833568
-Rigidbody2D:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8223576401328736019}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
+  destroyDelay: 0.05
+  coinValue: 1
+  spriteRenderer: {fileID: 0}
+  collectEffect: {fileID: 0}
