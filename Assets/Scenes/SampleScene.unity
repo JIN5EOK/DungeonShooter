@@ -590,6 +590,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destroyDelay: 0.05
+  coinValue: 1
   spriteRenderer: {fileID: 0}
   collectEffect: {fileID: 0}
 --- !u!58 &522612798
@@ -672,12 +673,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
-  m_Sprite: {fileID: -9122695006515159614, guid: 10943df5942ab4863830f3abf811abc6, type: 3}
+  m_Sprite: {fileID: -3338749442709606003, guid: c7d1e830286f941c482fd392efbc7fa3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 12, y: 12.38}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -3611,6 +3612,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 3073406401155221875, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 3169616247159687271, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -3674,7 +3679,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 20
   startWithFullHealth: 1
   currentHealth: 0
 --- !u!1001 &7563225022945081209
