@@ -46,7 +46,8 @@
     "com.jin5eok.jin5eokframework": "file:JIN5EOK_Unity_Framework/Assets/JIN5EOK",
     "com.unity.addressables": "2.7.6",
     "com.coplaydev.unity-mcp": "8.0.0",
-    "com.boxqkrtm.ide.cursor": "2.0.27"
+    "com.boxqkrtm.ide.cursor": "2.0.27",
+    "jp.hadashikick.vcontainer": "1.17.0"
   },
   "scopedRegistries": [
     {
@@ -54,7 +55,8 @@
       "url": "https://package.openupm.com",
       "scopes": [
         "com.boxqkrtm.ide.cursor",
-        "com.coplaydev.unity-mcp"
+        "com.coplaydev.unity-mcp",
+        "jp.hadashikick.vcontainer"
       ]
     }
   ]
