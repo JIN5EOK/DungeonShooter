@@ -43,7 +43,7 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0",
-    "com.jin5eok.jin5eokframework": "file:JIN5EOK_Unity_Framework/Assets/JIN5EOK",
+    "com.jin5eok.jin5eoklibrary": "file:JIN5EOK_Unity_Library/Assets/JIN5EOK",
     "com.unity.addressables": "2.7.6",
     "com.coplaydev.unity-mcp": "8.0.0",
     "com.boxqkrtm.ide.cursor": "2.0.27",
