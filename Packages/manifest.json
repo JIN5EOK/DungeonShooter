@@ -1,5 +1,9 @@
 {
   "dependencies": {
+    "com.boxqkrtm.ide.cursor": "2.0.27",
+    "com.coplaydev.unity-mcp": "8.0.0",
+    "com.jin5eok.jin5eoklibrary": "https://github.com/JIN5EOK/JIN5EOK_Unity_Library.git?path=Assets/JIN5EOK#main",
+    "com.unity.addressables": "2.7.6",
     "com.unity.collab-proxy": "2.10.0",
     "com.unity.feature.2d": "2.0.1",
     "com.unity.ide.rider": "3.0.38",
@@ -11,6 +15,7 @@
     "com.unity.timeline": "1.8.9",
     "com.unity.ugui": "2.0.0",
     "com.unity.visualscripting": "1.9.7",
+    "jp.hadashikick.vcontainer": "1.17.0",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
@@ -42,12 +47,7 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0",
-    "com.jin5eok.jin5eoklibrary": "file:JIN5EOK_Unity_Library/Assets/JIN5EOK",
-    "com.unity.addressables": "2.7.6",
-    "com.coplaydev.unity-mcp": "8.0.0",
-    "com.boxqkrtm.ide.cursor": "2.0.27",
-    "jp.hadashikick.vcontainer": "1.17.0"
+    "com.unity.modules.xr": "1.0.0"
   },
   "scopedRegistries": [
     {
