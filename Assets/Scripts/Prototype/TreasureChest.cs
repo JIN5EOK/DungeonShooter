@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
-
+using DungeonShooter;
 /// <summary>
 /// 보물상자. 플레이어가 가까이 다가가서 상호작용 키를 누르면 열리고 보상을 지급합니다.
 /// </summary>

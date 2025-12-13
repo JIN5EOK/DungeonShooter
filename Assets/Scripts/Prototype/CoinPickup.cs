@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-
+using DungeonShooter;
 /// <summary>
 /// 플레이어가 접촉하면 코인이 흡수되어 사라지는 단순 수집 오브젝트.
 /// 실제 보상 처리(골드 증가 등)는 플레이어 측에서 OnCollected 이벤트를 구독해 구현한다.

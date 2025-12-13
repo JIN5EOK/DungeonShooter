@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-
+using DungeonShooter;
 public class PlayerProto : BaseEntity
 {
     private Vector2 _moveInput;

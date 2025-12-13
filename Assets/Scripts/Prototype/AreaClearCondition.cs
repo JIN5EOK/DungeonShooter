@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-
+using DungeonShooter;
 /// <summary>
 /// 구역 클리어 조건을 체크하는 컴포넌트.
 /// 조건이 만족되면 연결된 AreaGate에 알림을 보냅니다.

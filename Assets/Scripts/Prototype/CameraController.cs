@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using DungeonShooter;
 /// <summary>
 /// 카메라 추적 시스템
 /// 플레이어나 다른 대상을 자연스럽게 따라다니거나, 원하는 위치로 이동할 수 있습니다.
