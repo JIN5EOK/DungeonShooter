@@ -162,7 +162,9 @@ MonoBehaviour:
   hitFlashDuration: 0.2
   deathDelay: 1
   disableOnDeath: 1
-  coinPickupPrefab: {fileID: 7620543341717877857, guid: 589385c9813ba42d5b046860959c8366, type: 3}
+  showAttackRange: 1
+  attackRangeVisualizer: {fileID: 0}
+  coinPickupPrefab: {fileID: 0}
   coinDropChance: 1
   coinDropRange: {x: 1, y: 3}
   coinDropRadius: 1

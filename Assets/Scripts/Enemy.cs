@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using DungeonShooter;
+using VContainer;
 
 public enum EnemyState
 {
@@ -38,8 +40,7 @@ public class Enemy : BaseEntity
     [SerializeField] private AttackRangeVisualizer attackRangeVisualizer;
 
     [Header("코인 드롭 설정")]
-    [Tooltip("사망 시 드롭할 코인 프리팹")]
-    [SerializeField] private CoinPickup coinPickupPrefab;
+    
     [Tooltip("코인 드롭 확률 (0~1)")]
     [SerializeField, Range(0f, 1f)] private float coinDropChance = 1f;
     [Tooltip("드롭할 코인 개수 범위")]
@@ -64,6 +65,14 @@ public class Enemy : BaseEntity
     private bool _isStunned;
     private Vector2 _knockbackDirection;
 
+    private EntityFactory _entityFactory;
+
+    [Inject]
+    private void Construct(EntityFactory entityFactory)
+    {
+        _entityFactory = entityFactory;
+    }
+    
     protected override void Start()
     {
         base.Start();
@@ -357,8 +366,10 @@ public class Enemy : BaseEntity
     /// <summary>
     /// 사망 시 코인을 드롭한다.
     /// </summary>
-    private void DropCoins()
+    private async Awaitable DropCoins()
     {
+        var coinPickup = await _entityFactory.Create(EntityKey.Coin);
+        var coinPickupPrefab = coinPickup.GetComponent<CoinPickup>();
         if (coinPickupPrefab == null)
         {
             Debug.LogWarning($"[{gameObject.name}] 코인 프리팹이 설정되지 않아 코인을 드롭하지 않습니다.");
@@ -430,10 +441,15 @@ public class Enemy : BaseEntity
         _spriteRenderer.color = _originalColor;
     }
 
+    private void HandleDeath()
+    {
+        _ = HandleDeathAsync();
+    }
+    
     /// <summary>
     /// 사망 처리
     /// </summary>
-    private void HandleDeath()
+    private async Awaitable HandleDeathAsync()
     {
         if (_currentState == EnemyState.Dead) return; // 중복 호출 방지
 
@@ -464,7 +480,7 @@ public class Enemy : BaseEntity
         }
 
         // 코인 드롭
-        DropCoins();
+        await DropCoins();
 
         // TODO: 사망 효과 추가
         // - 사망 애니메이션
