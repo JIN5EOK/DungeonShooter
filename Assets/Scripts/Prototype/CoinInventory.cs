@@ -5,7 +5,7 @@ using UnityEngine;
 /// 플레이어(또는 다른 소유자)의 코인/골드 보유량을 관리한다.
 /// </summary>
 [DisallowMultipleComponent]
-public class CoinInventory : MonoBehaviour
+public class CoinInventory 
 {
     [SerializeField, Min(0)]
     private int startingCoins = 0;

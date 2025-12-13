@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using DungeonShooter;
+using VContainer;
 /// <summary>
 /// 보물상자. 플레이어가 가까이 다가가서 상호작용 키를 누르면 열리고 보상을 지급합니다.
 /// </summary>
@@ -43,6 +44,7 @@ public class TreasureChest : MonoBehaviour, IInteractable
     private SpriteRenderer _spriteRenderer;
     private bool _isOpen = false;
     private bool _playerInRange = false;
+    private CoinInventory _coinInventory;
 
     /// <summary>
     /// 상자가 열렸을 때 발생하는 이벤트
@@ -71,6 +73,12 @@ public class TreasureChest : MonoBehaviour, IInteractable
         {
             interactionPrompt.SetActive(false);
         }
+    }
+
+    [Inject]
+    public void Construct(CoinInventory coinInventory)
+    {
+        _coinInventory = coinInventory;
     }
 
 
@@ -203,18 +211,17 @@ public class TreasureChest : MonoBehaviour, IInteractable
         else
         {
             // 직접 지급
-            GameSession session = GameSession.Instance;
-            if (session?.CoinInventory != null)
+            if (_coinInventory != null)
             {
-                session.CoinInventory.AddCoins(coinReward);
+                _coinInventory.AddCoins(coinReward);
                 if (showDebugInfo)
                 {
-                    Debug.Log($"[TreasureChest] {gameObject.name}: 코인 {coinReward}개를 지급했습니다. 총 {session.CoinInventory.CurrentCoins}개");
+                    Debug.Log($"[TreasureChest] {gameObject.name}: 코인 {coinReward}개를 지급했습니다. 총 {_coinInventory.CurrentCoins}개");
                 }
             }
             else
             {
-                Debug.LogWarning($"[TreasureChest] {gameObject.name}: GameSession 또는 CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
+                Debug.LogWarning($"[TreasureChest] {gameObject.name}: CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
             }
         }
     }

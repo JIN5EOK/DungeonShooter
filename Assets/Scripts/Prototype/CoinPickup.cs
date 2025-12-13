@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using DungeonShooter;
+using VContainer;
+
 /// <summary>
 /// 플레이어가 접촉하면 코인이 흡수되어 사라지는 단순 수집 오브젝트.
 /// 실제 보상 처리(골드 증가 등)는 플레이어 측에서 OnCollected 이벤트를 구독해 구현한다.
@@ -21,6 +23,7 @@ public class CoinPickup : MonoBehaviour
     [Tooltip("흡수 시 재생할 파티클 (선택 사항)")]
     [SerializeField] private ParticleSystem collectEffect;
 
+    private CoinInventory _coinInventory;
     /// <summary>
     /// 플레이어가 코인을 획득했을 때 알리는 이벤트. 
     /// PlayerProto 또는 플레이어 루트 GameObject를 전달한다.
@@ -29,7 +32,7 @@ public class CoinPickup : MonoBehaviour
 
     private Collider2D _coinCollider;
     private bool _collected;
-
+    
     private void Awake()
     {
         _coinCollider = GetComponent<Collider2D>();
@@ -42,6 +45,12 @@ public class CoinPickup : MonoBehaviour
         }
     }
 
+    [Inject]
+    public void Construct(CoinInventory coinInventory)
+    {
+        _coinInventory = coinInventory;
+    }
+    
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (_collected)
@@ -78,15 +87,14 @@ public class CoinPickup : MonoBehaviour
 
     private void RewardPlayer(GameObject player)
     {
-        GameSession session = GameSession.Instance;
-        if (session?.CoinInventory == null)
+        if (_coinInventory == null)
         {
-            Debug.LogWarning("[CoinPickup] GameSession 또는 CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
+            Debug.LogWarning("[CoinPickup] CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
             return;
         }
 
-        session.CoinInventory.AddCoins(coinValue);
-        Debug.Log($"[CoinPickup] {player.name}이(가) 코인 {coinValue}개 획득! 총 {session.CoinInventory.CurrentCoins}");
+        _coinInventory.AddCoins(coinValue);
+        Debug.Log($"[CoinPickup] {player.name}이(가) 코인 {coinValue}개 획득! 총 {_coinInventory.CurrentCoins}");
     }
 }
 
