@@ -13,7 +13,7 @@ public enum EnemyState
     Dead
 }
 
-public class Enemy : BaseEntity
+public class Enemy : EntityBase
 {
     [Header("AI 설정")]
     [SerializeField] private float detectionRange = 10f;

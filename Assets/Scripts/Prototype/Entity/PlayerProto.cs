@@ -2,17 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using DungeonShooter;
-public class PlayerProto : BaseEntity
+public class PlayerProto : EntityBase
 {
-    private Vector2 _moveInput;
     private InputManager _inputManager;
 
     [Header("구르기(회피)")]
     [SerializeField] private float dashSpeed = 15f;
     [SerializeField] private float dashDuration = 0.3f;
     [SerializeField] private float dashCooldown = 0.8f;
-    private bool _isDashing;
-    private float _dashTimer;
 
     [Header("스킬")]
     [SerializeField] private float skill1Cooldown = 2f;
@@ -49,6 +46,9 @@ public class PlayerProto : BaseEntity
     private System.Threading.CancellationTokenSource _jumpCancellationTokenSource;
     private HashSet<IInteractable> _nearbyInteractables = new HashSet<IInteractable>();
 
+    private MovementComponent _movementComponent;
+    private DashComponent _dashComponent;
+
     [Inject]
     private void Construct(InputManager inputManager)
     {
@@ -67,12 +67,20 @@ public class PlayerProto : BaseEntity
         _cooldownManager.RegisterCooldown("skill2", skill2Cooldown);
         _cooldownManager.RegisterCooldown("skill3", skill3Cooldown);
 
+        // 분리된 동작 컴포넌트들 초기화
+        _movementComponent = GetComponent<MovementComponent>();
+        _movementComponent = _movementComponent ?? gameObject.AddComponent<MovementComponent>();
+    
+        _movementComponent.SetMoveSpeed(moveSpeed);
+
+        _dashComponent = GetComponent<DashComponent>();
+        _dashComponent = _dashComponent ?? gameObject.AddComponent<DashComponent>();
+        
+        _dashComponent.Initialize(_cooldownManager);
+
         // 체력 컴포넌트 초기화
         _healthComponent = GetComponent<HealthComponent>();
-        if (_healthComponent == null)
-        {
-            _healthComponent = gameObject.AddComponent<HealthComponent>();
-        }
+        _healthComponent = _healthComponent ?? gameObject.AddComponent<HealthComponent>();
 
         // maxHealth 설정
         _healthComponent.SetMaxHealth(maxHealth, true); // healToFull = true로 체력 가득 채움
@@ -174,11 +182,13 @@ public class PlayerProto : BaseEntity
         if (!_isJumping)
         {
             // 입력 매니저에서 현재 이동 입력 값 가져오기
+            Vector2 moveInput = Vector2.zero;
             if (_inputManager != null)
             {
-                _moveInput = _inputManager.MoveInput;
+                moveInput = _inputManager.MoveInput;
             }
-            UpdateFacingDirection(_moveInput);
+            _movementComponent.SetMoveInput(moveInput);
+            UpdateFacingDirection(moveInput);
         }
     }
 
@@ -187,18 +197,20 @@ public class PlayerProto : BaseEntity
         // 죽었으면 물리 처리 중지
         if (_isDead) return;
 
+        // 구르기 중에는 입력 업데이트
+        if (_dashComponent.IsDashing)
+        {
+            _dashComponent.SetInputs(_movementComponent.GetMoveInput(), lastFacingDirection);
+            _dashComponent.UpdateDash();
+            return;
+        }
+
         if (_isJumping)
         {
             return;
         }
-        else if (_isDashing)
-        {
-            UpdateDash();
-        }
-        else
-        {
-            MovePlayer();
-        }
+        
+        _movementComponent.Move();
     }
 
     // ==================== 입력 매니저 이벤트 구독/해제 ====================
@@ -235,15 +247,13 @@ public class PlayerProto : BaseEntity
     // ==================== 입력 처리 ====================
     private void HandleMoveInputChanged(Vector2 input)
     {
-        _moveInput = input;
+        _movementComponent.SetMoveInput(input);
     }
 
     private void HandleDashInput()
     {
-        if (_cooldownManager.IsReady("dash"))
-        {
-            StartDash();
-        }
+        _dashComponent.SetInputs(_movementComponent.GetMoveInput(), lastFacingDirection);
+        _dashComponent.StartDash();
     }
 
     private void HandleSkill1Input()
@@ -337,36 +347,6 @@ public class PlayerProto : BaseEntity
         }
     }
 
-    // ==================== 이동 ====================
-    private void MovePlayer()
-    {
-        Vector2 velocity = _moveInput.normalized * moveSpeed;
-        rb.linearVelocity = velocity;
-    }
-
-    // ==================== 구르기 (회피) ====================
-    private void StartDash()
-    {
-        _isDashing = true;
-        _dashTimer = dashDuration;
-        _cooldownManager.StartCooldown("dash");
-        
-        Debug.Log("구르기!");
-    }
-
-    private void UpdateDash()
-    {
-        _dashTimer -= Time.fixedDeltaTime;
-        
-        Vector2 dashDirection = _moveInput.magnitude > 0 ? _moveInput.normalized : lastFacingDirection;
-        rb.linearVelocity = dashDirection * dashSpeed;
-
-        if (_dashTimer <= 0)
-        {
-            _isDashing = false;
-            rb.linearVelocity = Vector2.zero;
-        }
-    }
 
     // ==================== 스킬 ====================
     private void CastSkill1()
@@ -573,7 +553,7 @@ public class PlayerProto : BaseEntity
     }
 
     // ==================== UI 표시용 (옵션) ====================
-    public float GetDashCooldownPercent() => _cooldownManager.GetCooldownPercent("dash");
+    public float GetDashCooldownPercent() => _dashComponent.GetCooldownPercent();
     public float GetSkill1CooldownPercent() => _cooldownManager.GetCooldownPercent("skill1");
     public float GetSkill2CooldownPercent() => _cooldownManager.GetCooldownPercent("skill2");
     public float GetSkill3CooldownPercent() => _cooldownManager.GetCooldownPercent("skill3");
