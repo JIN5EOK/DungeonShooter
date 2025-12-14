@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 using DungeonShooter;
 public class PlayerProto : BaseEntity
 {
     private Vector2 _moveInput;
+    private InputManager _inputManager;
 
     [Header("구르기(회피)")]
     [SerializeField] private float dashSpeed = 15f;
@@ -38,10 +40,6 @@ public class PlayerProto : BaseEntity
     [SerializeField] private AttackRangeVisualizer skill2Visualizer; // 회전 공격
     [SerializeField] private AttackRangeVisualizer skill3Visualizer; // 점프 공격
 
-    [Header("상호작용 설정")]
-    [Tooltip("상호작용 키 (기본값: E)")]
-    [SerializeField] private KeyCode interactKey = KeyCode.E;
-
     private CooldownManager _cooldownManager;
     private HealthComponent _healthComponent;
     private SpriteRenderer _spriteRenderer;
@@ -51,9 +49,17 @@ public class PlayerProto : BaseEntity
     private System.Threading.CancellationTokenSource _jumpCancellationTokenSource;
     private HashSet<IInteractable> _nearbyInteractables = new HashSet<IInteractable>();
 
+    [Inject]
+    private void Construct(InputManager inputManager)
+    {
+        _inputManager = inputManager;
+    }
+
     protected override void Start()
     {
         base.Start();
+
+        SubscribeInputEvent();
 
         _cooldownManager = new CooldownManager();
         _cooldownManager.RegisterCooldown("dash", dashCooldown);
@@ -148,6 +154,8 @@ public class PlayerProto : BaseEntity
         _jumpCancellationTokenSource?.Cancel();
         _jumpCancellationTokenSource?.Dispose();
 
+        UnsubscribeInputEvent();
+
         // 이벤트 구독 해제
         if (_healthComponent != null)
         {
@@ -165,7 +173,11 @@ public class PlayerProto : BaseEntity
         
         if (!_isJumping)
         {
-            HandleInput();
+            // 입력 매니저에서 현재 이동 입력 값 가져오기
+            if (_inputManager != null)
+            {
+                _moveInput = _inputManager.MoveInput;
+            }
             UpdateFacingDirection(_moveInput);
         }
     }
@@ -189,36 +201,78 @@ public class PlayerProto : BaseEntity
         }
     }
 
-    // ==================== 입력 처리 ====================
-    private void HandleInput()
+    // ==================== 입력 매니저 이벤트 구독/해제 ====================
+    /// <summary>
+    /// 입력 매니저 이벤트를 구독합니다.
+    /// </summary>
+    private void SubscribeInputEvent()
     {
-        _moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        if (_inputManager == null) return;
 
-        if (Input.GetKeyDown(KeyCode.Space) && _cooldownManager.IsReady("dash"))
+        _inputManager.OnMoveInputChanged += HandleMoveInputChanged;
+        _inputManager.OnDashPressed += HandleDashInput;
+        _inputManager.OnSkill1Pressed += HandleSkill1Input;
+        _inputManager.OnSkill2Pressed += HandleSkill2Input;
+        _inputManager.OnSkill3Pressed += HandleSkill3Input;
+        _inputManager.OnInteractPressed += HandleInteractInput;
+    }
+
+    /// <summary>
+    /// 입력 매니저 이벤트 구독을 해제합니다.
+    /// </summary>
+    private void UnsubscribeInputEvent()
+    {
+        if (_inputManager == null) return;
+
+        _inputManager.OnMoveInputChanged -= HandleMoveInputChanged;
+        _inputManager.OnDashPressed -= HandleDashInput;
+        _inputManager.OnSkill1Pressed -= HandleSkill1Input;
+        _inputManager.OnSkill2Pressed -= HandleSkill2Input;
+        _inputManager.OnSkill3Pressed -= HandleSkill3Input;
+        _inputManager.OnInteractPressed -= HandleInteractInput;
+    }
+
+    // ==================== 입력 처리 ====================
+    private void HandleMoveInputChanged(Vector2 input)
+    {
+        _moveInput = input;
+    }
+
+    private void HandleDashInput()
+    {
+        if (_cooldownManager.IsReady("dash"))
         {
             StartDash();
         }
+    }
 
-        if (Input.GetKeyDown(KeyCode.J) && _cooldownManager.IsReady("skill1"))
+    private void HandleSkill1Input()
+    {
+        if (_cooldownManager.IsReady("skill1"))
         {
             CastSkill1();
         }
+    }
 
-        if (Input.GetKeyDown(KeyCode.K) && _cooldownManager.IsReady("skill2"))
+    private void HandleSkill2Input()
+    {
+        if (_cooldownManager.IsReady("skill2"))
         {
             CastSkill2();
         }
+    }
 
-        if (Input.GetKeyDown(KeyCode.L) && _cooldownManager.IsReady("skill3"))
+    private void HandleSkill3Input()
+    {
+        if (_cooldownManager.IsReady("skill3"))
         {
             CastSkill3Async();
         }
+    }
 
-        // 상호작용 키 입력 처리
-        if (Input.GetKeyDown(interactKey))
-        {
-            TryInteract();
-        }
+    private void HandleInteractInput()
+    {
+        TryInteract();
     }
 
     // ==================== 상호작용 ====================

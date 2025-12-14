@@ -10,6 +10,7 @@ namespace DungeonShooter
         {
             builder.Register<CoinInventory>(Lifetime.Singleton);
             builder.Register<EntityFactory>(Lifetime.Singleton);
+            builder.Register<InputManager>(Lifetime.Singleton);
             builder.RegisterEntryPoint<SceneStartInjector>();
             base.Configure(builder);
         }
