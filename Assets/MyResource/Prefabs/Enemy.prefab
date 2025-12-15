@@ -11,11 +11,13 @@ GameObject:
   - component: {fileID: 8000194227001901989}
   - component: {fileID: 5214938083091541001}
   - component: {fileID: 6682134852837990247}
-  - component: {fileID: 8480333223885060921}
   - component: {fileID: -4710752342727833568}
+  - component: {fileID: 7001560364046731188}
+  - component: {fileID: 399146359455650338}
+  - component: {fileID: 4560199198152073960}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -136,38 +138,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.78125, y: 0.78125}
   m_EdgeRadius: 0
---- !u!114 &8480333223885060921
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8223576401328736019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a144fb34abb7f4440a6be9192bd1a98e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 3
-  detectionRange: 10
-  attackRange: 1.5
-  attackCooldown: 1.5
-  attackDamage: 10
-  patrolRange: 5
-  patrolSpeed: 2
-  idleTime: 2
-  hitStunDuration: 0.5
-  knockbackForce: 3
-  hitColor: {r: 1, g: 0, b: 0, a: 1}
-  hitFlashDuration: 0.2
-  deathDelay: 1
-  disableOnDeath: 1
-  showAttackRange: 1
-  attackRangeVisualizer: {fileID: 0}
-  coinPickupPrefab: {fileID: 0}
-  coinDropChance: 1
-  coinDropRange: {x: 1, y: 3}
-  coinDropRadius: 1
 --- !u!50 &-4710752342727833568
 Rigidbody2D:
   serializedVersion: 5
@@ -183,7 +153,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -194,4 +164,68 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
+--- !u!114 &7001560364046731188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8223576401328736019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 325ac37a0e9164e528fb7f9ea9c965d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
+  statsComponent: {fileID: 0}
+  detectionRange: 10
+  patrolRange: 5
+  patrolSpeed: 2
+  idleTime: 2
+  hitStunDuration: 0.5
+  knockbackForce: 3
+  hitColor: {r: 1, g: 0, b: 0, a: 1}
+  hitFlashDuration: 0.2
+  deathDelay: 1
+  disableOnDeath: 1
+  showAttackRange: 1
+  attackRangeVisualizer: {fileID: 0}
+  coinDropChance: 1
+  coinDropRange: {x: 1, y: 3}
+  coinDropRadius: 1
+--- !u!114 &399146359455650338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8223576401328736019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab4f6b44ee01b42e1a52042bf93f4149, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stats:
+    moveSpeed: 5
+    maxHealth: 100
+    attackDamage: 10
+    attackRange: 1.5
+    attackCooldown: 1.5
+    defense: 0
+    knockbackResistance: 0
+--- !u!114 &4560199198152073960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8223576401328736019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ceae8b9499194fe7bead2cf9e9ce5db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  startWithFullHealth: 1
+  currentHealth: 0

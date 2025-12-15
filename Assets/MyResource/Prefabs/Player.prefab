@@ -9,12 +9,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3169616247159687271}
-  - component: {fileID: 7714411246160792420}
   - component: {fileID: 1471138663655619467}
   - component: {fileID: 7301684499219109624}
+  - component: {fileID: 4765213063567705226}
+  - component: {fileID: 8085422767866510689}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -34,25 +35,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7714411246160792420
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3073406401155221875}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa9e63cef977e43e28099b2744c82222, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 5
-  dashSpeed: 15
-  dashDuration: 0.3
-  dashCooldown: 0.8
-  skill1Cooldown: 2
-  skill2Cooldown: 3
-  skill3Cooldown: 5
 --- !u!212 &1471138663655619467
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -154,3 +136,54 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.78125, y: 0.78125}
   m_EdgeRadius: 0
+--- !u!114 &4765213063567705226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3073406401155221875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fef0affe280d446f9a56ffe0f392829d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
+  statsComponent: {fileID: 0}
+  dashSpeed: 15
+  dashDuration: 0.3
+  dashCooldown: 0.8
+  skill1Cooldown: 2
+  skill2Cooldown: 3
+  skill3Cooldown: 5
+  skill1Damage: 20
+  skill2Damage: 15
+  skill3Damage: 35
+  jumpDuration: 0.5
+  jumpHeight: 2
+  hitColor: {r: 1, g: 0, b: 0, a: 1}
+  hitFlashDuration: 0.2
+  showSkillRanges: 1
+  skill1Visualizer: {fileID: 0}
+  skill2Visualizer: {fileID: 0}
+  skill3Visualizer: {fileID: 0}
+--- !u!114 &8085422767866510689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3073406401155221875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab4f6b44ee01b42e1a52042bf93f4149, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stats:
+    moveSpeed: 5
+    maxHealth: 100
+    attackDamage: 10
+    attackRange: 1.5
+    attackCooldown: 1.5
+    defense: 0
+    knockbackResistance: 0

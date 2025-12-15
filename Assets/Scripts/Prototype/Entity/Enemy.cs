@@ -15,11 +15,11 @@ public enum EnemyState
 
 public class Enemy : EntityBase
 {
+    [Header("스탯 컴포넌트")]
+    [SerializeField] private EntityStatsComponent statsComponent;
+
     [Header("AI 설정")]
     [SerializeField] private float detectionRange = 10f;
-    [SerializeField] private float attackRange = 1.5f;
-    [SerializeField] private float attackCooldown = 1.5f;
-    [SerializeField] private int attackDamage = 10;
     [SerializeField] private float patrolRange = 5f;
     [SerializeField] private float patrolSpeed = 2f;
     [SerializeField] private float idleTime = 2f;
@@ -76,10 +76,12 @@ public class Enemy : EntityBase
     protected override void Start()
     {
         base.Start();
+        statsComponent = statsComponent ?? GetComponent<EntityStatsComponent>();
+        ApplyStatsFromComponent();
         _playerTransform = FindFirstObjectByType<PlayerProto>().transform;
 
         _cooldownManager = new CooldownManager();
-        _cooldownManager.RegisterCooldown("attack", attackCooldown);
+        _cooldownManager.RegisterCooldown("attack", GetAttackCooldown());
         _cooldownManager.RegisterCooldown("hitStun", hitStunDuration);
 
         // SpriteRenderer 초기화
@@ -124,9 +126,23 @@ public class Enemy : EntityBase
             
             if (attackRangeVisualizer != null)
             {
-                attackRangeVisualizer.SetRadius(attackRange);
+                attackRangeVisualizer.SetRadius(GetAttackRange());
                 attackRangeVisualizer.SetColor(new Color(1f, 0f, 0f, 0.3f)); // 반투명 빨간색
             }
+        }
+    }
+
+    private void ApplyStatsFromComponent()
+    {
+        if (statsComponent == null) return;
+
+        moveSpeed = statsComponent.MoveSpeed;
+
+        // HealthComponent와 동기화 (있을 경우)
+        var health = GetComponent<HealthComponent>();
+        if (health != null)
+        {
+            health.SetMaxHealth(statsComponent.MaxHealth, true);
         }
     }
 
@@ -267,7 +283,8 @@ public class Enemy : EntityBase
 
         // 공격 범위 내인지 확인
         float distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
-        if (distanceToPlayer <= attackRange && _cooldownManager.IsReady("attack"))
+        float range = GetAttackRange();
+        if (distanceToPlayer <= range && _cooldownManager.IsReady("attack"))
         {
             AttackPlayer();
         }
@@ -306,7 +323,8 @@ public class Enemy : EntityBase
     {
         _cooldownManager.StartCooldown("attack");
 
-        Debug.Log($"적이 플레이어를 공격! 데미지: {attackDamage}");
+        int damage = GetAttackDamage();
+        Debug.Log($"적이 플레이어를 공격! 데미지: {damage}");
 
         // 플레이어에게 데미지 주기
         if (_playerTransform != null)
@@ -314,7 +332,7 @@ public class Enemy : EntityBase
             HealthComponent playerHealth = _playerTransform.GetComponent<HealthComponent>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(attackDamage);
+                playerHealth.TakeDamage(damage);
             }
         }
 
@@ -325,7 +343,7 @@ public class Enemy : EntityBase
         }
         else
         {
-            DebugDrawCircle(transform.position, attackRange, Color.red, 0.3f);
+            DebugDrawCircle(transform.position, GetAttackRange(), Color.red, 0.3f);
         }
     }
 
@@ -335,7 +353,9 @@ public class Enemy : EntityBase
     public bool IsStunned => _isStunned;
     public EnemyState GetCurrentState() => _currentState;
     public float GetDetectionRange() => detectionRange;
-    public float GetAttackRange() => attackRange;
+    public float GetAttackRange() => statsComponent != null ? statsComponent.AttackRange : 0f;
+    private int GetAttackDamage() => statsComponent != null ? statsComponent.AttackDamage : 0;
+    private float GetAttackCooldown() => statsComponent != null ? statsComponent.AttackCooldown : 0f;
 
     // ==================== 디버그 시각화 ====================
     private void OnDrawGizmosSelected()
@@ -346,7 +366,7 @@ public class Enemy : EntityBase
 
         // 공격 범위
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
+        Gizmos.DrawWireSphere(transform.position, GetAttackRange());
 
         // 순찰 범위
         Gizmos.color = Color.blue;

@@ -326,7 +326,7 @@ MonoBehaviour:
   - {fileID: 1284243753}
   - {fileID: 1563389977}
   - {fileID: 1829365973}
-  player: {fileID: 484407907}
+  player: {fileID: 0}
 --- !u!1 &198804347 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8223576401328736019, guid: 6b7834735c593404985a61a391818e86, type: 3}
@@ -344,9 +344,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  startWithFullHealth: 1
-  currentHealth: 0
 --- !u!4 &198804353 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8000194227001901989, guid: 6b7834735c593404985a61a391818e86, type: 3}
@@ -446,9 +443,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  startWithFullHealth: 1
-  currentHealth: 0
 --- !u!1 &263973589
 GameObject:
   m_ObjectHideFlags: 0
@@ -602,9 +596,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  startWithFullHealth: 1
-  currentHealth: 0
 --- !u!4 &323795630 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8000194227001901989, guid: 6b7834735c593404985a61a391818e86, type: 3}
@@ -872,42 +863,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &484407902 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3073406401155221875, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
-  m_PrefabInstance: {fileID: 3085769312170441573}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &484407906 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3169616247159687271, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
   m_PrefabInstance: {fileID: 3085769312170441573}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &484407907 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7714411246160792420, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
-  m_PrefabInstance: {fileID: 3085769312170441573}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 484407902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa9e63cef977e43e28099b2744c82222, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &484407908
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 484407902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 100
-  startWithFullHealth: 1
-  currentHealth: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1649,9 +1609,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  startWithFullHealth: 1
-  currentHealth: 0
 --- !u!4 &777080924 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8000194227001901989, guid: 6b7834735c593404985a61a391818e86, type: 3}
@@ -2512,9 +2469,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  startWithFullHealth: 1
-  currentHealth: 0
 --- !u!1 &1281966235
 GameObject:
   m_ObjectHideFlags: 0
@@ -3230,9 +3184,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  startWithFullHealth: 1
-  currentHealth: 0
 --- !u!1 &1411886403
 GameObject:
   m_ObjectHideFlags: 0
@@ -3448,9 +3399,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  startWithFullHealth: 1
-  currentHealth: 0
 --- !u!1 &1531223676
 GameObject:
   m_ObjectHideFlags: 0
@@ -4471,9 +4419,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  startWithFullHealth: 1
-  currentHealth: 0
 --- !u!4 &1823453589 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8000194227001901989, guid: 6b7834735c593404985a61a391818e86, type: 3}
@@ -5014,9 +4959,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  startWithFullHealth: 1
-  currentHealth: 0
 --- !u!1 &2135053329
 GameObject:
   m_ObjectHideFlags: 0
@@ -5092,11 +5034,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2135053329}
   m_CullTransparentMesh: 1
---- !u!1 &3073406402710979060 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8223576401328736019, guid: 6b7834735c593404985a61a391818e86, type: 3}
-  m_PrefabInstance: {fileID: 7563225022945081209}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3085769312170441573
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5107,10 +5044,6 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3073406401155221875, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
       propertyPath: m_Name
-      value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 3073406401155221875, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
-      propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 3169616247159687271, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
@@ -5156,26 +5089,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3073406401155221875, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 484407908}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
---- !u!114 &7301684499678846593
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3073406402710979060}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fcc825b4c9d254f51b9d822fc747238a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 20
-  startWithFullHealth: 1
-  currentHealth: 0
 --- !u!4 &7301684499678846598 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8000194227001901989, guid: 6b7834735c593404985a61a391818e86, type: 3}
@@ -5189,14 +5104,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1850228896}
     m_Modifications:
-    - target: {fileID: -4710752342727833568, guid: 6b7834735c593404985a61a391818e86, type: 3}
-      propertyPath: m_Constraints
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: -4710752342727833568, guid: 6b7834735c593404985a61a391818e86, type: 3}
-      propertyPath: m_GravityScale
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8000194227001901989, guid: 6b7834735c593404985a61a391818e86, type: 3}
       propertyPath: m_LocalPosition.x
       value: -16.175728
@@ -5241,17 +5148,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy
       objectReference: {fileID: 0}
-    - target: {fileID: 8223576401328736019, guid: 6b7834735c593404985a61a391818e86, type: 3}
-      propertyPath: m_TagString
-      value: Enemy
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8223576401328736019, guid: 6b7834735c593404985a61a391818e86, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7301684499678846593}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6b7834735c593404985a61a391818e86, type: 3}
 --- !u!1001 &8467449633569260748
 PrefabInstance:

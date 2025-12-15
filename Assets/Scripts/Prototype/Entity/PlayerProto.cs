@@ -4,6 +4,9 @@ using VContainer;
 using DungeonShooter;
 public class PlayerProto : EntityBase
 {
+    [Header("스탯 컴포넌트")]
+    [SerializeField] private EntityStatsComponent statsComponent;
+
     private InputManager _inputManager;
 
     [Header("구르기(회피)")]
@@ -26,7 +29,6 @@ public class PlayerProto : EntityBase
     [SerializeField] private float jumpHeight = 2f;
 
     [Header("체력 설정")]
-    [SerializeField] private int maxHealth = 100;
     [SerializeField] private Color hitColor = Color.red;
     [SerializeField] private float hitFlashDuration = 0.2f;
 
@@ -45,6 +47,7 @@ public class PlayerProto : EntityBase
     private bool _isDead;
     private System.Threading.CancellationTokenSource _jumpCancellationTokenSource;
     private HashSet<IInteractable> _nearbyInteractables = new HashSet<IInteractable>();
+    private int _maxHealthCache = 0;
 
     private MovementComponent _movementComponent;
     private DashComponent _dashComponent;
@@ -58,6 +61,8 @@ public class PlayerProto : EntityBase
     protected override void Start()
     {
         base.Start();
+        statsComponent = statsComponent ?? GetComponent<EntityStatsComponent>();
+        ApplyStatsFromComponent();
 
         SubscribeInputEvent();
 
@@ -83,7 +88,7 @@ public class PlayerProto : EntityBase
         _healthComponent = _healthComponent ?? gameObject.AddComponent<HealthComponent>();
 
         // maxHealth 설정
-        _healthComponent.SetMaxHealth(maxHealth, true); // healToFull = true로 체력 가득 채움
+        _healthComponent.SetMaxHealth(_maxHealthCache, true); // healToFull = true로 체력 가득 채움
 
         // 체력 이벤트 구독
         _healthComponent.OnDamaged += HandleDamaged;
@@ -103,6 +108,15 @@ public class PlayerProto : EntityBase
         {
             InitializeSkillVisualizers();
         }
+    }
+
+    private void ApplyStatsFromComponent()
+    {
+        if (statsComponent == null) return;
+
+        moveSpeed = statsComponent.MoveSpeed;
+        _maxHealthCache = statsComponent.MaxHealth;
+        // 공격력/공격범위/쿨다운은 Player 스킬별 세팅과 별도라 여기서는 미적용
     }
 
     /// <summary>
@@ -684,7 +698,7 @@ public class PlayerProto : EntityBase
     /// </summary>
     public int GetMaxHealth()
     {
-        return _healthComponent != null ? _healthComponent.MaxHealth : maxHealth;
+        return _healthComponent != null ? _healthComponent.MaxHealth : _maxHealthCache;
     }
 
     /// <summary>
