@@ -9,11 +9,6 @@ public class PlayerProto : EntityBase
 
     private InputManager _inputManager;
 
-    [Header("구르기(회피)")]
-    [SerializeField] private float dashSpeed = 15f;
-    [SerializeField] private float dashDuration = 0.3f;
-    [SerializeField] private float dashCooldown = 0.8f;
-
     [Header("스킬")]
     [SerializeField] private float skill1Cooldown = 2f;
     [SerializeField] private float skill2Cooldown = 3f;
@@ -39,7 +34,7 @@ public class PlayerProto : EntityBase
     [SerializeField] private AttackRangeVisualizer skill2Visualizer; // 회전 공격
     [SerializeField] private AttackRangeVisualizer skill3Visualizer; // 점프 공격
 
-    private CooldownManager _cooldownManager;
+    private CooldownComponent _cooldownComponent;
     private HealthComponent _healthComponent;
     private SpriteRenderer _spriteRenderer;
     private Color _originalColor;
@@ -66,11 +61,9 @@ public class PlayerProto : EntityBase
 
         SubscribeInputEvent();
 
-        _cooldownManager = new CooldownManager();
-        _cooldownManager.RegisterCooldown("dash", dashCooldown);
-        _cooldownManager.RegisterCooldown("skill1", skill1Cooldown);
-        _cooldownManager.RegisterCooldown("skill2", skill2Cooldown);
-        _cooldownManager.RegisterCooldown("skill3", skill3Cooldown);
+        // 쿨다운 컴포넌트 초기화
+        _cooldownComponent = GetComponent<CooldownComponent>();
+        _cooldownComponent = _cooldownComponent ?? gameObject.AddComponent<CooldownComponent>();
 
         // 분리된 동작 컴포넌트들 초기화
         _movementComponent = GetComponent<MovementComponent>();
@@ -81,7 +74,7 @@ public class PlayerProto : EntityBase
         _dashComponent = GetComponent<DashComponent>();
         _dashComponent = _dashComponent ?? gameObject.AddComponent<DashComponent>();
         
-        _dashComponent.Initialize(_cooldownManager);
+        _dashComponent.Initialize(_cooldownComponent);
 
         // 체력 컴포넌트 초기화
         _healthComponent = GetComponent<HealthComponent>();
@@ -94,6 +87,12 @@ public class PlayerProto : EntityBase
         _healthComponent.OnDamaged += HandleDamaged;
         _healthComponent.OnDeath += HandleDeath;
 
+        // 쿨타임 등록
+        _cooldownComponent.RegisterCooldown("dash", _dashComponent.DashCooldown);
+        _cooldownComponent.RegisterCooldown("skill1", skill1Cooldown);
+        _cooldownComponent.RegisterCooldown("skill2", skill2Cooldown);
+        _cooldownComponent.RegisterCooldown("skill3", skill3Cooldown);
+        
         // SpriteRenderer 초기화
         _spriteRenderer = GetComponent<SpriteRenderer>();
         if (_spriteRenderer != null)
@@ -190,8 +189,6 @@ public class PlayerProto : EntityBase
     {
         // 죽었으면 입력 처리 중지
         if (_isDead) return;
-
-        _cooldownManager.UpdateCooldowns();
         
         if (!_isJumping)
         {
@@ -272,7 +269,7 @@ public class PlayerProto : EntityBase
 
     private void HandleSkill1Input()
     {
-        if (_cooldownManager.IsReady("skill1"))
+        if (_cooldownComponent.IsReady("skill1"))
         {
             CastSkill1();
         }
@@ -280,7 +277,7 @@ public class PlayerProto : EntityBase
 
     private void HandleSkill2Input()
     {
-        if (_cooldownManager.IsReady("skill2"))
+        if (_cooldownComponent.IsReady("skill2"))
         {
             CastSkill2();
         }
@@ -288,7 +285,7 @@ public class PlayerProto : EntityBase
 
     private void HandleSkill3Input()
     {
-        if (_cooldownManager.IsReady("skill3"))
+        if (_cooldownComponent.IsReady("skill3"))
         {
             CastSkill3Async();
         }
@@ -365,7 +362,7 @@ public class PlayerProto : EntityBase
     // ==================== 스킬 ====================
     private void CastSkill1()
     {
-        _cooldownManager.StartCooldown("skill1");
+        _cooldownComponent.StartCooldown("skill1");
 
         Debug.Log("스킬 1 - 전방 슬래시 공격");
         
@@ -386,7 +383,7 @@ public class PlayerProto : EntityBase
 
     private void CastSkill2()
     {
-        _cooldownManager.StartCooldown("skill2");
+        _cooldownComponent.StartCooldown("skill2");
 
         Debug.Log("스킬 2 - 회전 공격");
         
@@ -401,7 +398,7 @@ public class PlayerProto : EntityBase
 
     private async void CastSkill3Async()
     {
-        _cooldownManager.StartCooldown("skill3");
+        _cooldownComponent.StartCooldown("skill3");
         
         Debug.Log("스킬 3 - 점프 공격");
         
@@ -568,14 +565,14 @@ public class PlayerProto : EntityBase
 
     // ==================== UI 표시용 (옵션) ====================
     public float GetDashCooldownPercent() => _dashComponent.GetCooldownPercent();
-    public float GetSkill1CooldownPercent() => _cooldownManager.GetCooldownPercent("skill1");
-    public float GetSkill2CooldownPercent() => _cooldownManager.GetCooldownPercent("skill2");
-    public float GetSkill3CooldownPercent() => _cooldownManager.GetCooldownPercent("skill3");
+    public float GetSkill1CooldownPercent() => _cooldownComponent.GetCooldownPercent("skill1");
+    public float GetSkill2CooldownPercent() => _cooldownComponent.GetCooldownPercent("skill2");
+    public float GetSkill3CooldownPercent() => _cooldownComponent.GetCooldownPercent("skill3");
 
     /// <summary>
-    /// UI에서 쿨다운 매니저 접근용
+    /// UI에서 쿨다운 컴포넌트 접근용
     /// </summary>
-    public CooldownManager GetCooldownManager() => _cooldownManager;
+    public CooldownComponent GetCooldownComponent() => _cooldownComponent;
 
     // ==================== 체력 이벤트 핸들러 ====================
 

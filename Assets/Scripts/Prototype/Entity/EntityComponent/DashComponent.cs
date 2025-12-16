@@ -11,8 +11,12 @@ public class DashComponent : MonoBehaviour
     [SerializeField] private float _dashDuration = 0.3f;
     [SerializeField] private float _dashCooldown = 0.8f;
 
+    public float DashSpeed => _dashSpeed;
+    public float DashDuration => _dashDuration;
+    public float DashCooldown => _dashCooldown;
+    
     private Rigidbody2D _rigidbody;
-    private CooldownManager _cooldownManager;
+    private CooldownComponent _cooldownComponent;
     
     private bool _isDashing;
     private float _dashTimer;
@@ -27,12 +31,12 @@ public class DashComponent : MonoBehaviour
     }
 
     /// <summary>
-    /// CooldownManager를 초기화합니다.
+    /// CooldownComponent를 초기화합니다.
     /// </summary>
-    public void Initialize(CooldownManager cooldownManager)
+    public void Initialize(CooldownComponent cooldownComponent)
     {
-        _cooldownManager = cooldownManager;
-        _cooldownManager.RegisterCooldown("dash", _dashCooldown);
+        _cooldownComponent = cooldownComponent;
+        _cooldownComponent.RegisterCooldown("dash", _dashCooldown);
     }
 
     /// <summary>
@@ -49,14 +53,14 @@ public class DashComponent : MonoBehaviour
     /// </summary>
     public void StartDash()
     {
-        if (_cooldownManager == null || !_cooldownManager.IsReady("dash"))
+        if (_cooldownComponent == null || !_cooldownComponent.IsReady("dash"))
         {
             return;
         }
 
         _isDashing = true;
         _dashTimer = _dashDuration;
-        _cooldownManager.StartCooldown("dash");
+        _cooldownComponent.StartCooldown("dash");
         
         Debug.Log("구르기!");
     }
@@ -88,10 +92,10 @@ public class DashComponent : MonoBehaviour
     /// </summary>
     public float GetCooldownPercent()
     {
-        if (_cooldownManager == null)
+        if (_cooldownComponent == null)
         {
             return 0f;
         }
-        return _cooldownManager.GetCooldownPercent("dash");
+        return _cooldownComponent.GetCooldownPercent("dash");
     }
 }

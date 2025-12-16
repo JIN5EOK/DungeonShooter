@@ -49,7 +49,7 @@ public class Enemy : EntityBase
     [SerializeField] private float coinDropRadius = 1f;
 
     private Transform _playerTransform;
-    private CooldownManager _cooldownManager;
+    private CooldownComponent _cooldownComponent;
     private HealthComponent _healthComponent;
     private SpriteRenderer _spriteRenderer;
     private Color _originalColor;
@@ -80,9 +80,11 @@ public class Enemy : EntityBase
         ApplyStatsFromComponent();
         _playerTransform = FindFirstObjectByType<PlayerProto>().transform;
 
-        _cooldownManager = new CooldownManager();
-        _cooldownManager.RegisterCooldown("attack", GetAttackCooldown());
-        _cooldownManager.RegisterCooldown("hitStun", hitStunDuration);
+        // 쿨다운 컴포넌트 초기화
+        _cooldownComponent = GetComponent<CooldownComponent>();
+        _cooldownComponent = _cooldownComponent ?? gameObject.AddComponent<CooldownComponent>();
+        _cooldownComponent.RegisterCooldown("attack", GetAttackCooldown());
+        _cooldownComponent.RegisterCooldown("hitStun", hitStunDuration);
 
         // SpriteRenderer 초기화
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -161,14 +163,13 @@ public class Enemy : EntityBase
         // 죽었으면 AI 중지
         if (_currentState == EnemyState.Dead) return;
 
-        _cooldownManager.UpdateCooldowns();
         UpdateAI();
     }
 
     private void UpdateAI()
     {
         // 스턴 상태 확인
-        if (_isStunned && _cooldownManager.IsReady("hitStun"))
+        if (_isStunned && _cooldownComponent.IsReady("hitStun"))
         {
             _isStunned = false;
             _currentState = EnemyState.Idle;
@@ -193,7 +194,7 @@ public class Enemy : EntityBase
                 break;
             case EnemyState.Hit:
                 // 피격 후 잠시 대기
-                if (_cooldownManager.IsReady("hitStun"))
+                if (_cooldownComponent.IsReady("hitStun"))
                 {
                     _currentState = playerDetected ? EnemyState.Chase : EnemyState.Idle;
                 }
@@ -284,7 +285,7 @@ public class Enemy : EntityBase
         // 공격 범위 내인지 확인
         float distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
         float range = GetAttackRange();
-        if (distanceToPlayer <= range && _cooldownManager.IsReady("attack"))
+        if (distanceToPlayer <= range && _cooldownComponent.IsReady("attack"))
         {
             AttackPlayer();
         }
@@ -321,7 +322,7 @@ public class Enemy : EntityBase
     // ==================== 공격 ====================
     private void AttackPlayer()
     {
-        _cooldownManager.StartCooldown("attack");
+        _cooldownComponent.StartCooldown("attack");
 
         int damage = GetAttackDamage();
         Debug.Log($"적이 플레이어를 공격! 데미지: {damage}");
@@ -428,7 +429,7 @@ public class Enemy : EntityBase
         // 상태 변경
         _currentState = EnemyState.Hit;
         _isStunned = true;
-        _cooldownManager.StartCooldown("hitStun");
+        _cooldownComponent.StartCooldown("hitStun");
 
         // 넉백 적용
         if (_playerTransform != null)

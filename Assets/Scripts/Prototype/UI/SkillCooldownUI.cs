@@ -41,17 +41,17 @@ public class SkillCooldownUI : MonoBehaviour
     /// <summary>
     /// 쿨다운 상태 업데이트
     /// </summary>
-    public void UpdateCooldown(CooldownManager cooldownManager)
+    public void UpdateCooldown(CooldownComponent cooldownComponent)
     {
-        if (cooldownManager == null || string.IsNullOrEmpty(_skillCooldownKey))
+        if (cooldownComponent == null || string.IsNullOrEmpty(_skillCooldownKey))
         {
-            Debug.LogWarning($"[SkillCooldownUI] UpdateCooldown 실패: cooldownManager={cooldownManager != null}, key='{_skillCooldownKey}'");
+            Debug.LogWarning($"[SkillCooldownUI] UpdateCooldown 실패: cooldownComponent={cooldownComponent != null}, key='{_skillCooldownKey}'");
             return;
         }
 
-        bool skillReady = cooldownManager.IsReady(_skillCooldownKey);
-        float remainingTime = cooldownManager.GetRemainingCooldown(_skillCooldownKey);
-        float totalCooldown = cooldownManager.GetTotalCooldown(_skillCooldownKey);
+        bool skillReady = cooldownComponent.IsReady(_skillCooldownKey);
+        float remainingTime = cooldownComponent.GetRemainingCooldown(_skillCooldownKey);
+        float totalCooldown = cooldownComponent.GetTotalCooldown(_skillCooldownKey);
 
         // 디버그 로그 (쿨다운 중일 때만)
         if (!skillReady)

@@ -15,7 +15,7 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private PlayerProto player;
 
     private HealthComponent _playerHealth;
-    private CooldownManager _playerCooldowns;
+    private CooldownComponent _playerCooldowns;
 
     private async void Start()
     {
@@ -48,12 +48,12 @@ public class GameUIManager : MonoBehaviour
 
         // 플레이어 컴포넌트 참조
         _playerHealth = player.GetComponent<HealthComponent>();
-        _playerCooldowns = player.GetCooldownManager();
+        _playerCooldowns = player.GetCooldownComponent();
 
-        // CooldownManager가 아직 초기화 안 됐으면 재시도
+        // CooldownComponent가 아직 초기화 안 됐으면 재시도
         if (_playerCooldowns == null)
         {
-            Debug.LogWarning("[GameUIManager] CooldownManager가 아직 초기화되지 않음. 재시도 중...");
+            Debug.LogWarning("[GameUIManager] CooldownComponent가 아직 초기화되지 않음. 재시도 중...");
             await RetryInitializationAsync();
             return;
         }
@@ -71,7 +71,7 @@ public class GameUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// CooldownManager 초기화 재시도 (Awaitable 사용)
+    /// CooldownComponent 초기화 재시도 (Awaitable 사용)
     /// </summary>
     private async Awaitable RetryInitializationAsync()
     {
@@ -84,10 +84,10 @@ public class GameUIManager : MonoBehaviour
 
             if (player != null)
             {
-                _playerCooldowns = player.GetCooldownManager();
+                _playerCooldowns = player.GetCooldownComponent();
                 if (_playerCooldowns != null)
                 {
-                    Debug.Log($"[GameUIManager] CooldownManager 초기화 완료! (재시도: {retryCount + 1}회)");
+                    Debug.Log($"[GameUIManager] CooldownComponent 초기화 완료! (재시도: {retryCount + 1}회)");
                     InitializeSkillUIs();
                     return; // 성공하면 종료
                 }
@@ -96,7 +96,7 @@ public class GameUIManager : MonoBehaviour
             retryCount++;
         }
 
-        Debug.LogError($"[GameUIManager] CooldownManager 초기화 실패! {maxRetries}회 재시도 후 포기.");
+        Debug.LogError($"[GameUIManager] CooldownComponent 초기화 실패! {maxRetries}회 재시도 후 포기.");
     }
 
     /// <summary>
