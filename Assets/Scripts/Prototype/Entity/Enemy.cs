@@ -51,6 +51,7 @@ public class Enemy : EntityBase
     private Transform _playerTransform;
     private CooldownComponent _cooldownComponent;
     private HealthComponent _healthComponent;
+    private MovementComponent _movementComponent;
     private SpriteRenderer _spriteRenderer;
     private Color _originalColor;
 
@@ -85,6 +86,11 @@ public class Enemy : EntityBase
         _cooldownComponent = _cooldownComponent ?? gameObject.AddComponent<CooldownComponent>();
         _cooldownComponent.RegisterCooldown("attack", GetAttackCooldown());
         _cooldownComponent.RegisterCooldown("hitStun", hitStunDuration);
+
+        // 이동 컴포넌트 초기화
+        _movementComponent = GetComponent<MovementComponent>();
+        _movementComponent = _movementComponent ?? gameObject.AddComponent<MovementComponent>();
+        _movementComponent.SetMoveSpeed(moveSpeed);
 
         // SpriteRenderer 초기화
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -139,6 +145,12 @@ public class Enemy : EntityBase
         if (statsComponent == null) return;
 
         moveSpeed = statsComponent.MoveSpeed;
+
+        // MovementComponent와 동기화 (있을 경우)
+        if (_movementComponent != null)
+        {
+            _movementComponent.SetMoveSpeed(moveSpeed);
+        }
 
         // HealthComponent와 동기화 (있을 경우)
         var health = GetComponent<HealthComponent>();
@@ -222,7 +234,8 @@ public class Enemy : EntityBase
         switch (_currentState)
         {
             case EnemyState.Idle:
-                rb.linearVelocity = Vector2.zero;
+                _movementComponent.SetMoveInput(Vector2.zero);
+                _movementComponent.Move();
                 break;
             case EnemyState.Patrol:
                 MoveTowardsTarget(_patrolTargetPos, patrolSpeed);
@@ -235,7 +248,8 @@ public class Enemy : EntityBase
                 // 피격 시 약간의 넉백
                 break;
             default:
-                rb.linearVelocity = Vector2.zero;
+                _movementComponent.SetMoveInput(Vector2.zero);
+                _movementComponent.Move();
                 break;
         }
     }
@@ -296,14 +310,18 @@ public class Enemy : EntityBase
     {
         Vector2 directionToPlayer = (_playerTransform.position - transform.position).normalized;
         UpdateFacingDirection(directionToPlayer);
-        rb.linearVelocity = directionToPlayer * moveSpeed;
+        _movementComponent.SetMoveSpeed(moveSpeed);
+        _movementComponent.SetMoveInput(directionToPlayer);
+        _movementComponent.Move();
     }
 
     private void MoveTowardsTarget(Vector2 target, float speed)
     {
         Vector2 direction = (target - (Vector2)transform.position).normalized;
         UpdateFacingDirection(direction);
-        rb.linearVelocity = direction * speed;
+        _movementComponent.SetMoveSpeed(speed);
+        _movementComponent.SetMoveInput(direction);
+        _movementComponent.Move();
     }
 
     // ==================== 유틸리티 ====================
