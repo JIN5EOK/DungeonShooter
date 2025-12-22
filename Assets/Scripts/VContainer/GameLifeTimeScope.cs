@@ -9,6 +9,7 @@ namespace DungeonShooter
         protected override void Configure(IContainerBuilder builder)
         {
             builder.Register<CoinInventory>(Lifetime.Singleton);
+            builder.Register<Inventory>(Lifetime.Singleton);
             builder.Register<EntityFactory>(Lifetime.Singleton);
             builder.Register<InputManager>(Lifetime.Singleton);
             builder.RegisterEntryPoint<SceneStartInjector>();
