@@ -1,4 +1,4 @@
-### 구상...
+### 스펙 구상
 * 인벤토리 스펙
     * 패시브 아이템
         * 무제한으로 넣을 수 있음, 여기있는 아이템을 플레이어가 직접 버리거나 할 순 없음
@@ -20,18 +20,19 @@
 
 * 내부 자료구조
     * 인벤토리
-        * 자료 - 아이템 색인이 필요해진다면 딕셔너리 추가
+        * 자료구조
             * 패시브 아이템 리스트
             * 소모 아이템 리스트
-                * maxCount 선언 필요
-            * 액티브 아이템
+            * 액티브 아이템 (1개)
+            * 아이템 색인이 필요해진다면 딕셔너리 추가
         * 함수
             * 패시브/액티브/소모 아이템 추가/삭제
             * 아이템 조회 : 소지 갯수 반환
             * 아이템 갯수 반환
 
-### 다이어그램
+## 다이어그램
 
+### 아이템
 ```mermaid
 classDiagram
     class IItemData{
@@ -66,4 +67,43 @@ classDiagram
     IUseable <|.. ActiveItem
 
     IItemData <-- IItem
+
+
+
+```
+### 인벤토리
+```mermaid
+classDiagram
+    PassiveItem "1" -- "0..*" Inventory
+    ConsumeItem "1" -- "0..*" Inventory
+    ActiveItem "1" -- "1" Inventory
+    class Inventory{
+        -passiveItems List< PassiveItem >
+        -ConsumeItems List< ConsumeItem >
+        -activeItem : ActiveItem
+        +consumeItemSlotCount : int
+    }
+```
+### 필드상 아이템
+```mermaid
+classDiagram
+    Player --> "Interact" IInteractable
+    IInteractable <|.. FieldItemBase
+    Inventory <-- "AddItem(ItemData)" FieldItemBase
+
+    FieldItemBase <|-- FieldActiveItem
+    FieldItemBase <|-- FieldPassiveItem
+    FieldItemBase <|-- FieldConsumeItem
+    class Inventory{
+        +AddItem(ItemData) void
+    }
+
+    class IInteractable{
+        +Interact() void
+    }
+
+    class FieldItemBase{
+        +itemData : ItemData
+        +Interact() void
+    }
 ```

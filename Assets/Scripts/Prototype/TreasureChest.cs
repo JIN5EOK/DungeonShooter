@@ -89,7 +89,7 @@ public class TreasureChest : MonoBehaviour, IInteractable
             _playerInRange = true;
 
             // PlayerProto에 상호작용 가능한 오브젝트로 등록
-            PlayerProto player = other.GetComponent<PlayerProto>();
+            Player player = other.GetComponent<Player>();
             if (player != null)
             {
                 player.RegisterInteractable(this);
@@ -115,7 +115,7 @@ public class TreasureChest : MonoBehaviour, IInteractable
             _playerInRange = false;
 
             // PlayerProto에서 상호작용 가능한 오브젝트에서 제거
-            PlayerProto player = other.GetComponent<PlayerProto>();
+            Player player = other.GetComponent<Player>();
             if (player != null)
             {
                 player.UnregisterInteractable(this);

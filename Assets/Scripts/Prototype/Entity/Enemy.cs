@@ -79,7 +79,7 @@ public class Enemy : EntityBase
         base.Start();
         statsComponent = statsComponent ?? GetComponent<EntityStatsComponent>();
         ApplyStatsFromComponent();
-        _playerTransform = FindFirstObjectByType<PlayerProto>().transform;
+        _playerTransform = FindFirstObjectByType<Player>().transform;
 
         // 쿨다운 컴포넌트 초기화
         _cooldownComponent = GetComponent<CooldownComponent>();

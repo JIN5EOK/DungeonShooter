@@ -12,7 +12,7 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private SkillCooldownUI[] skillUIs;
 
     [Header("플레이어 참조")]
-    [SerializeField] private PlayerProto player;
+    [SerializeField] private Player player;
 
     private HealthComponent _playerHealth;
     private CooldownComponent _playerCooldowns;
@@ -37,7 +37,7 @@ public class GameUIManager : MonoBehaviour
         // 플레이어가 지정되지 않았으면 찾기
         if (player == null)
         {
-            player = FindFirstObjectByType<PlayerProto>();
+            player = FindFirstObjectByType<Player>();
         }
 
         if (player == null)

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using DungeonShooter;
-public class PlayerProto : EntityBase
+public class Player : EntityBase
 {
     [Header("스탯 컴포넌트")]
     [SerializeField] private EntityStatsComponent statsComponent;
