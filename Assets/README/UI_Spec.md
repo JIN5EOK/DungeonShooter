@@ -30,26 +30,3 @@
         * 예시
             * 데미지 숫자 표시
 
-## 다이어그램
-```mermaid
-classDiagram
-    class UIManager {
-        +String public_변수
-        +String protected_변수
-        +String private_변수
-        +public_함수()
-        #protected_함수()
-        -private_함수()
-    }
-    
-    클래스 <|-- 상속
-    클래스 <|.. 실체화
-    클래스 <-- 단방향 연관
-    클래스 -- 양방향 연관
-    클래스 .. 약한 연결성
-    클래스 <.. 의존
-    클래스 o.. 집합
-    클래스 *.. 합성
-    그외 <.. 설명문 달기 : 설명문
-    그외 "1..*" -- "1" 갯수 표시
-```
