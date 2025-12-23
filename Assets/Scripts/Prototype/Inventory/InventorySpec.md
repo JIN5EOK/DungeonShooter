@@ -32,45 +32,6 @@
 
 ## 다이어그램
 
-### 아이템
-```mermaid
-classDiagram
-    class IItemData{
-        +name : string
-        +description : string
-        +icon : AssetReference < Sprite >
-    }
-
-    class IUseable{
-        -itemData : ItemData
-        +Use() void
-    }
-        class PassiveItem{
-        -itemData : IItemData
-    }
-    class ActiveItem{
-        -itemData : IItemData
-        +Use() void
-    }
-    class ConsumeItem{
-        -itemData : IItemData
-        +Use() void
-    }
-    class IItem{
-        -itemData : IItemData
-    }
-    IItem <|.. PassiveItem
-    IItem <|.. ConsumeItem
-    IItem <|.. ActiveItem
-
-    IUseable <|.. ConsumeItem
-    IUseable <|.. ActiveItem
-
-    IItemData <-- IItem
-
-
-
-```
 ### 인벤토리
 ```mermaid
 classDiagram
@@ -82,20 +43,68 @@ classDiagram
         -ConsumeItems List< ConsumeItem >
         -activeItem : ActiveItem
         +consumeItemSlotCount : int
+
+        +AddItem(ItemBase) void
     }
 ```
-### 필드상 아이템
+
+### 인벤토리 아이템
+```mermaid
+classDiagram
+    class IUseable{
+        -itemData : ItemData
+        +Use() void
+    }
+    class PassiveItem{
+        -itemData : IItemData
+    }
+    class ActiveItem{
+        -itemData : IItemData
+        +Use() void
+    }
+    class ConsumeItem{
+        -itemData : IItemData
+        +Use() void
+    }
+    class ItemBase{
+        <<abstract>>
+        -itemEffects< List > : ItemEffect
+        -itemData : IItemData
+        // -itemEffects는 초기화시  ItemData에서 복사해와 사용
+    }
+    class ItemData{
+        <<ScriptableObject>>
+        +itemEffects< List, readonly > : ItemEffect
+        // 원본 데이터 참조용, 여기있는 이펙트를 실제로 사용하지 않음
+    }
+    class ItemEffect{
+        +Apply(Player) void
+        +Remove(Player) void
+    }
+
+    ItemEffect "0..*"--"1" ItemBase
+    ItemEffect "0..*"--"1" ItemData
+    ItemData <-- ItemBase
+    ItemBase <|.. PassiveItem
+    ItemBase <|.. ConsumeItem
+    ItemBase <|.. ActiveItem
+
+    IUseable <|.. ConsumeItem
+    IUseable <|.. ActiveItem
+```
+
+### 필드 아이템 (드롭 아이템)
 ```mermaid
 classDiagram
     Player --> "Interact" IInteractable
     IInteractable <|.. FieldItemBase
-    Inventory <-- "AddItem(ItemData)" FieldItemBase
+    Inventory <-- "AddItem" FieldItemBase
 
     FieldItemBase <|-- FieldActiveItem
     FieldItemBase <|-- FieldPassiveItem
     FieldItemBase <|-- FieldConsumeItem
     class Inventory{
-        +AddItem(ItemData) void
+        +AddItem(itemBase) void
     }
 
     class IInteractable{
@@ -103,7 +112,7 @@ classDiagram
     }
 
     class FieldItemBase{
-        +itemData : ItemData
+        +itemBase : itemBase
         +Interact() void
     }
 ```
