@@ -68,7 +68,7 @@ public class Inventory
     /// </summary>
     /// <param name="itemData">아이템 데이터</param>
     /// <returns>추가 성공 여부</returns>
-    public bool AddConsumeItem(IItemData itemData)
+    public bool AddConsumeItem(ItemData itemData)
     {
         if (itemData == null)
         {
@@ -111,7 +111,7 @@ public class Inventory
     /// </summary>
     /// <param name="itemData">아이템 데이터</param>
     /// <returns>제거 성공 여부</returns>
-    public bool RemoveConsumeItem(IItemData itemData)
+    public bool RemoveConsumeItem(ItemData itemData)
     {
         if (itemData == null)
             return false;
@@ -153,7 +153,7 @@ public class Inventory
     /// </summary>
     /// <param name="itemData">아이템 데이터</param>
     /// <returns>사용 성공 여부</returns>
-    public bool UseConsumeItem(IItemData itemData)
+    public bool UseConsumeItem(ItemData itemData)
     {
         if (itemData == null)
             return false;
@@ -168,7 +168,7 @@ public class Inventory
     /// <summary>
     /// 특정 아이템 데이터의 소모 아이템 슬롯 개수 조회
     /// </summary>
-    public int GetConsumeItemSlotCount(IItemData itemData)
+    public int GetConsumeItemSlotCount(ItemData itemData)
     {
         if (itemData == null)
             return 0;
@@ -226,7 +226,7 @@ public class Inventory
     /// </summary>
     /// <param name="itemData">확인할 아이템 데이터</param>
     /// <returns>소지 개수</returns>
-    public int GetItemCount(IItemData itemData)
+    public int GetItemCount(ItemData itemData)
     {
         if (itemData == null)
             return 0;
@@ -251,7 +251,7 @@ public class Inventory
     /// <summary>
     /// 특정 아이템 데이터를 소지하고 있는지 확인
     /// </summary>
-    public bool HasItem(IItemData itemData)
+    public bool HasItem(ItemData itemData)
     {
         return GetItemCount(itemData) > 0;
     }
