@@ -1,49 +1,40 @@
 ### 스펙 구상
 * 인벤토리 스펙
-    * 패시브 아이템
-        * 무제한으로 넣을 수 있음, 여기있는 아이템을 플레이어가 직접 버리거나 할 순 없음
-    * 소모 아이템
-        * 2칸
-        * 슬롯을 늘려주는 패시브 아이템이 존재한다
-        * 슬롯들이 꽉 찬 상태에서 획득하려고 하면 획독할 수 없다는 메시지를 출력한다, 만약 강제로 지급되는 이벤트가 있다면 바닥에 뿌려진다
-    * 액티브 아이템
-        * 1칸
-        * 액티브 아이템을 소지한 상태에서 획득하면 아이템이 교체된다
-
+    * 장착 아이템 슬롯
+        * 1개의 무기 슬롯
+            * 무기에는 고유 능력이 하나 존재한다, 필살기 느낌
+            * 예시 - 장창, 고유 능력 - 돌진공격
+        * 1개의 액티브 아이템 슬롯
+            * 예시 - 파이어볼 마법서 : 파이어볼을 발사할 수 있다
+    * 인벤토리 영역
+        * 아이템들이 저장되는 공간
+        * 액티브 아이템, 무기, 패시브 아이템이 저장된다
 * 아이템들의 고유 특징
+    * 무기
+        * 장착하면 해제할 수 없다, 해제하기 위해서는 다른 무기를 장착하는 수 밖에 없다
+    * 액티브
+        * 무기와 비슷하게 장착하면 해제할 수 없다, 해제하기 위해서는 다른 무기를 장착해야 한다
+        * 게임 중 사용버튼을 눌러 사용할 수 있다
     * 패시브
         * 소지하면 지속적으로 효과가 부여된다
-    * 액티브
-        * 게임 중 사용버튼을 눌러 사용할 수 있
-    * 소모
-        * 게임 중 단축키를 눌러 사용할 수 있다
-
 * 내부 자료구조
     * 인벤토리
         * 자료구조
-            * 패시브 아이템 리스트
-            * 소모 아이템 리스트
-            * 액티브 아이템 (1개)
-            * 아이템 색인이 필요해진다면 딕셔너리 추가
+            * 통합 아이템 인벤토리 공간(리스트)
+            * 일단은 리스트 사용하되 추후 색인 필요할 경우 딕셔너리 등 다른 방식 모색
         * 함수
-            * 패시브/액티브/소모 아이템 추가/삭제
-            * 아이템 조회 : 소지 갯수 반환
-            * 아이템 갯수 반환
+            * 아이템 추가/삭제
 
 ## 다이어그램
 
 ### 인벤토리
 ```mermaid
 classDiagram
-    PassiveItem "1" -- "0..*" Inventory
-    ConsumeItem "1" -- "0..*" Inventory
-    ActiveItem "1" -- "1" Inventory
+    ItemBase "0..*" -- "1" Inventory
     class Inventory{
-        -passiveItems List< PassiveItem >
-        -ConsumeItems List< ConsumeItem >
-        -activeItem : ActiveItem
-        +consumeItemSlotCount : int
-
+        -equippedActive : ActiveItem
+        -equippedWeapon : WeaponItem
+        -items : List< ItemBase >
         +AddItem(ItemBase) void
     }
 ```
@@ -52,8 +43,10 @@ classDiagram
 ```mermaid
 classDiagram
     class IUseable{
-        -itemData : ItemData
         +Use() void
+    }
+    class IEquipable{
+        +Equip() void
     }
     class PassiveItem{
         -itemData : IItemData
@@ -61,10 +54,12 @@ classDiagram
     class ActiveItem{
         -itemData : IItemData
         +Use() void
+        +Equip() void
     }
-    class ConsumeItem{
+    class WeaponItem{
         -itemData : IItemData
         +Use() void
+        +Equip() void
     }
     class ItemBase{
         <<abstract>>
@@ -86,23 +81,23 @@ classDiagram
     ItemEffect "0..*"--"1" ItemData
     ItemData <-- ItemBase
     ItemBase <|.. PassiveItem
-    ItemBase <|.. ConsumeItem
+    ItemBase <|.. WeaponItem
     ItemBase <|.. ActiveItem
 
-    IUseable <|.. ConsumeItem
+    IEquipable <|.. WeaponItem
+    IUseable <|.. WeaponItem
+    IEquipable <|.. ActiveItem
     IUseable <|.. ActiveItem
+    
 ```
 
 ### 필드 아이템 (드롭 아이템)
 ```mermaid
 classDiagram
     Player --> "Interact" IInteractable
-    IInteractable <|.. FieldItemBase
-    Inventory <-- "AddItem" FieldItemBase
+    IInteractable <|.. FieldItem
+    Inventory <-- "AddItem" FieldItem
 
-    FieldItemBase <|-- FieldActiveItem
-    FieldItemBase <|-- FieldPassiveItem
-    FieldItemBase <|-- FieldConsumeItem
     class Inventory{
         +AddItem(itemBase) void
     }
@@ -111,7 +106,7 @@ classDiagram
         +Interact() void
     }
 
-    class FieldItemBase{
+    class FieldItem{
         +itemBase : itemBase
         +Interact() void
     }
