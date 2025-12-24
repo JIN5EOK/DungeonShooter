@@ -3,7 +3,7 @@ using System;
 /// <summary>
 /// 액티브 아이템. 게임 중 사용 버튼을 눌러 사용할 수 있습니다.
 /// </summary>
-public class ActiveItem : ItemBase, IUseable
+public class ActiveItem : ItemBase, IEquipable, IUseable
 {
     private readonly Action _onUse;
 
@@ -15,6 +15,11 @@ public class ActiveItem : ItemBase, IUseable
     public ActiveItem(ItemData itemData, Action onUse = null) : base(itemData)
     {
         _onUse = onUse;
+    }
+
+    public void Equip()
+    {
+        // 장착 시 처리 (필요시 구현)
     }
 
     public void Use()
