@@ -1,4 +1,4 @@
-✨feat: Adding a new feature
+feat: Adding a new feature
 
 ╔═══════════════════════════════╗
 ║  !Delete this before commit!  ║
@@ -7,7 +7,7 @@
 │        Example Format         │  
 ├───────────────────────────────┤
 <Title>: [Type]: [Description]  
-✨feat: Add login feature  
+feat: Add login feature  
 <Details>: Use "-" for bullet points  
 - Added LoginFoo class  
   - LoginBar function...  
@@ -15,16 +15,16 @@
 ╭───────────────────────────────╮
 │        Title Tags Guide       │ 
 ├───────────────────────────────┤
-✨feat: New feature
-🐛fix: Bug fix
-📝docs: Docs update
-♻️refactor: Refactor code
-💄style: Code style
-🧪test: Tests
-🔖build: Build updates
-🍱content: Content/assets
-📦️package: Packages/plugins
-🔧chore: Misc changes
-🔀merge: Merge
-⏪️revert: Revert
+feat: New feature
+fix: Bug fix
+docs: Docs update
+refactor: Refactor code
+style: Code style
+test: Tests
+build: Build updates
+content: Content/assets
+package: Packages/plugins
+chore: Misc changes
+merge: Merge
+revert: Revert
 ╰───────────────────────────────╯
