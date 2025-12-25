@@ -13,6 +13,12 @@ namespace DungeonShooter
             builder.Register<InputManager>(Lifetime.Singleton);
             base.Configure(builder);
         }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            DontDestroyOnLoad(gameObject);
+        }
     }
 }
 
