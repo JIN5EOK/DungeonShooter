@@ -9,9 +9,8 @@ namespace DungeonShooter
     [Serializable]
     public class TileLayerData
     {
-        [SerializeField] private int index;
+        [SerializeField] private int index; // RoomData의 assetAddresses 인덱스 (TileBase 어드레서블 주소)
         [SerializeField] private int layer; // SortingLayer
-        [SerializeField] private Vector2Int palettePosition; // 팔레트상의 위치
         [SerializeField] private Vector2Int position; // 방 생성시 배치될 위치
 
         public int Index
@@ -24,12 +23,6 @@ namespace DungeonShooter
         {
             get => layer;
             set => layer = value;
-        }
-
-        public Vector2Int PalettePosition
-        {
-            get => palettePosition;
-            set => palettePosition = value;
         }
 
         public Vector2Int Position

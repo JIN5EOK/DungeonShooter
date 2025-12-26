@@ -11,6 +11,12 @@
 
 ### 방 데이터 프리셋 편집 및 저장
 * `RoomDataSerializer` 를 사용, 에디터를 통해 배치한 타일맵과 오브젝트들을 `RoomData`로 직렬화
+* 방 데이터 프리셋 제작시 계층구조
+    * RootGameObject
+        * Tilemaps
+            * 타일맵 컴포넌트들..(레이어에 따라 별도의 게임오브젝트로 분리됨)
+        * Objects
+            * 게임 오브젝트들 (플레이어, 적, 보물상자 등..) 
 ### 런타임 중 스테이지 생성
 * `StageGenerator`가 스테이지 생성 관련 세부 로직을 담당한다
 * `RoomDataSerializer`를 통해 역직렬화된 `RoomData`를 가져와 `Room`을 생성한다
@@ -47,7 +53,7 @@ classDiagram
     }
     class RoomData {
         -assetAddresses List< string >
-        // 타일 팔레트, 게임 오브젝트등 동적 로드에 사용되는 주소들
+        // 타일과 게임 오브젝트 어드레서블 주소 목록
         +tiles : List< TileLayerData >
         +objects : List< ObjectData >
     }
@@ -55,11 +61,9 @@ classDiagram
     class TileLayerData{
         +int index
         // index == RoomData의 어드레스 컬렉션상의 인덱스
-        // 타일 팔레트 어드레스에 해당
+        // TileBase 어드레서블 주소에 해당
         // 문자열 주소의 중복을 최소화 해서 용량 아끼기 위함
         +int layer // SortingLayer
-        +palettePosition Vector2Int
-        // 팔레트상의 위치
         +position Vector2Int
         // 방 생성시 배치될 위치
     }

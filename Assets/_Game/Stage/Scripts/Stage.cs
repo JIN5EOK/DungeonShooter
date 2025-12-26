@@ -58,6 +58,21 @@ namespace DungeonShooter
         {
             return _rooms.ContainsKey(id);
         }
+
+        /// <summary>
+        /// 반대 방향을 반환합니다.
+        /// </summary>
+        private Direction GetOppositeDirection(Direction direction)
+        {
+            return direction switch
+            {
+                Direction.North => Direction.South,
+                Direction.South => Direction.North,
+                Direction.East => Direction.West,
+                Direction.West => Direction.East,
+                _ => direction
+            };
+        }
     }
 }
 

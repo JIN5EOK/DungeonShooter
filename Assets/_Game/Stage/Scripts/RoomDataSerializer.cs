@@ -1,5 +1,11 @@
 using System.IO;
 using UnityEngine;
+using UnityEngine.Tilemaps;
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.AddressableAssets;
+using UnityEngine.AddressableAssets;
+#endif
 
 namespace DungeonShooter
 {
@@ -8,6 +14,45 @@ namespace DungeonShooter
     /// </summary>
     public static class RoomDataSerializer
     {
+#if UNITY_EDITOR
+        /// <summary>
+        /// 오브젝트의 어드레서블 주소를 가져옵니다. (에디터 전용)
+        /// </summary>
+        public static string GetAddressableAddress(Object obj)
+        {
+            if (obj == null)
+            {
+                return null;
+            }
+
+            // 1. 에셋 경로 얻기
+            string assetPath = AssetDatabase.GetAssetPath(obj);
+            if (string.IsNullOrEmpty(assetPath))
+            {
+                return null;
+            }
+
+            // 2. GUID 얻기
+            string guid = AssetDatabase.AssetPathToGUID(assetPath);
+
+            // 3. Addressables 설정에서 주소 찾기
+            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            if (settings == null)
+            {
+                Debug.LogWarning("[RoomDataSerializer] AddressableAssetSettings를 찾을 수 없습니다.");
+                return null;
+            }
+
+            var entry = settings.FindAssetEntry(guid);
+            if (entry != null)
+            {
+                return entry.address;
+            }
+
+            Debug.LogWarning($"[RoomDataSerializer] 오브젝트 '{obj.name}'의 어드레서블 주소를 찾을 수 없습니다. 어드레서블로 등록되어 있는지 확인하세요.");
+            return null;
+        }
+#endif
         /// <summary>
         /// 에디터에서 배치한 게임 오브젝트를 RoomData로 직렬화합니다.
         /// </summary>

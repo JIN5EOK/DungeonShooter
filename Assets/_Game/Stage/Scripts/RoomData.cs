@@ -10,7 +10,7 @@ namespace DungeonShooter
     [Serializable]
     public class RoomData
     {
-        [SerializeField] private List<string> assetAddresses = new List<string>(); // 타일 팔레트, 게임 오브젝트등 동적 로드에 사용되는 주소들
+        [SerializeField] private List<string> assetAddresses = new List<string>(); // TileBase 어드레서블 주소, 게임 오브젝트 어드레서블 주소 등 동적 로드에 사용되는 주소들
         [SerializeField] private List<TileLayerData> tiles = new List<TileLayerData>();
         [SerializeField] private List<ObjectData> objects = new List<ObjectData>();
 
