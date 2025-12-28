@@ -11,6 +11,11 @@
 
 ### 방 데이터 프리셋 편집 및 저장
 * `RoomDataSerializer` 를 사용, 에디터를 통해 배치한 타일맵과 오브젝트들을 `RoomData`로 직렬화
+    * 다음과 같은 방식으로 저장시 용량을 최적화한다
+    * 타일셋과 오브젝트의 종류를 표현할때 인덱스 방식으로 표현
+    * 예) "Enemy001" 같은 방식이 아닌 타일,오브젝트 주소 배열을 따로 만들고 해당하는 숫자 인덱스로 표현
+    * RLE 알고리즘을 통해 연속되는 타일 용량 최적화
+
 * 방 데이터 프리셋 제작시 계층구조
     * RootGameObject
         * Tilemaps
@@ -86,16 +91,28 @@ classDiagram
         +GenerateStage() void
     }
     Room --> Direction
-    StageGenerator --> RoomDataSerializer : 필요한 방 정보 역직렬화 해 가져오기
+    StageGenerator --> RoomDataSerializer : 방 정보 요청
     StageGenerator --> Stage : 방과 스테이지 생성
-    RoomDataSerializer -->  에디터상의게임맵 : 에디터로 배치된 게임 방을 읽어 직렬화
+    RoomDataSerializer -->  StageGenerator : 방 정보 역직렬화 후 반환
     Stage "1" -- "1..*" Room
     Room --> RoomData
     RoomData "1"-->"1..*" TileLayerData
     RoomData "1"-->"1..*" ObjectData
 ```
-
 ### 플로우차트
+
+`RoomData` 직렬화/역직렬화 흐름도
+```mermaid
+graph TD
+    A[사용자] -->|RoomData 전달| B[RoomDataSerializer]
+    B -->|변환| C[SerializedRoomData]
+    C -->|저장| D[직렬화데이터]
+    
+    D -->|로드| C
+    C -->|변환| B
+    B -->|RoomData 반환| A
+```
+
 방 진입 -> 클리어 흐름도
 ```mermaid
 graph TD;
