@@ -22,7 +22,7 @@ public abstract class ItemBase
     {
         if (itemData == null)
         {
-            Debug.LogError("[ItemBase] ItemData가 null입니다.");
+            Debug.LogError($"[{nameof(ItemBase)}] ItemData가 null입니다.");
             _itemEffects = new List<ItemEffect>();
             return;
         }

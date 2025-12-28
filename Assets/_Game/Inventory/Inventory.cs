@@ -34,7 +34,7 @@ public class Inventory
     {
         if (item == null)
         {
-            Debug.LogWarning("[Inventory] 아이템이 null입니다.");
+            Debug.LogWarning($"[{nameof(Inventory)}] 아이템이 null입니다.");
             return;
         }
 
@@ -53,7 +53,7 @@ public class Inventory
         // 장착된 아이템인지 확인
         if (item == _equippedWeapon || item == _equippedActive)
         {
-            Debug.LogWarning("[Inventory] 장착된 아이템은 제거할 수 없습니다. 먼저 해제하세요.");
+            Debug.LogWarning($"[{nameof(Inventory)}] 장착된 아이템은 제거할 수 없습니다. 먼저 해제하세요.");
             return false;
         }
 
@@ -72,14 +72,14 @@ public class Inventory
     {
         if (weapon == null)
         {
-            Debug.LogWarning("[Inventory] 무기가 null입니다.");
+            Debug.LogWarning($"[{nameof(Inventory)}] 무기가 null입니다.");
             return false;
         }
 
         // 인벤토리에 있는지 확인
         if (!_items.Contains(weapon))
         {
-            Debug.LogWarning("[Inventory] 인벤토리에 없는 무기입니다.");
+            Debug.LogWarning($"[{nameof(Inventory)}] 인벤토리에 없는 무기입니다.");
             return false;
         }
 
@@ -103,14 +103,14 @@ public class Inventory
     {
         if (activeItem == null)
         {
-            Debug.LogWarning("[Inventory] 액티브 아이템이 null입니다.");
+            Debug.LogWarning($"[{nameof(Inventory)}] 액티브 아이템이 null입니다.");
             return false;
         }
 
         // 인벤토리에 있는지 확인
         if (!_items.Contains(activeItem))
         {
-            Debug.LogWarning("[Inventory] 인벤토리에 없는 액티브 아이템입니다.");
+            Debug.LogWarning($"[{nameof(Inventory)}] 인벤토리에 없는 액티브 아이템입니다.");
             return false;
         }
 

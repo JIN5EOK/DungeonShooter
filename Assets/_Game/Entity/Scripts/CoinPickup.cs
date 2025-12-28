@@ -89,12 +89,12 @@ public class CoinPickup : MonoBehaviour
     {
         if (_coinInventory == null)
         {
-            Debug.LogWarning("[CoinPickup] CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
+            Debug.LogWarning($"[{nameof(CoinPickup)}] CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
             return;
         }
 
         _coinInventory.AddCoins(coinValue);
-        Debug.Log($"[CoinPickup] {player.name}이(가) 코인 {coinValue}개 획득! 총 {_coinInventory.CurrentCoins}");
+        Debug.Log($"[{nameof(CoinPickup)}] {player.name}이(가) 코인 {coinValue}개 획득! 총 {_coinInventory.CurrentCoins}");
     }
 }
 

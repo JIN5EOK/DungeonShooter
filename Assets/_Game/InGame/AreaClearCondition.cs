@@ -48,7 +48,7 @@ public class AreaClearCondition : MonoBehaviour
 
         if (targetGate == null && showDebugInfo)
         {
-            Debug.LogWarning($"[AreaClearCondition] {gameObject.name}: 연결된 AreaGate를 찾을 수 없습니다.");
+            Debug.LogWarning($"[{nameof(AreaClearCondition)}] {gameObject.name}: 연결된 AreaGate를 찾을 수 없습니다.");
         }
 
         InitializeEnemies();
@@ -83,7 +83,7 @@ public class AreaClearCondition : MonoBehaviour
 
                 if (showDebugInfo && count > 0)
                 {
-                    Debug.Log($"[AreaClearCondition] {gameObject.name}: {count}개의 Collider 감지됨");
+                    Debug.Log($"[{nameof(AreaClearCondition)}] {gameObject.name}: {count}개의 Collider 감지됨");
                 }
 
                 foreach (Collider2D col in colliders)
@@ -102,7 +102,7 @@ public class AreaClearCondition : MonoBehaviour
             {
                 if (showDebugInfo)
                 {
-                    Debug.LogWarning($"[AreaClearCondition] {gameObject.name}: detectionArea와 Collider가 없어 자동 감지가 불가능합니다.");
+                    Debug.LogWarning($"[{nameof(AreaClearCondition)}] {gameObject.name}: detectionArea와 Collider가 없어 자동 감지가 불가능합니다.");
                 }
             }
         }
@@ -122,7 +122,7 @@ public class AreaClearCondition : MonoBehaviour
 
         if (showDebugInfo)
         {
-            Debug.Log($"[AreaClearCondition] {gameObject.name} 초기화 완료. 추적 중인 적: {_trackedEnemies.Count}마리");
+            Debug.Log($"[{nameof(AreaClearCondition)}] {gameObject.name} 초기화 완료. 추적 중인 적: {_trackedEnemies.Count}마리");
         }
     }
 
@@ -187,7 +187,7 @@ public class AreaClearCondition : MonoBehaviour
         
         if (showDebugInfo)
         {
-            Debug.Log($"[AreaClearCondition] {gameObject.name}: 적 사망 감지. 남은 적: {_trackedEnemies.Count}마리");
+            Debug.Log($"[{nameof(AreaClearCondition)}] {gameObject.name}: 적 사망 감지. 남은 적: {_trackedEnemies.Count}마리");
         }
 
         // 클리어 조건 체크
@@ -231,7 +231,7 @@ public class AreaClearCondition : MonoBehaviour
 
         if (showDebugInfo)
         {
-            Debug.Log($"[AreaClearCondition] {gameObject.name} 클리어 조건 만족!");
+            Debug.Log($"[{nameof(AreaClearCondition)}] {gameObject.name} 클리어 조건 만족!");
         }
 
         // AreaGate에 알림

@@ -81,7 +81,7 @@ namespace DungeonShooter
             var settings = AddressableAssetSettingsDefaultObject.Settings;
             if (settings == null)
             {
-                Debug.LogWarning("[RoomDataSerializer] AddressableAssetSettings를 찾을 수 없습니다.");
+                Debug.LogWarning($"[{nameof(RoomDataSerializer)}] AddressableAssetSettings를 찾을 수 없습니다.");
                 return null;
             }
 
@@ -91,7 +91,7 @@ namespace DungeonShooter
                 return entry.address;
             }
 
-            Debug.LogWarning($"[RoomDataSerializer] 오브젝트 '{obj.name}'의 어드레서블 주소를 찾을 수 없습니다. 어드레서블로 등록되어 있는지 확인하세요.");
+            Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 오브젝트 '{obj.name}'의 어드레서블 주소를 찾을 수 없습니다. 어드레서블로 등록되어 있는지 확인하세요.");
             return null;
         }
 

@@ -50,11 +50,11 @@ public class CameraController : MonoBehaviour
             if (player != null)
             {
                 _target = player.transform;
-                Debug.Log($"[CameraController] Player 자동 찾기 완료: {player.name}");
+                Debug.Log($"[{nameof(CameraController)}] Player 자동 찾기 완료: {player.name}");
             }
             else
             {
-                Debug.LogWarning("[CameraController] Player 태그를 가진 오브젝트를 찾을 수 없습니다.");
+                Debug.LogWarning($"[{nameof(CameraController)}] Player 태그를 가진 오브젝트를 찾을 수 없습니다.");
             }
         }
     }
@@ -137,11 +137,11 @@ public class CameraController : MonoBehaviour
         
         if (target == null)
         {
-            Debug.Log("[CameraController] 추적 대상이 null로 설정되어 추적이 중지됩니다.");
+            Debug.Log($"[{nameof(CameraController)}] 추적 대상이 null로 설정되어 추적이 중지됩니다.");
         }
         else
         {
-            Debug.Log($"[CameraController] 추적 대상 변경: {target.name}");
+            Debug.Log($"[{nameof(CameraController)}] 추적 대상 변경: {target.name}");
         }
     }
 

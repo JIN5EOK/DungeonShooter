@@ -80,13 +80,13 @@ public class FieldItem : MonoBehaviour, IInteractable
 
         if (_inventory == null)
         {
-            Debug.LogWarning("[FieldItem] Inventory가 주입되지 않았습니다.");
+            Debug.LogWarning($"[{nameof(FieldItem)}] Inventory가 주입되지 않았습니다.");
             return;
         }
 
         if (item == null)
         {
-            Debug.LogWarning("[FieldItem] 아이템이 설정되지 않았습니다.");
+            Debug.LogWarning($"[{nameof(FieldItem)}] 아이템이 설정되지 않았습니다.");
             return;
         }
 

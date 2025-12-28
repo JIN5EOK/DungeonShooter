@@ -42,7 +42,7 @@ public class GameUIManager : MonoBehaviour
 
         if (player == null)
         {
-            Debug.LogError("[GameUIManager] 플레이어를 찾을 수 없습니다!");
+            Debug.LogError($"[{nameof(GameUIManager)}] 플레이어를 찾을 수 없습니다!");
             return;
         }
 
@@ -53,12 +53,12 @@ public class GameUIManager : MonoBehaviour
         // CooldownComponent가 아직 초기화 안 됐으면 재시도
         if (_playerCooldowns == null)
         {
-            Debug.LogWarning("[GameUIManager] CooldownComponent가 아직 초기화되지 않음. 재시도 중...");
+            Debug.LogWarning($"[{nameof(GameUIManager)}] CooldownComponent가 아직 초기화되지 않음. 재시도 중...");
             await RetryInitializationAsync();
             return;
         }
 
-        Debug.Log("[GameUIManager] 초기화 완료");
+        Debug.Log($"[{nameof(GameUIManager)}] 초기화 완료");
 
         // 체력 UI 초기화
         if (healthBarUI != null && _playerHealth != null)
@@ -87,7 +87,7 @@ public class GameUIManager : MonoBehaviour
                 _playerCooldowns = player.GetCooldownComponent();
                 if (_playerCooldowns != null)
                 {
-                    Debug.Log($"[GameUIManager] CooldownComponent 초기화 완료! (재시도: {retryCount + 1}회)");
+                    Debug.Log($"[{nameof(GameUIManager)}] CooldownComponent 초기화 완료! (재시도: {retryCount + 1}회)");
                     InitializeSkillUIs();
                     return; // 성공하면 종료
                 }
@@ -96,7 +96,7 @@ public class GameUIManager : MonoBehaviour
             retryCount++;
         }
 
-        Debug.LogError($"[GameUIManager] CooldownComponent 초기화 실패! {maxRetries}회 재시도 후 포기.");
+        Debug.LogError($"[{nameof(GameUIManager)}] CooldownComponent 초기화 실패! {maxRetries}회 재시도 후 포기.");
     }
 
     /// <summary>

@@ -19,7 +19,7 @@ namespace DungeonShooter
             // 2. 정해진 로직에 따라 각 방을 이어붙여 Stage 생성
             // 3. 랜덤 선택, 연결 규칙 등 적용
 
-            Debug.LogWarning("[StageGenerator] GenerateStage는 아직 구현되지 않았습니다.");
+            Debug.LogWarning($"[{nameof(StageGenerator)}] GenerateStage는 아직 구현되지 않았습니다.");
             return stage;
         }
     }

@@ -24,7 +24,7 @@ namespace DungeonShooter
             LayerIndex = LayerMask.NameToLayer(layerName);
             if (LayerIndex == -1)
             {
-                Debug.LogWarning($"[GameLayer] '{layerName}' 레이어가 TagManager에 정의되어 있지 않습니다.");
+                Debug.LogWarning($"[{nameof(GameLayer)}] '{layerName}' 레이어가 TagManager에 정의되어 있지 않습니다.");
             }
             Mask = LayerIndex >= 0 ? 1 << LayerIndex : 0;
         }

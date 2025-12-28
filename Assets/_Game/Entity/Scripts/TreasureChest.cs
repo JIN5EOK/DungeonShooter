@@ -103,7 +103,7 @@ public class TreasureChest : MonoBehaviour, IInteractable
 
             if (showDebugInfo)
             {
-                Debug.Log($"[TreasureChest] {gameObject.name}: 플레이어가 범위 내에 들어왔습니다.");
+                Debug.Log($"[{nameof(TreasureChest)}] {gameObject.name}: 플레이어가 범위 내에 들어왔습니다.");
             }
         }
     }
@@ -129,7 +129,7 @@ public class TreasureChest : MonoBehaviour, IInteractable
 
             if (showDebugInfo)
             {
-                Debug.Log($"[TreasureChest] {gameObject.name}: 플레이어가 범위를 벗어났습니다.");
+                Debug.Log($"[{nameof(TreasureChest)}] {gameObject.name}: 플레이어가 범위를 벗어났습니다.");
             }
         }
     }
@@ -146,7 +146,7 @@ public class TreasureChest : MonoBehaviour, IInteractable
 
         if (showDebugInfo)
         {
-            Debug.Log($"[TreasureChest] {gameObject.name}: 상자가 열렸습니다!");
+            Debug.Log($"[{nameof(TreasureChest)}] {gameObject.name}: 상자가 열렸습니다!");
         }
 
         // 상호작용 프롬프트 숨기기
@@ -205,7 +205,7 @@ public class TreasureChest : MonoBehaviour, IInteractable
 
             if (showDebugInfo)
             {
-                Debug.Log($"[TreasureChest] {gameObject.name}: 코인 {coinReward}개를 드롭했습니다.");
+                Debug.Log($"[{nameof(TreasureChest)}] {gameObject.name}: 코인 {coinReward}개를 드롭했습니다.");
             }
         }
         else
@@ -216,12 +216,12 @@ public class TreasureChest : MonoBehaviour, IInteractable
                 _coinInventory.AddCoins(coinReward);
                 if (showDebugInfo)
                 {
-                    Debug.Log($"[TreasureChest] {gameObject.name}: 코인 {coinReward}개를 지급했습니다. 총 {_coinInventory.CurrentCoins}개");
+                    Debug.Log($"[{nameof(TreasureChest)}] {gameObject.name}: 코인 {coinReward}개를 지급했습니다. 총 {_coinInventory.CurrentCoins}개");
                 }
             }
             else
             {
-                Debug.LogWarning($"[TreasureChest] {gameObject.name}: CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
+                Debug.LogWarning($"[{nameof(TreasureChest)}] {gameObject.name}: CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
             }
         }
     }

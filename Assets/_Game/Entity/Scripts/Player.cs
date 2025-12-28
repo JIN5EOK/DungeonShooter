@@ -100,7 +100,7 @@ public class Player : EntityBase
             _originalColor = _spriteRenderer.color;
         }
 
-        Debug.Log($"[PlayerProto] 체력 시스템 초기화 완료: {_healthComponent.CurrentHealth}/{_healthComponent.MaxHealth}");
+        Debug.Log($"[{nameof(Player)}] 체력 시스템 초기화 완료: {_healthComponent.CurrentHealth}/{_healthComponent.MaxHealth}");
 
         // 스킬 범위 시각화 초기화
         if (showSkillRanges)
@@ -581,7 +581,7 @@ public class Player : EntityBase
     /// </summary>
     private void HandleDamaged(int damage, int remainingHealth)
     {
-        Debug.Log($"[PlayerProto] 피격! 데미지: {damage}, 남은 HP: {remainingHealth}");
+        Debug.Log($"[{nameof(Player)}] 피격! 데미지: {damage}, 남은 HP: {remainingHealth}");
 
         // 시각적 피드백
         StartCoroutine(HitFlashEffect());
@@ -617,7 +617,7 @@ public class Player : EntityBase
 
         _isDead = true;
 
-        Debug.Log("[PlayerProto] 플레이어 사망!");
+        Debug.Log($"[{nameof(Player)}] 플레이어 사망!");
 
         // 물리 완전 중지
         rb.linearVelocity = Vector2.zero;
@@ -672,7 +672,7 @@ public class Player : EntityBase
 
         yield return new WaitForSeconds(0.5f); // 추가 대기
 
-        Debug.Log("[PlayerProto] 게임 오버! 씬 재시작 중...");
+        Debug.Log($"[{nameof(Player)}] 게임 오버! 씬 재시작 중...");
 
         // 씬 재시작
         UnityEngine.SceneManagement.SceneManager.LoadScene(
@@ -706,7 +706,7 @@ public class Player : EntityBase
         if (_healthComponent != null && !_isDead)
         {
             _healthComponent.Heal(amount);
-            Debug.Log($"[PlayerProto] 체력 회복: +{amount}");
+            Debug.Log($"[{nameof(Player)}] 체력 회복: +{amount}");
         }
     }
 }

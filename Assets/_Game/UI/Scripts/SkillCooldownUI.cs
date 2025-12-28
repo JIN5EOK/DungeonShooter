@@ -45,7 +45,7 @@ public class SkillCooldownUI : MonoBehaviour
     {
         if (cooldownComponent == null || string.IsNullOrEmpty(_skillCooldownKey))
         {
-            Debug.LogWarning($"[SkillCooldownUI] UpdateCooldown 실패: cooldownComponent={cooldownComponent != null}, key='{_skillCooldownKey}'");
+            Debug.LogWarning($"[{nameof(SkillCooldownUI)}] UpdateCooldown 실패: cooldownComponent={cooldownComponent != null}, key='{_skillCooldownKey}'");
             return;
         }
 
@@ -56,7 +56,7 @@ public class SkillCooldownUI : MonoBehaviour
         // 디버그 로그 (쿨다운 중일 때만)
         if (!skillReady)
         {
-            Debug.Log($"[SkillCooldownUI] {_skillCooldownKey}: {remainingTime:F1}s / {totalCooldown:F1}s");
+            Debug.Log($"[{nameof(SkillCooldownUI)}] {_skillCooldownKey}: {remainingTime:F1}s / {totalCooldown:F1}s");
         }
 
         if (skillReady)

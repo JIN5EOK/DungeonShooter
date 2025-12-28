@@ -33,7 +33,7 @@ namespace DungeonShooter
             if (!_rooms.TryGetValue(roomId1, out Room room1) || 
                 !_rooms.TryGetValue(roomId2, out Room room2))
             {
-                Debug.LogWarning($"[Stage] 연결하려는 방 중 하나가 존재하지 않습니다. Room1: {roomId1}, Room2: {roomId2}");
+                Debug.LogWarning($"[{nameof(Stage)}] 연결하려는 방 중 하나가 존재하지 않습니다. Room1: {roomId1}, Room2: {roomId2}");
                 return;
             }
 
