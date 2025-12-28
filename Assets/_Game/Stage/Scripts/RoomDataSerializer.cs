@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -6,7 +7,6 @@ using UnityEditor;
 using UnityEditor.AddressableAssets;
 #endif
 
-// TODO: RLE 압축 알고리즘 적용 필요
 namespace DungeonShooter
 {
     /// <summary>
@@ -14,11 +14,53 @@ namespace DungeonShooter
     /// </summary>
     public static class RoomDataSerializer
     {
-#if UNITY_EDITOR
         /// <summary>
-        /// 오브젝트의 어드레서블 주소를 가져옵니다. (에디터 전용)
+        /// 에디터에서 배치한 게임 오브젝트를 RoomData로 직렬화합니다.
         /// </summary>
-        public static string GetAddressableAddress(Object obj)
+        public static RoomData SerializeRoom(GameObject room)
+        {
+            if (Application.isEditor == false)
+            {
+                Debug.LogError($"[{nameof(RoomDataSerializer)}] SerializeRoom은 에디터에서만 사용할 수 있습니다.");
+                return null;
+            }
+            if (room == null)
+            {
+                Debug.LogError($"[{nameof(RoomDataSerializer)}] 게임오브젝트가 null입니다.");
+                return null;
+            }
+
+            RoomData roomData = new RoomData();
+
+            // 1. Tilemaps 하위의 타일맵 컴포넌트들을 찾아서 TileLayerData로 변환
+            Transform tilemapsTransform = room.transform.Find("Tilemaps");
+            if (tilemapsTransform != null)
+            {
+                SerializeTilemaps(tilemapsTransform, roomData);
+            }
+            else
+            {
+                Debug.LogWarning($"[{nameof(RoomDataSerializer)}] '{room.name}'에 'Tilemaps' 자식이 없습니다.");
+            }
+
+            // 2. Objects 하위의 오브젝트들을 찾아서 ObjectData로 변환
+            Transform objectsTransform = room.transform.Find("Objects");
+            if (objectsTransform != null)
+            {
+                SerializeObjects(objectsTransform, roomData);
+            }
+            else
+            {
+                Debug.LogWarning($"[{nameof(RoomDataSerializer)}] '{room.name}'에 'Objects' 자식이 없습니다.");
+            }
+
+            return roomData;
+        }
+
+        /// <summary>
+        /// 오브젝트의 어드레서블 주소를 가져옵니다.
+        /// </summary>
+        private static string GetAddressableAddress(Object obj)
         {
             if (obj == null)
             {
@@ -52,50 +94,7 @@ namespace DungeonShooter
             Debug.LogWarning($"[RoomDataSerializer] 오브젝트 '{obj.name}'의 어드레서블 주소를 찾을 수 없습니다. 어드레서블로 등록되어 있는지 확인하세요.");
             return null;
         }
-#endif
-        /// <summary>
-        /// 에디터에서 배치한 게임 오브젝트를 RoomData로 직렬화합니다.
-        /// </summary>
-        public static RoomData SerializeRoom(GameObject room)
-        {
-            if (room == null)
-            {
-                Debug.LogError("[RoomDataSerializer] room이 null입니다.");
-                return null;
-            }
 
-            RoomData roomData = new RoomData();
-
-#if UNITY_EDITOR
-            // 1. Tilemaps 하위의 타일맵 컴포넌트들을 찾아서 TileLayerData로 변환
-            Transform tilemapsTransform = room.transform.Find("Tilemaps");
-            if (tilemapsTransform != null)
-            {
-                SerializeTilemaps(tilemapsTransform, roomData);
-            }
-            else
-            {
-                Debug.LogWarning($"[RoomDataSerializer] '{room.name}'에 'Tilemaps' 자식이 없습니다.");
-            }
-
-            // 2. Objects 하위의 오브젝트들을 찾아서 ObjectData로 변환
-            Transform objectsTransform = room.transform.Find("Objects");
-            if (objectsTransform != null)
-            {
-                SerializeObjects(objectsTransform, roomData);
-            }
-            else
-            {
-                Debug.LogWarning($"[RoomDataSerializer] '{room.name}'에 'Objects' 자식이 없습니다.");
-            }
-#else
-            Debug.LogError("[RoomDataSerializer] SerializeRoom은 에디터에서만 사용할 수 있습니다.");
-#endif
-
-            return roomData;
-        }
-
-#if UNITY_EDITOR
         /// <summary>
         /// 타일맵들을 직렬화합니다.
         /// </summary>
@@ -124,7 +123,7 @@ namespace DungeonShooter
                     string address = GetAddressableAddress(tile);
                     if (string.IsNullOrEmpty(address))
                     {
-                        Debug.LogWarning($"[RoomDataSerializer] 타일 '{tile.name}'의 어드레서블 주소를 찾을 수 없습니다. 위치: {pos}");
+                        Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 타일 '{tile.name}'의 어드레서블 주소를 찾을 수 없습니다. 위치: {pos}");
                         continue;
                     }
 
@@ -156,7 +155,6 @@ namespace DungeonShooter
                 GameObject obj = child.gameObject;
 
                 // 프리팹 인스턴스인지 확인
-#if UNITY_EDITOR
                 PrefabAssetType prefabType = PrefabUtility.GetPrefabAssetType(obj);
                 if (prefabType == PrefabAssetType.NotAPrefab)
                 {
@@ -164,7 +162,7 @@ namespace DungeonShooter
                     GameObject prefabRoot = PrefabUtility.GetCorrespondingObjectFromSource(obj);
                     if (prefabRoot == null)
                     {
-                        Debug.LogWarning($"[RoomDataSerializer] 오브젝트 '{obj.name}'는 프리팹이 아닙니다. 어드레서블로 등록된 프리팹을 사용해야 합니다.");
+                        Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 오브젝트 '{obj.name}'는 프리팹이 아닙니다. 어드레서블로 등록된 프리팹을 사용해야 합니다.");
                         continue;
                     }
 
@@ -172,7 +170,7 @@ namespace DungeonShooter
                     string address = GetAddressableAddress(prefabRoot);
                     if (string.IsNullOrEmpty(address))
                     {
-                        Debug.LogWarning($"[RoomDataSerializer] 프리팹 '{prefabRoot.name}'의 어드레서블 주소를 찾을 수 없습니다.");
+                        Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 프리팹 '{prefabRoot.name}'의 어드레서블 주소를 찾을 수 없습니다.");
                         continue;
                     }
 
@@ -202,7 +200,7 @@ namespace DungeonShooter
                     string address = GetAddressableAddress(prefabAsset);
                     if (string.IsNullOrEmpty(address))
                     {
-                        Debug.LogWarning($"[RoomDataSerializer] 프리팹 '{prefabAsset.name}'의 어드레서블 주소를 찾을 수 없습니다.");
+                        Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 프리팹 '{prefabAsset.name}'의 어드레서블 주소를 찾을 수 없습니다.");
                         continue;
                     }
 
@@ -218,10 +216,8 @@ namespace DungeonShooter
 
                     roomData.Objects.Add(objectData);
                 }
-#endif
             }
         }
-#endif
 
         /// <summary>
         /// 파일에서 RoomData를 역직렬화합니다.
@@ -230,19 +226,27 @@ namespace DungeonShooter
         {
             if (string.IsNullOrEmpty(path) || !File.Exists(path))
             {
-                Debug.LogError($"[RoomDataSerializer] 파일을 찾을 수 없습니다: {path}");
+                Debug.LogError($"[{nameof(RoomDataSerializer)}] 파일을 찾을 수 없습니다: {path}");
                 return null;
             }
 
             try
             {
                 string json = File.ReadAllText(path);
-                RoomData roomData = JsonUtility.FromJson<RoomData>(json);
-                return roomData;
+                SerializedRoomData serialized = JsonUtility.FromJson<SerializedRoomData>(json);
+                
+                if (serialized == null)
+                {
+                    Debug.LogError($"[{nameof(RoomDataSerializer)}] 역직렬화된 데이터가 null입니다.");
+                    return null;
+                }
+                
+                // RoomData로 변환 (RLE 압축 해제)
+                return serialized.ToRoomData();
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[RoomDataSerializer] 역직렬화 실패: {e.Message}");
+                Debug.LogError($"[{nameof(RoomDataSerializer)}] 역직렬화 실패: {e.Message}");
                 return null;
             }
         }
@@ -254,13 +258,22 @@ namespace DungeonShooter
         {
             if (roomData == null)
             {
-                Debug.LogError("[RoomDataSerializer] roomData가 null입니다.");
+                Debug.LogError($"[{nameof(RoomDataSerializer)}] roomData가 null입니다.");
                 return;
             }
 
             try
             {
-                string json = JsonUtility.ToJson(roomData, true);
+                // RoomData를 RoomDataSerialized로 변환 (RLE 압축)
+                SerializedRoomData serialized = SerializedRoomData.FromRoomData(roomData);
+                if (serialized == null)
+                {
+                    Debug.LogError($"[{nameof(RoomDataSerializer)}] 직렬화 변환에 실패했습니다.");
+                    return;
+                }
+
+                // JSON으로 직렬화 (pretty print 제거로 용량 절약)
+                string json = JsonUtility.ToJson(serialized, false);
                 string directory = Path.GetDirectoryName(path);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 {
@@ -268,13 +281,14 @@ namespace DungeonShooter
                 }
 
                 File.WriteAllText(path, json);
-                Debug.Log($"[RoomDataSerializer] 저장 완료: {path}");
+                Debug.Log($"[{nameof(RoomDataSerializer)}] 저장 완료: {path}");
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[RoomDataSerializer] 저장 실패: {e.Message}");
+                Debug.LogError($"[{nameof(RoomDataSerializer)}] 저장 실패: {e.Message}");
             }
         }
+
     }
 }
 

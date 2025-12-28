@@ -1,0 +1,147 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace DungeonShooter
+{
+    /// <summary>
+    /// 직렬화 전용 RoomData - RLE 압축된 형태로 저장
+    /// </summary>
+    [Serializable]
+    public class SerializedRoomData
+    {
+        [SerializeField] private List<string> assetAddresses = new List<string>();
+        [SerializeField] private List<TileLayerDataRLE> tilesRLE = new List<TileLayerDataRLE>(); // RLE 압축된 타일
+        [SerializeField] private List<ObjectData> objects = new List<ObjectData>();
+
+        public List<string> AssetAddresses
+        {
+            get => assetAddresses;
+            set => assetAddresses = value;
+        }
+
+        public List<TileLayerDataRLE> TilesRLE
+        {
+            get => tilesRLE;
+            set => tilesRLE = value;
+        }
+
+        public List<ObjectData> Objects
+        {
+            get => objects;
+            set => objects = value;
+        }
+
+        /// <summary>
+        /// RoomData로 변환합니다 (RLE 압축 해제).
+        /// </summary>
+        public RoomData ToRoomData()
+        {
+            RoomData roomData = new RoomData();
+            roomData.AssetAddresses = new List<string>(assetAddresses);
+            roomData.Objects = new List<ObjectData>(objects);
+
+            // RLE 압축 해제
+            foreach (TileLayerDataRLE rleData in tilesRLE)
+            {
+                for (int i = 0; i < rleData.Length; i++)
+                {
+                    TileLayerData tileData = new TileLayerData
+                    {
+                        Index = rleData.Index,
+                        Layer = rleData.Layer,
+                        Position = new Vector2Int(rleData.StartPosition.x + i, rleData.StartPosition.y)
+                    };
+
+                    roomData.Tiles.Add(tileData);
+                }
+            }
+
+            return roomData;
+        }
+
+        /// <summary>
+        /// RoomData로부터 생성합니다 (RLE 압축).
+        /// </summary>
+        public static SerializedRoomData FromRoomData(RoomData roomData)
+        {
+            if (roomData == null)
+            {
+                return null;
+            }
+
+            SerializedRoomData serialized = new SerializedRoomData();
+            serialized.AssetAddresses = new List<string>(roomData.AssetAddresses);
+            serialized.Objects = new List<ObjectData>(roomData.Objects);
+
+            // RLE 압축
+            CompressTiles(roomData.Tiles, serialized.TilesRLE);
+
+            return serialized;
+        }
+
+        /// <summary>
+        /// 타일 데이터를 RLE로 압축합니다.
+        /// </summary>
+        private static void CompressTiles(List<TileLayerData> tiles, List<TileLayerDataRLE> tilesRLE)
+        {
+            if (tiles == null || tiles.Count == 0)
+            {
+                return;
+            }
+
+            tilesRLE.Clear();
+
+            // 타일들을 레이어, Y 좌표, index, X 좌표 순으로 정렬
+            List<TileLayerData> sortedTiles = new List<TileLayerData>(tiles);
+            sortedTiles.Sort((a, b) =>
+            {
+                int layerCompare = a.Layer.CompareTo(b.Layer);
+                if (layerCompare != 0) return layerCompare;
+
+                int yCompare = a.Position.y.CompareTo(b.Position.y);
+                if (yCompare != 0) return yCompare;
+
+                int indexCompare = a.Index.CompareTo(b.Index);
+                if (indexCompare != 0) return indexCompare;
+
+                return a.Position.x.CompareTo(b.Position.x);
+            });
+
+            // RLE 압축
+            for (int i = 0; i < sortedTiles.Count; i++)
+            {
+                TileLayerData current = sortedTiles[i];
+                Vector2Int startPos = current.Position;
+                int length = 1;
+
+                // 같은 레이어, 같은 Y, 같은 index인 연속된 타일 찾기
+                while (i + length < sortedTiles.Count)
+                {
+                    TileLayerData next = sortedTiles[i + length];
+                    if (next.Layer != current.Layer ||
+                        next.Index != current.Index ||
+                        next.Position.y != current.Position.y ||
+                        next.Position.x != startPos.x + length)
+                    {
+                        break;
+                    }
+                    length++;
+                }
+
+                // RLE 엔트리 생성
+                TileLayerDataRLE rleData = new TileLayerDataRLE
+                {
+                    Index = current.Index,
+                    Layer = current.Layer,
+                    StartPosition = startPos,
+                    Length = length
+                };
+
+                tilesRLE.Add(rleData);
+                i += length - 1; // 다음 그룹으로 이동
+            }
+        }
+    }
+}
+
