@@ -4,9 +4,9 @@ using UnityEngine.Tilemaps;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.AddressableAssets;
-using UnityEngine.AddressableAssets;
 #endif
 
+// TODO: RLE 압축 알고리즘 적용 필요
 namespace DungeonShooter
 {
     /// <summary>
@@ -66,14 +66,162 @@ namespace DungeonShooter
 
             RoomData roomData = new RoomData();
 
-            // TODO: 타일맵과 오브젝트를 읽어서 RoomData에 저장
-            // 1. 타일맵 컴포넌트들을 찾아서 TileLayerData로 변환
-            // 2. 오브젝트들을 찾아서 ObjectData로 변환
-            // 3. assetAddresses 테이블 구성
+#if UNITY_EDITOR
+            // 1. Tilemaps 하위의 타일맵 컴포넌트들을 찾아서 TileLayerData로 변환
+            Transform tilemapsTransform = room.transform.Find("Tilemaps");
+            if (tilemapsTransform != null)
+            {
+                SerializeTilemaps(tilemapsTransform, roomData);
+            }
+            else
+            {
+                Debug.LogWarning($"[RoomDataSerializer] '{room.name}'에 'Tilemaps' 자식이 없습니다.");
+            }
 
-            Debug.LogWarning("[RoomDataSerializer] SerializeRoom은 아직 구현되지 않았습니다.");
+            // 2. Objects 하위의 오브젝트들을 찾아서 ObjectData로 변환
+            Transform objectsTransform = room.transform.Find("Objects");
+            if (objectsTransform != null)
+            {
+                SerializeObjects(objectsTransform, roomData);
+            }
+            else
+            {
+                Debug.LogWarning($"[RoomDataSerializer] '{room.name}'에 'Objects' 자식이 없습니다.");
+            }
+#else
+            Debug.LogError("[RoomDataSerializer] SerializeRoom은 에디터에서만 사용할 수 있습니다.");
+#endif
+
             return roomData;
         }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// 타일맵들을 직렬화합니다.
+        /// </summary>
+        private static void SerializeTilemaps(Transform tilemapsParent, RoomData roomData)
+        {
+            // Tilemaps 하위의 모든 Tilemap 컴포넌트 찾기
+            Tilemap[] tilemaps = tilemapsParent.GetComponentsInChildren<Tilemap>();
+
+            foreach (Tilemap tilemap in tilemaps)
+            {
+                // TilemapRenderer에서 SortingLayer ID 가져오기
+                TilemapRenderer renderer = tilemap.GetComponent<TilemapRenderer>();
+                int sortingLayerId = renderer != null ? renderer.sortingLayerID : 0;
+
+                // 타일맵의 모든 타일 순회
+                BoundsInt bounds = tilemap.cellBounds;
+                foreach (Vector3Int pos in bounds.allPositionsWithin)
+                {
+                    TileBase tile = tilemap.GetTile(pos);
+                    if (tile == null)
+                    {
+                        continue;
+                    }
+
+                    // TileBase의 어드레서블 주소 얻기
+                    string address = GetAddressableAddress(tile);
+                    if (string.IsNullOrEmpty(address))
+                    {
+                        Debug.LogWarning($"[RoomDataSerializer] 타일 '{tile.name}'의 어드레서블 주소를 찾을 수 없습니다. 위치: {pos}");
+                        continue;
+                    }
+
+                    // 주소 테이블에 추가하고 인덱스 얻기
+                    int addressIndex = roomData.GetOrAddAddress(address);
+
+                    // TileLayerData 생성
+                    TileLayerData tileData = new TileLayerData
+                    {
+                        Index = addressIndex,
+                        Layer = sortingLayerId,
+                        Position = new Vector2Int(pos.x, pos.y)
+                    };
+
+                    roomData.Tiles.Add(tileData);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 오브젝트들을 직렬화합니다.
+        /// </summary>
+        private static void SerializeObjects(Transform objectsParent, RoomData roomData)
+        {
+            // Objects 하위의 모든 자식 오브젝트 순회
+            for (int i = 0; i < objectsParent.childCount; i++)
+            {
+                Transform child = objectsParent.GetChild(i);
+                GameObject obj = child.gameObject;
+
+                // 프리팹 인스턴스인지 확인
+#if UNITY_EDITOR
+                PrefabAssetType prefabType = PrefabUtility.GetPrefabAssetType(obj);
+                if (prefabType == PrefabAssetType.NotAPrefab)
+                {
+                    // 프리팹이 아니면 프리팹 루트를 찾기
+                    GameObject prefabRoot = PrefabUtility.GetCorrespondingObjectFromSource(obj);
+                    if (prefabRoot == null)
+                    {
+                        Debug.LogWarning($"[RoomDataSerializer] 오브젝트 '{obj.name}'는 프리팹이 아닙니다. 어드레서블로 등록된 프리팹을 사용해야 합니다.");
+                        continue;
+                    }
+
+                    // 프리팹의 어드레서블 주소 얻기
+                    string address = GetAddressableAddress(prefabRoot);
+                    if (string.IsNullOrEmpty(address))
+                    {
+                        Debug.LogWarning($"[RoomDataSerializer] 프리팹 '{prefabRoot.name}'의 어드레서블 주소를 찾을 수 없습니다.");
+                        continue;
+                    }
+
+                    // 주소 테이블에 추가하고 인덱스 얻기
+                    int addressIndex = roomData.GetOrAddAddress(address);
+
+                    // ObjectData 생성
+                    Vector3 position = child.position;
+                    ObjectData objectData = new ObjectData
+                    {
+                        Index = addressIndex,
+                        Position = new Vector2(position.x, position.y),
+                        Rotation = child.rotation
+                    };
+
+                    roomData.Objects.Add(objectData);
+                }
+                else
+                {
+                    // 프리팹 인스턴스인 경우
+                    GameObject prefabAsset = PrefabUtility.GetCorrespondingObjectFromSource(obj);
+                    if (prefabAsset == null)
+                    {
+                        continue;
+                    }
+
+                    string address = GetAddressableAddress(prefabAsset);
+                    if (string.IsNullOrEmpty(address))
+                    {
+                        Debug.LogWarning($"[RoomDataSerializer] 프리팹 '{prefabAsset.name}'의 어드레서블 주소를 찾을 수 없습니다.");
+                        continue;
+                    }
+
+                    int addressIndex = roomData.GetOrAddAddress(address);
+
+                    Vector3 position = child.position;
+                    ObjectData objectData = new ObjectData
+                    {
+                        Index = addressIndex,
+                        Position = new Vector2(position.x, position.y),
+                        Rotation = child.rotation
+                    };
+
+                    roomData.Objects.Add(objectData);
+                }
+#endif
+            }
+        }
+#endif
 
         /// <summary>
         /// 파일에서 RoomData를 역직렬화합니다.
