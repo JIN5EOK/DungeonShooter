@@ -19,11 +19,10 @@
       "url": "https://package.openupm.com"
     },
     "com.jin5eok.jin5eoklibrary": {
-      "version": "https://github.com/JIN5EOK/JIN5EOK_Unity_Library.git?path=Assets/JIN5EOK#main",
+      "version": "file:JIN5EOK_Unity_Library/Assets/JIN5EOK",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "9f5b2d7bab64bd7ea63742aaad19257a7d777dca"
+      "source": "local",
+      "dependencies": {}
     },
     "com.unity.2d.animation": {
       "version": "10.2.1",

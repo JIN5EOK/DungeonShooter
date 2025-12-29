@@ -2,7 +2,7 @@
   "dependencies": {
     "com.boxqkrtm.ide.cursor": "2.0.27",
     "com.coplaydev.unity-mcp": "8.0.0",
-    "com.jin5eok.jin5eoklibrary": "https://github.com/JIN5EOK/JIN5EOK_Unity_Library.git?path=Assets/JIN5EOK#main",
+    "com.jin5eok.jin5eoklibrary": "file:JIN5EOK_Unity_Library/Assets/JIN5EOK",
     "com.unity.addressables": "2.7.6",
     "com.unity.collab-proxy": "2.10.0",
     "com.unity.feature.2d": "2.0.1",
