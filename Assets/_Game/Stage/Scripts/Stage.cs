@@ -26,20 +26,41 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 두 방을 연결합니다.
+        /// 특정 방의 지정된 방향에 있는 방과 연결합니다.
+        /// 해당 방향에 방이 없으면 연결하지 않습니다.
         /// </summary>
-        public void ConnectRooms(int roomId1, int roomId2, Direction direction)
+        /// <param name="roomId">연결할 방의 ID</param>
+        /// <param name="direction">연결할 방향</param>
+        /// <returns>연결 성공 여부</returns>
+        public bool ConnectRoomInDirection(int roomId, Direction direction)
         {
-            if (!_rooms.TryGetValue(roomId1, out Room room1) || 
-                !_rooms.TryGetValue(roomId2, out Room room2))
+            if (!_rooms.TryGetValue(roomId, out Room room))
             {
-                Debug.LogWarning($"[{nameof(Stage)}] 연결하려는 방 중 하나가 존재하지 않습니다. Room1: {roomId1}, Room2: {roomId2}");
-                return;
+                Debug.LogWarning($"[{nameof(Stage)}] 방을 찾을 수 없습니다. RoomId: {roomId}");
+                return false;
+            }
+
+            // 이미 해당 방향에 연결이 있으면 스킵
+            if (room.Connections.ContainsKey(direction))
+            {
+                return false;
+            }
+
+            // 방향에 따른 인접 위치 계산
+            Vector2Int adjacentPosition = room.Position + GetDirectionVector(direction);
+            
+            // 해당 위치에 방이 있는지 찾기
+            Room adjacentRoom = FindRoomAtPosition(adjacentPosition);
+            if (adjacentRoom == null)
+            {
+                return false; // 해당 방향에 방이 없음
             }
 
             // 양방향 연결
-            room1.ConnectTo(direction, roomId2);
-            room2.ConnectTo(GetOppositeDirection(direction), roomId1);
+            room.ConnectTo(direction, adjacentRoom.Id);
+            adjacentRoom.ConnectTo(GetOppositeDirection(direction), roomId);
+            
+            return true;
         }
 
         /// <summary>
@@ -57,6 +78,36 @@ namespace DungeonShooter
         public bool HasRoom(int id)
         {
             return _rooms.ContainsKey(id);
+        }
+
+        /// <summary>
+        /// 특정 위치에 있는 방을 찾습니다.
+        /// </summary>
+        private Room FindRoomAtPosition(Vector2Int position)
+        {
+            foreach (var room in _rooms.Values)
+            {
+                if (room.Position == position)
+                {
+                    return room;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 방향에 따른 Vector2Int 오프셋을 반환합니다.
+        /// </summary>
+        private Vector2Int GetDirectionVector(Direction direction)
+        {
+            return direction switch
+            {
+                Direction.North => Vector2Int.up,      // (0, 1)
+                Direction.South => Vector2Int.down,    // (0, -1)
+                Direction.East => Vector2Int.right,    // (1, 0)
+                Direction.West => Vector2Int.left,    // (-1, 0)
+                _ => Vector2Int.zero
+            };
         }
 
         /// <summary>
