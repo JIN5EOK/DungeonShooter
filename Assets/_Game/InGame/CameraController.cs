@@ -46,7 +46,7 @@ public class CameraController : MonoBehaviour
         // 타겟이 지정되지 않았으면 Player 태그를 가진 오브젝트 찾기
         if (_target == null)
         {
-            GameObject player = GameObject.FindGameObjectWithTag(GameTags.Player);
+            var player = GameObject.FindGameObjectWithTag(GameTags.Player);
             if (player != null)
             {
                 _target = player.transform;
@@ -78,8 +78,8 @@ public class CameraController : MonoBehaviour
     /// </summary>
     private void FollowTarget()
     {
-        Vector3 targetPosition = _target.position + _offset;
-        Vector3 currentPosition = transform.position;
+        var targetPosition = _target.position + _offset;
+        var currentPosition = transform.position;
 
         // X, Y축 추적 여부에 따라 위치 계산
         if (!_followX) targetPosition.x = currentPosition.x;
@@ -103,7 +103,7 @@ public class CameraController : MonoBehaviour
     /// <param name="position">이동할 위치</param>
     public void MoveToPosition(Vector3 position)
     {
-        Vector3 targetPosition = position + _offset;
+        var targetPosition = position + _offset;
         targetPosition.z = _offset.z;
 
         transform.position = Vector3.SmoothDamp(
@@ -120,7 +120,7 @@ public class CameraController : MonoBehaviour
     /// <param name="position">이동할 위치</param>
     public void SetPositionImmediate(Vector3 position)
     {
-        Vector3 targetPosition = position + _offset;
+        var targetPosition = position + _offset;
         targetPosition.z = _offset.z;
         transform.position = targetPosition;
         _velocity = Vector3.zero;
@@ -195,7 +195,7 @@ public class CameraController : MonoBehaviour
     /// </summary>
     public Vector3 GetCameraPosition()
     {
-        Vector3 pos = transform.position;
+        var pos = transform.position;
         pos.z = 0; // Z축 오프셋 제거
         return pos - _offset;
     }

@@ -59,11 +59,11 @@ public class HealthComponent : MonoBehaviour
         if (IsDead) return;
         if (amount < 0) amount = 0;
 
-        int oldHealth = currentHealth;
+        var oldHealth = currentHealth;
         currentHealth += amount;
         currentHealth = Mathf.Min(currentHealth, maxHealth);
 
-        int actualHealed = currentHealth - oldHealth;
+        var actualHealed = currentHealth - oldHealth;
         if (actualHealed > 0)
         {
             OnHealed?.Invoke(actualHealed, currentHealth);

@@ -78,7 +78,7 @@ public class PauseMenuUI : MonoBehaviour
     private void RestartGame()
     {
         ResumeGame();
-        Scene activeScene = SceneManager.GetActiveScene();
+        var activeScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(activeScene.buildIndex);
     }
 
@@ -104,7 +104,7 @@ public class PauseMenuUI : MonoBehaviour
             windowRoot = transform.GetChild(0) as RectTransform;
         }
 
-        Button[] buttons = GetComponentsInChildren<Button>(true);
+        var buttons = GetComponentsInChildren<Button>(true);
         if (resumeButton == null)
         {
             resumeButton = Array.Find(buttons, b => b.name.IndexOf("Resume", StringComparison.OrdinalIgnoreCase) >= 0);

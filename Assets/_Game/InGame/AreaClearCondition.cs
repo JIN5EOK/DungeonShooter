@@ -73,13 +73,13 @@ public class AreaClearCondition : MonoBehaviour
             
             if (searchArea != null)
             {
-                List<Collider2D> colliders = new List<Collider2D>();
-                ContactFilter2D filter = new ContactFilter2D();
+                var colliders = new List<Collider2D>();
+                var filter = new ContactFilter2D();
                 filter.NoFilter();
                 filter.useTriggers = true; // Trigger Collider도 감지하도록 설정
                 
                 // Overlap 사용 (Trigger Collider도 감지됨)
-                int count = searchArea.Overlap(filter, colliders);
+                var count = searchArea.Overlap(filter, colliders);
 
                 if (showDebugInfo && count > 0)
                 {
@@ -90,7 +90,7 @@ public class AreaClearCondition : MonoBehaviour
                 {
                     if (col != null && col.CompareTag(GameTags.Enemy))
                     {
-                        Enemy enemy = col.GetComponent<Enemy>();
+                        var enemy = col.GetComponent<Enemy>();
                         if (enemy != null && !_trackedEnemies.Contains(enemy))
                         {
                             RegisterEnemy(enemy);
@@ -135,7 +135,7 @@ public class AreaClearCondition : MonoBehaviour
 
         _trackedEnemies.Add(enemy);
         
-        HealthComponent health = enemy.GetComponent<HealthComponent>();
+        var health = enemy.GetComponent<HealthComponent>();
         if (health != null)
         {
             _healthToEnemyMap[health] = enemy;
@@ -155,7 +155,7 @@ public class AreaClearCondition : MonoBehaviour
 
         _trackedEnemies.Remove(enemy);
         
-        HealthComponent health = enemy.GetComponent<HealthComponent>();
+        var health = enemy.GetComponent<HealthComponent>();
         if (health != null && _healthToEnemyMap.ContainsKey(health))
         {
             if (_healthDeathHandlers.ContainsKey(health))
@@ -175,7 +175,7 @@ public class AreaClearCondition : MonoBehaviour
         if (deadHealth == null || !_healthToEnemyMap.ContainsKey(deadHealth))
             return;
 
-        Enemy deadEnemy = _healthToEnemyMap[deadHealth];
+        var deadEnemy = _healthToEnemyMap[deadHealth];
         _trackedEnemies.Remove(deadEnemy);
         _healthToEnemyMap.Remove(deadHealth);
         
@@ -201,7 +201,7 @@ public class AreaClearCondition : MonoBehaviour
     {
         if (_isCleared) return;
 
-        bool isCleared = false;
+        var isCleared = false;
 
         if (requireAllEnemiesKilled)
         {
@@ -296,12 +296,12 @@ public class AreaClearCondition : MonoBehaviour
         // 감지 영역 시각화
         if (autoDetectEnemies)
         {
-            Collider2D searchArea = detectionArea != null ? detectionArea : GetComponent<Collider2D>();
+            var searchArea = detectionArea != null ? detectionArea : GetComponent<Collider2D>();
             
             if (searchArea != null)
             {
                 Gizmos.color = Color.yellow;
-                Bounds bounds = searchArea.bounds;
+                var bounds = searchArea.bounds;
                 Gizmos.DrawWireCube(bounds.center, bounds.size);
             }
         }

@@ -77,7 +77,7 @@ public class DashComponent : MonoBehaviour
 
         _dashTimer -= Time.fixedDeltaTime;
         
-        Vector2 dashDirection = _moveInput.magnitude > 0 ? _moveInput.normalized : _lastFacingDirection;
+        var dashDirection = _moveInput.magnitude > 0 ? _moveInput.normalized : _lastFacingDirection;
         _rigidbody.linearVelocity = dashDirection * _dashSpeed;
 
         if (_dashTimer <= 0)

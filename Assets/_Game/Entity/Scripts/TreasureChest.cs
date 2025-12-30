@@ -89,7 +89,7 @@ public class TreasureChest : MonoBehaviour, IInteractable
             _playerInRange = true;
 
             // PlayerProto에 상호작용 가능한 오브젝트로 등록
-            Player player = other.GetComponent<Player>();
+            var player = other.GetComponent<Player>();
             if (player != null)
             {
                 player.RegisterInteractable(this);
@@ -115,7 +115,7 @@ public class TreasureChest : MonoBehaviour, IInteractable
             _playerInRange = false;
 
             // PlayerProto에서 상호작용 가능한 오브젝트에서 제거
-            Player player = other.GetComponent<Player>();
+            var player = other.GetComponent<Player>();
             if (player != null)
             {
                 player.UnregisterInteractable(this);
@@ -199,7 +199,7 @@ public class TreasureChest : MonoBehaviour, IInteractable
             // 코인을 상자 주변에 드롭
             for (int i = 0; i < coinReward; i++)
             {
-                Vector2 dropPosition = (Vector2)transform.position + UnityEngine.Random.insideUnitCircle * 1.5f;
+                var dropPosition = (Vector2)transform.position + UnityEngine.Random.insideUnitCircle * 1.5f;
                 Instantiate(coinPrefab, dropPosition, Quaternion.identity);
             }
 

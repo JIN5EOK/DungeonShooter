@@ -30,10 +30,10 @@ namespace DungeonShooter
                 return null;
             }
 
-            RoomData roomData = new RoomData();
+            var roomData = new RoomData();
 
             // 1. Tilemaps 하위의 타일맵 컴포넌트들을 찾아서 TileLayerData로 변환
-            Transform tilemapsTransform = room.transform.Find("Tilemaps");
+            var tilemapsTransform = room.transform.Find("Tilemaps");
             if (tilemapsTransform != null)
             {
                 SerializeTilemaps(tilemapsTransform, roomData);
@@ -44,7 +44,7 @@ namespace DungeonShooter
             }
 
             // 2. Objects 하위의 오브젝트들을 찾아서 ObjectData로 변환
-            Transform objectsTransform = room.transform.Find("Objects");
+            var objectsTransform = room.transform.Find("Objects");
             if (objectsTransform != null)
             {
                 SerializeObjects(objectsTransform, roomData);
@@ -68,14 +68,14 @@ namespace DungeonShooter
             }
 
             // 1. 에셋 경로 얻기
-            string assetPath = AssetDatabase.GetAssetPath(obj);
+            var assetPath = AssetDatabase.GetAssetPath(obj);
             if (string.IsNullOrEmpty(assetPath))
             {
                 return null;
             }
 
             // 2. GUID 얻기
-            string guid = AssetDatabase.AssetPathToGUID(assetPath);
+            var guid = AssetDatabase.AssetPathToGUID(assetPath);
 
             // 3. Addressables 설정에서 주소 찾기
             var settings = AddressableAssetSettingsDefaultObject.Settings;
@@ -101,26 +101,26 @@ namespace DungeonShooter
         private static void SerializeTilemaps(Transform tilemapsParent, RoomData roomData)
         {
             // Tilemaps 하위의 모든 Tilemap 컴포넌트 찾기
-            Tilemap[] tilemaps = tilemapsParent.GetComponentsInChildren<Tilemap>();
+            var tilemaps = tilemapsParent.GetComponentsInChildren<Tilemap>();
 
             foreach (Tilemap tilemap in tilemaps)
             {
                 // TilemapRenderer에서 SortingLayer ID 가져오기
-                TilemapRenderer renderer = tilemap.GetComponent<TilemapRenderer>();
-                int sortingLayerId = renderer != null ? renderer.sortingLayerID : 0;
+                var renderer = tilemap.GetComponent<TilemapRenderer>();
+                var sortingLayerId = renderer != null ? renderer.sortingLayerID : 0;
 
                 // 타일맵의 모든 타일 순회
-                BoundsInt bounds = tilemap.cellBounds;
+                var bounds = tilemap.cellBounds;
                 foreach (Vector3Int pos in bounds.allPositionsWithin)
                 {
-                    TileBase tile = tilemap.GetTile(pos);
+                    var tile = tilemap.GetTile(pos);
                     if (tile == null)
                     {
                         continue;
                     }
 
                     // TileBase의 어드레서블 주소 얻기
-                    string address = GetAddressableAddress(tile);
+                    var address = GetAddressableAddress(tile);
                     if (string.IsNullOrEmpty(address))
                     {
                         Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 타일 '{tile.name}'의 어드레서블 주소를 찾을 수 없습니다. 위치: {pos}");
@@ -128,10 +128,10 @@ namespace DungeonShooter
                     }
 
                     // 주소 테이블에 추가하고 인덱스 얻기
-                    int addressIndex = roomData.GetOrAddAddress(address);
+                    var addressIndex = roomData.GetOrAddAddress(address);
 
                     // TileLayerData 생성
-                    TileLayerData tileData = new TileLayerData
+                    var tileData = new TileLayerData
                     {
                         Index = addressIndex,
                         Layer = sortingLayerId,
@@ -151,15 +151,15 @@ namespace DungeonShooter
             // Objects 하위의 모든 자식 오브젝트 순회
             for (int i = 0; i < objectsParent.childCount; i++)
             {
-                Transform child = objectsParent.GetChild(i);
-                GameObject obj = child.gameObject;
+                var child = objectsParent.GetChild(i);
+                var obj = child.gameObject;
 
                 // 프리팹 인스턴스인지 확인
-                PrefabAssetType prefabType = PrefabUtility.GetPrefabAssetType(obj);
+                var prefabType = PrefabUtility.GetPrefabAssetType(obj);
                 if (prefabType == PrefabAssetType.NotAPrefab)
                 {
                     // 프리팹이 아니면 프리팹 루트를 찾기
-                    GameObject prefabRoot = PrefabUtility.GetCorrespondingObjectFromSource(obj);
+                    var prefabRoot = PrefabUtility.GetCorrespondingObjectFromSource(obj);
                     if (prefabRoot == null)
                     {
                         Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 오브젝트 '{obj.name}'는 프리팹이 아닙니다. 어드레서블로 등록된 프리팹을 사용해야 합니다.");
@@ -167,7 +167,7 @@ namespace DungeonShooter
                     }
 
                     // 프리팹의 어드레서블 주소 얻기
-                    string address = GetAddressableAddress(prefabRoot);
+                    var address = GetAddressableAddress(prefabRoot);
                     if (string.IsNullOrEmpty(address))
                     {
                         Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 프리팹 '{prefabRoot.name}'의 어드레서블 주소를 찾을 수 없습니다.");
@@ -175,11 +175,11 @@ namespace DungeonShooter
                     }
 
                     // 주소 테이블에 추가하고 인덱스 얻기
-                    int addressIndex = roomData.GetOrAddAddress(address);
+                    var addressIndex = roomData.GetOrAddAddress(address);
 
                     // ObjectData 생성
-                    Vector3 position = child.position;
-                    ObjectData objectData = new ObjectData
+                    var position = child.position;
+                    var objectData = new ObjectData
                     {
                         Index = addressIndex,
                         Position = new Vector2(position.x, position.y),
@@ -191,23 +191,23 @@ namespace DungeonShooter
                 else
                 {
                     // 프리팹 인스턴스인 경우
-                    GameObject prefabAsset = PrefabUtility.GetCorrespondingObjectFromSource(obj);
+                    var prefabAsset = PrefabUtility.GetCorrespondingObjectFromSource(obj);
                     if (prefabAsset == null)
                     {
                         continue;
                     }
 
-                    string address = GetAddressableAddress(prefabAsset);
+                    var address = GetAddressableAddress(prefabAsset);
                     if (string.IsNullOrEmpty(address))
                     {
                         Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 프리팹 '{prefabAsset.name}'의 어드레서블 주소를 찾을 수 없습니다.");
                         continue;
                     }
 
-                    int addressIndex = roomData.GetOrAddAddress(address);
+                    var addressIndex = roomData.GetOrAddAddress(address);
 
-                    Vector3 position = child.position;
-                    ObjectData objectData = new ObjectData
+                    var position = child.position;
+                    var objectData = new ObjectData
                     {
                         Index = addressIndex,
                         Position = new Vector2(position.x, position.y),
@@ -232,8 +232,8 @@ namespace DungeonShooter
 
             try
             {
-                string json = File.ReadAllText(path);
-                SerializedRoomData serialized = JsonUtility.FromJson<SerializedRoomData>(json);
+                var json = File.ReadAllText(path);
+                var serialized = JsonUtility.FromJson<SerializedRoomData>(json);
                 
                 if (serialized == null)
                 {
@@ -265,7 +265,7 @@ namespace DungeonShooter
             try
             {
                 // RoomData를 RoomDataSerialized로 변환 (RLE 압축)
-                SerializedRoomData serialized = SerializedRoomData.FromRoomData(roomData);
+                var serialized = SerializedRoomData.FromRoomData(roomData);
                 if (serialized == null)
                 {
                     Debug.LogError($"[{nameof(RoomDataSerializer)}] 직렬화 변환에 실패했습니다.");
@@ -273,8 +273,8 @@ namespace DungeonShooter
                 }
 
                 // JSON으로 직렬화 (pretty print 제거로 용량 절약)
-                string json = JsonUtility.ToJson(serialized, false);
-                string directory = Path.GetDirectoryName(path);
+                var json = JsonUtility.ToJson(serialized, false);
+                var directory = Path.GetDirectoryName(path);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);

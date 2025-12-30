@@ -126,7 +126,7 @@ public class Player : EntityBase
         // 스킬1 (전방 슬래시) 시각화 - 독립 GameObject (공격 위치에 표시)
         if (skill1Visualizer == null)
         {
-            GameObject skill1Obj = new GameObject("Skill1RangeVisualizer");
+            var skill1Obj = new GameObject("Skill1RangeVisualizer");
             skill1Obj.transform.SetParent(null); // 부모 없이 독립적으로
             skill1Obj.AddComponent<LineRenderer>();
             skill1Visualizer = skill1Obj.AddComponent<AttackRangeVisualizer>();
@@ -141,7 +141,7 @@ public class Player : EntityBase
         // 스킬2 (회전 공격) 시각화 - 플레이어 중심
         if (skill2Visualizer == null)
         {
-            GameObject skill2Obj = new GameObject("Skill2RangeVisualizer");
+            var skill2Obj = new GameObject("Skill2RangeVisualizer");
             skill2Obj.transform.SetParent(transform);
             skill2Obj.transform.localPosition = Vector3.zero;
             skill2Obj.AddComponent<LineRenderer>();
@@ -156,7 +156,7 @@ public class Player : EntityBase
         // 스킬3 (점프 공격) 시각화 - 독립 GameObject (착지 위치에 고정)
         if (skill3Visualizer == null)
         {
-            GameObject skill3Obj = new GameObject("Skill3RangeVisualizer");
+            var skill3Obj = new GameObject("Skill3RangeVisualizer");
             skill3Obj.transform.SetParent(null); // 부모 없이 독립적으로
             skill3Obj.AddComponent<LineRenderer>();
             skill3Visualizer = skill3Obj.AddComponent<AttackRangeVisualizer>();
@@ -193,7 +193,7 @@ public class Player : EntityBase
         if (!_isJumping)
         {
             // 입력 매니저에서 현재 이동 입력 값 가져오기
-            Vector2 moveInput = Vector2.zero;
+            var moveInput = Vector2.zero;
             if (_inputManager != null)
             {
                 moveInput = _inputManager.MoveInput;
@@ -326,7 +326,7 @@ public class Player : EntityBase
     {
         // 가장 가까운 상호작용 가능한 오브젝트 찾기
         IInteractable closestInteractable = null;
-        float closestDistance = float.MaxValue;
+        var closestDistance = float.MaxValue;
 
         foreach (IInteractable interactable in _nearbyInteractables)
         {
@@ -335,7 +335,7 @@ public class Player : EntityBase
                 // MonoBehaviour인 경우 거리 계산
                 if (interactable is MonoBehaviour mb)
                 {
-                    float distance = Vector2.Distance(transform.position, mb.transform.position);
+                    var distance = Vector2.Distance(transform.position, mb.transform.position);
                     if (distance < closestDistance)
                     {
                         closestDistance = distance;
@@ -367,7 +367,7 @@ public class Player : EntityBase
         Debug.Log("스킬 1 - 전방 슬래시 공격");
         
         // 실제 공격 위치 계산 (PerformRangeAttack과 동일한 로직)
-        Vector2 attackPos = (Vector2)transform.position + lastFacingDirection * (3f / 2f);
+        var attackPos = (Vector2)transform.position + lastFacingDirection * (3f / 2f);
         
         // 스킬 범위 시각화 (실제 공격 위치에 정확히 표시)
         if (showSkillRanges && skill1Visualizer != null)
@@ -430,18 +430,18 @@ public class Player : EntityBase
     
     private void PerformRangeAttack(Vector2 direction, float range, float radius, int damage)
     {
-        Vector2 attackPos = (Vector2)transform.position + direction * (range / 2);
+        var attackPos = (Vector2)transform.position + direction * (range / 2);
         
         Debug.DrawLine(transform.position, attackPos + direction * range, Color.red, 0.5f);
         
-        Collider2D[] hits = Physics2D.OverlapCircleAll(attackPos, radius);
-        int hitCount = 0;
+        var hits = Physics2D.OverlapCircleAll(attackPos, radius);
+        var hitCount = 0;
         
         foreach (Collider2D hit in hits)
         {
             if (hit.CompareTag(GameTags.Enemy))
             {
-                HealthComponent enemyHealth = hit.GetComponent<HealthComponent>();
+                var enemyHealth = hit.GetComponent<HealthComponent>();
                 if (enemyHealth != null && !enemyHealth.IsDead)
                 {
                     enemyHealth.TakeDamage(damage);
@@ -459,14 +459,14 @@ public class Player : EntityBase
 
     private void PerformSpinAttack(float radius, int damage)
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
-        int hitCount = 0;
+        var hits = Physics2D.OverlapCircleAll(transform.position, radius);
+        var hitCount = 0;
         
         foreach (Collider2D hit in hits)
         {
             if (hit.CompareTag(GameTags.Enemy))
             {
-                HealthComponent enemyHealth = hit.GetComponent<HealthComponent>();
+                var enemyHealth = hit.GetComponent<HealthComponent>();
                 if (enemyHealth != null && !enemyHealth.IsDead)
                 {
                     enemyHealth.TakeDamage(damage);
@@ -491,8 +491,8 @@ public class Player : EntityBase
     {
         _isJumping = true;
         
-        Vector2 startPos = transform.position;
-        Vector2 targetPos = startPos + lastFacingDirection * targetDistance;
+        var startPos = (Vector2)transform.position;
+        var targetPos = startPos + lastFacingDirection * targetDistance;
         
         Debug.Log($"[스킬3] 점프 시작! {startPos} → {targetPos}");
         
@@ -504,7 +504,7 @@ public class Player : EntityBase
             skill3Visualizer.Show();
         }
         
-        float elapsedTime = 0f;
+        var elapsedTime = 0f;
         
         try
         {
@@ -515,11 +515,11 @@ public class Player : EntityBase
                 cancellationToken.ThrowIfCancellationRequested();
                 
                 elapsedTime += Time.deltaTime;
-                float progress = elapsedTime / jumpDuration;
+                var progress = elapsedTime / jumpDuration;
                 
                 // 포물선 움직임
-                Vector2 currentPos = Vector2.Lerp(startPos, targetPos, progress);
-                float height = Mathf.Sin(progress * Mathf.PI) * jumpHeight;
+                var currentPos = Vector2.Lerp(startPos, targetPos, progress);
+                var height = Mathf.Sin(progress * Mathf.PI) * jumpHeight;
                 
                 transform.position = new Vector3(currentPos.x, currentPos.y + height, 0);
                 rb.linearVelocity = Vector2.zero;
@@ -533,14 +533,14 @@ public class Player : EntityBase
             
             // 착지 시 데미지 적용
             Debug.Log($"[스킬3] 착지!");
-            Collider2D[] hits = Physics2D.OverlapCircleAll(targetPos, radius);
-            int hitCount = 0;
+            var hits = Physics2D.OverlapCircleAll(targetPos, radius);
+            var hitCount = 0;
             
             foreach (Collider2D hit in hits)
             {
                 if (hit.CompareTag(GameTags.Enemy))
                 {
-                    HealthComponent enemyHealth = hit.GetComponent<HealthComponent>();
+                    var enemyHealth = hit.GetComponent<HealthComponent>();
                     if (enemyHealth != null && !enemyHealth.IsDead)
                     {
                         enemyHealth.TakeDamage(damage);
@@ -627,7 +627,7 @@ public class Player : EntityBase
         enabled = false; // MonoBehaviour 비활성화 (Update, FixedUpdate 중지)
 
         // Collider 비활성화 (적과 충돌 방지)
-        Collider2D playerCollider = GetComponent<Collider2D>();
+        var playerCollider = GetComponent<Collider2D>();
         if (playerCollider != null)
         {
             playerCollider.enabled = false;
@@ -659,12 +659,12 @@ public class Player : EntityBase
         // 페이드 아웃 효과 (선택사항)
         if (_spriteRenderer != null)
         {
-            float fadeTime = 1f;
-            Color startColor = _spriteRenderer.color;
+            var fadeTime = 1f;
+            var startColor = _spriteRenderer.color;
 
             for (float t = 0; t < fadeTime; t += Time.deltaTime)
             {
-                float alpha = Mathf.Lerp(1f, 0f, t / fadeTime);
+                var alpha = Mathf.Lerp(1f, 0f, t / fadeTime);
                 _spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
                 yield return null;
             }

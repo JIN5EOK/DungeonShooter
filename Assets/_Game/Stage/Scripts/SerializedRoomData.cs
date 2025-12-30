@@ -37,7 +37,7 @@ namespace DungeonShooter
         /// </summary>
         public RoomData ToRoomData()
         {
-            RoomData roomData = new RoomData();
+            var roomData = new RoomData();
             roomData.AssetAddresses = new List<string>(assetAddresses);
             roomData.Objects = new List<ObjectData>(objects);
 
@@ -46,7 +46,7 @@ namespace DungeonShooter
             {
                 for (int i = 0; i < rleData.Length; i++)
                 {
-                    TileLayerData tileData = new TileLayerData
+                    var tileData = new TileLayerData
                     {
                         Index = rleData.Index,
                         Layer = rleData.Layer,
@@ -70,7 +70,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            SerializedRoomData serialized = new SerializedRoomData();
+            var serialized = new SerializedRoomData();
             serialized.AssetAddresses = new List<string>(roomData.AssetAddresses);
             serialized.Objects = new List<ObjectData>(roomData.Objects);
 
@@ -93,16 +93,16 @@ namespace DungeonShooter
             tilesRLE.Clear();
 
             // 타일들을 레이어, Y 좌표, index, X 좌표 순으로 정렬
-            List<TileLayerData> sortedTiles = new List<TileLayerData>(tiles);
+            var sortedTiles = new List<TileLayerData>(tiles);
             sortedTiles.Sort((a, b) =>
             {
-                int layerCompare = a.Layer.CompareTo(b.Layer);
+                var layerCompare = a.Layer.CompareTo(b.Layer);
                 if (layerCompare != 0) return layerCompare;
 
-                int yCompare = a.Position.y.CompareTo(b.Position.y);
+                var yCompare = a.Position.y.CompareTo(b.Position.y);
                 if (yCompare != 0) return yCompare;
 
-                int indexCompare = a.Index.CompareTo(b.Index);
+                var indexCompare = a.Index.CompareTo(b.Index);
                 if (indexCompare != 0) return indexCompare;
 
                 return a.Position.x.CompareTo(b.Position.x);
@@ -111,14 +111,14 @@ namespace DungeonShooter
             // RLE 압축
             for (int i = 0; i < sortedTiles.Count; i++)
             {
-                TileLayerData current = sortedTiles[i];
-                Vector2Int startPos = current.Position;
-                int length = 1;
+                var current = sortedTiles[i];
+                var startPos = current.Position;
+                var length = 1;
 
                 // 같은 레이어, 같은 Y, 같은 index인 연속된 타일 찾기
                 while (i + length < sortedTiles.Count)
                 {
-                    TileLayerData next = sortedTiles[i + length];
+                    var next = sortedTiles[i + length];
                     if (next.Layer != current.Layer ||
                         next.Index != current.Index ||
                         next.Position.y != current.Position.y ||
@@ -130,7 +130,7 @@ namespace DungeonShooter
                 }
 
                 // RLE 엔트리 생성
-                TileLayerDataRLE rleData = new TileLayerDataRLE
+                var rleData = new TileLayerDataRLE
                 {
                     Index = current.Index,
                     Layer = current.Layer,

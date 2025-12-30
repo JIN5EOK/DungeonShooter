@@ -75,7 +75,7 @@ public class GameUIManager : MonoBehaviour
     /// </summary>
     private async Awaitable RetryInitializationAsync()
     {
-        int retryCount = 0;
+        var retryCount = 0;
         const int maxRetries = 10;
 
         while (retryCount < maxRetries)
@@ -106,8 +106,8 @@ public class GameUIManager : MonoBehaviour
     {
         if (skillUIs != null && skillUIs.Length > 0)
         {
-            string[] skillKeys = { "dash", "skill1", "skill2", "skill3" };
-            string[] skillNames = { "회피", "슬래시", "회전베기", "점프공격" };
+            var skillKeys = new string[] { "dash", "skill1", "skill2", "skill3" };
+            var skillNames = new string[] { "회피", "슬래시", "회전베기", "점프공격" };
 
             for (int i = 0; i < skillUIs.Length && i < skillKeys.Length; i++)
             {

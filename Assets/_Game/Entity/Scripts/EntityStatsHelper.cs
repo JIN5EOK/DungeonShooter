@@ -11,7 +11,7 @@ public static class EntityStatsHelper
     public static int CalculateFinalDamage(IEntityStats stats, int baseDamage)
     {
         if (stats == null) return Mathf.Max(1, baseDamage);
-        int finalDamage = baseDamage - stats.Defense;
+        var finalDamage = baseDamage - stats.Defense;
         return Mathf.Max(1, finalDamage);
     }
 

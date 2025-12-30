@@ -30,7 +30,7 @@ public class MovementComponent : MonoBehaviour
     /// </summary>
     public void Move()
     {
-        Vector2 velocity = _moveInput.normalized * _moveSpeed;
+        var velocity = _moveInput.normalized * _moveSpeed;
         _rigidbody.linearVelocity = velocity;
     }
 

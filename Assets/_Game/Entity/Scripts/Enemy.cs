@@ -124,7 +124,7 @@ public class Enemy : EntityBase
                 if (attackRangeVisualizer == null)
                 {
                     // 자동으로 생성 (LineRenderer 먼저 추가 필요)
-                    GameObject visualizerObj = new GameObject("AttackRangeVisualizer");
+                    var visualizerObj = new GameObject("AttackRangeVisualizer");
                     visualizerObj.transform.SetParent(transform);
                     visualizerObj.transform.localPosition = Vector3.zero;
                     visualizerObj.AddComponent<LineRenderer>(); // LineRenderer 먼저 추가
@@ -191,7 +191,7 @@ public class Enemy : EntityBase
         if (_isStunned) return;
 
         // 플레이어 감지
-        bool playerDetected = IsPlayerInRange(detectionRange);
+        var playerDetected = IsPlayerInRange(detectionRange);
 
         switch (_currentState)
         {
@@ -297,8 +297,8 @@ public class Enemy : EntityBase
         }
 
         // 공격 범위 내인지 확인
-        float distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
-        float range = GetAttackRange();
+        var distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
+        var range = GetAttackRange();
         if (distanceToPlayer <= range && _cooldownComponent.IsReady("attack"))
         {
             AttackPlayer();
@@ -308,7 +308,7 @@ public class Enemy : EntityBase
     // ==================== 움직임 ====================
     private void MoveTowardsPlayer()
     {
-        Vector2 directionToPlayer = (_playerTransform.position - transform.position).normalized;
+        var directionToPlayer = (_playerTransform.position - transform.position).normalized;
         UpdateFacingDirection(directionToPlayer);
         _movementComponent.SetMoveSpeed(moveSpeed);
         _movementComponent.SetMoveInput(directionToPlayer);
@@ -317,7 +317,7 @@ public class Enemy : EntityBase
 
     private void MoveTowardsTarget(Vector2 target, float speed)
     {
-        Vector2 direction = (target - (Vector2)transform.position).normalized;
+        var direction = (target - (Vector2)transform.position).normalized;
         UpdateFacingDirection(direction);
         _movementComponent.SetMoveSpeed(speed);
         _movementComponent.SetMoveInput(direction);
@@ -333,7 +333,7 @@ public class Enemy : EntityBase
 
     private void SetNewPatrolTarget()
     {
-        Vector2 randomDirection = Random.insideUnitCircle.normalized;
+        var randomDirection = Random.insideUnitCircle.normalized;
         _patrolTargetPos = _patrolStartPos + randomDirection * patrolRange;
     }
 
@@ -342,13 +342,13 @@ public class Enemy : EntityBase
     {
         _cooldownComponent.StartCooldown("attack");
 
-        int damage = GetAttackDamage();
+        var damage = GetAttackDamage();
         Debug.Log($"적이 플레이어를 공격! 데미지: {damage}");
 
         // 플레이어에게 데미지 주기
         if (_playerTransform != null)
         {
-            HealthComponent playerHealth = _playerTransform.GetComponent<HealthComponent>();
+            var playerHealth = _playerTransform.GetComponent<HealthComponent>();
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(damage);
@@ -420,17 +420,17 @@ public class Enemy : EntityBase
             return;
 
         // 드롭할 코인 개수 결정
-        int coinCount = Random.Range(coinDropRange.x, coinDropRange.y + 1);
+        var coinCount = Random.Range(coinDropRange.x, coinDropRange.y + 1);
 
         // 코인 생성
         for (int i = 0; i < coinCount; i++)
         {
             // 랜덤 위치 계산 (적 위치 주변)
-            Vector2 randomOffset = Random.insideUnitCircle * coinDropRadius;
-            Vector3 dropPosition = transform.position + (Vector3)randomOffset;
+            var randomOffset = Random.insideUnitCircle * coinDropRadius;
+            var dropPosition = transform.position + (Vector3)randomOffset;
 
             // 코인 인스턴스 생성
-            CoinPickup coin = Instantiate(coinPickupPrefab, dropPosition, Quaternion.identity);
+            var coin = Instantiate(coinPickupPrefab, dropPosition, Quaternion.identity);
             Debug.Log($"[{gameObject.name}] 코인 {coinCount}개 드롭!");
         }
     }
@@ -500,7 +500,7 @@ public class Enemy : EntityBase
         rb.linearVelocity = Vector2.zero;
 
         // Collider 비활성화 (관통 방지)
-        Collider2D collider = GetComponent<Collider2D>();
+        var collider = GetComponent<Collider2D>();
         if (collider != null)
         {
             collider.enabled = false;

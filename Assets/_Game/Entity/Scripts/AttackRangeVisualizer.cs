@@ -77,7 +77,7 @@ public class AttackRangeVisualizer : MonoBehaviour
         _lineRenderer.endColor = rangeColor;
         
         // Sorting Order 설정 (Renderer를 통해)
-        Renderer renderer = _lineRenderer as Renderer;
+        var renderer = _lineRenderer as Renderer;
         if (renderer != null)
         {
             renderer.sortingOrder = 10; // 다른 오브젝트 위에 표시
@@ -92,16 +92,16 @@ public class AttackRangeVisualizer : MonoBehaviour
         _lineRenderer.positionCount = segments + 1;
         
         // useWorldSpace에 따라 좌표계 결정
-        bool useWorld = _lineRenderer.useWorldSpace;
-        Vector3 center = useWorld ? transform.position : Vector3.zero;
+        var useWorld = _lineRenderer.useWorldSpace;
+        var center = useWorld ? transform.position : Vector3.zero;
         
         for (int i = 0; i <= segments; i++)
         {
-            float angle = (i / (float)segments) * 360f * Mathf.Deg2Rad;
-            float x = Mathf.Cos(angle) * radius;
-            float y = Mathf.Sin(angle) * radius;
+            var angle = (i / (float)segments) * 360f * Mathf.Deg2Rad;
+            var x = Mathf.Cos(angle) * radius;
+            var y = Mathf.Sin(angle) * radius;
             
-            Vector3 pos = center + new Vector3(x, y, 0);
+            var pos = center + new Vector3(x, y, 0);
             _lineRenderer.SetPosition(i, pos);
         }
     }

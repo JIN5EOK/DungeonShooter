@@ -34,12 +34,12 @@ public class AreaGate : MonoBehaviour
         // 시각 요소에서 SpriteRenderer 찾기
         if (visualElements != null && visualElements.Length > 0)
         {
-            System.Collections.Generic.List<SpriteRenderer> renderers = new System.Collections.Generic.List<SpriteRenderer>();
+            var renderers = new System.Collections.Generic.List<SpriteRenderer>();
             foreach (GameObject element in visualElements)
             {
                 if (element != null)
                 {
-                    SpriteRenderer sr = element.GetComponent<SpriteRenderer>();
+                    var sr = element.GetComponent<SpriteRenderer>();
                     if (sr != null)
                     {
                         renderers.Add(sr);
@@ -120,8 +120,8 @@ public class AreaGate : MonoBehaviour
         // 페이드 아웃 효과
         if (_spriteRenderers != null && _spriteRenderers.Length > 0 && fadeOutDuration > 0)
         {
-            float elapsedTime = 0f;
-            Color[] originalColors = new Color[_spriteRenderers.Length];
+            var elapsedTime = 0f;
+            var originalColors = new Color[_spriteRenderers.Length];
             
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
@@ -134,13 +134,13 @@ public class AreaGate : MonoBehaviour
             while (elapsedTime < fadeOutDuration)
             {
                 elapsedTime += Time.deltaTime;
-                float alpha = Mathf.Lerp(1f, 0f, elapsedTime / fadeOutDuration);
+                var alpha = Mathf.Lerp(1f, 0f, elapsedTime / fadeOutDuration);
 
                 for (int i = 0; i < _spriteRenderers.Length; i++)
                 {
                     if (_spriteRenderers[i] != null)
                     {
-                        Color color = originalColors[i];
+                        var color = originalColors[i];
                         color.a = alpha;
                         _spriteRenderers[i].color = color;
                     }

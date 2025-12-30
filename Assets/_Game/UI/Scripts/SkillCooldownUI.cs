@@ -49,9 +49,9 @@ public class SkillCooldownUI : MonoBehaviour
             return;
         }
 
-        bool skillReady = cooldownComponent.IsReady(_skillCooldownKey);
-        float remainingTime = cooldownComponent.GetRemainingCooldown(_skillCooldownKey);
-        float totalCooldown = cooldownComponent.GetTotalCooldown(_skillCooldownKey);
+        var skillReady = cooldownComponent.IsReady(_skillCooldownKey);
+        var remainingTime = cooldownComponent.GetRemainingCooldown(_skillCooldownKey);
+        var totalCooldown = cooldownComponent.GetTotalCooldown(_skillCooldownKey);
 
         // 디버그 로그 (쿨다운 중일 때만)
         if (!skillReady)
@@ -75,7 +75,7 @@ public class SkillCooldownUI : MonoBehaviour
         // 준비 상태에서 펄스 효과
         if (_isReady && enableReadyPulse && skillIcon != null)
         {
-            float pulse = 1f + pulseIntensity * Mathf.Sin(Time.time * pulseSpeed);
+            var pulse = 1f + pulseIntensity * Mathf.Sin(Time.time * pulseSpeed);
             skillIcon.color = readyColor * pulse;
         }
     }
@@ -133,7 +133,7 @@ public class SkillCooldownUI : MonoBehaviour
         // 오버레이 fillAmount 업데이트 (시계 방향으로 줄어듦)
         if (cooldownOverlay != null)
         {
-            float progress = remainingTime / totalCooldown;
+            var progress = remainingTime / totalCooldown;
             cooldownOverlay.fillAmount = progress;
         }
 
@@ -176,11 +176,11 @@ public class SkillCooldownUI : MonoBehaviour
         if (skillIcon == null) yield break;
 
         // 잠깐 크게 만들었다가 원래 크기로
-        Vector3 originalScale = skillIcon.transform.localScale;
-        Vector3 bigScale = originalScale * 1.2f;
+        var originalScale = skillIcon.transform.localScale;
+        var bigScale = originalScale * 1.2f;
 
-        float duration = 0.1f;
-        float elapsed = 0f;
+        var duration = 0.1f;
+        var elapsed = 0f;
 
         // 커지기
         while (elapsed < duration)

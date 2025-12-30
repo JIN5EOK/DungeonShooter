@@ -37,8 +37,8 @@ public class HealthBarUI : MonoBehaviour
         if (_healthComponent != null)
         {
             // 초기 체력 설정
-            int maxHP = _healthComponent.MaxHealth;
-            int currentHP = _healthComponent.CurrentHealth;
+            var maxHP = _healthComponent.MaxHealth;
+            var currentHP = _healthComponent.CurrentHealth;
 
             _targetFillAmount = (float)currentHP / maxHP;
             _currentFillAmount = _targetFillAmount;
@@ -67,7 +67,7 @@ public class HealthBarUI : MonoBehaviour
         if (_healthComponent == null) return;
 
         // 현재 체력 비율 계산
-        float healthRatio = (float)_healthComponent.CurrentHealth / _healthComponent.MaxHealth;
+        var healthRatio = (float)_healthComponent.CurrentHealth / _healthComponent.MaxHealth;
         _targetFillAmount = healthRatio;
 
         // 텍스트 업데이트
@@ -133,8 +133,8 @@ public class HealthBarUI : MonoBehaviour
 
         if (healthFillImage != null)
         {
-            float alpha = 0.7f + 0.3f * Mathf.Sin(Time.time * pulseSpeed);
-            Color color = healthFillImage.color;
+            var alpha = 0.7f + 0.3f * Mathf.Sin(Time.time * pulseSpeed);
+            var color = healthFillImage.color;
             color.a = alpha;
             healthFillImage.color = color;
         }

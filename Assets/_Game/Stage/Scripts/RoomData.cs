@@ -42,7 +42,7 @@ namespace DungeonShooter
                 return -1;
             }
 
-            int index = assetAddresses.IndexOf(address);
+            var index = assetAddresses.IndexOf(address);
             if (index == -1)
             {
                 assetAddresses.Add(address);

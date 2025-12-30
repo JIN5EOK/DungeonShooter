@@ -57,7 +57,7 @@ public class Inventory
             return false;
         }
 
-        bool removed = _items.Remove(item);
+        var removed = _items.Remove(item);
         if (removed)
         {
             OnItemRemoved?.Invoke(item);
