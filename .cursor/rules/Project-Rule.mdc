@@ -8,12 +8,13 @@ alwaysApply: true
 - 역할이 너무 디테일한 부분을 나타내지 않도록 주의한다
   - 잘못된 예시) GameResetButton_OrangeGameResetButton
   
-## 명명규칙
+## 코드 작성 규칙
 - 클래스, 구조체, 인터페이스, 델리게이트 선언은 파스칼케이스를 사용
 - private 변수는 이름 앞에 _를 붙이는 카멜케이스를 사용
   - Ex) private int _foo
 - const, readonly등의 상수, 불변값들은 파스칼케이스를 사용
   - Ex) private readonly int FooValue
+- 변수명 대신 var를 사용해도 무방한 경우(대입될 타입이 모호하여 오작동하거나 혼동의 여지가 없는 경우)에는 var를 사용한다
     
 ## 로깅 규칙
 - 이모지 사용 금지
