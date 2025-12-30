@@ -63,6 +63,10 @@ classDiagram
         +GenerateStage() void
     }
 
+    class StageInstantiator{
+        +InstantiateStage(int roomCount, int stageNumber) void
+    }
+
     class RoomType{
         <<Enum>>
         Normal
@@ -74,6 +78,8 @@ classDiagram
     StageGenerator --> RoomDataSerializer : 방 정보 요청
     StageGenerator --> Stage : 방과 스테이지 생성
     RoomDataSerializer -->  StageGenerator : 방 정보 역직렬화 후 반환
+    StageInstantiator --> StageGenerator : 스테이지 정보를 이용해 전체 스테이지 인스턴스 생성
+    StageInstantiator --> RoomInstantiator : 개별 방 인스턴스 생성
     Stage "1" -- "1..*" Room
     Room --> RoomData
     RoomData "1"-->"1..*" TileLayerData
@@ -140,7 +146,7 @@ graph TD
         - 게임 오브젝트들 (적, 보물상자등..) 
 ```
 
-### 런타임 중 스테이지 생성
+## 런타임 중 스테이지 생성
 * `StageGenerator`가 스테이지 생성 관련 세부 로직을 담당한다
 * `RoomDataSerializer`를 통해 역직렬화된 `RoomData`를 가져와 `Room`을 생성한다
 * 정해진 로직에 따라 각 방을 이어붙여 `Stage`를 생성한다
@@ -152,6 +158,18 @@ graph TD
 * RLE 알고리즘을 통해 연속되는 타일 용량 최적화
 
 현재 위 방식으로 프로토타입 맵을 대상으로 직렬화 해 본 결과 5.9Mb -> 89kb로 용량 감소
+
+## 방 에디터 스크립트 `RoomEditor`
+
+아래 기능을 포함한다, 게임을 실행하지 않은 상태에서 동작해야 한다
+인스펙터 버튼은 오딘 인스펙터 에셋을 사용해 만든다
+* 컴포넌트 활성화시
+    * 해당 컴포넌트 하위에 Tilemaps(Grid 컴포넌트 부착)와 Objects 게임오브젝트가 있는지 확인하고 없다면 생성한다
+* 인스펙터 버튼
+    * 맵 저장(직렬화) 버튼
+        * 지정한 경로에 맵을 저장한다
+    * 맵 불러오기(역직렬화) 버튼
+        * 지정한 Json 파일에서 맵 데이터를 읽어와 배치한다, 기존에 배치된 게임오브젝트와 타일들은 사라진다
 
 ## 스테이지와 방
 방 진입 -> 클리어 흐름도
@@ -173,13 +191,4 @@ graph TD;
     * 잠금 조건을 모두 해결하였다면 (적 모두 제거, 스위치 누르기 등) 방을 클리어 한 것으로 처리하고 방문이 열린다
 
 ## 임시 작성
-### 에디팅 스크립트
-아래 기능을 포함한다, 게임을 실행하지 않은 상태에서 동작해야 한다
-인스펙터 버튼은 오딘 인스펙터 에셋을 사용해 만든다
-* 컴포넌트 활성화시
-    * 해당 컴포넌트 하위에 Tilemaps(Grid 컴포넌트 부착)와 Objects 게임오브젝트가 있는지 확인하고 없다면 생성한다
-* 인스펙터 버튼
-    * 맵 저장(직렬화) 버튼
-        * 지정한 경로에 맵을 저장한다
-    * 맵 불러오기(역직렬화) 버튼
-        * 지정한 Json 파일에서 맵 데이터를 읽어와 배치한다, 기존에 배치된 게임오브젝트와 타일들은 사라진다
+- 시드 기능? 같은 시드를 넣으면 언제나 같은 결과물이 나오도록 하기
