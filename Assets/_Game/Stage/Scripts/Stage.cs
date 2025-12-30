@@ -19,8 +19,8 @@ namespace DungeonShooter
         /// <returns>생성된 방의 ID</returns>
         public int AddRoom(RoomData roomData, Vector2Int position)
         {
-            int id = _nextRoomId++;
-            Room room = new Room(id, roomData, position);
+            var id = _nextRoomId++;
+            var room = new Room(id, roomData, position);
             _rooms[id] = room;
             return id;
         }
@@ -47,10 +47,10 @@ namespace DungeonShooter
             }
 
             // 방향에 따른 인접 위치 계산
-            Vector2Int adjacentPosition = room.Position + GetDirectionVector(direction);
+            var adjacentPosition = room.Position + GetDirectionVector(direction);
             
             // 해당 위치에 방이 있는지 찾기
-            Room adjacentRoom = FindRoomAtPosition(adjacentPosition);
+            var adjacentRoom = FindRoomAtPosition(adjacentPosition);
             if (adjacentRoom == null)
             {
                 return false; // 해당 방향에 방이 없음
@@ -78,6 +78,30 @@ namespace DungeonShooter
         public bool HasRoom(int id)
         {
             return _rooms.ContainsKey(id);
+        }
+
+        /// <summary>
+        /// 방의 RoomData를 교체합니다. (새로운 Room 객체로 교체)
+        /// </summary>
+        public bool ReplaceRoomData(int roomId, RoomData newRoomData)
+        {
+            if (!_rooms.TryGetValue(roomId, out Room oldRoom))
+            {
+                return false;
+            }
+
+            // 새 Room 객체 생성 (기존 연결 정보 유지)
+            var newRoom = new Room(roomId, newRoomData, oldRoom.Position);
+            newRoom.IsCleared = oldRoom.IsCleared;
+
+            // 기존 연결 정보 복사
+            foreach (var connection in oldRoom.Connections)
+            {
+                newRoom.ConnectTo(connection.Key, connection.Value);
+            }
+
+            _rooms[roomId] = newRoom;
+            return true;
         }
 
         /// <summary>
