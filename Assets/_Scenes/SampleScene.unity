@@ -1283,6 +1283,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1114647237}
   - component: {fileID: 1114647236}
+  - component: {fileID: 1114647238}
   m_Layer: 0
   m_Name: GameLifeTimeScope
   m_TagString: Untagged
@@ -1321,6 +1322,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1114647238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114647235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa95d6b9c652846f4aa8ca039fc7dc23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1254900599
 PrefabInstance:
   m_ObjectHideFlags: 0

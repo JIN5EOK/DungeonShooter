@@ -15,8 +15,18 @@ MonoBehaviour:
   m_GroupName: CommonEntity
   m_GUID: 7d56d823f1afb4d48bc2e6bafd88f99d
   m_SerializeEntries:
+  - m_GUID: 1c540a31334464ba4a5106db508a8412
+    m_Address: Player
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 589385c9813ba42d5b046860959c8366
     m_Address: Coin
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6b7834735c593404985a61a391818e86
+    m_Address: Enemy
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
