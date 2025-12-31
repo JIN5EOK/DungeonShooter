@@ -29,6 +29,7 @@ namespace DungeonShooter
         }
 
         public Dictionary<Direction, int> Connections => _connections;
+        public RoomComponent RoomComponent { get; set; }
 
         public Room(int id, RoomData roomData, Vector2Int position)
         {

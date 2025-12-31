@@ -12,6 +12,7 @@ namespace DungeonShooter
         private int _nextRoomId = 0;
 
         public IReadOnlyDictionary<int, Room> Rooms => _rooms;
+        public StageComponent StageComponent { get; set; }
 
         /// <summary>
         /// 방을 추가합니다.

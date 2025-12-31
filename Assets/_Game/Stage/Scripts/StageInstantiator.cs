@@ -21,14 +21,12 @@ namespace DungeonShooter
         /// Stage를 실제 게임오브젝트로 변환합니다.
         /// </summary>
         /// <param name="stage">변환할 Stage</param>
-        /// <param name="addressablesScope">AddressablesScope 인스턴스</param>
         /// <param name="parent">부모 Transform (null이면 씬 루트)</param>
         /// <param name="stageName">생성될 게임오브젝트 이름</param>
         /// <param name="roomSize">방 하나의 크기 (월드 좌표)</param>
         /// <returns>생성된 게임오브젝트를 반환하는 Task</returns>
         public static async Task<GameObject> InstantiateStage(
             Stage stage,
-            Jin5eok.AddressablesScope addressablesScope,
             Transform parent = null,
             string stageName = "Stage",
             float roomSize = 20f)
@@ -39,17 +37,15 @@ namespace DungeonShooter
                 return null;
             }
 
-            if (addressablesScope == null)
-            {
-                Debug.LogError($"[{nameof(StageInstantiator)}] AddressablesScope가 null입니다.");
-                return null;
-            }
-
             var stageObj = new GameObject(stageName);
             if (parent != null)
             {
                 stageObj.transform.SetParent(parent);
             }
+
+            // StageComponent 추가 및 초기화
+            var stageComponent = stageObj.AddComponent<StageComponent>();
+            stageComponent.Initialize(stage);
 
             // 모든 방을 생성
             var roomTasks = new List<Task<GameObject>>();
@@ -64,8 +60,7 @@ namespace DungeonShooter
                 var roomName = $"Room_{room.Id}";
 
                 var task = InstantiateRoomRuntime(
-                    room.RoomData,
-                    addressablesScope,
+                    room,
                     stageObj.transform,
                     roomName);
 
@@ -94,28 +89,26 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// RoomData를 게임오브젝트로 변환합니다 (비동기).
+        /// Room을 게임오브젝트로 변환합니다 (비동기).
         /// </summary>
-        /// <param name="roomData">변환할 RoomData</param>
-        /// <param name="addressablesScope">AddressablesScope 인스턴스</param>
+        /// <param name="room">변환할 Room</param>
         /// <param name="parent">부모 Transform (null이면 씬 루트)</param>
         /// <param name="roomName">생성될 게임오브젝트 이름</param>
         /// <returns>생성된 게임오브젝트를 반환하는 Awaitable</returns>
         public static async Task<GameObject> InstantiateRoomRuntime(
-            RoomData roomData,
-            Jin5eok.AddressablesScope addressablesScope,
+            Room room,
             Transform parent = null,
             string roomName = "Room")
         {
-            if (roomData == null)
+            if (room == null)
             {
-                Debug.LogError($"[{nameof(StageInstantiator)}] RoomData가 null입니다.");
+                Debug.LogError($"[{nameof(StageInstantiator)}] Room이 null입니다.");
                 return null;
             }
 
-            if (addressablesScope == null)
+            if (room.RoomData == null)
             {
-                Debug.LogError($"[{nameof(StageInstantiator)}] AddressablesScope가 null입니다.");
+                Debug.LogError($"[{nameof(StageInstantiator)}] Room의 RoomData가 null입니다.");
                 return null;
             }
 
@@ -125,13 +118,18 @@ namespace DungeonShooter
                 return null;
             }
 
+            // RoomComponent 추가 및 초기화
+            var roomObj = tilemapsParent.parent.gameObject;
+            var roomComponent = roomObj.AddComponent<RoomComponent>();
+            roomComponent.Initialize(room);
+
             // 타일맵 생성 및 배치 (비동기)
-            await InstantiateTilemapsAsync(roomData, tilemapsParent, addressablesScope);
+            await InstantiateTilemapsAsync(room.RoomData, tilemapsParent, roomComponent.AddressablesScope);
 
             // 오브젝트 생성 및 배치 (비동기)
-            await InstantiateObjectsAsync(roomData, objectsParent, addressablesScope);
+            await InstantiateObjectsAsync(room.RoomData, objectsParent, roomComponent.AddressablesScope);
 
-            return tilemapsParent.parent.gameObject;
+            return roomObj;
         }
 
         /// <summary>
