@@ -13,13 +13,13 @@ classDiagram
         East
         West
     }
-    class Stage {
+    class Stage["Stage<br>생성된 스테이지 정보"] {
         +rooms : Dictionary< int, Room > // int == id
         +AddRoom(RoomData roomData, Vector2Int position) int
         +ConnectRoomInDirection(int roomId, Direction direction) bool
         +GetRoom(int) Room
     }
-    class Room {
+    class Room["Room<br>생성된 방 정보"] {
         +id : int
         +roomData readonly RoomData 
         +position : Vector2Int
@@ -27,7 +27,7 @@ classDiagram
         +connections : Dictionary< Direction, int > 
         // 방들간 연결 표현, Direction은 문이 위치하는 방향
     }
-    class RoomData {
+    class RoomData["RoomData<br>방 원본 데이터"] {
         -roomType RoomType
         -assetAddresses List< string >
         // 타일과 게임 오브젝트 어드레서블 주소 목록
@@ -35,7 +35,7 @@ classDiagram
         +objects : List< ObjectData >
     }
 
-    class TileLayerData{
+    class TileLayerData["TileLayerData<br>방의 개별 타일 데이터"]{
         +int index
         // index == RoomData의 어드레스 컬렉션상의 인덱스
         // TileBase 어드레서블 주소에 해당
@@ -45,7 +45,7 @@ classDiagram
         // 방 생성시 배치될 위치
     }
 
-    class ObjectData{
+    class ObjectData["ObjectData<br>방의 게임 오브젝트 데이터"]{
         +int index
         // index == RoomData의 어드레스 컬렉션상의 인덱스
         // 오브젝트 어드레스에 해당
@@ -55,16 +55,20 @@ classDiagram
         // 방 생성시 배치될 위치와 회전값
     }
 
-    class RoomDataSerializer{
+    class RoomDataSerializer["RoomDataSerializer<br>RoomData 직렬화,역직렬화 수행"]{
         +SerializeRoom(GameObject room) RoomData
         +DeserializeRoom(string path) RoomData
     }
-    class StageGenerator{
-        +GenerateStage() void
+
+    class StageGenerator["StageGenerator<br>스테이지 구조 생성 수행"]{
+        +GenerateStage(int roomCount, List< string > roomDataPaths) Stage
     }
 
-    class StageInstantiator{
-        +InstantiateStage(int roomCount, int stageNumber) void
+    class StageInstantiator["StageInstantiator<br>스테이지 구조 기반으로 실제 스테이지 게임오브젝트 생성"]{
+        +InstantiateStage(Stage stage) void
+    }
+    
+    class StageManager["StageManager<br>게임 스테이지 관리자"]{
     }
 
     class RoomType{
@@ -73,13 +77,13 @@ classDiagram
         Boss
         Shop
     }
-
+    RoomDataSerializer --> RoomData
+    StageManager --> StageInstantiator : 스테이지 시작시 스테이지 인스턴스 요청
     Room --> Direction
     StageGenerator --> RoomDataSerializer : 방 정보 요청
-    StageGenerator --> Stage : 방과 스테이지 생성
+    StageGenerator --> Stage
     RoomDataSerializer -->  StageGenerator : 방 정보 역직렬화 후 반환
-    StageInstantiator --> StageGenerator : 스테이지 정보를 이용해 전체 스테이지 인스턴스 생성
-    StageInstantiator --> RoomInstantiator : 개별 방 인스턴스 생성
+    StageInstantiator --> StageGenerator : 각 방들간 연결정보 포함된 스테이지 데이터  요청
     Stage "1" -- "1..*" Room
     Room --> RoomData
     RoomData "1"-->"1..*" TileLayerData
