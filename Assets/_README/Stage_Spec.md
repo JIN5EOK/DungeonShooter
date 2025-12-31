@@ -2,8 +2,7 @@
 스테이지와 방을 비롯한 게임 맵 자료구조,생성 알고리즘에 관한 설계
 
 ## 클래스 다이어그램
-
-스테이지와 방
+### 맵 생성 / 맵 데이터와 직렬화 관련 클래스 다이어그램
 ```mermaid
 classDiagram
     class Direction {
@@ -19,6 +18,7 @@ classDiagram
         +ConnectRoomInDirection(int roomId, Direction direction) bool
         +GetRoom(int) Room
     }
+
     class Room["Room<br>생성된 방 정보"] {
         +id : int
         +roomData readonly RoomData 
@@ -27,6 +27,7 @@ classDiagram
         +connections : Dictionary< Direction, int > 
         // 방들간 연결 표현, Direction은 문이 위치하는 방향
     }
+
     class RoomData["RoomData<br>방 원본 데이터"] {
         -roomType RoomType
         -assetAddresses List< string >
@@ -36,17 +37,17 @@ classDiagram
     }
 
     class TileLayerData["TileLayerData<br>방의 개별 타일 데이터"]{
-        +int index
+        +index int
         // index == RoomData의 어드레스 컬렉션상의 인덱스
         // TileBase 어드레서블 주소에 해당
         // 문자열 주소의 중복을 최소화 해서 용량 아끼기 위함
-        +int layer // SortingLayer
+        +layer int // SortingLayer
         +position Vector2Int
         // 방 생성시 배치될 위치
     }
 
     class ObjectData["ObjectData<br>방의 게임 오브젝트 데이터"]{
-        +int index
+        +index int
         // index == RoomData의 어드레스 컬렉션상의 인덱스
         // 오브젝트 어드레스에 해당
         // 문자열 주소의 중복을 최소화 해서 용량 아끼기 위함
@@ -77,6 +78,7 @@ classDiagram
         Boss
         Shop
     }
+    
     RoomDataSerializer --> RoomData
     StageManager --> StageInstantiator : 스테이지 시작시 스테이지 인스턴스 요청
     Room --> Direction
@@ -89,6 +91,43 @@ classDiagram
     RoomData "1"-->"1..*" TileLayerData
     RoomData "1"-->"1..*" ObjectData
     RoomData --> RoomType
+```
+
+### 런타임 스테이지 관련 클래스 다이어그램
+
+```mermaid
+classDiagram
+    class StageComponent["StageComponent<br>스테이지 게임오브젝트 컴포넌트"] {
+        -stage : Stage
+        +Initialize(stage : Stage) void
+    }
+    
+    class RoomComponent["RoomComponent<br>방 게임오브젝트 컴포넌트"] {
+        -room : Room
+        +Initialize(room : Room) void
+    }
+    
+    class StageManager["StageManager<br>런타임 스테이지 관리자"] {
+        -stage : Stage
+        -stageComponent : StageComponent
+    }
+    
+    class Stage["Stage<br>스테이지 정보"] {
+        +stageComponent : StageComponent
+    }
+    
+    class Room["Room<br>방 정보"] {
+        +roomComponent : RoomComponent
+    }
+    
+    StageManager --> Stage : 데이터 관리
+    StageManager --> StageComponent : 컴포넌트 관리
+    StageComponent --> Stage
+    StageComponent "1" -- "1..*" RoomComponent
+    RoomComponent --> Room
+    Stage "1" -- "1..*" Room
+    Stage --> StageComponent
+    Room --> RoomComponent
 ```
 
 ## 스테이지 생성 알고리즘
@@ -194,13 +233,22 @@ graph TD;
 * `Room` 클리어
     * 잠금 조건을 모두 해결하였다면 (적 모두 제거, 스위치 누르기 등) 방을 클리어 한 것으로 처리하고 방문이 열린다
 
+## 런타임 스테이지 인스턴스 구조
+
+스테이지와 방의 데이터 구조`Stage`, `Room`와 실제 게임오브젝트에 사용되는 `Monobehaviour` 컴포넌트`StageComponent`, `RoomComponent`로 구성된다
+
+### 컴포넌트
+* 컴포넌트들간엔 연결구조 X, 탐색은 오로지 데이터 구조(`Stage`, `Room`)로 수행
+* **StageComponent**
+    * 스테이지 게임오브젝트에 붙는 컴포넌트
+    * `AddressablesScope`를 보유하여 필요한 리소스 관리
+* **RoomComponent**
+    * 각 방 게임오브젝트에 붙는 컴포넌트
+    * `AddressablesScope`를 보유하여 필요한 리소스 관리
+* **StageManager**
+    * 런타임 `Stage`, `Room` 관리자
+    * 스테이지 흐름, 관리 전반 담당
+
+
 ## 임시 작성
 - 시드 기능? 같은 시드를 넣으면 언제나 같은 결과물이 나오도록 하기
-
-스테이지, 방 게임오브젝트에 붙이는 컴포넌트 구상
-
-* 스테이지 컴포넌트는 소속된 방 컴포넌트들을 자식으로 가진다
-* 방 컴포넌트는 각자의 `AddressablesScope`를 가진다, 어드레서블로 로드한 타일셋과 오브젝트를 관리하는 스코프로 방 컴포넌트 파괴시 핸들을 모두 해제한다
-* 스테이지 컴포넌트를 비활성화/활성화 해서 방들을 일괄 비활성화/활성화 시키거나 개별 방 컴포넌트를 비활성화/활성화 시킬 수 있다
-* 단 Stage,Room 스크립트들의 관리 주체는 `StageManager`이다, 방 컴포넌트와 스테이지 컴포넌트는 이 두 스크립트 내의 정보를 갱신시켜주는 역할만 담당한다
-
