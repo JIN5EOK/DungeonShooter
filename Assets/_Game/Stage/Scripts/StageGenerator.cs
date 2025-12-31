@@ -8,7 +8,7 @@ namespace DungeonShooter
     /// <summary>
     /// 스테이지 생성 관련 세부 로직을 담당하는 클래스
     /// </summary>
-    public class StageGenerator
+    public static class StageGenerator
     {
         private const int DEFAULT_ROOM_COUNT = 15;
         private const int DEFAULT_GRID_SIZE = 10;
@@ -20,7 +20,7 @@ namespace DungeonShooter
         /// <param name="normalRoomDataPaths">일반 방 데이터 파일 경로 리스트</param>
         /// <param name="bossRoomDataPath">보스 방 데이터 파일 경로 (선택)</param>
         /// <param name="startRoomDataPath">시작 방 데이터 파일 경로 (선택)</param>
-        public Stage GenerateStage(
+        public static Stage GenerateStage(
             int roomCount = DEFAULT_ROOM_COUNT,
             List<string> normalRoomDataPaths = null,
             string bossRoomDataPath = null,
@@ -58,7 +58,7 @@ namespace DungeonShooter
         /// 방들을 2차원 평면에 배치합니다.
         /// (0,0) 위치에 루트 노드를 생성하고 이를 시작 방으로 설정합니다.
         /// </summary>
-        private List<int> PlaceRoomsOnGrid(Stage stage, int roomCount)
+        private static List<int> PlaceRoomsOnGrid(Stage stage, int roomCount)
         {
             var roomIds = new List<int>();
             var usedPositions = new HashSet<Vector2Int>();
@@ -78,9 +78,8 @@ namespace DungeonShooter
             };
 
             int count = 0;
-            int maxCount = roomCount * 10; // 무한 루프 방지
 
-            while (roomIds.Count < roomCount && count < maxCount)
+            while (roomIds.Count < roomCount)
             {
                 count++;
 
@@ -134,7 +133,7 @@ namespace DungeonShooter
         /// 방들이 끊어지지 않고 최소 신장 트리 형태를 갖추도록 연결합니다.
         /// 크루스칼 알고리즘과 Union-Find를 사용합니다.
         /// </summary>
-        private void BuildMinimumSpanningTree(Stage stage, List<int> roomIds)
+        private static void BuildMinimumSpanningTree(Stage stage, List<int> roomIds)
         {
             if (roomIds.Count <= 1)
             {
@@ -229,7 +228,7 @@ namespace DungeonShooter
         /// <summary>
         /// 시작 방에서 거리상 가장 먼 방을 보스 방으로 설정합니다.
         /// </summary>
-        private void SetStartAndBossRooms(Stage stage, List<int> roomIds, string startRoomDataPath, string bossRoomDataPath)
+        private static void SetStartAndBossRooms(Stage stage, List<int> roomIds, string startRoomDataPath, string bossRoomDataPath)
         {
             if (roomIds.Count < 2)
             {
@@ -272,7 +271,7 @@ namespace DungeonShooter
         /// <summary>
         /// BFS로 가장 먼 방을 찾습니다.
         /// </summary>
-        private int FindFarthestRoom(Stage stage, int startRoomId)
+        private static int FindFarthestRoom(Stage stage, int startRoomId)
         {
             var queue = new Queue<int>();
             var distances = new Dictionary<int, int>();
@@ -316,7 +315,7 @@ namespace DungeonShooter
         /// 자연스러워 보이도록 랜덤 엣지를 추가합니다.
         /// 보스 방 등 특수 방에는 엣지를 추가하지 않습니다.
         /// </summary>
-        private void AddRandomEdges(Stage stage, List<int> roomIds)
+        private static void AddRandomEdges(Stage stage, List<int> roomIds)
         {
             if (roomIds.Count < 2)
             {
@@ -394,7 +393,7 @@ namespace DungeonShooter
         /// <summary>
         /// 시작 방에서 각 방까지의 거리를 계산합니다.
         /// </summary>
-        private Dictionary<int, int> CalculateDistancesFromStart(Stage stage, int startRoomId)
+        private static Dictionary<int, int> CalculateDistancesFromStart(Stage stage, int startRoomId)
         {
             var distances = new Dictionary<int, int>();
             var queue = new Queue<int>();
@@ -429,7 +428,7 @@ namespace DungeonShooter
         /// <summary>
         /// 각 방에 RoomData를 할당합니다.
         /// </summary>
-        private void AssignRoomData(Stage stage, List<int> roomIds, List<string> normalRoomDataPaths)
+        private static void AssignRoomData(Stage stage, List<int> roomIds, List<string> normalRoomDataPaths)
         {
             if (normalRoomDataPaths == null || normalRoomDataPaths.Count == 0)
             {
@@ -466,7 +465,7 @@ namespace DungeonShooter
         /// <summary>
         /// 방이 특정 방향으로 실제로 연결되어 있는지 확인합니다.
         /// </summary>
-        private bool IsConnected(Room room, Direction direction, Dictionary<Vector2Int, Room> roomMap, Dictionary<Direction, Vector2Int> dirToVector)
+        private static bool IsConnected(Room room, Direction direction, Dictionary<Vector2Int, Room> roomMap, Dictionary<Direction, Vector2Int> dirToVector)
         {
             if (!room.Connections.ContainsKey(direction))
             {
@@ -483,7 +482,7 @@ namespace DungeonShooter
         /// <summary>
         /// 반대 방향을 반환합니다.
         /// </summary>
-        private Direction GetOppositeDirection(Direction direction)
+        private static Direction GetOppositeDirection(Direction direction)
         {
             return direction switch
             {
@@ -498,7 +497,7 @@ namespace DungeonShooter
                 /// <summary>
         /// 스테이지 맵을 텍스트로 출력합니다.
         /// </summary>
-        private void LogStageMap(Stage stage, List<int> roomIds)
+        private static void LogStageMap(Stage stage, List<int> roomIds)
         {
             if (roomIds.Count == 0)
             {
