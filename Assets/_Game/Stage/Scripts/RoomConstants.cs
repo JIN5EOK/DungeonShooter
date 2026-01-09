@@ -7,6 +7,9 @@ namespace DungeonShooter
     {
         public const string TILEMAPS_GAMEOBJECT_NAME = "Tilemaps";
         public const string OBJECTS_GAMEOBJECT_NAME = "Objects";
+        public const int ROOM_SIZE_X = 32;
+        public const int ROOM_SIZE_Y = 24;
+        public const int ROOM_SPACING = 10;
     }
 }
 

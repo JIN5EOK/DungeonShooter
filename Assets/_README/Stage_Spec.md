@@ -187,8 +187,10 @@ graph TD
 ``` 
 
 - RootGameObject
+    - BaseTilemaps
+        - 기본으로 생성되는 타일맵 컴포넌트들..
     - Tilemaps
-        - 레이어별 타일맵 컴포넌트들..
+        - 사용자가 직접 배치한 타일맵 컴포넌트들..
     - Objects
         - 게임 오브젝트들 (적, 보물상자등..) 
 ```
