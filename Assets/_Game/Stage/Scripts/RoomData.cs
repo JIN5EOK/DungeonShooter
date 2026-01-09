@@ -10,26 +10,47 @@ namespace DungeonShooter
     [Serializable]
     public class RoomData
     {
-        [SerializeField] private List<string> assetAddresses = new List<string>(); // TileBase 어드레서블 주소, 게임 오브젝트 어드레서블 주소 등 동적 로드에 사용되는 주소들
-        [SerializeField] private List<TileLayerData> tiles = new List<TileLayerData>(); // 타일 데이터
-        [SerializeField] private List<ObjectData> objects = new List<ObjectData>();
+        [SerializeField] private string _tileAddress;
+        [SerializeField] private string _wallAddress;
+        [SerializeField] private string _topAddress;
+        [SerializeField] private List<string> _assetAddresses = new List<string>(); // TileBase 어드레서블 주소, 게임 오브젝트 어드레서블 주소 등 동적 로드에 사용되는 주소들
+        [SerializeField] private List<TileLayerData> _tiles = new List<TileLayerData>(); // 타일 데이터
+        [SerializeField] private List<ObjectData> _objects = new List<ObjectData>();
+
+        public string TileAddress
+        {
+            get => _tileAddress;
+            set => _tileAddress = value;
+        }
+
+        public string WallAddress
+        {
+            get => _wallAddress;
+            set => _wallAddress = value;
+        }
+
+        public string TopAddress
+        {
+            get => _topAddress;
+            set => _topAddress = value;
+        }
 
         public List<string> AssetAddresses
         {
-            get => assetAddresses;
-            set => assetAddresses = value;
+            get => _assetAddresses;
+            set => _assetAddresses = value;
         }
 
         public List<TileLayerData> Tiles
         {
-            get => tiles;
-            set => tiles = value;
+            get => _tiles;
+            set => _tiles = value;
         }
 
         public List<ObjectData> Objects
         {
-            get => objects;
-            set => objects = value;
+            get => _objects;
+            set => _objects = value;
         }
 
         /// <summary>
@@ -42,11 +63,11 @@ namespace DungeonShooter
                 return -1;
             }
 
-            var index = assetAddresses.IndexOf(address);
+            var index = _assetAddresses.IndexOf(address);
             if (index == -1)
             {
-                assetAddresses.Add(address);
-                index = assetAddresses.Count - 1;
+                _assetAddresses.Add(address);
+                index = _assetAddresses.Count - 1;
             }
 
             return index;
@@ -57,9 +78,9 @@ namespace DungeonShooter
         /// </summary>
         public string GetAddress(int index)
         {
-            if (index >= 0 && index < assetAddresses.Count)
+            if (index >= 0 && index < _assetAddresses.Count)
             {
-                return assetAddresses[index];
+                return _assetAddresses[index];
             }
 
             return null;

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Jin5eok;
 
 namespace DungeonShooter
 {
@@ -41,7 +40,7 @@ namespace DungeonShooter
             SetStartAndBossRooms(stage, roomIds, startRoomDataPath, bossRoomDataPath);
 
             // 3. 방들이 끊어지지 않고 최소 신장 트리 형태를 갖추도록 연결
-            BuildMinimumSpanningTree(stage, roomIds);
+            BuildSpanningTree(stage, roomIds);
 
             // 4. 자연스러워 보이도록 랜덤 엣지 추가 (보스 방 제외)
             AddRandomEdges(stage, roomIds);
@@ -130,18 +129,18 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 방들이 끊어지지 않고 최소 신장 트리 형태를 갖추도록 연결합니다.
-        /// 크루스칼 알고리즘과 Union-Find를 사용합니다.
+        /// 방들이 끊어지지 않고 신장 트리 형태를 갖추도록 연결합니다.
+        /// BFS 탐색을 통해 연결합니다.
         /// </summary>
-        private static void BuildMinimumSpanningTree(Stage stage, List<int> roomIds)
+        private static void BuildSpanningTree(Stage stage, List<int> roomIds)
         {
             if (roomIds.Count <= 1)
             {
                 return;
             }
 
-            // 실제로 인접한 방이 있는 엣지만 생성
-            var edges = new List<(int roomId, Direction direction)>();
+            var visited = new HashSet<int>();
+            var queue = new Queue<int>();
             var directionVectors = new Dictionary<Direction, Vector2Int>
             {
                 { Direction.North, Vector2Int.up },
@@ -150,70 +149,48 @@ namespace DungeonShooter
                 { Direction.West, Vector2Int.left }
             };
 
-            foreach (int roomId in roomIds)
-            {
-                var room = stage.GetRoom(roomId);
-                if (room == null) continue;
+            // 시작 방(첫 번째 방)에서 BFS 시작
+            var startRoomId = roomIds[0];
+            queue.Enqueue(startRoomId);
+            visited.Add(startRoomId);
 
-                foreach (var (dir, vector) in directionVectors)
-                {
-                    var adjacentPos = room.Position + vector;
-                    // 해당 위치에 방이 있는지 확인
-                    var hasAdjacentRoom = stage.Rooms.Values.Any(r => r.Position == adjacentPos);
-                    if (hasAdjacentRoom)
-                    {
-                        edges.Add((roomId, dir));
-                    }
-                }
-            }
-
-            // 엣지를 랜덤하게 섞기
-            for (int i = 0; i < edges.Count; i++)
-            {
-                int randomIndex = Random.Range(i, edges.Count);
-                (edges[i], edges[randomIndex]) = (edges[randomIndex], edges[i]);
-            }
-
-            // Union-Find 초기화
-            var uf = new UnionFind<int>();
-            foreach (int roomId in roomIds)
-            {
-                uf.MakeSet(roomId);
-            }
-
-            // 크루스칼 알고리즘
             var connectedCount = 0;
             var targetConnections = roomIds.Count - 1;
 
-            foreach (var (roomId, direction) in edges)
+            while (queue.Count > 0 && connectedCount < targetConnections)
             {
-                if (connectedCount >= targetConnections)
+                var currentRoomId = queue.Dequeue();
+                var currentRoom = stage.GetRoom(currentRoomId);
+                if (currentRoom == null) continue;
+
+                // 인접한 방들을 랜덤한 순서로 확인
+                var directions = new List<Direction>(directionVectors.Keys);
+                for (int i = 0; i < directions.Count; i++)
                 {
-                    break;
+                    int randomIndex = Random.Range(i, directions.Count);
+                    var temp = directions[i];
+                    directions[i] = directions[randomIndex];
+                    directions[randomIndex] = temp;
                 }
 
-                // 연결 시도
-                if (stage.ConnectRoomInDirection(roomId, direction))
+                foreach (var direction in directions)
                 {
-                    // 인접 방 ID 찾기
-                    var room = stage.GetRoom(roomId);
-                    if (room != null && room.Connections.TryGetValue(direction, out int adjacentRoomId))
+                    if (connectedCount >= targetConnections)
                     {
-                        if (!uf.Connected(roomId, adjacentRoomId))
+                        break;
+                    }
+
+                    var adjacentPos = currentRoom.Position + directionVectors[direction];
+                    var adjacentRoom = stage.Rooms.Values.FirstOrDefault(r => r.Position == adjacentPos);
+                    
+                    // 인접 방이 있고 아직 방문하지 않은 경우 연결
+                    if (adjacentRoom != null && !visited.Contains(adjacentRoom.Id))
+                    {
+                        if (stage.ConnectRoomInDirection(currentRoomId, direction))
                         {
-                            uf.Union(roomId, adjacentRoomId);
+                            visited.Add(adjacentRoom.Id);
+                            queue.Enqueue(adjacentRoom.Id);
                             connectedCount++;
-                        }
-                        else
-                        {
-                            // 사이클이 생기므로 연결 해제
-                            room.Disconnect(direction);
-                            var adjacentRoom = stage.GetRoom(adjacentRoomId);
-                            if (adjacentRoom != null)
-                            {
-                                var oppositeDir = GetOppositeDirection(direction);
-                                adjacentRoom.Disconnect(oppositeDir);
-                            }
                         }
                     }
                 }
