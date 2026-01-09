@@ -29,7 +29,10 @@ classDiagram
     }
 
     class RoomData["RoomData<br>방 원본 데이터"] {
-        -roomType RoomType
+        -tileAddress : string
+        -wallAddress : string
+        -topAddress : string
+        -roomType : RoomType
         -assetAddresses List< string >
         // 타일과 게임 오브젝트 어드레서블 주소 목록
         +tiles : List< TileLayerData >
@@ -98,15 +101,22 @@ classDiagram
 ```mermaid
 classDiagram
     class StageComponent["StageComponent<br>스테이지 게임오브젝트 컴포넌트"] {
+        <<MonoBehaviour>>
         -stage : Stage
         +Initialize(stage : Stage) void
     }
     
     class RoomComponent["RoomComponent<br>방 게임오브젝트 컴포넌트"] {
+        <<MonoBehaviour>>
         -room : Room
+        +doorComponents : List~DoorComponent~
         +Initialize(room : Room) void
     }
-    
+
+    class DoorComponent["DoorComponent<br>문 오브젝트 열기 닫기 등 관련 기능 수행"] {
+        <<MonoBehaviour>>
+    }
+
     class StageManager["StageManager<br>런타임 스테이지 관리자"] {
         -stage : Stage
         -stageComponent : StageComponent
@@ -124,6 +134,7 @@ classDiagram
     StageManager --> StageComponent : 컴포넌트 관리
     StageComponent --> Stage
     StageComponent "1" -- "1..*" RoomComponent
+    RoomComponent "1" -- "1..*" DoorComponent
     RoomComponent --> Room
     Stage "1" -- "1..*" Room
     Stage --> StageComponent
@@ -150,18 +161,11 @@ graph TD;
         2. 랜덤한 노드를 선택한 후 해당 노드의 상,하,좌,우 방향 중 랜덤한 비어있는 방향에 방을 추가한다
         3. 목표한 방 갯수에 도달할 때 까지 2번을 반복한다
         4. 방을 모두 만들었다면 시작방에서 거리상 가장 먼 방을 보스방으로 설정한다 (추후 상점 등 다른 특수방이 추가된다면 이 단계에서 배치한다)
-    2. 방들이 끊어지지 않고 최소 신장 트리형태를 갖추도록 시작 방 부터 시작해 랜덤한 방끼리 연결한다
-        * 크루스칼 알고리즘, Union-Find를 사용한다
-    3. 자연스러워 보이도록 랜덤한 엣지들을 추가한다
-        * 엣지의 갯수는 랜덤으로 하되 좌표 거리상 시작지점에서 먼 방일수록 연결된 엣지가 적어질 가능성이 높아지도록 한다
+    2. 방들이 끊어지지 않고 신장 트리 형태를 갖추도록 시작 방 부터 시작해 랜덤한 방끼리 연결한다
+        * BFS 탐색을 통해 연결한다
+            * (원래 추후 연결 가중치를 염두에 두고 크루스칼 알고리즘과 Union-Find를 사용하려 했으나 너무 오버 스펙인듯 하여 사용하지 않으려 함)
+    3. 랜덤한 방향으로 엣지들을 추가한다
         * 단 보스방처럼 특별한 방들엔 엣지를 추가하지 않는다 (진입로를 하나로 유지하기 위함)
-* 방 프리셋의 문 위치 제약
-    * 문 생성위치 제약이 없는 방 : 문이 하나만 있을수도 있고 네개 모두 있을 수 있는 방
-    * 문이 한쪽으로 밖에 없는 방 : 통로가 동,서,남,북 중 한쪽만 있을 수 있는 방
-
-
-* 추후 추가되어야 하는 부분들
-    * 스테이지 번호에 따라 어떤 맵 프리셋을 사용할지 정보들
 
 ## 방 데이터 프리셋 편집 및 저장
 
@@ -193,6 +197,10 @@ graph TD
 * `StageGenerator`가 스테이지 생성 관련 세부 로직을 담당한다
 * `RoomDataSerializer`를 통해 역직렬화된 `RoomData`를 가져와 `Room`을 생성한다
 * 정해진 로직에 따라 각 방을 이어붙여 `Stage`를 생성한다
+* `StageInstantaitor`가 스테이지 인스턴스 생성 로직을 담당한다
+    * 방 사이즈는 `RoomConstants`에 지정된 방 사이즈를 기반으로 생성되며 마찬가지로 지정된 간격만큼 서로 간격을 유지하여 배치된다
+    * 연결된 방이 있는 방향에는 벽을 생성하지 않고 타일을 배치하여(복도) 방들간 이동 가능하도록 만든다
+
 
 ### 방 데이터 프리셋 저장 용량 최적화
 * 다음과 같은 방식으로 저장시 용량을 최적화한다
