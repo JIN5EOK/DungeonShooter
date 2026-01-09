@@ -1,8 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Jin5eok;
-using Mono.Cecil.Cil;
 using UnityEngine;
 
 namespace DungeonShooter
@@ -26,9 +22,15 @@ namespace DungeonShooter
 
         private async void CreateStageAsync()
         {
-            _stage = StageGenerator.GenerateStage(15, new List<string> { "Assets/_Game/Stage/Rooms/Stage001/Stage001_0001.json", "Assets/_Game/Stage/Rooms/Stage001/Stage001_0002.json" });
+            var startRoomAddresses = new string[] { "Stage001_0001" };
+            var normalRoomAddresses = new string[] { "Stage001_0001",
+                                                        "Stage001_0002" };
+            var bossRoomAddresses = new string[] { "Stage001_0001" };
+            IRoomDataRepository roomDataRepository = new RoomDataRepository(startRoomAddresses, normalRoomAddresses, bossRoomAddresses);
+            _stage = await StageGenerator.GenerateStage(roomDataRepository, 15);
             var stageObj = await StageInstantiator.InstantiateStage(_stage);
             _stageComponent = stageObj != null ? stageObj.GetComponent<StageComponent>() : null;
+            roomDataRepository.Dispose();
         }
     }
 }

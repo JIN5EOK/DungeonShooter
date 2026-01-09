@@ -4,18 +4,31 @@ using UnityEngine;
 
 namespace DungeonShooter
 {
+    public enum RoomType
+    {
+        Start,
+        Normal,
+        Boss,
+    }
     /// <summary>
     /// 방 데이터 - 타일과 오브젝트 배치 정보를 담는 설계도 클래스
     /// </summary>
     [Serializable]
     public class RoomData
     {
+        [SerializeField] private RoomType _roomType;
         [SerializeField] private string _tileAddress;
         [SerializeField] private string _wallAddress;
         [SerializeField] private string _topAddress;
         [SerializeField] private List<string> _assetAddresses = new List<string>(); // TileBase 어드레서블 주소, 게임 오브젝트 어드레서블 주소 등 동적 로드에 사용되는 주소들
         [SerializeField] private List<TileLayerData> _tiles = new List<TileLayerData>(); // 타일 데이터
         [SerializeField] private List<ObjectData> _objects = new List<ObjectData>();
+
+        public RoomType RoomType
+        {
+            get => _roomType;
+            set => _roomType = value;
+        }
 
         public string TileAddress
         {

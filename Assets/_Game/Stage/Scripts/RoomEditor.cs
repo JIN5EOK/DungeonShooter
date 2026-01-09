@@ -98,7 +98,15 @@ namespace DungeonShooter
 
             EnsureStructure();
 
-            var roomData = RoomDataSerializer.DeserializeRoom(loadPath);
+            // 파일 경로에서 TextAsset 로드
+            var textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(loadPath);
+            if (textAsset == null)
+            {
+                Debug.LogError($"[{nameof(RoomEditor)}] 파일을 찾을 수 없습니다: {loadPath}");
+                return;
+            }
+
+            var roomData = RoomDataSerializer.DeserializeRoom(textAsset);
             if (roomData == null)
             {
                 Debug.LogError($"[{nameof(RoomEditor)}] 방 역직렬화에 실패했습니다.");

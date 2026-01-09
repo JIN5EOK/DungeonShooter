@@ -1,7 +1,8 @@
-using System.Collections.Generic;
+using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.AddressableAssets;
@@ -220,19 +221,19 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 파일에서 RoomData를 역직렬화합니다.
+        /// TextAsset에서 RoomData를 역직렬화합니다.
         /// </summary>
-        public static RoomData DeserializeRoom(string path)
+        public static RoomData DeserializeRoom(TextAsset textAsset)
         {
-            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            if (textAsset == null)
             {
-                Debug.LogError($"[{nameof(RoomDataSerializer)}] 파일을 찾을 수 없습니다: {path}");
+                Debug.LogError($"[{nameof(RoomDataSerializer)}] TextAsset이 null입니다.");
                 return null;
             }
 
             try
             {
-                var json = File.ReadAllText(path);
+                var json = textAsset.text;
                 var serialized = JsonUtility.FromJson<SerializedRoomData>(json);
                 
                 if (serialized == null)
@@ -244,7 +245,7 @@ namespace DungeonShooter
                 // RoomData로 변환 (RLE 압축 해제)
                 return serialized.ToRoomData();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Debug.LogError($"[{nameof(RoomDataSerializer)}] 역직렬화 실패: {e.Message}");
                 return null;
@@ -283,7 +284,7 @@ namespace DungeonShooter
                 File.WriteAllText(path, json);
                 Debug.Log($"[{nameof(RoomDataSerializer)}] 저장 완료: {path}");
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Debug.LogError($"[{nameof(RoomDataSerializer)}] 저장 실패: {e.Message}");
             }
