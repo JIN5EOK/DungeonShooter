@@ -17,6 +17,8 @@ namespace DungeonShooter
     public class RoomData
     {
         [SerializeField] private RoomType _roomType;
+        [SerializeField] private int _roomSizeX;
+        [SerializeField] private int _roomSizeY;
         [SerializeField] private string _tileAddress;
         [SerializeField] private string _wallAddress;
         [SerializeField] private string _topAddress;
@@ -24,48 +26,23 @@ namespace DungeonShooter
         [SerializeField] private List<TileLayerData> _tiles = new List<TileLayerData>(); // 타일 데이터
         [SerializeField] private List<ObjectData> _objects = new List<ObjectData>();
 
-        public RoomType RoomType
-        {
-            get => _roomType;
-            set => _roomType = value;
-        }
-
-        public string TileAddress
-        {
-            get => _tileAddress;
-            set => _tileAddress = value;
-        }
-
-        public string WallAddress
-        {
-            get => _wallAddress;
-            set => _wallAddress = value;
-        }
-
-        public string TopAddress
-        {
-            get => _topAddress;
-            set => _topAddress = value;
-        }
-
+        public int RoomSizeX => Mathf.Clamp(_roomSizeX, RoomConstants.ROOM_SIZE_MIN_X, RoomConstants.ROOM_SIZE_MAX_X);
+        public int RoomSizeY => Mathf.Clamp(_roomSizeY, RoomConstants.ROOM_SIZE_MIN_Y, RoomConstants.ROOM_SIZE_MAX_Y);
+        public RoomType RoomType => _roomType;
+        public string TileAddress => _tileAddress;
+        public string WallAddress => _wallAddress;
+        public string TopAddress => _topAddress;
         public List<string> AssetAddresses
         {
             get => _assetAddresses;
             set => _assetAddresses = value;
         }
-
-        public List<TileLayerData> Tiles
-        {
-            get => _tiles;
-            set => _tiles = value;
-        }
-
+        public List<TileLayerData> Tiles => _tiles;
         public List<ObjectData> Objects
         {
             get => _objects;
             set => _objects = value;
         }
-
         /// <summary>
         /// 주소를 테이블에 추가하고 인덱스를 반환합니다. 이미 존재하면 기존 인덱스를 반환합니다.
         /// </summary>

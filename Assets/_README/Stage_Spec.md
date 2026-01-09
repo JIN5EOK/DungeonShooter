@@ -193,11 +193,13 @@ graph TD
 방 데이터 프리셋 제작시 계층구조
 ``` 
 
-- RootGameObject
+- RootGameObject : 기본 타일 맵 컴포넌트들
     - BaseTilemaps
-        - 기본으로 생성되는 타일맵 컴포넌트들..
-    - Tilemaps
-        - 사용자가 직접 배치한 타일맵 컴포넌트들..
+        - BaseTilemap_Ground
+        - BaseTilemap_Wall
+    - Tilemaps : 사용자가 직접 배치하는 타일맵 컴포넌트들
+        - Tilemap_Ground
+        - Tilemap_Wall
     - Objects
         - 게임 오브젝트들 (적, 보물상자등..) 
 ```
@@ -208,6 +210,8 @@ graph TD
 * 정해진 로직에 따라 각 방을 이어붙여 `Stage`를 생성한다
 * `StageInstantaitor`가 스테이지 인스턴스 생성 로직을 담당한다
     * 방 사이즈는 `RoomConstants`에 지정된 방 사이즈를 기반으로 생성되며 마찬가지로 지정된 간격만큼 서로 간격을 유지하여 배치된다
+        * 생성된 방 타일의 상단 1타일 높이만큼 Wall타일을 배치한다
+        * 방 타일들의 주변을 2타일 두께의 Top타일들로 둘러싼다
     * 연결된 방이 있는 방향에는 벽을 생성하지 않고 타일을 배치하여(복도) 방들간 이동 가능하도록 만든다
 
 
