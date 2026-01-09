@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
-using Jin5eok;
 
 namespace DungeonShooter
 {
@@ -507,8 +507,8 @@ namespace DungeonShooter
             // Y축을 역순으로 (위에서 아래로)
             for (int y = maxY; y >= minY; y--)
             {
-                var nodeLine = new System.Text.StringBuilder();
-                var verticalLine = new System.Text.StringBuilder();
+                var nodeLine = new StringBuilder();
+                var verticalLine = new StringBuilder();
 
                 for (int x = minX; x <= maxX; x++)
                 {

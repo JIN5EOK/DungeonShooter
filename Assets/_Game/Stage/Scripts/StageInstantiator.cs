@@ -4,11 +4,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Jin5eok;
-#if UNITY_EDITOR
-using UnityEditor;
-using UnityEditor.AddressableAssets;
-using UnityEditor.AddressableAssets.Settings;
-#endif
 
 namespace DungeonShooter
 {
@@ -28,8 +23,7 @@ namespace DungeonShooter
         public static async Task<GameObject> InstantiateStage(
             Stage stage,
             Transform parent = null,
-            string stageName = "Stage",
-            float roomSize = 20f)
+            float roomSize = RoomConstants.ROOM_SIZE_X)
         {
             if (stage == null)
             {
@@ -37,7 +31,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            var stageObj = new GameObject(stageName);
+            var stageObj = new GameObject("Stage");
             if (parent != null)
             {
                 stageObj.transform.SetParent(parent);
@@ -287,7 +281,7 @@ namespace DungeonShooter
             }
         }
         /// <summary>
-        /// 에디터 전용: RoomData를 게임오브젝트로 변환합니다.
+        /// RoomData를 게임오브젝트로 변환합니다.
         /// roomObj가 null이면 새로 생성하고, null이 아니면 기존 GameObject에 데이터를 불러옵니다.
         /// </summary>
         /// <param name="roomData">변환할 RoomData</param>
@@ -307,23 +301,22 @@ namespace DungeonShooter
                 return null;
             }
 
-            if (!Application.isEditor)
-            {
-                Debug.LogError($"[{nameof(StageInstantiator)}] InstantiateRoomEditor는 에디터에서만 사용할 수 있습니다.");
-                return null;
-            }
-
             var (tilemapsParent, objectsParent) = GetOrCreateRoomStructure(roomObj, parent, roomName);
             if (tilemapsParent == null || objectsParent == null)
             {
                 return null;
             }
 
-            // 타일맵 생성 및 배치
-            InstantiateTilemaps(roomData, tilemapsParent, LoadTileEditor);
+            // AddressablesScope 생성 (에디터에서도 사용)
+            using var addressablesScope = new AddressablesScope();
 
-            // 오브젝트 생성 및 배치
-            InstantiateObjects(roomData, objectsParent, LoadPrefabEditor, InstantiatePrefabEditor);
+            // 타일맵 생성 및 배치 (비동기 메서드를 동기적으로 실행)
+            var tilemapsTask = InstantiateTilemapsAsync(roomData, tilemapsParent, addressablesScope);
+            tilemapsTask.Wait();
+
+            // 오브젝트 생성 및 배치 (비동기 메서드를 동기적으로 실행)
+            var objectsTask = InstantiateObjectsAsync(roomData, objectsParent, addressablesScope);
+            objectsTask.Wait();
 
             return roomObj ?? tilemapsParent.parent.gameObject;
         }
@@ -368,143 +361,6 @@ namespace DungeonShooter
             }
         }
 
-        /// <summary>
-        /// RoomData의 타일 데이터를 타일맵에 배치합니다.
-        /// </summary>
-        private static void InstantiateTilemaps(
-            RoomData roomData,
-            Transform tilemapsParent,
-            System.Func<RoomData, int, TileBase> loadTile)
-        {
-            var grid = tilemapsParent.GetComponent<Grid>();
-            if (grid == null)
-            {
-                Debug.LogError($"[{nameof(StageInstantiator)}] Grid 컴포넌트가 없습니다.");
-                return;
-            }
-
-            // 레이어별로 그룹화
-            var tilesByLayer = roomData.Tiles.GroupBy(t => t.Layer);
-
-            foreach (var layerGroup in tilesByLayer)
-            {
-                var sortingLayerId = layerGroup.Key;
-                var sortingLayerName = GetSortingLayerName(sortingLayerId);
-
-                // 레이어별 Tilemap 생성
-                var tilemapName = $"Tilemap_{sortingLayerName}";
-                var tilemapObj = new GameObject(tilemapName);
-                tilemapObj.transform.SetParent(tilemapsParent);
-                var tilemap = tilemapObj.AddComponent<Tilemap>();
-                var renderer = tilemapObj.AddComponent<TilemapRenderer>();
-                renderer.sortingLayerID = sortingLayerId;
-
-                // 타일 배치
-                foreach (var tileData in layerGroup)
-                {
-                    var tileBase = loadTile(roomData, tileData.Index);
-                    if (tileBase == null) continue;
-
-                    var cellPosition = new Vector3Int(tileData.Position.x, tileData.Position.y, 0);
-                    tilemap.SetTile(cellPosition, tileBase);
-                }
-            }
-        }
-
-        /// <summary>
-        /// RoomData의 오브젝트 데이터를 배치합니다.
-        /// </summary>
-        private static void InstantiateObjects(
-            RoomData roomData,
-            Transform objectsParent,
-            System.Func<RoomData, int, GameObject> loadPrefab,
-            System.Func<GameObject, Transform, GameObject> instantiatePrefab)
-        {
-            foreach (var objectData in roomData.Objects)
-            {
-                var prefab = loadPrefab(roomData, objectData.Index);
-                if (prefab == null) continue;
-
-                var position = new Vector3(objectData.Position.x, objectData.Position.y, 0);
-                var instance = instantiatePrefab(prefab, objectsParent);
-                if (instance != null)
-                {
-                    instance.transform.position = position;
-                    instance.transform.rotation = objectData.Rotation;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 에디터 전용: RoomData의 인덱스로부터 Addressables 주소를 통해 에셋을 로드합니다.
-        /// </summary>
-        private static T LoadAssetFromAddressEditor<T>(RoomData roomData, int index) where T : Object
-        {
-            if (!Application.isEditor)
-            {
-                Debug.LogError($"[{nameof(StageInstantiator)}] LoadAssetFromAddressEditor는 에디터에서만 사용할 수 있습니다.");
-                return null;
-            }
-
-#if UNITY_EDITOR
-            var address = roomData.GetAddress(index);
-            if (string.IsNullOrEmpty(address))
-            {
-                Debug.LogWarning($"[{nameof(StageInstantiator)}] 인덱스 {index}에 해당하는 주소를 찾을 수 없습니다.");
-                return null;
-            }
-
-            var settings = AddressableAssetSettingsDefaultObject.Settings;
-            if (settings == null)
-            {
-                Debug.LogError($"[{nameof(StageInstantiator)}] AddressableAssetSettings를 찾을 수 없습니다.");
-                return null;
-            }
-
-            AddressableAssetEntry entry = null;
-
-            // 먼저 FindAssetEntry 시도
-            entry = settings.FindAssetEntry(address);
-
-            // 찾지 못하면 모든 그룹을 순회하면서 찾기
-            if (entry == null)
-            {
-                foreach (var group in settings.groups)
-                {
-                    if (group == null) continue;
-
-                    entry = group.entries.FirstOrDefault(e => e.address == address);
-                    if (entry != null)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            if (entry == null)
-            {
-                Debug.LogWarning($"[{nameof(StageInstantiator)}] 주소 '{address}'에 해당하는 Addressable 엔트리를 찾을 수 없습니다.");
-                return null;
-            }
-
-            var assetPath = AssetDatabase.GUIDToAssetPath(entry.guid);
-            if (string.IsNullOrEmpty(assetPath))
-            {
-                Debug.LogWarning($"[{nameof(StageInstantiator)}] GUID '{entry.guid}'에 해당하는 에셋 경로를 찾을 수 없습니다.");
-                return null;
-            }
-
-            var asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
-            if (asset == null)
-            {
-                Debug.LogWarning($"[{nameof(StageInstantiator)}] 주소 '{address}'에서 {typeof(T).Name} 타입의 에셋을 로드할 수 없습니다.");
-            }
-
-            return asset;
-#else
-            return null;
-#endif
-        }
 
         /// <summary>
         /// SortingLayer ID로부터 이름을 가져옵니다.
@@ -521,34 +377,6 @@ namespace DungeonShooter
             }
 
             return $"Layer_{sortingLayerId}";
-        }
-
-        /// <summary>
-        /// 에디터 전용: 타일을 로드합니다.
-        /// </summary>
-        private static TileBase LoadTileEditor(RoomData roomData, int index)
-        {
-            return LoadAssetFromAddressEditor<TileBase>(roomData, index);
-        }
-
-        /// <summary>
-        /// 에디터 전용: 프리팹을 로드합니다.
-        /// </summary>
-        private static GameObject LoadPrefabEditor(RoomData roomData, int index)
-        {
-            return LoadAssetFromAddressEditor<GameObject>(roomData, index);
-        }
-
-        /// <summary>
-        /// 에디터 전용: 프리팹을 인스턴스화합니다.
-        /// </summary>
-        private static GameObject InstantiatePrefabEditor(GameObject prefab, Transform parent)
-        {
-#if UNITY_EDITOR
-            return PrefabUtility.InstantiatePrefab(prefab, parent) as GameObject;
-#else
-            return null;
-#endif
         }
     }
 }
