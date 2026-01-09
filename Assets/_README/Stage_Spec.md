@@ -12,6 +12,11 @@ classDiagram
         East
         West
     }
+
+    class IRoomDataRepository["IRoomDataRepository<br>스테이지별 방 데이터 맞춤 제공"] {
+        +GetRandomRoom(RoomType type)
+    }
+
     class Stage["Stage<br>생성된 스테이지 정보"] {
         +rooms : Dictionary< int, Room > // int == id
         +AddRoom(RoomData roomData, Vector2Int position) int
@@ -65,7 +70,7 @@ classDiagram
     }
 
     class StageGenerator["StageGenerator<br>스테이지 구조 생성 수행"]{
-        +GenerateStage(int roomCount, List< string > roomDataPaths) Stage
+        +GenerateStage(int roomCount) Stage
     }
 
     class StageInstantiator["StageInstantiator<br>스테이지 구조 기반으로 실제 스테이지 게임오브젝트 생성"]{
@@ -82,12 +87,13 @@ classDiagram
         Shop
     }
     
-    RoomDataSerializer --> RoomData
+    StageGenerator --> IRoomDataRepository
     StageManager --> StageInstantiator : 스테이지 시작시 스테이지 인스턴스 요청
     Room --> Direction
-    StageGenerator --> RoomDataSerializer : 방 정보 요청
+    
+    IRoomDataRepository --> RoomDataSerializer : 방 정보 요청
     StageGenerator --> Stage
-    RoomDataSerializer -->  StageGenerator : 방 정보 역직렬화 후 반환
+    RoomDataSerializer -->  IRoomDataRepository : 방 정보 역직렬화 후 반환
     StageInstantiator --> StageGenerator : 각 방들간 연결정보 포함된 스테이지 데이터  요청
     Stage "1" -- "1..*" Room
     Room --> RoomData
@@ -95,6 +101,7 @@ classDiagram
     RoomData "1"-->"1..*" ObjectData
     RoomData --> RoomType
 ```
+* `IRoomDataRepository`를 사용하는 이유 : 방 데이터 가져오는 방법을 숨기기 위함 (직렬화-역직렬화..)
 
 ### 런타임 스테이지 관련 클래스 다이어그램
 
