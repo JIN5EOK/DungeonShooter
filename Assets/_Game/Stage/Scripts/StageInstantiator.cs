@@ -17,13 +17,10 @@ namespace DungeonShooter
         /// </summary>
         /// <param name="stage">변환할 Stage</param>
         /// <param name="parent">부모 Transform (null이면 씬 루트)</param>
-        /// <param name="stageName">생성될 게임오브젝트 이름</param>
-        /// <param name="roomSize">방 하나의 크기 (월드 좌표)</param>
         /// <returns>생성된 게임오브젝트를 반환하는 Task</returns>
         public static async Task<GameObject> InstantiateStage(
             Stage stage,
-            Transform parent = null,
-            float roomSize = RoomConstants.ROOM_SIZE_X)
+            Transform parent = null)
         {
             if (stage == null)
             {
@@ -72,7 +69,7 @@ namespace DungeonShooter
 
                 if (index < roomObjects.Length && roomObjects[index] != null)
                 {
-                    var worldPosition = new Vector3(room.Position.x * roomSize, room.Position.y * roomSize, 0);
+                    var worldPosition = new Vector3(room.Position.x * RoomConstants.ROOM_SPACING, room.Position.y * RoomConstants.ROOM_SPACING, 0);
                     roomObjects[index].transform.position = worldPosition;
                 }
                 index++;

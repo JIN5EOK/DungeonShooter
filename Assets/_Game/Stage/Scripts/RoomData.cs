@@ -19,19 +19,12 @@ namespace DungeonShooter
         [SerializeField] private RoomType _roomType;
         [SerializeField] private int _roomSizeX;
         [SerializeField] private int _roomSizeY;
-        [SerializeField] private string _tileAddress;
-        [SerializeField] private string _wallAddress;
-        [SerializeField] private string _topAddress;
         [SerializeField] private List<string> _assetAddresses = new List<string>(); // TileBase 어드레서블 주소, 게임 오브젝트 어드레서블 주소 등 동적 로드에 사용되는 주소들
         [SerializeField] private List<TileLayerData> _tiles = new List<TileLayerData>(); // 타일 데이터
         [SerializeField] private List<ObjectData> _objects = new List<ObjectData>();
 
         public int RoomSizeX => Mathf.Clamp(_roomSizeX, RoomConstants.ROOM_SIZE_MIN_X, RoomConstants.ROOM_SIZE_MAX_X);
         public int RoomSizeY => Mathf.Clamp(_roomSizeY, RoomConstants.ROOM_SIZE_MIN_Y, RoomConstants.ROOM_SIZE_MAX_Y);
-        public RoomType RoomType => _roomType;
-        public string TileAddress => _tileAddress;
-        public string WallAddress => _wallAddress;
-        public string TopAddress => _topAddress;
         public List<string> AssetAddresses
         {
             get => _assetAddresses;
