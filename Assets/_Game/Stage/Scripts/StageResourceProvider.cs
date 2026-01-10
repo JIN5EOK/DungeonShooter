@@ -1,11 +1,13 @@
+using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Jin5eok;
+using Object = UnityEngine.Object;
 
 namespace DungeonShooter
 {
 
-    public interface IStageResourceProvider
+    public interface IStageResourceProvider : IDisposable
     {
         Awaitable<TileBase> GetTopTile();
         Awaitable<TileBase> GetWallTile();
@@ -19,13 +21,11 @@ namespace DungeonShooter
     /// </summary>
     public class StageResourceProvider : IStageResourceProvider
     {
-        private readonly Stage _stage;
         private readonly AddressablesScope _addressablesScope;
 
-        public StageResourceProvider(Stage stage, AddressablesScope addressablesScope)
+        public StageResourceProvider()
         {
-            _stage = stage;
-            _addressablesScope = addressablesScope;
+            _addressablesScope = new AddressablesScope();
         }
 
         /// <summary>
@@ -79,6 +79,11 @@ namespace DungeonShooter
         {
             // TODO: 구현 필요
             return null;
+        }
+
+        public void Dispose()
+        {
+            _addressablesScope?.Dispose();
         }
     }
 }

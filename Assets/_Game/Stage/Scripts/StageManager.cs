@@ -22,15 +22,25 @@ namespace DungeonShooter
 
         private async void CreateStageAsync()
         {
-            var startRoomAddresses = new string[] { "Stage001_0001" };
-            var normalRoomAddresses = new string[] { "Stage001_0001",
-                                                        "Stage001_0002" };
-            var bossRoomAddresses = new string[] { "Stage001_0001" };
-            IRoomDataRepository roomDataRepository = new RoomDataRepository(startRoomAddresses, normalRoomAddresses, bossRoomAddresses);
+            var roomDataRepository = GetRoomDataRepository();
             _stage = await StageGenerator.GenerateStage(roomDataRepository, 15);
             var stageObj = await StageInstantiator.InstantiateStage(_stage);
             _stageComponent = stageObj != null ? stageObj.GetComponent<StageComponent>() : null;
-            roomDataRepository.Dispose();
+            
+        }
+
+        private IRoomDataRepository GetRoomDataRepository()
+        {
+            var startRoomAddresses = new string[] { "Stage001_0001" };
+            var normalRoomAddresses = new string[] { "Stage001_0001",
+                "Stage001_0002" };
+            var bossRoomAddresses = new string[] { "Stage001_0001" };
+            return new RoomDataRepository(startRoomAddresses, normalRoomAddresses, bossRoomAddresses);
+        }
+
+        private IStageResourceProvider GetResourceProvider()
+        {
+            return new StageResourceProvider();
         }
     }
 }
