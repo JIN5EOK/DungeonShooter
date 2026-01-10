@@ -5,6 +5,7 @@ namespace DungeonShooter
 {
     public class StageManager : MonoBehaviour
     {
+        [SerializeField] private StageConfig _testStageConfig;
         private Stage _stage;
         private StageComponent _stageComponent;
 
@@ -22,26 +23,22 @@ namespace DungeonShooter
 
         private async void CreateStageAsync()
         {
-            var roomDataRepository = GetRoomDataRepository();
-            _stage = await StageGenerator.GenerateStage(roomDataRepository, 15);
-            var stageObj = await StageInstantiator.InstantiateStage(_stage);
+            _stage = await StageGenerator.GenerateStage(await GetRoomDataRepository(_testStageConfig), 15);
+            var stageObj = await StageInstantiator.InstantiateStage(await GetResourceProvider(_testStageConfig), _stage);
             _stageComponent = stageObj != null ? stageObj.GetComponent<StageComponent>() : null;
-            
         }
 
-        private IRoomDataRepository GetRoomDataRepository()
+        private async Awaitable<IRoomDataRepository> GetRoomDataRepository(StageConfig config)
         {
-            var startRoomAddresses = new string[] { "Stage001_0001" };
-            var normalRoomAddresses = new string[] { "Stage001_0001",
-                "Stage001_0002" };
-            var bossRoomAddresses = new string[] { "Stage001_0001" };
-            return new RoomDataRepository(startRoomAddresses, normalRoomAddresses, bossRoomAddresses);
+            var roomDataRepository = new RoomDataRepository(config);
+            await roomDataRepository.InitializeAsync();
+            return roomDataRepository;
         }
 
-        private IStageResourceProvider GetResourceProvider()
+        private async Awaitable<IStageResourceProvider> GetResourceProvider(StageConfig config)
         {
-            //return new StageResourceProvider();
-            return null;
+            var stageResourceProvider = new StageResourceProvider(config);
+            return stageResourceProvider;
         }
     }
 }

@@ -12,12 +12,16 @@ namespace DungeonShooter
         [SerializeField] private AssetReferenceT<TileBase> _groundTile;
         [SerializeField] private AssetReferenceT<TileBase> _topTile;
         [SerializeField] public AssetLabelReference _stageEnemyLabel;
-        [SerializeField] public AssetLabelReference _roomDataLabel;
         
+        [SerializeField] public AssetLabelReference _startRoomDataLabel;
+        [SerializeField] public AssetLabelReference _normalRoomDataLabel;
+        [SerializeField] public AssetLabelReference _bossRoomDataLabel;
         public AssetReferenceT<TileBase> WallTile => _wallTile;
         public AssetReferenceT<TileBase> GroundTile => _groundTile;
         public AssetReferenceT<TileBase> TopTile => _topTile;
         public AssetLabelReference StageEnemyLabel => _stageEnemyLabel;
-        public AssetLabelReference RoomDataLabel => _roomDataLabel;
+        public AssetLabelReference StartRoomDataLabel => _startRoomDataLabel;
+        public AssetLabelReference NormalRoomDataLabel => _normalRoomDataLabel;
+        public AssetLabelReference BossRoomDataLabel => _bossRoomDataLabel;
     }
 }

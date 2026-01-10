@@ -19,9 +19,11 @@ namespace DungeonShooter
         /// <param name="parent">부모 Transform (null이면 씬 루트)</param>
         /// <returns>생성된 게임오브젝트를 반환하는 Task</returns>
         public static async Task<GameObject> InstantiateStage(
+            IStageResourceProvider resourceProvider,
             Stage stage,
             Transform parent = null)
         {
+            //TODO : resourceProivder를 사용해 스테이지 생성하도록 수정하기
             if (stage == null)
             {
                 Debug.LogError($"[{nameof(StageInstantiator)}] Stage가 null입니다.");

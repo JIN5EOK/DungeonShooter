@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.ResourceLocations;
 using UnityEngine.Tilemaps;
 using Jin5eok;
 using Object = UnityEngine.Object;
@@ -22,13 +26,15 @@ namespace DungeonShooter
     public class StageResourceProvider : IStageResourceProvider
     {
         private readonly AddressablesScope _addressablesScope;
-        private StageConfig _stageConfig;
+        private readonly StageConfig _stageConfig;
+        
         public StageResourceProvider(StageConfig config)
         {
             _addressablesScope = new AddressablesScope();
             _stageConfig = config;
         }
-
+        
+        
         /// <summary>
         /// Top 타일을 가져옵니다.
         /// </summary>
