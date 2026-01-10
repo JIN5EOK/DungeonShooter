@@ -70,11 +70,11 @@ classDiagram
     }
 
     class StageGenerator["StageGenerator<br>스테이지 구조 생성 수행"]{
-        +GenerateStage(int roomCount) Stage
+        +GenerateStage(int roomCount, IRoomDataRepository roomDataRepository) Stage
     }
 
     class StageInstantiator["StageInstantiator<br>스테이지 구조 기반으로 실제 스테이지 게임오브젝트 생성"]{
-        +InstantiateStage(Stage stage) void
+        +InstantiateStage(Stage stage, IStageResourceProvider resourceProvider) void
     }
     
     class StageManager["StageManager<br>게임 스테이지 관리자"]{
@@ -97,8 +97,9 @@ classDiagram
     }
     
     StageInstantiator --> IStageResourceProvider : 스테이지 생성에 필요한 에셋, 객체 제공받음
-    StageGenerator --> IRoomDataRepository
-    StageManager --> StageInstantiator : 스테이지 시작시 스테이지 인스턴스 요청
+    StageGenerator --> IRoomDataRepository : RoomData 제공받음
+    StageManager --> StageInstantiator : 스테이지 스테이지 구조정보 기반 인스턴스 생성
+    StageManager --> StageGenerator : 스테이지 구조 정보 생성
     Room --> Direction
     
     IRoomDataRepository --> RoomDataSerializer : 방 정보 요청
