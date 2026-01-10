@@ -4,7 +4,7 @@ using System.Linq;
 using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using VContainer;
+using Random = UnityEngine.Random;
 
 namespace DungeonShooter
 {
@@ -67,7 +67,7 @@ namespace DungeonShooter
         public async Awaitable<RoomData> GetRandomRoom(RoomType type)
         {
             var targetAddresses = type == RoomType.Start ? StartRoomDataAddresses : type == RoomType.Normal ? NormalRoomDataAddresses : BossRoomDataAddresses;
-            var targetAddress = targetAddresses[UnityEngine.Random.Range(0, targetAddresses.Count)];
+            var targetAddress = targetAddresses[Random.Range(0, targetAddresses.Count)];
             var handle = _addressablesScope.LoadAssetAsync<TextAsset>(targetAddress);
             await handle.Task;
             return RoomDataSerializer.DeserializeRoom(handle.Result);

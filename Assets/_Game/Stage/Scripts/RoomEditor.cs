@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using Sirenix.OdinInspector;
 
 namespace DungeonShooter
 {
@@ -11,15 +10,19 @@ namespace DungeonShooter
     [ExecuteInEditMode]
     public class RoomEditor : MonoBehaviour
     {
-        [BoxGroup("저장")]
-        [FolderPath(RequireExistingPath = true)]
-        [LabelText("저장 경로")]
-        public string savePath = "Assets/";
+        [SerializeField]
+        [Tooltip("저장 경로")]
+        private string _savePath = "Assets/";
 
-        [BoxGroup("로드")]
-        [Sirenix.OdinInspector.FilePath(Extensions = "json")]
-        [LabelText("불러오기 경로")]
-        public string loadPath;
+        [SerializeField]
+        [Tooltip("불러오기 경로")]
+        private string _loadPath;
+
+        public string SavePath => _savePath;
+        public string LoadPath => _loadPath;
+
+        public void SetSavePath(string path) => _savePath = path;
+        public void SetLoadPath(string path) => _loadPath = path;
 
         private void OnEnable()
         {
@@ -61,10 +64,7 @@ namespace DungeonShooter
             }
         }
 
-        [BoxGroup("저장")]
-        [Button("방 저장", ButtonSizes.Large)]
-        [PropertyOrder(10)]
-        private void SaveMap()
+        public void SaveMap()
         {
             if (!ValidateEditorMode()) return;
 
@@ -76,21 +76,18 @@ namespace DungeonShooter
             }
 
             var fileName = $"{gameObject.name}.json";
-            var fullPath = System.IO.Path.Combine(savePath, fileName);
+            var fullPath = System.IO.Path.Combine(_savePath, fileName);
             RoomDataSerializer.SaveToFile(roomData, fullPath);
 
             EditorUtility.SetDirty(this);
             AssetDatabase.Refresh();
         }
 
-        [BoxGroup("로드")]
-        [Button("방 불러오기", ButtonSizes.Large)]
-        [PropertyOrder(20)]
-        private void LoadRoom()
+        public void LoadRoom()
         {
             if (!ValidateEditorMode()) return;
 
-            if (string.IsNullOrEmpty(loadPath))
+            if (string.IsNullOrEmpty(_loadPath))
             {
                 Debug.LogError($"[{nameof(RoomEditor)}] 불러올 파일 경로가 지정되지 않았습니다.");
                 return;
@@ -99,10 +96,10 @@ namespace DungeonShooter
             EnsureStructure();
 
             // 파일 경로에서 TextAsset 로드
-            var textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(loadPath);
+            var textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(_loadPath);
             if (textAsset == null)
             {
-                Debug.LogError($"[{nameof(RoomEditor)}] 파일을 찾을 수 없습니다: {loadPath}");
+                Debug.LogError($"[{nameof(RoomEditor)}] 파일을 찾을 수 없습니다: {_loadPath}");
                 return;
             }
 
@@ -117,7 +114,7 @@ namespace DungeonShooter
             StageInstantiator.InstantiateRoomEditor(roomData, roomObj: gameObject);
 
             EditorUtility.SetDirty(this);
-            Debug.Log($"[{nameof(RoomEditor)}] 방 불러오기 완료: {loadPath}");
+            Debug.Log($"[{nameof(RoomEditor)}] 방 불러오기 완료: {_loadPath}");
         }
 
 
