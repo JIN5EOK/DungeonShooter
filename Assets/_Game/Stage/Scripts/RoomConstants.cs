@@ -14,6 +14,7 @@ namespace DungeonShooter
         public const int ROOM_SIZE_MIN_Y = 6;
         public const int ROOM_SIZE_MAX_X = 32;
         public const int ROOM_SIZE_MAX_Y = 32;
+        public const int ROOM_CORRIDOR_SIZE = 4;
     }
 }
 

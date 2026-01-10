@@ -117,6 +117,7 @@ classDiagram
     * Factory -> 인스턴스 생성
     * Repository -> 데이터 저장 및 조회
     * Provider -> 말 그대로 '제공' 전반
+
 ### 런타임 스테이지 관련 클래스 다이어그램
 
 ```mermaid
@@ -162,6 +163,20 @@ classDiagram
     Room --> RoomComponent
 ```
 
+스테이지와 방의 데이터 구조`Stage`, `Room`와 실제 게임오브젝트에 사용되는 `Monobehaviour` 컴포넌트`StageComponent`, `RoomComponent`로 구성된다
+
+### 컴포넌트
+* 컴포넌트들간엔 연결구조 X, 탐색은 오로지 데이터 구조(`Stage`, `Room`)로 수행
+* **StageComponent**
+    * 스테이지 게임오브젝트에 붙는 컴포넌트
+    * `AddressablesScope`를 보유하여 필요한 리소스 관리
+* **RoomComponent**
+    * 각 방 게임오브젝트에 붙는 컴포넌트
+    * `AddressablesScope`를 보유하여 필요한 리소스 관리
+* **StageManager**
+    * 런타임 `Stage`, `Room` 관리자
+    * 스테이지 흐름, 관리 전반 담당
+
 ## 스테이지 생성 알고리즘
 ```mermaid
 graph TD;
@@ -204,29 +219,37 @@ graph TD
 
 * `RoomDataSerializer` 를 사용, 에디터를 통해 배치한 타일맵과 오브젝트들을 `RoomData`로 직렬화
 
-방 데이터 프리셋 제작시 계층구조
+스테이지 데이터 프리셋 제작시 계층구조
 ``` 
 
-- RootGameObject : 기본 타일 맵 컴포넌트들
-    - BaseTilemaps
-        - BaseTilemap_Ground
-        - BaseTilemap_Wall
-    - Tilemaps : 사용자가 직접 배치하는 타일맵 컴포넌트들
-        - Tilemap_Ground
-        - Tilemap_Wall
-    - Objects
-        - 게임 오브젝트들 (적, 보물상자등..) 
+- 
+- Stage
+    - Corridor
+        - CorridorTilemap_Ground
+    - RootGameObject : 방 게임 오브젝트
+        - BaseTilemaps
+            - BaseTilemap_Ground
+            - BaseTilemap_Wall
+        - Tilemaps : 사용자가 직접 배치하는 타일맵 컴포넌트들
+            - Tilemap_Deco
+        - Objects
+            - 게임 오브젝트들 (적, 보물상자등..) 
 ```
 
 ## 런타임 중 스테이지 생성
-* `StageGenerator`가 스테이지 생성 관련 세부 로직을 담당한다
-* `RoomDataSerializer`를 통해 역직렬화된 `RoomData`를 가져와 `Room`을 생성한다
-* 정해진 로직에 따라 각 방을 이어붙여 `Stage`를 생성한다
+* 스테이지 구조 만들기
+  * `StageGenerator`가 스테이지 생성 관련 세부 로직을 담당한다
+    * 정해진 로직에 따라 각 방을 이어붙여 `Stage`를 생성한다
 * `StageInstantaitor`가 스테이지 인스턴스 생성 로직을 담당한다
-    * 방 사이즈는 `RoomConstants`에 지정된 방 사이즈를 기반으로 생성되며 마찬가지로 지정된 간격만큼 서로 간격을 유지하여 배치된다
+  * 방 생성 로직
+    * 각 방간의 거리는 `RoomConstants.ROOM_SPACING`를 참고한다
+    * 관련 리소스는 함수 파라미터로 넘겨받은 `IStageResourceProvider`을 통해 제공받는다
+  * 각 방들을 연결하는 CorridorTilemap_Ground를 Ground 타일로 채운다 (이동 가능 복도 생성), 복도의 너비는 `RoomConstants.ROOM_CORRIDOR_SIZE`를 참고한다 
+  *  `RoomData`에 지정된 방 사이즈를 기반으로 `BaseTilemap_Ground`, `BaseTilemap_Wall`을 생성한다
         * 생성된 방 타일의 상단 1타일 높이만큼 Wall타일을 배치한다
         * 방 타일들의 주변을 2타일 두께의 Top타일들로 둘러싼다
-    * 연결된 방이 있는 방향에는 벽을 생성하지 않고 타일을 배치하여(복도) 방들간 이동 가능하도록 만든다
+        * 복도가 놓인 부분에는 Wall 타일들을 배치되지 않도록 하여 통과할 수 있도록 한다
+  * `RoomData`의 타일 정보와 오브젝트 정보를 참고하여 `Tilemap_Deco`, Objects 아래에 오브젝트들을 채운다
 
 
 ### 방 데이터 프리셋 저장 용량 최적화
@@ -267,22 +290,6 @@ graph TD;
         * 문이 잠겼다면 카메라 범위를 방 안으로 제한한다, (카메라가 방 밖으로 빠져나가지 않도록 한다), 만약 카메라보다 방이 작거나 같다면 카메라의 위치는 방의 중앙 지점으로 고정된다
 * `Room` 클리어
     * 잠금 조건을 모두 해결하였다면 (적 모두 제거, 스위치 누르기 등) 방을 클리어 한 것으로 처리하고 방문이 열린다
-
-## 런타임 스테이지 인스턴스 구조
-
-스테이지와 방의 데이터 구조`Stage`, `Room`와 실제 게임오브젝트에 사용되는 `Monobehaviour` 컴포넌트`StageComponent`, `RoomComponent`로 구성된다
-
-### 컴포넌트
-* 컴포넌트들간엔 연결구조 X, 탐색은 오로지 데이터 구조(`Stage`, `Room`)로 수행
-* **StageComponent**
-    * 스테이지 게임오브젝트에 붙는 컴포넌트
-    * `AddressablesScope`를 보유하여 필요한 리소스 관리
-* **RoomComponent**
-    * 각 방 게임오브젝트에 붙는 컴포넌트
-    * `AddressablesScope`를 보유하여 필요한 리소스 관리
-* **StageManager**
-    * 런타임 `Stage`, `Room` 관리자
-    * 스테이지 흐름, 관리 전반 담당
 
 
 ## 임시 작성
