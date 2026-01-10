@@ -28,17 +28,11 @@ namespace DungeonShooter
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("방 크기 설정, ExampleTile은 실제 게임에 생성되는 타일이 아닙니다.", EditorStyles.boldLabel);
             
-            EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(_exampleTileProperty);
-            EditorGUILayout.PropertyField(_roomSizeXProperty);
-            EditorGUILayout.PropertyField(_roomSizeYProperty);
+            EditorGUILayout.IntSlider(_roomSizeXProperty, RoomConstants.ROOM_SIZE_MIN_X, RoomConstants.ROOM_SIZE_MAX_X, "방 크기 X");
+            EditorGUILayout.IntSlider(_roomSizeYProperty, RoomConstants.ROOM_SIZE_MIN_Y, RoomConstants.ROOM_SIZE_MAX_Y, "방 크기 Y");
             
-            var hasChanged = EditorGUI.EndChangeCheck();
-            
-            if (hasChanged)
-            {
-                serializedObject.ApplyModifiedProperties();
-            }
+            serializedObject.ApplyModifiedProperties();
             
             if (GUILayout.Button("타일 업데이트", GUILayout.Height(25)))
             {

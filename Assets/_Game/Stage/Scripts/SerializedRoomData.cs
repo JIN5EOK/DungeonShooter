@@ -10,9 +10,23 @@ namespace DungeonShooter
     [Serializable]
     public class SerializedRoomData
     {
+        [SerializeField] private int roomSizeX;
+        [SerializeField] private int roomSizeY;
         [SerializeField] private List<string> assetAddresses = new List<string>();
         [SerializeField] private List<TileLayerDataRLE> tilesRLE = new List<TileLayerDataRLE>(); // RLE 압축된 타일
         [SerializeField] private List<ObjectData> objects = new List<ObjectData>();
+
+        public int RoomSizeX
+        {
+            get => roomSizeX;
+            set => roomSizeX = value;
+        }
+
+        public int RoomSizeY
+        {
+            get => roomSizeY;
+            set => roomSizeY = value;
+        }
 
         public List<string> AssetAddresses
         {
@@ -38,6 +52,8 @@ namespace DungeonShooter
         public RoomData ToRoomData()
         {
             var roomData = new RoomData();
+            roomData.RoomSizeX = roomSizeX;
+            roomData.RoomSizeY = roomSizeY;
             roomData.AssetAddresses = new List<string>(assetAddresses);
             roomData.Objects = new List<ObjectData>(objects);
 
@@ -71,6 +87,8 @@ namespace DungeonShooter
             }
 
             var serialized = new SerializedRoomData();
+            serialized.RoomSizeX = roomData.RoomSizeX;
+            serialized.RoomSizeY = roomData.RoomSizeY;
             serialized.AssetAddresses = new List<string>(roomData.AssetAddresses);
             serialized.Objects = new List<ObjectData>(roomData.Objects);
 

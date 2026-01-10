@@ -30,6 +30,8 @@ namespace DungeonShooter
 
         public string SavePath => _savePath;
         public string LoadPath => _loadPath;
+        public int RoomSizeX => _roomSizeX;
+        public int RoomSizeY => _roomSizeY;
 
         public void SetSavePath(string path) => _savePath = path;
         public void SetLoadPath(string path) => _loadPath = path;
@@ -83,7 +85,7 @@ namespace DungeonShooter
         {
             if (!ValidateEditorMode()) return;
 
-            var roomData = RoomDataSerializer.SerializeRoom(gameObject);
+            var roomData = RoomDataSerializer.SerializeRoom(gameObject, _roomSizeX, _roomSizeY);
             if (roomData == null)
             {
                 Debug.LogError($"[{nameof(RoomEditor)}] 방 직렬화에 실패했습니다.");

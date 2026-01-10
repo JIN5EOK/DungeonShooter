@@ -23,8 +23,17 @@ namespace DungeonShooter
         [SerializeField] private List<TileLayerData> _tiles = new List<TileLayerData>(); // 타일 데이터
         [SerializeField] private List<ObjectData> _objects = new List<ObjectData>();
 
-        public int RoomSizeX => Mathf.Clamp(_roomSizeX, RoomConstants.ROOM_SIZE_MIN_X, RoomConstants.ROOM_SIZE_MAX_X);
-        public int RoomSizeY => Mathf.Clamp(_roomSizeY, RoomConstants.ROOM_SIZE_MIN_Y, RoomConstants.ROOM_SIZE_MAX_Y);
+        public int RoomSizeX
+        {
+             get => _roomSizeX;
+             set => _roomSizeX = value;
+        }
+
+        public int RoomSizeY
+        {
+            get => _roomSizeY;
+            set => _roomSizeY = value;
+        }
         public List<string> AssetAddresses
         {
             get => _assetAddresses;

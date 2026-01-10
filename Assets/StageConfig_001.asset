@@ -32,5 +32,9 @@ MonoBehaviour:
     m_EditorAssetChanged: 1
   _stageEnemyLabel:
     m_LabelString: 
-  _roomDataLabel:
-    m_LabelString: 
+  _startRoomDataLabel:
+    m_LabelString: RoomData_001
+  _normalRoomDataLabel:
+    m_LabelString: RoomData_001
+  _bossRoomDataLabel:
+    m_LabelString: RoomData_001

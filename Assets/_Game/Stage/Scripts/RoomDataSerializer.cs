@@ -18,7 +18,7 @@ namespace DungeonShooter
         /// <summary>
         /// 에디터에서 배치한 게임 오브젝트를 RoomData로 직렬화합니다.
         /// </summary>
-        public static RoomData SerializeRoom(GameObject room)
+        public static RoomData SerializeRoom(GameObject room, int roomSizeX, int roomSizeY)
         {
             if (Application.isEditor == false)
             {
@@ -32,6 +32,8 @@ namespace DungeonShooter
             }
 
             var roomData = new RoomData();
+            roomData.RoomSizeX = roomSizeX;
+            roomData.RoomSizeY = roomSizeY;
 
             // 1. Tilemaps 하위의 타일맵 컴포넌트들을 찾아서 TileLayerData로 변환
             var tilemapsTransform = room.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
