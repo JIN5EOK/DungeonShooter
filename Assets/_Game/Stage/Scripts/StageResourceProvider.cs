@@ -22,10 +22,11 @@ namespace DungeonShooter
     public class StageResourceProvider : IStageResourceProvider
     {
         private readonly AddressablesScope _addressablesScope;
-
-        public StageResourceProvider()
+        private StageConfig _stageConfig;
+        public StageResourceProvider(StageConfig config)
         {
             _addressablesScope = new AddressablesScope();
+            _stageConfig = config;
         }
 
         /// <summary>
@@ -33,8 +34,9 @@ namespace DungeonShooter
         /// </summary>
         public async Awaitable<TileBase> GetTopTile()
         {
-            // TODO: 구현 필요
-            return null;
+            var handle = _addressablesScope.LoadAssetAsync<TileBase>(_stageConfig.TopTile);
+            await handle.Task;
+            return handle.Result;
         }
 
         /// <summary>
@@ -42,8 +44,9 @@ namespace DungeonShooter
         /// </summary>
         public async Awaitable<TileBase> GetWallTile()
         {
-            // TODO: 구현 필요
-            return null;
+            var handle = _addressablesScope.LoadAssetAsync<TileBase>(_stageConfig.WallTile);
+            await handle.Task;
+            return handle.Result;
         }
 
         /// <summary>
@@ -51,8 +54,9 @@ namespace DungeonShooter
         /// </summary>
         public async Awaitable<TileBase> GetGroundTile()
         {
-            // TODO: 구현 필요
-            return null;
+            var handle = _addressablesScope.LoadAssetAsync<TileBase>(_stageConfig.GroundTile);
+            await handle.Task;
+            return handle.Result;
         }
 
         /// <summary>

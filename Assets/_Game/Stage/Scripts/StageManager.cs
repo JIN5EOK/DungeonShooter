@@ -40,7 +40,8 @@ namespace DungeonShooter
 
         private IStageResourceProvider GetResourceProvider()
         {
-            return new StageResourceProvider();
+            //return new StageResourceProvider();
+            return null;
         }
     }
 }
