@@ -87,14 +87,16 @@ classDiagram
         Shop
     }
     
-    class StageResourceProvider["StageResourceProvider<br>현재 스테이지에 적절한  타일, 캐릭터 제공"]{
+    class IStageResourceProvider["IStageResourceProvider<br>현재 스테이지에 적절한  타일, 캐릭터 제공"]{
         +GetTopTile() TileBase
         +GetWallTile() TileBase
         +GetGroundTile() TileBase
+        +GetTile(string address) TileBase
         +GetRandomEnemy() Enemy // 스테이지에 맞는 랜덤 적 제공
+        +GetGameObject(string address) GameObject
     }
     
-    StageInstantiator --> StageResourceProvider : 스테이지 생성에 필요한 에셋, 객체 제공받음
+    StageInstantiator --> IStageResourceProvider : 스테이지 생성에 필요한 에셋, 객체 제공받음
     StageGenerator --> IRoomDataRepository
     StageManager --> StageInstantiator : 스테이지 시작시 스테이지 인스턴스 요청
     Room --> Direction
