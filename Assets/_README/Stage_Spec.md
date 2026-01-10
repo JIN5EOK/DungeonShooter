@@ -87,6 +87,14 @@ classDiagram
         Shop
     }
     
+    class StageResourceProvider["StageResourceProvider<br>현재 스테이지에 적절한  타일, 캐릭터 제공"]{
+        +GetTopTile() TileBase
+        +GetWallTile() TileBase
+        +GetGroundTile() TileBase
+        +GetRandomEnemy() Enemy // 스테이지에 맞는 랜덤 적 제공
+    }
+    
+    StageInstantiator --> StageResourceProvider : 스테이지 생성에 필요한 에셋, 객체 제공받음
     StageGenerator --> IRoomDataRepository
     StageManager --> StageInstantiator : 스테이지 시작시 스테이지 인스턴스 요청
     Room --> Direction
@@ -102,7 +110,10 @@ classDiagram
     RoomData --> RoomType
 ```
 * `IRoomDataRepository`를 사용하는 이유 : 방 데이터 가져오는 방법을 숨기기 위함 (직렬화-역직렬화..)
-
+* Factory vs Repository vs Provider ? 
+    * Factory -> 인스턴스 생성
+    * Repository -> 데이터 저장 및 조회
+    * Provider -> 말 그대로 '제공' 전반
 ### 런타임 스테이지 관련 클래스 다이어그램
 
 ```mermaid
