@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.Tilemaps;
 
 namespace DungeonShooter
 {
@@ -10,6 +11,15 @@ namespace DungeonShooter
     [ExecuteInEditMode]
     public class RoomEditor : MonoBehaviour
     {
+        [SerializeField]
+        [Tooltip("방 크기 표시를 위해 설치할 타일맵")]
+        private TileBase _exampleTile;
+
+        [SerializeField] 
+        private int _roomSizeX;
+        [SerializeField] 
+        private int _roomSizeY;
+        
         [SerializeField]
         [Tooltip("저장 경로")]
         private string _savePath = "Assets/";
@@ -23,6 +33,11 @@ namespace DungeonShooter
 
         public void SetSavePath(string path) => _savePath = path;
         public void SetLoadPath(string path) => _loadPath = path;
+
+        public void UpdateRoomSizeTilesPublic()
+        {
+            UpdateRoomSizeTiles();
+        }
 
         private void OnEnable()
         {
@@ -117,6 +132,69 @@ namespace DungeonShooter
             Debug.Log($"[{nameof(RoomEditor)}] 방 불러오기 완료: {_loadPath}");
         }
 
+
+        /// <summary>
+        /// 방 크기에 맞춰 BaseTilemap_Ground에 타일을 배치합니다.
+        /// </summary>
+        private void UpdateRoomSizeTiles()
+        {
+            if (!ValidateEditorMode()) return;
+
+            if (_exampleTile == null)
+            {
+                Debug.LogWarning($"[{nameof(RoomEditor)}] 예제 타일이 설정되지 않았습니다.");
+                return;
+            }
+
+            // BaseTilemaps 찾기 또는 생성
+            var baseTilemapsTransform = transform.Find("BaseTilemaps");
+            if (baseTilemapsTransform == null)
+            {
+                var baseTilemaps = new GameObject("BaseTilemaps");
+                baseTilemaps.transform.SetParent(transform);
+                baseTilemapsTransform = baseTilemaps.transform;
+            }
+
+            // BaseTilemap_Ground 찾기 또는 생성
+            var baseTilemapGroundTransform = baseTilemapsTransform.Find("BaseTilemap_Ground");
+            Tilemap tilemap;
+            
+            if (baseTilemapGroundTransform == null)
+            {
+                var baseTilemapGround = new GameObject("BaseTilemap_Ground");
+                baseTilemapGround.transform.SetParent(baseTilemapsTransform);
+                tilemap = baseTilemapGround.AddComponent<Tilemap>();
+                baseTilemapGround.AddComponent<TilemapRenderer>();
+            }
+            else
+            {
+                tilemap = baseTilemapGroundTransform.GetComponent<Tilemap>();
+                if (tilemap == null)
+                {
+                    tilemap = baseTilemapGroundTransform.gameObject.AddComponent<Tilemap>();
+                    baseTilemapGroundTransform.gameObject.AddComponent<TilemapRenderer>();
+                }
+            }
+
+            // 기존 타일 모두 제거
+            tilemap.ClearAllTiles();
+
+            // 중앙 기준으로 타일 배치 (Transform 중앙이 (0,0)이 되도록)
+            var startX = -_roomSizeX / 2;
+            var startY = -_roomSizeY / 2;
+            
+            for (int x = 0; x < _roomSizeX; x++)
+            {
+                for (int y = 0; y < _roomSizeY; y++)
+                {
+                    var position = new Vector3Int(startX + x, startY + y, 0);
+                    tilemap.SetTile(position, _exampleTile);
+                }
+            }
+
+            EditorUtility.SetDirty(this);
+            EditorUtility.SetDirty(tilemap);
+        }
 
         /// <summary>
         /// 에디터 모드인지 확인합니다.
