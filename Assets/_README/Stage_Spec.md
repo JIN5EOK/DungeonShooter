@@ -33,48 +33,39 @@ classDiagram
         // 방들간 연결 표현, Direction은 문이 위치하는 방향
     }
 
-    class RoomData["RoomData<br>방 원본 데이터"] {
-        -tileAddress : string
-        -wallAddress : string
-        -topAddress : string
+    class RoomData["RoomData<br>방 설계 내용이 담긴 원본 데이터"] {
         -roomType : RoomType
-        -assetAddresses List< string >
+        -assetAddresses : List< string >
+        -roomSizeX : int
+        -roomSizeY : int
         // 타일과 게임 오브젝트 어드레서블 주소 목록
         +tiles : List< TileLayerData >
         +objects : List< ObjectData >
     }
 
     class TileLayerData["TileLayerData<br>방의 개별 타일 데이터"]{
-        +index int
-        // index == RoomData의 어드레스 컬렉션상의 인덱스
-        // TileBase 어드레서블 주소에 해당
-        // 문자열 주소의 중복을 최소화 해서 용량 아끼기 위함
+        +index int // index == RoomData의 assetAddresses 인덱스
         +layer int // SortingLayer
         +position Vector2Int
-        // 방 생성시 배치될 위치
     }
 
     class ObjectData["ObjectData<br>방의 게임 오브젝트 데이터"]{
-        +index int
-        // index == RoomData의 어드레스 컬렉션상의 인덱스
-        // 오브젝트 어드레스에 해당
-        // 문자열 주소의 중복을 최소화 해서 용량 아끼기 위함
+        +index int // index == RoomData의 assetAddresses 인덱스
         +position Vector2
         +rotation Quaternion
-        // 방 생성시 배치될 위치와 회전값
     }
 
     class RoomDataSerializer["RoomDataSerializer<br>RoomData 직렬화,역직렬화 수행"]{
-        +SerializeRoom(GameObject room) RoomData
-        +DeserializeRoom(string path) RoomData
+        +SerializeRoom(GameObject room, int roomSizeX, int roomSizeY) RoomData
+        +DeserializeRoom(TextAsset textAsset) RoomData
     }
 
     class StageGenerator["StageGenerator<br>스테이지 구조 생성 수행"]{
-        +GenerateStage(int roomCount, IRoomDataRepository roomDataRepository) Stage
+        +GenerateStage(IRoomDataRepository roomDataRepository, int roomCount) Stage
     }
 
     class StageInstantiator["StageInstantiator<br>스테이지 구조 기반으로 실제 스테이지 게임오브젝트 생성"]{
-        +InstantiateStage(Stage stage, IStageResourceProvider resourceProvider) void
+        +InstantiateStage(IStageResourceProvider resourceProvider, Stage stage) void
     }
     
     class StageManager["StageManager<br>게임 스테이지 관리자"]{
@@ -198,8 +189,7 @@ graph TD;
         3. 목표한 방 갯수에 도달할 때 까지 2번을 반복한다
         4. 방을 모두 만들었다면 시작방에서 거리상 가장 먼 방을 보스방으로 설정한다 (추후 상점 등 다른 특수방이 추가된다면 이 단계에서 배치한다)
     2. 방들이 끊어지지 않고 신장 트리 형태를 갖추도록 시작 방 부터 시작해 랜덤한 방끼리 연결한다
-        * BFS 탐색을 통해 연결한다
-            * (원래 추후 연결 가중치를 추가할것을 염두에 두고 크루스칼 알고리즘과 Union-Find를 사용하려 했으나 너무 오버 스펙인듯 하여 사용하지 않으려 함)
+        * BFS 탐색을 통해 연결
     3. 랜덤한 방향으로 엣지들을 추가한다
         * 단 보스방처럼 특별한 방들엔 엣지를 추가하지 않는다 (진입로를 하나로 유지하기 위함)
 
@@ -211,11 +201,13 @@ graph TD
     A[사용자] -->|RoomData 전달| B[RoomDataSerializer]
     B -->|변환| C[SerializedRoomData]
     C -->|저장| D[직렬화데이터]
-    
     D -->|로드| C
     C -->|변환| B
     B -->|RoomData 반환| A
 ```
+* RoomData -> 런타임에 사용하기 위한 Raw 방 데이터
+* SerializedRoomData -> 직렬화시 용량 최적화 로직이 적용되어있는 저장용 데이터
+
 
 * `RoomDataSerializer` 를 사용, 에디터를 통해 배치한 타일맵과 오브젝트들을 `RoomData`로 직렬화
 
@@ -236,20 +228,21 @@ graph TD
             - 게임 오브젝트들 (적, 보물상자등..) 
 ```
 
-## 런타임 중 스테이지 생성
-* 스테이지 구조 만들기
-  * `StageGenerator`가 스테이지 생성 관련 세부 로직을 담당한다
-    * 정해진 로직에 따라 각 방을 이어붙여 `Stage`를 생성한다
-* `StageInstantaitor`가 스테이지 인스턴스 생성 로직을 담당한다
-  * 방 생성 로직
-    * 각 방간의 거리는 `RoomConstants.ROOM_SPACING`를 참고한다
-    * 관련 리소스는 함수 파라미터로 넘겨받은 `IStageResourceProvider`을 통해 제공받는다
-  * 각 방들을 연결하는 CorridorTilemap_Ground를 Ground 타일로 채운다 (이동 가능 복도 생성), 복도의 너비는 `RoomConstants.ROOM_CORRIDOR_SIZE`를 참고한다 
-  *  `RoomData`에 지정된 방 사이즈를 기반으로 `BaseTilemap_Ground`, `BaseTilemap_Wall`을 생성한다
+## 런타임 중 스테이지 생성 규칙
+1. 스테이지 구조 만들기
+    * `StageGenerator`가 스테이지 생성 관련 세부 로직을 담당한다
+        * 정해진 로직에 따라 각 방을 이어붙여 `Stage`를 생성한다
+2. 스테이지 인스턴스 만들기
+    * `StageInstantaitor`가 스테이지 인스턴스 생성 로직을 담당한다
+    * 방 생성 로직
+        * 각 방간의 거리는 `RoomConstants.ROOM_SPACING`를 참고한다
+        * 관련 리소스는 함수 파라미터로 넘겨받은 `IStageResourceProvider`을 통해 제공받는다
+    * 각 방들을 연결하는 `CorridorTilemap_Ground`를 Ground 타일로 채운다 (이동 가능 복도 생성), 복도의 너비는 `RoomConstants.ROOM_CORRIDOR_SIZE`를 참고한다 
+    *  `RoomData`에 지정된 방 사이즈를 기반으로 `BaseTilemap_Ground`, `BaseTilemap_Wall`을 생성한다
         * 생성된 방 타일의 상단 1타일 높이만큼 Wall타일을 배치한다
         * 방 타일들의 주변을 2타일 두께의 Top타일들로 둘러싼다
-        * 복도가 놓인 부분에는 Wall 타일들을 배치되지 않도록 하여 통과할 수 있도록 한다
-  * `RoomData`의 타일 정보와 오브젝트 정보를 참고하여 `Tilemap_Deco`, Objects 아래에 오브젝트들을 채운다
+        * 복도가 놓일 부분에는 Wall 타일들을 배치되지 않도록 하여 통과할 수 있도록 한다
+    * `RoomData`의 타일 정보와 오브젝트 정보를 참고하여 `Tilemap_Deco`, Objects 아래에 오브젝트들을 채운다
 
 
 ### 방 데이터 프리셋 저장 용량 최적화
@@ -291,6 +284,11 @@ graph TD;
 * `Room` 클리어
     * 잠금 조건을 모두 해결하였다면 (적 모두 제거, 스위치 누르기 등) 방을 클리어 한 것으로 처리하고 방문이 열린다
 
-
-## 임시 작성
-- 시드 기능? 같은 시드를 넣으면 언제나 같은 결과물이 나오도록 하기
+### 현재 미완성인 부분, 추후 변경 필요
+* RoomEditor
+    * RoomEditor이 활성화 되었을때 타일맵 레이어 오브젝트들이 없다면 만들어주기
+    * 버튼 눌러서 초기 상태로 돌아가기
+* StageInstantiator
+    * 타일맵 렌더러 게임오브젝트들을 생성할때 알맞은 레이어 설정
+* StageResourceProvider
+    * 게임오브젝트, 타일 생성 반환 기능 완성 필요

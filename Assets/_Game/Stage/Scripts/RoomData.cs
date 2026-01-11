@@ -4,12 +4,6 @@ using UnityEngine;
 
 namespace DungeonShooter
 {
-    public enum RoomType
-    {
-        Start,
-        Normal,
-        Boss,
-    }
     /// <summary>
     /// 방 데이터 - 타일과 오브젝트 배치 정보를 담는 설계도 클래스
     /// </summary>
