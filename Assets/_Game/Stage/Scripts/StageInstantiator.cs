@@ -156,49 +156,19 @@ namespace DungeonShooter
             Transform parent,
             string roomName)
         {
-            Transform tilemapsParent;
-            Transform objectsParent;
-
-            if (roomObj == null)
-            {
-                // 새로 생성
-                roomObj = new GameObject(roomName);
-                if (parent != null)
-                {
-                    roomObj.transform.SetParent(parent);
-                }
-
-                // Tilemaps 구조 생성
-                var tilemapsObj = new GameObject(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
-                tilemapsObj.transform.SetParent(roomObj.transform);
-                tilemapsObj.AddComponent<Grid>();
-                tilemapsParent = tilemapsObj.transform;
-
-                // Objects 구조 생성
-                var objectsObj = new GameObject(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
-                objectsObj.transform.SetParent(roomObj.transform);
-                objectsParent = objectsObj.transform;
-            }
-            else
+            if (roomObj != null)
             {
                 // 기존 타일맵과 오브젝트 제거
                 ClearExistingData(roomObj);
+            }
 
-                // Tilemaps와 Objects 자식 찾기
-                tilemapsParent = roomObj.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
-                objectsParent = roomObj.transform.Find(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            var (tilemapsParent, objectsParent, _) = RoomTilemapHelper.GetOrCreateRoomStructure(
+                roomObj, parent, roomName, createBaseTilemaps: false);
 
-                if (tilemapsParent == null)
-                {
-                    Debug.LogError($"[{nameof(StageInstantiator)}] '{RoomConstants.TILEMAPS_GAMEOBJECT_NAME}' 자식이 없습니다.");
-                    return (null, null);
-                }
-
-                if (objectsParent == null)
-                {
-                    Debug.LogError($"[{nameof(StageInstantiator)}] '{RoomConstants.OBJECTS_GAMEOBJECT_NAME}' 자식이 없습니다.");
-                    return (null, null);
-                }
+            if (tilemapsParent == null || objectsParent == null)
+            {
+                Debug.LogError($"[{nameof(StageInstantiator)}] Room 구조를 생성할 수 없습니다.");
+                return (null, null);
             }
 
             return (tilemapsParent, objectsParent);
@@ -412,38 +382,8 @@ namespace DungeonShooter
                 return;
             }
 
-            // BaseTilemaps 구조 생성
-            Transform baseTilemapsParent = tilemapsParent.Find(RoomConstants.BASE_TILEMAPS_GAMEOBJECT_NAME);
-            GameObject baseTilemapsObj;
-            if (baseTilemapsParent == null)
-            {
-                baseTilemapsObj = new GameObject(RoomConstants.BASE_TILEMAPS_GAMEOBJECT_NAME);
-                baseTilemapsObj.transform.SetParent(tilemapsParent);
-                baseTilemapsParent = baseTilemapsObj.transform;
-            }
-            else
-            {
-                baseTilemapsObj = baseTilemapsParent.gameObject;
-            }
-
             // BaseTilemap_Ground 생성
-            var groundTilemapObj = baseTilemapsParent.Find(RoomConstants.BASE_TILEMAP_GROUND_NAME);
-            Tilemap groundTilemap;
-            if (groundTilemapObj == null)
-            {
-                var groundObj = new GameObject(RoomConstants.BASE_TILEMAP_GROUND_NAME);
-                groundObj.transform.SetParent(baseTilemapsParent);
-                groundTilemap = groundObj.AddComponent<Tilemap>();
-                groundObj.AddComponent<TilemapRenderer>();
-            }
-            else
-            {
-                groundTilemap = groundTilemapObj.GetComponent<Tilemap>();
-                if (groundTilemap == null)
-                {
-                    groundTilemap = groundTilemapObj.gameObject.AddComponent<Tilemap>();
-                }
-            }
+            var groundTilemap = RoomTilemapHelper.GetOrCreateGroundTilemap(tilemapsParent);
 
             // BaseTilemap_Ground 채우기 (중앙 기준)
             var startX = -roomSizeX / 2;
@@ -458,23 +398,7 @@ namespace DungeonShooter
             }
 
             // BaseTilemap_Wall 생성
-            var wallTilemapObj = baseTilemapsParent.Find(RoomConstants.BASE_TILEMAP_WALL_NAME);
-            Tilemap wallTilemap;
-            if (wallTilemapObj == null)
-            {
-                var wallObj = new GameObject(RoomConstants.BASE_TILEMAP_WALL_NAME);
-                wallObj.transform.SetParent(baseTilemapsParent);
-                wallTilemap = wallObj.AddComponent<Tilemap>();
-                wallObj.AddComponent<TilemapRenderer>();
-            }
-            else
-            {
-                wallTilemap = wallTilemapObj.GetComponent<Tilemap>();
-                if (wallTilemap == null)
-                {
-                    wallTilemap = wallTilemapObj.gameObject.AddComponent<Tilemap>();
-                }
-            }
+            var wallTilemap = RoomTilemapHelper.GetOrCreateWallTilemap(tilemapsParent);
 
             // 복도 위치 정보 수집 (Wall과 Top 타일 배치 시 제외하기 위해)
             var corridorPositions = new HashSet<Vector2Int>();
@@ -524,23 +448,7 @@ namespace DungeonShooter
             }
 
             // Top 타일로 방 주변 2타일 두께로 둘러싸기
-            var topTilemapObj = baseTilemapsParent.Find(RoomConstants.BASE_TILEMAP_TOP_NAME);
-            Tilemap topTilemap;
-            if (topTilemapObj == null)
-            {
-                var topObj = new GameObject(RoomConstants.BASE_TILEMAP_TOP_NAME);
-                topObj.transform.SetParent(baseTilemapsParent);
-                topTilemap = topObj.AddComponent<Tilemap>();
-                topObj.AddComponent<TilemapRenderer>();
-            }
-            else
-            {
-                topTilemap = topTilemapObj.GetComponent<Tilemap>();
-                if (topTilemap == null)
-                {
-                    topTilemap = topTilemapObj.gameObject.AddComponent<Tilemap>();
-                }
-            }
+            var topTilemap = RoomTilemapHelper.GetOrCreateTopTilemap(tilemapsParent);
 
             // 상하좌우 2타일 두께로 Top 타일 배치 (복도 위치 제외, 위쪽만 Wall 위에 배치되므로 +1)
             for (int i = 0; i < RoomConstants.TOP_TILE_THICKNESS; i++)

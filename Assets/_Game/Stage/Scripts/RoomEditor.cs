@@ -148,35 +148,9 @@ namespace DungeonShooter
                 return;
             }
 
-            // BaseTilemaps 찾기 또는 생성
-            var baseTilemapsTransform = transform.Find("BaseTilemaps");
-            if (baseTilemapsTransform == null)
-            {
-                var baseTilemaps = new GameObject("BaseTilemaps");
-                baseTilemaps.transform.SetParent(transform);
-                baseTilemapsTransform = baseTilemaps.transform;
-            }
-
             // BaseTilemap_Ground 찾기 또는 생성
-            var baseTilemapGroundTransform = baseTilemapsTransform.Find("BaseTilemap_Ground");
-            Tilemap tilemap;
-            
-            if (baseTilemapGroundTransform == null)
-            {
-                var baseTilemapGround = new GameObject("BaseTilemap_Ground");
-                baseTilemapGround.transform.SetParent(baseTilemapsTransform);
-                tilemap = baseTilemapGround.AddComponent<Tilemap>();
-                baseTilemapGround.AddComponent<TilemapRenderer>();
-            }
-            else
-            {
-                tilemap = baseTilemapGroundTransform.GetComponent<Tilemap>();
-                if (tilemap == null)
-                {
-                    tilemap = baseTilemapGroundTransform.gameObject.AddComponent<Tilemap>();
-                    baseTilemapGroundTransform.gameObject.AddComponent<TilemapRenderer>();
-                }
-            }
+            // RoomEditor는 Editor 전용이므로 Tilemaps 구조 없이 직접 BaseTilemaps를 생성
+            var tilemap = RoomTilemapHelper.GetOrCreateGroundTilemap(transform);
 
             // 기존 타일 모두 제거
             tilemap.ClearAllTiles();
