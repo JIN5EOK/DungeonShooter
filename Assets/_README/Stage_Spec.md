@@ -7,10 +7,10 @@
 classDiagram
     class Direction {
         <<enum>>
-        North
-        South
-        East
-        West
+        Up
+        Down
+        Right
+        Left
     }
 
     class IRoomDataRepository["IRoomDataRepository<br>스테이지별 방 데이터 맞춤 제공"] {

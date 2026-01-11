@@ -143,10 +143,10 @@ namespace DungeonShooter
             var queue = new Queue<int>();
             var directionVectors = new Dictionary<Direction, Vector2Int>
             {
-                { Direction.North, Vector2Int.up },
-                { Direction.South, Vector2Int.down },
-                { Direction.East, Vector2Int.right },
-                { Direction.West, Vector2Int.left }
+                { Direction.Up, Vector2Int.up },
+                { Direction.Down, Vector2Int.down },
+                { Direction.Right, Vector2Int.right },
+                { Direction.Left, Vector2Int.left }
             };
 
             // 시작 방(첫 번째 방)에서 BFS 시작
@@ -304,10 +304,10 @@ namespace DungeonShooter
             var candidateEdges = new List<(int roomId, Direction direction)>();
             var directionVectors = new Dictionary<Direction, Vector2Int>
             {
-                { Direction.North, Vector2Int.up },
-                { Direction.South, Vector2Int.down },
-                { Direction.East, Vector2Int.right },
-                { Direction.West, Vector2Int.left }
+                { Direction.Up, Vector2Int.up },
+                { Direction.Down, Vector2Int.down },
+                { Direction.Right, Vector2Int.right },
+                { Direction.Left, Vector2Int.left }
             };
             // 실제로 인접한 방이 있고, 아직 연결되지 않은 엣지만 생성 (특수 방 제외)
             foreach (int roomId in roomIds)
@@ -451,10 +451,10 @@ namespace DungeonShooter
         {
             return direction switch
             {
-                Direction.North => Direction.South,
-                Direction.South => Direction.North,
-                Direction.East => Direction.West,
-                Direction.West => Direction.East,
+                Direction.Up => Direction.Down,
+                Direction.Down => Direction.Up,
+                Direction.Right => Direction.Left,
+                Direction.Left => Direction.Right,
                 _ => direction
             };
         }
@@ -495,10 +495,10 @@ namespace DungeonShooter
             // Direction을 Vector2Int로 변환
             var dirToVector = new Dictionary<Direction, Vector2Int>
             {
-                { Direction.North, Vector2Int.up },
-                { Direction.South, Vector2Int.down },
-                { Direction.East, Vector2Int.right },
-                { Direction.West, Vector2Int.left }
+                { Direction.Up, Vector2Int.up },
+                { Direction.Down, Vector2Int.down },
+                { Direction.Right, Vector2Int.right },
+                { Direction.Left, Vector2Int.left }
             };
 
             var mapLines = new List<string>();
@@ -520,10 +520,10 @@ namespace DungeonShooter
                         var room = roomMap[pos];
                         
                         // 연결 상태 확인
-                        var hasWest = IsConnected(room, Direction.West, roomMap, dirToVector);
-                        var hasEast = IsConnected(room, Direction.East, roomMap, dirToVector);
-                        var hasNorth = IsConnected(room, Direction.North, roomMap, dirToVector);
-                        var hasSouth = IsConnected(room, Direction.South, roomMap, dirToVector);
+                        var hasWest = IsConnected(room, Direction.Left, roomMap, dirToVector);
+                        var hasEast = IsConnected(room, Direction.Right, roomMap, dirToVector);
+                        var hasNorth = IsConnected(room, Direction.Up, roomMap, dirToVector);
+                        var hasSouth = IsConnected(room, Direction.Down, roomMap, dirToVector);
 
                         // 노드 문자 (시작 방과 보스 방 우선 표시)
                         string nodeChar;
@@ -569,7 +569,7 @@ namespace DungeonShooter
                         if (roomMap.ContainsKey(posLeft))
                         {
                             var roomLeft = roomMap[posLeft];
-                            hasLeftConnection = IsConnected(roomLeft, Direction.East, roomMap, dirToVector);
+                            hasLeftConnection = IsConnected(roomLeft, Direction.Right, roomMap, dirToVector);
                         }
 
                         if (hasLeftConnection)
@@ -587,7 +587,7 @@ namespace DungeonShooter
                         {
                             var roomAbove = roomMap[posAbove];
                             var posBelow = new Vector2Int(x, y - 1);
-                            if (IsConnected(roomAbove, Direction.South, roomMap, dirToVector) &&
+                            if (IsConnected(roomAbove, Direction.Down, roomMap, dirToVector) &&
                                 roomMap.ContainsKey(posBelow))
                             {
                                 verticalLine.Append(" │ ");

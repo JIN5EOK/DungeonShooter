@@ -127,10 +127,10 @@ namespace DungeonShooter
         {
             return direction switch
             {
-                Direction.North => Vector2Int.up,      // (0, 1)
-                Direction.South => Vector2Int.down,    // (0, -1)
-                Direction.East => Vector2Int.right,    // (1, 0)
-                Direction.West => Vector2Int.left,    // (-1, 0)
+                Direction.Up => Vector2Int.up,      // (0, 1)
+                Direction.Down => Vector2Int.down,    // (0, -1)
+                Direction.Right => Vector2Int.right,    // (1, 0)
+                Direction.Left => Vector2Int.left,    // (-1, 0)
                 _ => Vector2Int.zero
             };
         }
@@ -142,10 +142,10 @@ namespace DungeonShooter
         {
             return direction switch
             {
-                Direction.North => Direction.South,
-                Direction.South => Direction.North,
-                Direction.East => Direction.West,
-                Direction.West => Direction.East,
+                Direction.Up => Direction.Down,
+                Direction.Down => Direction.Up,
+                Direction.Right => Direction.Left,
+                Direction.Left => Direction.Right,
                 _ => direction
             };
         }

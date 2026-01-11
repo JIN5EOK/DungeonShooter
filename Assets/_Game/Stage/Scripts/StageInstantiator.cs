@@ -489,7 +489,7 @@ namespace DungeonShooter
                 for (int w = -corridorHalfWidth; w < corridorHalfWidth; w++)
                 {
                     // Wall용 복도 위치 (상단 1타일)
-                    if (direction == Direction.North)
+                    if (direction == Direction.Up)
                     {
                         corridorPositions.Add(new Vector2Int(roomCenterX + w, topWallY));
                     }
@@ -499,10 +499,10 @@ namespace DungeonShooter
                     {
                         var pos = direction switch
                         {
-                            Direction.North => new Vector2Int(roomCenterX + w, startY + roomSizeY + 1 + i),
-                            Direction.South => new Vector2Int(roomCenterX + w, startY - 1 - i),
-                            Direction.East => new Vector2Int(startX + roomSizeX + i, roomCenterY + w),
-                            Direction.West => new Vector2Int(startX - 1 - i, roomCenterY + w),
+                            Direction.Up => new Vector2Int(roomCenterX + w, startY + roomSizeY + 1 + i),
+                            Direction.Down => new Vector2Int(roomCenterX + w, startY - 1 - i),
+                            Direction.Right => new Vector2Int(startX + roomSizeX + i, roomCenterY + w),
+                            Direction.Left => new Vector2Int(startX - 1 - i, roomCenterY + w),
                             _ => Vector2Int.zero
                         };
                         
@@ -695,19 +695,19 @@ namespace DungeonShooter
                     var corridorExtension = 2; // 방 안쪽으로 들어가는 거리
                     switch (direction)
                     {
-                        case Direction.North:
+                        case Direction.Up:
                             corridorStart = new Vector3Int(roomCenterX - corridorHalfWidth, roomCenterY + roomSizeY / 2 - corridorExtension, 0);
                             corridorEnd = new Vector3Int(targetRoomCenterX - corridorHalfWidth, targetRoomCenterY - targetRoomSizeY / 2 + corridorExtension, 0);
                             break;
-                        case Direction.South:
+                        case Direction.Down:
                             corridorStart = new Vector3Int(roomCenterX - corridorHalfWidth, roomCenterY - roomSizeY / 2 + corridorExtension, 0);
                             corridorEnd = new Vector3Int(targetRoomCenterX - corridorHalfWidth, targetRoomCenterY + targetRoomSizeY / 2 - corridorExtension, 0);
                             break;
-                        case Direction.East:
+                        case Direction.Right:
                             corridorStart = new Vector3Int(roomCenterX + roomSizeX / 2 - corridorExtension, roomCenterY - corridorHalfWidth, 0);
                             corridorEnd = new Vector3Int(targetRoomCenterX - targetRoomSizeX / 2 + corridorExtension, targetRoomCenterY - corridorHalfWidth, 0);
                             break;
-                        case Direction.West:
+                        case Direction.Left:
                             corridorStart = new Vector3Int(roomCenterX - roomSizeX / 2 + corridorExtension, roomCenterY - corridorHalfWidth, 0);
                             corridorEnd = new Vector3Int(targetRoomCenterX + targetRoomSizeX / 2 - corridorExtension, targetRoomCenterY - corridorHalfWidth, 0);
                             break;
@@ -730,7 +730,7 @@ namespace DungeonShooter
                         for (int w = 0; w < RoomConstants.ROOM_CORRIDOR_SIZE; w++)
                         {
                             Vector3Int tilePos;
-                            if (direction == Direction.North || direction == Direction.South)
+                            if (direction == Direction.Up || direction == Direction.Down)
                             {
                                 tilePos = new Vector3Int(x + w, y, 0);
                             }
