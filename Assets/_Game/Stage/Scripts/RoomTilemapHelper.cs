@@ -62,7 +62,12 @@ namespace DungeonShooter
         /// <param name="roomParent">Room GameObject의 Transform</param>
         public static Transform GetOrCreateBaseTilemaps(Transform roomParent)
         {
-            return GetOrCreateChild(roomParent, RoomConstants.BASE_TILEMAPS_GAMEOBJECT_NAME);
+            var baseTilemaps = GetOrCreateChild(roomParent, RoomConstants.BASE_TILEMAPS_GAMEOBJECT_NAME);
+            if (baseTilemaps.GetComponent<Grid>() == null)
+            {
+                baseTilemaps.gameObject.AddComponent<Grid>();
+            }
+            return baseTilemaps;
         }
 
         /// <summary>
