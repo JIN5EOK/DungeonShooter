@@ -1,6 +1,4 @@
 ### 스테이지 관련
-* StageInstantiator
-    * 타일맵 렌더러 게임오브젝트들을 생성할때 알맞은 레이어 설정
 * StageResourceProvider
     * 게임오브젝트, 타일 생성 반환 기능 완성 필요
 * Stage리소스에 관련된 의존성 주입구조 만들기

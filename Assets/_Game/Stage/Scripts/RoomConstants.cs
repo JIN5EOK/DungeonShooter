@@ -11,6 +11,7 @@ namespace DungeonShooter
         public const string BASE_TILEMAP_GROUND_NAME = "BaseTilemap_Ground";
         public const string BASE_TILEMAP_WALL_NAME = "BaseTilemap_Wall";
         public const string BASE_TILEMAP_TOP_NAME = "BaseTilemap_Top";
+        public const string TILEMAP_DECO_NAME = "Tilemap_Deco";
         public const string CORRIDOR_TILEMAP_GROUND_NAME = "CorridorTilemap_Ground";
         public const int ROOM_SIZE_X = 32;
         public const int ROOM_SIZE_Y = 24;

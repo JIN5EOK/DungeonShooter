@@ -47,6 +47,9 @@ namespace DungeonShooter
                 tilemapsParent.gameObject.AddComponent<Grid>();
             }
 
+            // Tilemap_Deco 생성
+            GetOrCreateDecoTilemap(roomObj.transform);
+
             // Objects 구조 생성 또는 가져오기
             var objectsParent = GetOrCreateChild(roomObj.transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
 
@@ -78,6 +81,28 @@ namespace DungeonShooter
         }
 
         /// <summary>
+        /// 타일맵 이름에 따라 적절한 렌더링 레이어를 반환합니다.
+        /// </summary>
+        private static RenderingLayer GetRenderingLayerForTilemap(string tilemapName)
+        {
+            if (tilemapName.Contains(RenderingLayers.Ground.LayerName))
+            {
+                return RenderingLayers.Ground;
+            }
+            else if (tilemapName.Contains(RenderingLayers.Wall.LayerName))
+            {
+                return RenderingLayers.Wall;
+            }
+            else if (tilemapName.Contains(RenderingLayers.Deco.LayerName))
+            {
+                return RenderingLayers.Deco;
+            }
+            
+            // 기본값은 Ground
+            return RenderingLayers.Ground;
+        }
+
+        /// <summary>
         /// 지정된 이름의 Tilemap을 찾거나 생성합니다.
         /// </summary>
         public static Tilemap GetOrCreateTilemap(Transform parent, string tilemapName, bool addRenderer = true)
@@ -90,9 +115,17 @@ namespace DungeonShooter
                 tilemap = tilemapObj.gameObject.AddComponent<Tilemap>();
             }
             
-            if (addRenderer && tilemapObj.GetComponent<TilemapRenderer>() == null)
+            if (addRenderer)
             {
-                tilemapObj.gameObject.AddComponent<TilemapRenderer>();
+                var renderer = tilemapObj.GetComponent<TilemapRenderer>();
+                if (renderer == null)
+                {
+                    renderer = tilemapObj.gameObject.AddComponent<TilemapRenderer>();
+                }
+                
+                // 타일맵 이름에 따라 적절한 렌더링 레이어 설정
+                var renderingLayer = GetRenderingLayerForTilemap(tilemapName);
+                renderer.sortingLayerName = renderingLayer.LayerName;
             }
             
             return tilemap;
@@ -126,6 +159,20 @@ namespace DungeonShooter
         {
             var baseTilemaps = GetOrCreateBaseTilemaps(roomParent);
             return GetOrCreateTilemap(baseTilemaps, RoomConstants.BASE_TILEMAP_TOP_NAME);
+        }
+
+        /// <summary>
+        /// Tilemap_Deco를 찾거나 생성합니다.
+        /// </summary>
+        /// <param name="roomParent">Room GameObject의 Transform</param>
+        public static Tilemap GetOrCreateDecoTilemap(Transform roomParent)
+        {
+            var tilemapsParent = GetOrCreateChild(roomParent, RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
+            if (tilemapsParent.GetComponent<Grid>() == null)
+            {
+                tilemapsParent.gameObject.AddComponent<Grid>();
+            }
+            return GetOrCreateTilemap(tilemapsParent, RoomConstants.TILEMAP_DECO_NAME);
         }
 
         /// <summary>
