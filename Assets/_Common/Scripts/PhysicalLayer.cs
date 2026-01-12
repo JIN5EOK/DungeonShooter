@@ -23,7 +23,7 @@ namespace DungeonShooter
         public int Mask { get; }
     }
 
-    public static class GameLayers
+    public static class PhysicalLayers
     {
         public static readonly PhysicalLayer Player = new("Player");
         public static readonly PhysicalLayer Enemy = new("Enemy");
