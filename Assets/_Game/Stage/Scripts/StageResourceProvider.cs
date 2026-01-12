@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.ResourceLocations;
 using UnityEngine.Tilemaps;
 using Jin5eok;
 using Object = UnityEngine.Object;
@@ -120,20 +119,23 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 주소에 해당하는 게임 오브젝트를 가져옵니다.
+        /// 주소에 해당하는 게임 오브젝트를 생성합니다.
         /// </summary>
         public async Awaitable<GameObject> GetGameObject(string address)
         {
-            // TODO: 구현 필요
-            return null;
+            var handle = _addressablesScope.InstantiateAsync(address);
+            await handle.Task;
+            return handle.Result;
         }
+
         /// <summary>
         /// 주소에 해당하는 타일을 가져옵니다.
         /// </summary>
-        public Awaitable<TileBase> GetTile(string address)
+        public async Awaitable<TileBase> GetTile(string address)
         {
-            // TODO: 구현 필요
-            return null;
+            var handle = _addressablesScope.LoadAssetAsync<TileBase>(address);
+            await handle.Task;
+            return handle.Result;
         }
 
         public void Dispose()
