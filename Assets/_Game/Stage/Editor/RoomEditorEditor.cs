@@ -36,7 +36,7 @@ namespace DungeonShooter
             
             if (GUILayout.Button("타일 업데이트", GUILayout.Height(25)))
             {
-                roomEditor.UpdateRoomSizeTilesPublic();
+                roomEditor.UpdateRoomSizeTiles();
             }
 
             // 저장 섹션
@@ -94,6 +94,22 @@ namespace DungeonShooter
             if (GUILayout.Button("방 불러오기", GUILayout.Height(30)))
             {
                 roomEditor.LoadRoom();
+            }
+
+            // 리셋 섹션
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("리셋", EditorStyles.boldLabel);
+            
+            if (GUILayout.Button("초기 상태로 리셋", GUILayout.Height(30)))
+            {
+                if (EditorUtility.DisplayDialog(
+                    "방 리셋 확인",
+                    "생성된 타일맵과 오브젝트를 모두 제거하고 초기 상태로 돌아갑니다. 계속하시겠습니까?",
+                    "확인",
+                    "취소"))
+                {
+                    roomEditor.ResetRoom();
+                }
             }
 
             EditorGUILayout.Space();

@@ -36,49 +36,14 @@ namespace DungeonShooter
         public void SetSavePath(string path) => _savePath = path;
         public void SetLoadPath(string path) => _loadPath = path;
 
-        public void UpdateRoomSizeTilesPublic()
-        {
-            UpdateRoomSizeTiles();
-        }
-
-        private void OnEnable()
-        {
-            if (Application.isPlaying)
-            {
-                return;
-            }
-
-            EnsureStructure();
-        }
-
         /// <summary>
-        /// Tilemaps와 Objects 자식 구조를 확인하고 없으면 생성합니다.
+        /// Tilemaps와 Objects 게임 오브젝트 자식 구조를 생성합니다.
         /// </summary>
         private void EnsureStructure()
         {
-            // Tilemaps 자식 확인 및 생성
-            var tilemapsTransform = transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
-            if (tilemapsTransform == null)
-            {
-                var tilemaps = new GameObject(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
-                tilemaps.transform.SetParent(transform);
-                tilemaps.AddComponent<Grid>();
-            }
-            else
-            {
-                // Grid 컴포넌트 확인
-                if (tilemapsTransform.GetComponent<Grid>() == null)
-                {
-                    tilemapsTransform.gameObject.AddComponent<Grid>();
-                }
-            }
-
-            // Objects 자식 확인 및 생성
-            if (transform.Find(RoomConstants.OBJECTS_GAMEOBJECT_NAME) == null)
-            {
-                var objects = new GameObject(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
-                objects.transform.SetParent(transform);
-            }
+            RoomTilemapHelper.ClearRoomObject(gameObject);
+            RoomTilemapHelper.GetOrCreateRoomStructure(gameObject, null, gameObject.name, createBaseTilemaps: true);
+            UpdateRoomSizeTiles();
         }
 
         public void SaveMap()
@@ -138,7 +103,7 @@ namespace DungeonShooter
         /// <summary>
         /// 방 크기에 맞춰 BaseTilemap_Ground에 타일을 배치합니다.
         /// </summary>
-        private void UpdateRoomSizeTiles()
+        public void UpdateRoomSizeTiles()
         {
             if (!ValidateEditorMode()) return;
 
@@ -170,6 +135,22 @@ namespace DungeonShooter
 
             EditorUtility.SetDirty(this);
             EditorUtility.SetDirty(tilemap);
+        }
+
+        /// <summary>
+        /// 방을 초기 상태로 리셋합니다.
+        /// 생성된 타일맵을 모두 제거하고, Objects 하위의 오브젝트들을 모두 제거합니다.
+        /// </summary>
+        public void ResetRoom()
+        {
+            if (!ValidateEditorMode()) return;
+
+
+            // 구조 재생성
+            EnsureStructure();
+
+            EditorUtility.SetDirty(this);
+            Debug.Log($"[{nameof(RoomEditor)}] 방이 초기 상태로 리셋되었습니다.");
         }
 
         /// <summary>

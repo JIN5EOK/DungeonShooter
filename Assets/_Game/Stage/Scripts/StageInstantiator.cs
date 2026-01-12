@@ -382,8 +382,11 @@ namespace DungeonShooter
                 return;
             }
 
+            // Room GameObject 가져오기
+            var roomObj = tilemapsParent.parent.gameObject;
+
             // BaseTilemap_Ground 생성
-            var groundTilemap = RoomTilemapHelper.GetOrCreateGroundTilemap(tilemapsParent);
+            var groundTilemap = RoomTilemapHelper.GetOrCreateGroundTilemap(roomObj.transform);
 
             // BaseTilemap_Ground 채우기 (중앙 기준)
             var startX = -roomSizeX / 2;
@@ -398,7 +401,7 @@ namespace DungeonShooter
             }
 
             // BaseTilemap_Wall 생성
-            var wallTilemap = RoomTilemapHelper.GetOrCreateWallTilemap(tilemapsParent);
+            var wallTilemap = RoomTilemapHelper.GetOrCreateWallTilemap(roomObj.transform);
 
             // 복도 위치 정보 수집 (Wall과 Top 타일 배치 시 제외하기 위해)
             var corridorPositions = new HashSet<Vector2Int>();
@@ -448,7 +451,7 @@ namespace DungeonShooter
             }
 
             // Top 타일로 방 주변 2타일 두께로 둘러싸기
-            var topTilemap = RoomTilemapHelper.GetOrCreateTopTilemap(tilemapsParent);
+            var topTilemap = RoomTilemapHelper.GetOrCreateTopTilemap(roomObj.transform);
 
             // 상하좌우 2타일 두께로 Top 타일 배치 (복도 위치 제외, 위쪽만 Wall 위에 배치되므로 +1)
             for (int i = 0; i < RoomConstants.TOP_TILE_THICKNESS; i++)

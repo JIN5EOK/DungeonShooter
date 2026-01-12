@@ -33,7 +33,14 @@ namespace DungeonShooter
                 }
             }
 
-            // Tilemaps 구조 생성 또는 가져오기
+            // BaseTilemaps 구조 생성 또는 가져오기 (Room GameObject의 직접 자식)
+            Transform baseTilemapsParent = null;
+            if (createBaseTilemaps)
+            {
+                baseTilemapsParent = GetOrCreateBaseTilemaps(roomObj.transform);
+            }
+
+            // Tilemaps 구조 생성 또는 가져오기 (사용자가 배치하는 타일맵들)
             var tilemapsParent = GetOrCreateChild(roomObj.transform, RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
             if (tilemapsParent.GetComponent<Grid>() == null)
             {
@@ -43,23 +50,16 @@ namespace DungeonShooter
             // Objects 구조 생성 또는 가져오기
             var objectsParent = GetOrCreateChild(roomObj.transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
 
-            // BaseTilemaps 구조 생성 또는 가져오기
-            Transform baseTilemapsParent = null;
-            if (createBaseTilemaps)
-            {
-                baseTilemapsParent = GetOrCreateBaseTilemaps(tilemapsParent);
-            }
-
             return (tilemapsParent, objectsParent, baseTilemapsParent);
         }
 
         /// <summary>
         /// BaseTilemaps GameObject를 찾거나 생성합니다.
         /// </summary>
-        /// <param name="parent">부모 Transform (Tilemaps 또는 Room GameObject)</param>
-        public static Transform GetOrCreateBaseTilemaps(Transform parent)
+        /// <param name="roomParent">Room GameObject의 Transform</param>
+        public static Transform GetOrCreateBaseTilemaps(Transform roomParent)
         {
-            return GetOrCreateChild(parent, RoomConstants.BASE_TILEMAPS_GAMEOBJECT_NAME);
+            return GetOrCreateChild(roomParent, RoomConstants.BASE_TILEMAPS_GAMEOBJECT_NAME);
         }
 
         /// <summary>
@@ -101,37 +101,76 @@ namespace DungeonShooter
         /// <summary>
         /// BaseTilemap_Ground를 찾거나 생성합니다.
         /// </summary>
-        /// <param name="parent">부모 Transform (Tilemaps 또는 BaseTilemaps)</param>
-        public static Tilemap GetOrCreateGroundTilemap(Transform parent)
+        /// <param name="roomParent">Room GameObject의 Transform</param>
+        public static Tilemap GetOrCreateGroundTilemap(Transform roomParent)
         {
-            // parent가 BaseTilemaps인지 확인
-            if (parent.name == RoomConstants.BASE_TILEMAPS_GAMEOBJECT_NAME)
-            {
-                return GetOrCreateTilemap(parent, RoomConstants.BASE_TILEMAP_GROUND_NAME);
-            }
-            else
-            {
-                var baseTilemaps = GetOrCreateBaseTilemaps(parent);
-                return GetOrCreateTilemap(baseTilemaps, RoomConstants.BASE_TILEMAP_GROUND_NAME);
-            }
+            var baseTilemaps = GetOrCreateBaseTilemaps(roomParent);
+            return GetOrCreateTilemap(baseTilemaps, RoomConstants.BASE_TILEMAP_GROUND_NAME);
         }
 
         /// <summary>
         /// BaseTilemap_Wall을 찾거나 생성합니다.
         /// </summary>
-        public static Tilemap GetOrCreateWallTilemap(Transform tilemapsParent)
+        /// <param name="roomParent">Room GameObject의 Transform</param>
+        public static Tilemap GetOrCreateWallTilemap(Transform roomParent)
         {
-            var baseTilemaps = GetOrCreateBaseTilemaps(tilemapsParent);
+            var baseTilemaps = GetOrCreateBaseTilemaps(roomParent);
             return GetOrCreateTilemap(baseTilemaps, RoomConstants.BASE_TILEMAP_WALL_NAME);
         }
 
         /// <summary>
         /// BaseTilemap_Top을 찾거나 생성합니다.
         /// </summary>
-        public static Tilemap GetOrCreateTopTilemap(Transform tilemapsParent)
+        /// <param name="roomParent">Room GameObject의 Transform</param>
+        public static Tilemap GetOrCreateTopTilemap(Transform roomParent)
         {
-            var baseTilemaps = GetOrCreateBaseTilemaps(tilemapsParent);
+            var baseTilemaps = GetOrCreateBaseTilemaps(roomParent);
             return GetOrCreateTilemap(baseTilemaps, RoomConstants.BASE_TILEMAP_TOP_NAME);
+        }
+
+        /// <summary>
+        /// Room의 타일맵과 오브젝트를 모두 제거합니다.
+        /// </summary>
+        /// <param name="roomObj">Room GameObject</param>
+        public static void ClearRoomObject(GameObject roomObj)
+        {
+            if (roomObj == null) return;
+
+            // Tilemaps 하위의 모든 타일맵 제거 (BaseTilemaps는 제외)
+            var tilemapsParent = roomObj.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
+            if (tilemapsParent != null)
+            {
+                for (int i = tilemapsParent.childCount - 1; i >= 0; i--)
+                {
+                    var child = tilemapsParent.GetChild(i);
+                    if (Application.isEditor && !Application.isPlaying)
+                    {
+                        Object.DestroyImmediate(child.gameObject);
+                    }
+                    else
+                    {
+                        Object.Destroy(child.gameObject);
+                    }
+                }
+            }
+
+            // Objects 하위의 모든 오브젝트 제거
+            var objectsParent = roomObj.transform.Find(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            if (objectsParent != null)
+            {
+                for (int i = objectsParent.childCount - 1; i >= 0; i--)
+                {
+                    var child = objectsParent.GetChild(i);
+                    if (Application.isEditor && !Application.isPlaying)
+                    {
+                        Object.DestroyImmediate(child.gameObject);
+                    }
+                    else
+                    {
+                        Object.Destroy(child.gameObject);
+                    }
+                }
+            }
         }
     }
 }
