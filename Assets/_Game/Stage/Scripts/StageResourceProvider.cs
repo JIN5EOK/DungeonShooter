@@ -27,11 +27,27 @@ namespace DungeonShooter
     {
         private readonly AddressablesScope _addressablesScope;
         private readonly StageConfig _stageConfig;
+        private List<string> EnemyAddresses { get; set; }
         
         public StageResourceProvider(StageConfig config)
         {
             _addressablesScope = new AddressablesScope();
             _stageConfig = config;
+        }
+
+        /// <summary>
+        /// StageConfig의 Label 데이터를 기반으로 에셋의 어드레스 목록을 로드하여 저장합니다.
+        /// </summary>
+        public async Awaitable InitializeAsync()
+        {
+            if (!string.IsNullOrEmpty(_stageConfig.StageEnemyLabel.labelString))
+            {
+                var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.StageEnemyLabel.labelString);
+                await handle.Task;
+                EnemyAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
+
+                Addressables.Release(handle);
+            }
         }
         
         
@@ -70,8 +86,37 @@ namespace DungeonShooter
         /// </summary>
         public async Awaitable<Enemy> GetRandomEnemy()
         {
-            // TODO: 구현 필요
-            return null;
+            if (EnemyAddresses == null || EnemyAddresses.Count == 0)
+            {
+                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 적 어드레스 목록이 초기화되지 않았습니다. InitializeAsync를 먼저 호출하세요.");
+                return null;
+            }
+
+            // 랜덤으로 하나 선택
+            var enemyAddress = EnemyAddresses[UnityEngine.Random.Range(0, EnemyAddresses.Count)];
+
+            // 적 프리팹 로드
+            var enemyPrefabHandle = _addressablesScope.LoadAssetAsync<GameObject>(enemyAddress);
+            await enemyPrefabHandle.Task;
+
+            if (enemyPrefabHandle.Status != UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 적 프리팹 로드 실패: {enemyAddress}");
+                return null;
+            }
+
+            var enemyPrefab = enemyPrefabHandle.Result;
+            var enemyInstance = Object.Instantiate(enemyPrefab);
+            var enemy = enemyInstance.GetComponent<Enemy>();
+
+            if (enemy == null)
+            {
+                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 프리팹에 Enemy 컴포넌트가 없습니다: {enemyAddress}");
+                Object.Destroy(enemyInstance);
+                return null;
+            }
+
+            return enemy;
         }
 
         /// <summary>
