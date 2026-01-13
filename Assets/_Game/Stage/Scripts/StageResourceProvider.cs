@@ -12,7 +12,6 @@ namespace DungeonShooter
 
     public interface IStageResourceProvider : IDisposable
     {
-        Awaitable<TileBase> GetTopTile();
         Awaitable<TileBase> GetWallTile();
         Awaitable<TileBase> GetGroundTile();
         Awaitable<TileBase> GetTile(string address);
@@ -49,17 +48,7 @@ namespace DungeonShooter
             }
         }
         
-        
-        /// <summary>
-        /// Top 타일을 가져옵니다.
-        /// </summary>
-        public async Awaitable<TileBase> GetTopTile()
-        {
-            var handle = _addressablesScope.LoadAssetAsync<TileBase>(_stageConfig.TopTile);
-            await handle.Task;
-            return handle.Result;
-        }
-
+    
         /// <summary>
         /// Wall 타일을 가져옵니다.
         /// </summary>

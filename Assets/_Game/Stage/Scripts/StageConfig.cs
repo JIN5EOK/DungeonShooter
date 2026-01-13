@@ -10,7 +10,6 @@ namespace DungeonShooter
     {
         [SerializeField] private AssetReferenceT<TileBase> _wallTile;
         [SerializeField] private AssetReferenceT<TileBase> _groundTile;
-        [SerializeField] private AssetReferenceT<TileBase> _topTile;
         [SerializeField] public AssetLabelReference _stageEnemyLabel;
         
         [SerializeField] public AssetLabelReference _startRoomDataLabel;
@@ -18,7 +17,6 @@ namespace DungeonShooter
         [SerializeField] public AssetLabelReference _bossRoomDataLabel;
         public AssetReferenceT<TileBase> WallTile => _wallTile;
         public AssetReferenceT<TileBase> GroundTile => _groundTile;
-        public AssetReferenceT<TileBase> TopTile => _topTile;
         public AssetLabelReference StageEnemyLabel => _stageEnemyLabel;
         public AssetLabelReference StartRoomDataLabel => _startRoomDataLabel;
         public AssetLabelReference NormalRoomDataLabel => _normalRoomDataLabel;

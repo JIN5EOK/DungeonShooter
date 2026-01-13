@@ -362,9 +362,8 @@ namespace DungeonShooter
             // 타일 로드
             var groundTile = await resourceProvider.GetGroundTile();
             var wallTile = await resourceProvider.GetWallTile();
-            var topTile = await resourceProvider.GetTopTile();
 
-            if (groundTile == null || wallTile == null || topTile == null)
+            if (groundTile == null || wallTile == null)
             {
                 Debug.LogError($"[{nameof(StageInstantiator)}] 필수 타일을 로드할 수 없습니다.");
                 return;
@@ -391,30 +390,23 @@ namespace DungeonShooter
             // BaseTilemap_Wall 생성
             var wallTilemap = RoomTilemapHelper.GetOrCreateWallTilemap(roomObj.transform);
 
-            // 복도 위치 정보 수집 (Wall과 Top 타일 배치 시 제외하기 위해)
+            // 복도 위치 정보 수집 (Wall 타일 배치 시 제외하기 위해)
             var corridorPositions = new HashSet<Vector2Int>();
             var corridorHalfWidth = RoomConstants.ROOM_CORRIDOR_SIZE / 2;
             var roomCenterX = startX + roomSizeX / 2;
             var roomCenterY = startY + roomSizeY / 2;
-            var topWallY = startY + roomSizeY;
             
             foreach (var connection in room.Connections)
             {
                 var direction = connection.Key;
                 for (int w = -corridorHalfWidth; w < corridorHalfWidth; w++)
                 {
-                    // Wall용 복도 위치 (상단 1타일)
-                    if (direction == Direction.Up)
-                    {
-                        corridorPositions.Add(new Vector2Int(roomCenterX + w, topWallY));
-                    }
-                    
-                    // Top용 복도 위치 (2타일 두께, 위쪽만 Wall 위에 배치되므로 +1)
-                    for (int i = 0; i < RoomConstants.TOP_TILE_THICKNESS; i++)
+                    // Wall용 복도 위치 (Y 두께 3에 맞게)
+                    for (int i = 0; i < RoomConstants.WALL_TILE_THICKNESS_Y; i++)
                     {
                         var pos = direction switch
                         {
-                            Direction.Up => new Vector2Int(roomCenterX + w, startY + roomSizeY + 1 + i),
+                            Direction.Up => new Vector2Int(roomCenterX + w, startY + roomSizeY + i),
                             Direction.Down => new Vector2Int(roomCenterX + w, startY - 1 - i),
                             Direction.Right => new Vector2Int(startX + roomSizeX + i, roomCenterY + w),
                             Direction.Left => new Vector2Int(startX - 1 - i, roomCenterY + w),
@@ -429,58 +421,60 @@ namespace DungeonShooter
                 }
             }
 
-            // 상단 1타일 높이만큼 Wall 타일 배치 (복도 위치 제외)
-            for (int x = startX; x < startX + roomSizeX; x++)
+            // Wall 타일 배치: X 방향 2타일 두께, Y 방향 3타일 두께 (복도 위치 제외)
+            // 위쪽 (Y 두께 3)
+            for (int i = 0; i < RoomConstants.WALL_TILE_THICKNESS_Y; i++)
             {
-                if (!corridorPositions.Contains(new Vector2Int(x, topWallY)))
+                for (int x = startX - RoomConstants.WALL_TILE_THICKNESS_X; x < startX + roomSizeX + RoomConstants.WALL_TILE_THICKNESS_X; x++)
                 {
-                    wallTilemap.SetTile(new Vector3Int(x, topWallY, 0), wallTile);
+                    var pos = new Vector2Int(x, startY + roomSizeY + i);
+                    if (!corridorPositions.Contains(pos))
+                    {
+                        wallTilemap.SetTile(new Vector3Int(x, startY + roomSizeY + i, 0), wallTile);
+                    }
                 }
             }
-
-            // Top 타일로 방 주변 2타일 두께로 둘러싸기
-            var topTilemap = RoomTilemapHelper.GetOrCreateTopTilemap(roomObj.transform);
-
-            // 상하좌우 2타일 두께로 Top 타일 배치 (복도 위치 제외, 위쪽만 Wall 위에 배치되므로 +1)
-            for (int i = 0; i < RoomConstants.TOP_TILE_THICKNESS; i++)
+            
+            // 아래쪽 (Y 두께 3)
+            for (int i = 0; i < RoomConstants.WALL_TILE_THICKNESS_Y; i++)
             {
-                // 위쪽 (Wall 위에 배치)
-                for (int x = startX - RoomConstants.TOP_TILE_THICKNESS; x < startX + roomSizeX + RoomConstants.TOP_TILE_THICKNESS; x++)
+                for (int x = startX - RoomConstants.WALL_TILE_THICKNESS_X; x < startX + roomSizeX + RoomConstants.WALL_TILE_THICKNESS_X; x++)
                 {
-                    PlaceTopTileIfNotCorridor(topTilemap, topTile, corridorPositions, x, startY + roomSizeY + 1 + i);
+                    var pos = new Vector2Int(x, startY - 1 - i);
+                    if (!corridorPositions.Contains(pos))
+                    {
+                        wallTilemap.SetTile(new Vector3Int(x, startY - 1 - i, 0), wallTile);
+                    }
                 }
-                // 아래쪽
-                for (int x = startX - RoomConstants.TOP_TILE_THICKNESS; x < startX + roomSizeX + RoomConstants.TOP_TILE_THICKNESS; x++)
+            }
+            
+            // 왼쪽 (X 두께 2)
+            for (int i = 0; i < RoomConstants.WALL_TILE_THICKNESS_X; i++)
+            {
+                for (int y = startY - RoomConstants.WALL_TILE_THICKNESS_Y; y < startY + roomSizeY + RoomConstants.WALL_TILE_THICKNESS_Y; y++)
                 {
-                    PlaceTopTileIfNotCorridor(topTilemap, topTile, corridorPositions, x, startY - 1 - i);
+                    var pos = new Vector2Int(startX - 1 - i, y);
+                    if (!corridorPositions.Contains(pos))
+                    {
+                        wallTilemap.SetTile(new Vector3Int(startX - 1 - i, y, 0), wallTile);
+                    }
                 }
-                // 왼쪽
-                for (int y = startY - 1; y < startY + roomSizeY + 1; y++)
+            }
+            
+            // 오른쪽 (X 두께 2)
+            for (int i = 0; i < RoomConstants.WALL_TILE_THICKNESS_X; i++)
+            {
+                for (int y = startY - RoomConstants.WALL_TILE_THICKNESS_Y; y < startY + roomSizeY + RoomConstants.WALL_TILE_THICKNESS_Y; y++)
                 {
-                    PlaceTopTileIfNotCorridor(topTilemap, topTile, corridorPositions, startX - 1 - i, y);
-                }
-                // 오른쪽
-                for (int y = startY - 1; y < startY + roomSizeY + 1; y++)
-                {
-                    PlaceTopTileIfNotCorridor(topTilemap, topTile, corridorPositions, startX + roomSizeX + i, y);
+                    var pos = new Vector2Int(startX + roomSizeX + i, y);
+                    if (!corridorPositions.Contains(pos))
+                    {
+                        wallTilemap.SetTile(new Vector3Int(startX + roomSizeX + i, y, 0), wallTile);
+                    }
                 }
             }
         }
 
-        /// <summary>
-        /// 복도 위치가 아닌 경우에만 Top 타일을 배치합니다.
-        /// </summary>
-        private static void PlaceTopTileIfNotCorridor(
-            Tilemap topTilemap, TileBase topTile,
-            HashSet<Vector2Int> corridorPositions, int x, int y)
-        {
-            var pos = new Vector2Int(x, y);
-            if (!corridorPositions.Contains(pos))
-            {
-                topTilemap.SetTile(new Vector3Int(x, y, 0), topTile);
-            }
-        }
-        
         /// <summary>
         /// 방들을 연결하는 복도를 생성합니다.
         /// </summary>

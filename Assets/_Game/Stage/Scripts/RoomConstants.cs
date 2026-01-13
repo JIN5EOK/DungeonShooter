@@ -10,7 +10,6 @@ namespace DungeonShooter
         public const string BASE_TILEMAPS_GAMEOBJECT_NAME = "BaseTilemaps";
         public const string BASE_TILEMAP_GROUND_NAME = "BaseTilemap_Ground";
         public const string BASE_TILEMAP_WALL_NAME = "BaseTilemap_Wall";
-        public const string BASE_TILEMAP_TOP_NAME = "BaseTilemap_Top";
         public const string TILEMAP_DECO_NAME = "Tilemap_Deco";
         public const string CORRIDOR_TILEMAP_GROUND_NAME = "CorridorTilemap_Ground";
         public const int ROOM_SIZE_X = 32;
@@ -21,7 +20,8 @@ namespace DungeonShooter
         public const int ROOM_SIZE_MAX_X = 32;
         public const int ROOM_SIZE_MAX_Y = 32;
         public const int ROOM_CORRIDOR_SIZE = 4;
-        public const int TOP_TILE_THICKNESS = 2;
+        public const int WALL_TILE_THICKNESS_X = 2;
+        public const int WALL_TILE_THICKNESS_Y = 3;
     }
 }
 

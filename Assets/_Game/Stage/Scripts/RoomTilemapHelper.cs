@@ -157,16 +157,6 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// BaseTilemap_Top을 찾거나 생성합니다.
-        /// </summary>
-        /// <param name="roomParent">Room GameObject의 Transform</param>
-        public static Tilemap GetOrCreateTopTilemap(Transform roomParent)
-        {
-            var baseTilemaps = GetOrCreateBaseTilemaps(roomParent);
-            return GetOrCreateTilemap(baseTilemaps, RoomConstants.BASE_TILEMAP_TOP_NAME);
-        }
-
-        /// <summary>
         /// Tilemap_Deco를 찾거나 생성합니다.
         /// </summary>
         /// <param name="roomParent">Room GameObject의 Transform</param>
