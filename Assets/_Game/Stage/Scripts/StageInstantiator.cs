@@ -248,33 +248,21 @@ namespace DungeonShooter
             Transform objectsParent,
             Jin5eok.AddressablesScope addressablesScope)
         {
-            var uniqueObjectIndices = roomData.Objects.Select(o => o.Index).Distinct().ToList();
-            var prefabCache = new Dictionary<int, GameObject>();
-
-            // 모든 프리팹을 먼저 로드
-            foreach (var index in uniqueObjectIndices)
+            foreach (var objectData in roomData.Objects)
             {
-                var address = roomData.GetAddress(index);
+                var address = roomData.GetAddress(objectData.Index);
                 if (string.IsNullOrEmpty(address)) continue;
 
-                var handle = addressablesScope.LoadAssetAsync<GameObject>(address);
+                var handle = addressablesScope.InstantiateAsync(address);
                 await handle.Task;
 
                 if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
                 {
-                    prefabCache[index] = handle.Result;
+                    var instance = handle.Result;
+                    instance.transform.SetParent(objectsParent);
+                    instance.transform.position = new Vector3(objectData.Position.x, objectData.Position.y, 0);
+                    instance.transform.rotation = objectData.Rotation;
                 }
-            }
-
-            // 오브젝트 인스턴스화
-            foreach (var objectData in roomData.Objects)
-            {
-                if (!prefabCache.TryGetValue(objectData.Index, out var prefab)) continue;
-
-                var position = new Vector3(objectData.Position.x, objectData.Position.y, 0);
-                var instance = Object.Instantiate(prefab, objectsParent);
-                instance.transform.position = position;
-                instance.transform.rotation = objectData.Rotation;
             }
         }
         /// <summary>
