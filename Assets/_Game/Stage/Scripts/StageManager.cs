@@ -1,44 +1,48 @@
-using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 
 namespace DungeonShooter
 {
     public class StageManager : MonoBehaviour
     {
-        [SerializeField] private StageConfig _testStageConfig;
+        private StageContext _context;
         private Stage _stage;
         private StageComponent _stageComponent;
 
         public Stage Stage => _stage;
         public StageComponent StageComponent => _stageComponent;
-
-        // 스테이지 생성 테스트를 위한 임시코드들
-        public void Update()
+        
+        [Inject]
+        public void Construct(StageContext context)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                CreateStageAsync();
-            }
+            _context = context;
         }
-
+        
+        public void Start()
+        {
+            CreateStageAsync();
+        }
+        
+        /// <summary>
+        /// 스테이지 구조와 인스턴스를 생성합니다
+        /// </summary>
         private async void CreateStageAsync()
         {
-            _stage = await StageGenerator.GenerateStage(await GetRoomDataRepository(_testStageConfig), 15);
-            var stageObj = await StageInstantiator.InstantiateStage(await GetResourceProvider(_testStageConfig), _stage);
-            _stageComponent = stageObj != null ? stageObj.GetComponent<StageComponent>() : null;
-        }
-
-        private async Awaitable<IRoomDataRepository> GetRoomDataRepository(StageConfig config)
-        {
-            var roomDataRepository = new RoomDataRepository(config);
+            // 방 데이터 제공
+            var roomDataRepository = new RoomDataRepository(_context.StageConfig);
             await roomDataRepository.InitializeAsync();
-            return roomDataRepository;
+            // 스테이지 리소스 제공
+            var stageResourceProvider = new StageResourceProvider(_context.StageConfig);
+            await stageResourceProvider.InitializeAsync();
+            
+            _stage = await StageGenerator.GenerateStage(roomDataRepository, 15);
+            var stageObj = await StageInstantiator.InstantiateStage(stageResourceProvider, _stage);
+            _stageComponent = stageObj.GetComponent<StageComponent>();
         }
-
-        private async Awaitable<IStageResourceProvider> GetResourceProvider(StageConfig config)
+        
+        private void OnDestroy()
         {
-            var stageResourceProvider = new StageResourceProvider(config);
-            return stageResourceProvider;
+            _context?.Dispose();
         }
     }
 }
