@@ -62,6 +62,17 @@ namespace DungeonShooter
             }
             EditorGUILayout.EndHorizontal();
             
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("파일 이름", GUILayout.Width(80));
+            var fileName = EditorGUILayout.TextField(roomEditor.FileName);
+            roomEditor.SetFileName(fileName);
+            EditorGUILayout.EndHorizontal();
+            
+            if (string.IsNullOrEmpty(roomEditor.FileName))
+            {
+                EditorGUILayout.HelpBox("파일 이름이 비어있으면 게임오브젝트 이름이 사용됩니다.", MessageType.Info);
+            }
+            
             if (GUILayout.Button("방 저장", GUILayout.Height(30)))
             {
                 roomEditor.SaveMap();

@@ -5,7 +5,11 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Tilemaps;
 using Jin5eok;
+using VContainer.Unity;
 using Object = UnityEngine.Object;
+using VContainer;
+using UnityEditor.Tilemaps;
+using System.Threading.Tasks;
 
 namespace DungeonShooter
 {
@@ -16,7 +20,7 @@ namespace DungeonShooter
         Awaitable<TileBase> GetGroundTile();
         Awaitable<TileBase> GetTile(string address);
         Awaitable<Enemy> GetRandomEnemy();
-        Awaitable<GameObject> GetGameObject(string address);
+        Awaitable<GameObject> GetInstance(string address);
     }
     /// <summary>
     /// 현재 스테이지에 적절한 타일, 캐릭터를 제공하는 클래스
@@ -28,11 +32,14 @@ namespace DungeonShooter
         private List<string> EnemyAddresses { get; set; }
         private bool _isInitialized;
         private Awaitable _initializationTask;
-        
-        public StageResourceProvider(StageConfig config)
+        private IObjectResolver _resolver;
+
+        [Inject]
+        public StageResourceProvider(StageContext context, IObjectResolver resolver)
         {
             _addressablesScope = new AddressablesScope();
-            _stageConfig = config;
+            _stageConfig = context.StageConfig;
+            _resolver = resolver;
         }
 
         /// <summary>
@@ -62,19 +69,16 @@ namespace DungeonShooter
         /// </summary>
         private async Awaitable EnsureInitializedAsync()
         {
-            if (_isInitialized)
-            {
-                return;
-            }
-
-            if (_initializationTask == null)
+            if (_isInitialized == false)
             {
                 _initializationTask = InitializeAsync();
             }
-
-            await _initializationTask;
+            
+            if (_initializationTask != null)
+            {
+                await _initializationTask;
+            }
         }
-        
     
         /// <summary>
         /// Wall 타일을 가져옵니다.
@@ -102,7 +106,6 @@ namespace DungeonShooter
         public async Awaitable<Enemy> GetRandomEnemy()
         {
             await EnsureInitializedAsync();
-
             if (EnemyAddresses == null || EnemyAddresses.Count == 0)
             {
                 Debug.LogWarning($"[{nameof(StageResourceProvider)}] 적 어드레스 목록이 비어있습니다.");
@@ -112,20 +115,14 @@ namespace DungeonShooter
             // 랜덤으로 하나 선택
             var enemyAddress = EnemyAddresses[UnityEngine.Random.Range(0, EnemyAddresses.Count)];
 
-            // 적 프리팹 로드
-            var enemyPrefabHandle = _addressablesScope.LoadAssetAsync<GameObject>(enemyAddress);
-            await enemyPrefabHandle.Task;
-
-            if (enemyPrefabHandle.Status != UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+            var enemyInstance = await GetInstance(enemyAddress);
+            if (enemyInstance == null)
             {
-                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 적 프리팹 로드 실패: {enemyAddress}");
+                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 적 인스턴스 생성 실패: {enemyAddress}");
                 return null;
             }
 
-            var enemyPrefab = enemyPrefabHandle.Result;
-            var enemyInstance = Object.Instantiate(enemyPrefab);
             var enemy = enemyInstance.GetComponent<Enemy>();
-
             if (enemy == null)
             {
                 Debug.LogWarning($"[{nameof(StageResourceProvider)}] 프리팹에 Enemy 컴포넌트가 없습니다: {enemyAddress}");
@@ -137,12 +134,26 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 주소에 해당하는 게임 오브젝트를 생성합니다.
+        /// 주소에 해당하는 인스턴스를 생성하고 의존성 주입
         /// </summary>
-        public async Awaitable<GameObject> GetGameObject(string address)
+        public async Awaitable<GameObject> GetInstance(string address)
         {
             var handle = _addressablesScope.InstantiateAsync(address);
             await handle.Task;
+
+            if (handle.Status != UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 인스턴스 생성 실패: {address}");
+                return null;
+            }
+
+            if (handle.Result == null)
+            {
+                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 인스턴스가 null입니다: {address}");
+                return null;
+            }
+
+            _resolver?.InjectGameObject(handle.Result);
             return handle.Result;
         }
 

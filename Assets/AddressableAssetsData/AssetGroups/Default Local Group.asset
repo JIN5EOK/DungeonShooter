@@ -21,8 +21,19 @@ MonoBehaviour:
     m_SerializedLabels:
     - RoomData_001
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0fb156dbd3e134da988e9aa7ce7b2391
+    m_Address: RandomEnemySpawn
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 36b9e7a8dc77e4b55b3e0302990009d6
     m_Address: Stage001_0002
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RoomData_001
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8a4d5face077b4eec84984c7e30f619a
+    m_Address: Stage001_0003
     m_ReadOnly: 0
     m_SerializedLabels:
     - RoomData_001

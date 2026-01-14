@@ -28,7 +28,8 @@ MonoBehaviour:
   - m_GUID: 6b7834735c593404985a61a391818e86
     m_Address: Enemy
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Stage001_Enemy
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: ff2f738c00cb84c36a2dfb5e186b5ebf, type: 2}

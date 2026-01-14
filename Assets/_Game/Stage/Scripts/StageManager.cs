@@ -12,10 +12,15 @@ namespace DungeonShooter
         public Stage Stage => _stage;
         public StageComponent StageComponent => _stageComponent;
         
+        private RoomDataRepository _roomDataRepository;
+        private StageResourceProvider _stageResourceProvider;
+
         [Inject]
-        public void Construct(StageContext context)
+        public void Construct(StageContext context, RoomDataRepository roomDataRepository, StageResourceProvider stageResourceProvider)
         {
             _context = context;
+            _roomDataRepository = roomDataRepository;
+            _stageResourceProvider = stageResourceProvider;
         }
         
         public void Start()
@@ -28,13 +33,8 @@ namespace DungeonShooter
         /// </summary>
         private async void CreateStageAsync()
         {
-            // 방 데이터 제공
-            var roomDataRepository = new RoomDataRepository(_context.StageConfig);
-            // 스테이지 리소스 제공
-            var stageResourceProvider = new StageResourceProvider(_context.StageConfig);
-            
-            _stage = await StageGenerator.GenerateStage(roomDataRepository, 15);
-            var stageObj = await StageInstantiator.InstantiateStage(stageResourceProvider, _stage);
+            _stage = await StageGenerator.GenerateStage(_roomDataRepository, 15);
+            var stageObj = await StageInstantiator.InstantiateStage(_stageResourceProvider, _stage);
             _stageComponent = stageObj.GetComponent<StageComponent>();
         }
         

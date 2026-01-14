@@ -4,6 +4,7 @@ using System.Linq;
 using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using VContainer;
 using Random = UnityEngine.Random;
 
 namespace DungeonShooter
@@ -23,9 +24,10 @@ namespace DungeonShooter
         private bool _isInitialized;
         private Awaitable _initializationTask;
 
-        public RoomDataRepository(StageConfig config)
+        [Inject]
+        public RoomDataRepository(StageContext stageContext)
         {
-            _stageConfig = config;
+            _stageConfig = stageContext.StageConfig;
         }
 
         /// <summary>

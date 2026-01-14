@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Jin5eok;
+using VContainer.Unity;
 
 namespace DungeonShooter
 {
@@ -143,7 +144,7 @@ namespace DungeonShooter
             await InstantiateDecoTilemapsAsync(room.RoomData, tilemapsParent, roomComponent.AddressablesScope);
 
             // 오브젝트 생성 및 배치 (비동기)
-            await InstantiateObjectsAsync(room.RoomData, objectsParent, roomComponent.AddressablesScope);
+            await InstantiateObjectsAsync(room.RoomData, objectsParent, resourceProvider);
 
             return roomObj;
         }
@@ -246,19 +247,16 @@ namespace DungeonShooter
         private static async Task InstantiateObjectsAsync(
             RoomData roomData,
             Transform objectsParent,
-            Jin5eok.AddressablesScope addressablesScope)
+            IStageResourceProvider resourceProvider)
         {
             foreach (var objectData in roomData.Objects)
             {
                 var address = roomData.GetAddress(objectData.Index);
                 if (string.IsNullOrEmpty(address)) continue;
 
-                var handle = addressablesScope.InstantiateAsync(address);
-                await handle.Task;
-
-                if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+                var instance = await resourceProvider.GetInstance(address);
+                if (instance != null)
                 {
-                    var instance = handle.Result;
                     instance.transform.SetParent(objectsParent);
                     instance.transform.position = new Vector3(objectData.Position.x, objectData.Position.y, 0);
                     instance.transform.rotation = objectData.Rotation;
@@ -273,16 +271,24 @@ namespace DungeonShooter
         /// <param name="roomObj">대상 GameObject (null이면 새로 생성)</param>
         /// <param name="parent">부모 Transform (roomObj가 null일 때만 사용, null이면 씬 루트)</param>
         /// <param name="roomName">생성될 게임오브젝트 이름 (roomObj가 null일 때만 사용)</param>
+        /// <param name="resourceProvider">리소스 제공자</param>
         /// <returns>생성되거나 수정된 게임오브젝트</returns>
         public static GameObject InstantiateRoomEditor(
             RoomData roomData,
             GameObject roomObj = null,
             Transform parent = null,
-            string roomName = "Room")
+            string roomName = "Room",
+            IStageResourceProvider resourceProvider = null)
         {
             if (roomData == null)
             {
                 Debug.LogError($"[{nameof(StageInstantiator)}] RoomData가 null입니다.");
+                return null;
+            }
+
+            if (resourceProvider == null)
+            {
+                Debug.LogError($"[{nameof(StageInstantiator)}] ResourceProvider가 null입니다.");
                 return null;
             }
 
@@ -292,7 +298,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            // AddressablesScope 생성 (에디터에서도 사용)
+            // AddressablesScope 생성 (타일맵용, 에디터에서도 사용)
             using var addressablesScope = new AddressablesScope();
 
             // 타일맵 생성 및 배치 (비동기 메서드를 동기적으로 실행)
@@ -300,7 +306,7 @@ namespace DungeonShooter
             tilemapsTask.Wait();
 
             // 오브젝트 생성 및 배치 (비동기 메서드를 동기적으로 실행)
-            var objectsTask = InstantiateObjectsAsync(roomData, objectsParent, addressablesScope);
+            var objectsTask = InstantiateObjectsAsync(roomData, objectsParent, resourceProvider);
             objectsTask.Wait();
 
             return roomObj ?? tilemapsParent.parent.gameObject;

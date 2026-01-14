@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: e727023362f784fb398d507d154abd24
   m_currentHash:
     serializedVersion: 2
-    Hash: c98916960cb155570c78c6461c431bb2
+    Hash: 00000000000000000000000000000000
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -104,6 +104,8 @@ MonoBehaviour:
     m_LabelNames:
     - default
     - RoomData_001
+    - Stage001
+    - Stage001_Enemy
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 8f3f610015f81434d9df3a6bf63ee347, type: 2}

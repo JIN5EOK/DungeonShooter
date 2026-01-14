@@ -25,16 +25,22 @@ namespace DungeonShooter
         private string _savePath = "Assets/";
 
         [SerializeField]
+        [Tooltip("저장할 파일 이름 (확장자 제외, 비어있으면 게임오브젝트 이름 사용)")]
+        private string _fileName;
+
+        [SerializeField]
         [Tooltip("불러오기 경로")]
         private string _loadPath;
 
         public string SavePath => _savePath;
         public string LoadPath => _loadPath;
+        public string FileName => _fileName;
         public int RoomSizeX => _roomSizeX;
         public int RoomSizeY => _roomSizeY;
 
         public void SetSavePath(string path) => _savePath = path;
         public void SetLoadPath(string path) => _loadPath = path;
+        public void SetFileName(string fileName) => _fileName = fileName;
 
         /// <summary>
         /// Tilemaps와 Objects 게임 오브젝트 자식 구조를 생성합니다.
@@ -57,7 +63,11 @@ namespace DungeonShooter
                 return;
             }
 
-            var fileName = $"{gameObject.name}.json";
+            var fileName = string.IsNullOrEmpty(_fileName) ? gameObject.name : _fileName;
+            if (!fileName.EndsWith(".json"))
+            {
+                fileName += ".json";
+            }
             var fullPath = System.IO.Path.Combine(_savePath, fileName);
             RoomDataSerializer.SaveToFile(roomData, fullPath);
 

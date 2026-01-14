@@ -24,14 +24,8 @@ MonoBehaviour:
     m_SubObjectType: 
     m_SubObjectGUID: 
     m_EditorAssetChanged: 1
-  _topTile:
-    m_AssetGUID: 8ae768ec2eaa94277b11eadec1b2f793
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 1
   _stageEnemyLabel:
-    m_LabelString: 
+    m_LabelString: Stage001_Enemy
   _startRoomDataLabel:
     m_LabelString: RoomData_001
   _normalRoomDataLabel:
