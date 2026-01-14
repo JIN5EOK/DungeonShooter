@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using DungeonShooter;
+using Jin5eok;
+
 public class Player : EntityBase
 {
     [Header("스탯 컴포넌트")]
@@ -50,32 +52,18 @@ public class Player : EntityBase
     protected override void Start()
     {
         base.Start();
-        statsComponent = statsComponent ?? GetComponent<EntityStatsComponent>();
-        ApplyStatsFromComponent();
-
-        SubscribeInputEvent();
-
-        // 쿨다운 컴포넌트 초기화
-        _cooldownComponent = GetComponent<CooldownComponent>();
-        _cooldownComponent = _cooldownComponent ?? gameObject.AddComponent<CooldownComponent>();
-
-        // 분리된 동작 컴포넌트들 초기화
-        _movementComponent = GetComponent<MovementComponent>();
-        _movementComponent = _movementComponent ?? gameObject.AddComponent<MovementComponent>();
-    
-        _movementComponent.MoveSpeed = moveSpeed;
-
-        _dashComponent = GetComponent<DashComponent>();
-        _dashComponent = _dashComponent ?? gameObject.AddComponent<DashComponent>();
+        statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
         
+        SubscribeInputEvent();
+        
+        _cooldownComponent = gameObject.AddOrGetComponent<CooldownComponent>();
+        _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
+        
+        _dashComponent = gameObject.AddOrGetComponent<DashComponent>();
         _dashComponent.Initialize(_cooldownComponent);
-
-        // 체력 컴포넌트 초기화
-        _healthComponent = GetComponent<HealthComponent>();
-        _healthComponent = _healthComponent ?? gameObject.AddComponent<HealthComponent>();
-
+        
         // 체력 이벤트 구독
-        _healthComponent.OnDamaged += HandleDamaged;
+        _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();
         _healthComponent.OnDeath += HandleDeath;
 
         // 쿨타임 등록
@@ -91,15 +79,6 @@ public class Player : EntityBase
         {
             InitializeSkillVisualizers();
         }
-    }
-
-    private void ApplyStatsFromComponent()
-    {
-        if (statsComponent == null) return;
-
-        moveSpeed = statsComponent.MoveSpeed;
-        _maxHealthCache = statsComponent.MaxHealth;
-        // 공격력/공격범위/쿨다운은 Player 스킬별 세팅과 별도라 여기서는 미적용
     }
 
     /// <summary>
@@ -164,7 +143,6 @@ public class Player : EntityBase
         // 이벤트 구독 해제
         if (_healthComponent != null)
         {
-            _healthComponent.OnDamaged -= HandleDamaged;
             _healthComponent.OnDeath -= HandleDeath;
         }
     }
@@ -560,19 +538,6 @@ public class Player : EntityBase
     // ==================== 체력 이벤트 핸들러 ====================
 
     /// <summary>
-    /// 데미지를 받았을 때 처리
-    /// </summary>
-    private void HandleDamaged(int damage, int remainingHealth)
-    {
-        Debug.Log($"[{nameof(Player)}] 피격! 데미지: {damage}, 남은 HP: {remainingHealth}");
-
-        // TODO: 추가 피격 효과
-        // - 피격 사운드
-        // - 화면 흔들림
-        // - 파티클 이펙트
-    }
-
-    /// <summary>
     /// 사망 처리
     /// </summary>
     private void HandleDeath()
@@ -584,15 +549,8 @@ public class Player : EntityBase
         Debug.Log($"[{nameof(Player)}] 플레이어 사망!");
 
         // 모든 입력 및 로직 비활성화
-        enabled = false; // MonoBehaviour 비활성화 (Update, FixedUpdate 중지)
-
-        // TODO: 사망 효과 추가
-        // - 사망 애니메이션
-        // - 사망 사운드
-        // - 게임 오버 UI 표시
-        // - 리스폰 시스템
-
-        // 게임 오버 처리
+        enabled = false;
+        
         StartCoroutine(GameOverSequence());
     }
 
@@ -626,35 +584,5 @@ public class Player : EntityBase
         UnityEngine.SceneManagement.SceneManager.LoadScene(
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
         );
-    }
-
-    // ==================== 체력 관련 Public 메서드 ====================
-
-    /// <summary>
-    /// 현재 체력 반환
-    /// </summary>
-    public int GetCurrentHealth()
-    {
-        return _healthComponent != null ? _healthComponent.CurrentHealth : 0;
-    }
-
-    /// <summary>
-    /// 최대 체력 반환
-    /// </summary>
-    public int GetMaxHealth()
-    {
-        return _healthComponent != null ? _healthComponent.MaxHealth : _maxHealthCache;
-    }
-
-    /// <summary>
-    /// 체력 회복
-    /// </summary>
-    public void Heal(int amount)
-    {
-        if (_healthComponent != null && !_isDead)
-        {
-            _healthComponent.Heal(amount);
-            Debug.Log($"[{nameof(Player)}] 체력 회복: +{amount}");
-        }
     }
 }

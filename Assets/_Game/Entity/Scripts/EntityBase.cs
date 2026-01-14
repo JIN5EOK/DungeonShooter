@@ -2,9 +2,6 @@ using UnityEngine;
 
 public abstract class EntityBase : MonoBehaviour
 {
-    [Header("기본 설정")]
-    [SerializeField] protected float moveSpeed = 5f;
-
     protected Rigidbody2D rb;
 
     protected virtual void Start()

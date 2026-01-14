@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using DungeonShooter;
+using Jin5eok;
 using VContainer;
 
 public enum EnemyState
@@ -21,7 +22,6 @@ public class Enemy : EntityBase
     [Header("AI 설정")]
     [SerializeField] private float detectionRange = 10f;
     [SerializeField] private float patrolRange = 5f;
-    [SerializeField] private float patrolSpeed = 2f;
     [SerializeField] private float idleTime = 2f;
 
     [Header("피격 설정")]
@@ -73,19 +73,15 @@ public class Enemy : EntityBase
     protected override void Start()
     {
         base.Start();
-        statsComponent = statsComponent ?? GetComponent<EntityStatsComponent>();
+        statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
         _playerTransform = FindFirstObjectByType<Player>().transform;
-
-        // 쿨다운 컴포넌트 초기화
-        _cooldownComponent = GetComponent<CooldownComponent>();
-        _cooldownComponent = _cooldownComponent ?? gameObject.AddComponent<CooldownComponent>();
+        
+        _cooldownComponent = gameObject.AddOrGetComponent<CooldownComponent>();
         _cooldownComponent.RegisterCooldown("attack", GetAttackCooldown());
         _cooldownComponent.RegisterCooldown("hitStun", hitStunDuration);
-
-        // 이동 컴포넌트 초기화
-        _movementComponent = GetComponent<MovementComponent>();
-        _movementComponent = _movementComponent ?? gameObject.AddComponent<MovementComponent>();
-        _movementComponent.MoveSpeed = moveSpeed;
+        
+        _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
+        _movementComponent.MoveSpeed = statsComponent.MoveSpeed;
 
         // 순찰 초기화
         _patrolStartPos = transform.position;
@@ -206,7 +202,7 @@ public class Enemy : EntityBase
                 _movementComponent.Move();
                 break;
             case EnemyState.Patrol:
-                MoveTowardsTarget(_patrolTargetPos, patrolSpeed);
+                MoveTowardsTarget(_patrolTargetPos);
                 break;
             case EnemyState.Chase:
                 if (_playerTransform != null)
@@ -277,15 +273,13 @@ public class Enemy : EntityBase
     private void MoveTowardsPlayer()
     {
         var directionToPlayer = (_playerTransform.position - transform.position).normalized;
-        _movementComponent.MoveSpeed = moveSpeed;
         _movementComponent.Direction = directionToPlayer;
         _movementComponent.Move();
     }
 
-    private void MoveTowardsTarget(Vector2 target, float speed)
+    private void MoveTowardsTarget(Vector2 target)
     {
         var direction = (target - (Vector2)transform.position).normalized; ;
-        _movementComponent.MoveSpeed = speed;
         _movementComponent.Direction = direction;
         _movementComponent.Move();
     }
@@ -421,10 +415,6 @@ public class Enemy : EntityBase
             _knockbackDirection = ((Vector2)transform.position - (Vector2)_playerTransform.position).normalized;
             rb.linearVelocity = _knockbackDirection * knockbackForce;
         }
-
-        // TODO: 추가 피격 효과
-        // - 피격 사운드
-        // - 파티클 이펙트
     }
 
     private void HandleDeath()
