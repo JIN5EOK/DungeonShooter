@@ -42,10 +42,9 @@ public class DashComponent : MonoBehaviour
     /// <summary>
     /// 이동 입력과 마지막 바라본 방향을 설정합니다.
     /// </summary>
-    public void SetInputs(Vector2 moveInput, Vector2 lastFacingDirection)
+    public void SetInputs(Vector2 moveInput)
     {
         _moveInput = moveInput;
-        _lastFacingDirection = lastFacingDirection;
     }
 
     /// <summary>
@@ -77,7 +76,7 @@ public class DashComponent : MonoBehaviour
 
         _dashTimer -= Time.fixedDeltaTime;
         
-        var dashDirection = _moveInput.magnitude > 0 ? _moveInput.normalized : _lastFacingDirection;
+        var dashDirection = _moveInput.normalized;
         _rigidbody.linearVelocity = dashDirection * _dashSpeed;
 
         if (_dashTimer <= 0)

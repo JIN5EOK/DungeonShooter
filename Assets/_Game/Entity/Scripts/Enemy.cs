@@ -90,7 +90,7 @@ public class Enemy : EntityBase
         // 이동 컴포넌트 초기화
         _movementComponent = GetComponent<MovementComponent>();
         _movementComponent = _movementComponent ?? gameObject.AddComponent<MovementComponent>();
-        _movementComponent.SetMoveSpeed(moveSpeed);
+        _movementComponent.MoveSpeed = moveSpeed;
 
         // SpriteRenderer 초기화
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -149,7 +149,7 @@ public class Enemy : EntityBase
         // MovementComponent와 동기화 (있을 경우)
         if (_movementComponent != null)
         {
-            _movementComponent.SetMoveSpeed(moveSpeed);
+            _movementComponent.MoveSpeed = moveSpeed;
         }
 
         // HealthComponent와 동기화 (있을 경우)
@@ -234,7 +234,7 @@ public class Enemy : EntityBase
         switch (_currentState)
         {
             case EnemyState.Idle:
-                _movementComponent.SetMoveInput(Vector2.zero);
+                _movementComponent.Direction = Vector2.zero;
                 _movementComponent.Move();
                 break;
             case EnemyState.Patrol:
@@ -248,7 +248,7 @@ public class Enemy : EntityBase
                 // 피격 시 약간의 넉백
                 break;
             default:
-                _movementComponent.SetMoveInput(Vector2.zero);
+                _movementComponent.Direction = Vector2.zero;
                 _movementComponent.Move();
                 break;
         }
@@ -309,18 +309,16 @@ public class Enemy : EntityBase
     private void MoveTowardsPlayer()
     {
         var directionToPlayer = (_playerTransform.position - transform.position).normalized;
-        UpdateFacingDirection(directionToPlayer);
-        _movementComponent.SetMoveSpeed(moveSpeed);
-        _movementComponent.SetMoveInput(directionToPlayer);
+        _movementComponent.MoveSpeed = moveSpeed;
+        _movementComponent.Direction = directionToPlayer;
         _movementComponent.Move();
     }
 
     private void MoveTowardsTarget(Vector2 target, float speed)
     {
-        var direction = (target - (Vector2)transform.position).normalized;
-        UpdateFacingDirection(direction);
-        _movementComponent.SetMoveSpeed(speed);
-        _movementComponent.SetMoveInput(direction);
+        var direction = (target - (Vector2)transform.position).normalized; ;
+        _movementComponent.MoveSpeed = speed;
+        _movementComponent.Direction = direction;
         _movementComponent.Move();
     }
 

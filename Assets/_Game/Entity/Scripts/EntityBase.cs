@@ -6,7 +6,6 @@ public abstract class EntityBase : MonoBehaviour
     [SerializeField] protected float moveSpeed = 5f;
 
     protected Rigidbody2D rb;
-    protected Vector2 lastFacingDirection = Vector2.right;
 
     protected virtual void Start()
     {
@@ -21,14 +20,6 @@ public abstract class EntityBase : MonoBehaviour
             rb = gameObject.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-        }
-    }
-
-    protected void UpdateFacingDirection(Vector2 direction)
-    {
-        if (direction.magnitude > 0)
-        {
-            lastFacingDirection = direction.normalized;
         }
     }
 

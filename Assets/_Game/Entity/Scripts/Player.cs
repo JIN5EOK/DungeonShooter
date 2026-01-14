@@ -69,7 +69,7 @@ public class Player : EntityBase
         _movementComponent = GetComponent<MovementComponent>();
         _movementComponent = _movementComponent ?? gameObject.AddComponent<MovementComponent>();
     
-        _movementComponent.SetMoveSpeed(moveSpeed);
+        _movementComponent.MoveSpeed = moveSpeed;
 
         _dashComponent = GetComponent<DashComponent>();
         _dashComponent = _dashComponent ?? gameObject.AddComponent<DashComponent>();
@@ -198,8 +198,7 @@ public class Player : EntityBase
             {
                 moveInput = _inputManager.MoveInput;
             }
-            _movementComponent.SetMoveInput(moveInput);
-            UpdateFacingDirection(moveInput);
+            _movementComponent.Direction = moveInput;
         }
     }
 
@@ -211,7 +210,7 @@ public class Player : EntityBase
         // 구르기 중에는 입력 업데이트
         if (_dashComponent.IsDashing)
         {
-            _dashComponent.SetInputs(_movementComponent.GetMoveInput(), lastFacingDirection);
+            _dashComponent.SetInputs(_movementComponent.Direction);
             _dashComponent.UpdateDash();
             return;
         }
@@ -258,12 +257,12 @@ public class Player : EntityBase
     // ==================== 입력 처리 ====================
     private void HandleMoveInputChanged(Vector2 input)
     {
-        _movementComponent.SetMoveInput(input);
+        _movementComponent.Direction = input;
     }
 
     private void HandleDashInput()
     {
-        _dashComponent.SetInputs(_movementComponent.GetMoveInput(), lastFacingDirection);
+        _dashComponent.SetInputs(_movementComponent.Direction);
         _dashComponent.StartDash();
     }
 
@@ -367,7 +366,7 @@ public class Player : EntityBase
         Debug.Log("스킬 1 - 전방 슬래시 공격");
         
         // 실제 공격 위치 계산 (PerformRangeAttack과 동일한 로직)
-        var attackPos = (Vector2)transform.position + lastFacingDirection * (3f / 2f);
+        var attackPos = (Vector2)transform.position + _movementComponent.Direction * (3f / 2f);
         
         // 스킬 범위 시각화 (실제 공격 위치에 정확히 표시)
         if (showSkillRanges && skill1Visualizer != null)
@@ -378,7 +377,7 @@ public class Player : EntityBase
             skill1Visualizer.Show();
         }
         
-        PerformRangeAttack(lastFacingDirection, range: 3f, radius: 1f, damage: skill1Damage);
+        PerformRangeAttack(_movementComponent.Direction, range: 3f, radius: 1f, damage: skill1Damage);
     }
 
     private void CastSkill2()
@@ -492,7 +491,7 @@ public class Player : EntityBase
         _isJumping = true;
         
         var startPos = (Vector2)transform.position;
-        var targetPos = startPos + lastFacingDirection * targetDistance;
+        var targetPos = startPos + _movementComponent.Direction * targetDistance;
         
         Debug.Log($"[스킬3] 점프 시작! {startPos} → {targetPos}");
         

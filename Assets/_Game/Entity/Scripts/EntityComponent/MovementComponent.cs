@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -9,46 +10,26 @@ public class MovementComponent : MonoBehaviour
     [Header("이동 설정")]
     [SerializeField] private float _moveSpeed = 5f;
 
+    public Vector2 Direction { get; set; }
+    public float MoveSpeed { get; set; }
     private Rigidbody2D _rigidbody;
-    private Vector2 _moveInput;
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
     }
-
-    /// <summary>
-    /// 이동 입력을 설정합니다.
-    /// </summary>
-    public void SetMoveInput(Vector2 input)
-    {
-        _moveInput = input;
-    }
-
+    
     /// <summary>
     /// 캐릭터를 이동시킵니다.
     /// </summary>
     public void Move()
     {
-        var velocity = _moveInput.normalized * _moveSpeed;
+        var velocity = Direction.normalized * _moveSpeed;
         _rigidbody.linearVelocity = velocity;
     }
 
-    /// <summary>
-    /// 현재 이동 입력을 반환합니다.
-    /// </summary>
-    public Vector2 GetMoveInput() => _moveInput;
-
-    /// <summary>
-    /// 이동 속도를 설정합니다.
-    /// </summary>
-    public void SetMoveSpeed(float speed)
+    public void Update()
     {
-        _moveSpeed = speed;
+        Move();
     }
-
-    /// <summary>
-    /// 이동 속도를 반환합니다.
-    /// </summary>
-    public float GetMoveSpeed() => _moveSpeed;
 }
