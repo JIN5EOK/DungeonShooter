@@ -30,10 +30,8 @@ namespace DungeonShooter
         {
             // 방 데이터 제공
             var roomDataRepository = new RoomDataRepository(_context.StageConfig);
-            await roomDataRepository.InitializeAsync();
             // 스테이지 리소스 제공
             var stageResourceProvider = new StageResourceProvider(_context.StageConfig);
-            await stageResourceProvider.InitializeAsync();
             
             _stage = await StageGenerator.GenerateStage(roomDataRepository, 15);
             var stageObj = await StageInstantiator.InstantiateStage(stageResourceProvider, _stage);

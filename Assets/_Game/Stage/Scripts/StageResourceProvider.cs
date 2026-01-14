@@ -26,6 +26,8 @@ namespace DungeonShooter
         private readonly AddressablesScope _addressablesScope;
         private readonly StageConfig _stageConfig;
         private List<string> EnemyAddresses { get; set; }
+        private bool _isInitialized;
+        private Awaitable _initializationTask;
         
         public StageResourceProvider(StageConfig config)
         {
@@ -36,8 +38,13 @@ namespace DungeonShooter
         /// <summary>
         /// StageConfig의 Label 데이터를 기반으로 에셋의 어드레스 목록을 로드하여 저장합니다.
         /// </summary>
-        public async Awaitable InitializeAsync()
+        private async Awaitable InitializeAsync()
         {
+            if (_isInitialized)
+            {
+                return;
+            }
+
             if (!string.IsNullOrEmpty(_stageConfig.StageEnemyLabel.labelString))
             {
                 var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.StageEnemyLabel.labelString);
@@ -46,6 +53,26 @@ namespace DungeonShooter
 
                 Addressables.Release(handle);
             }
+
+            _isInitialized = true;
+        }
+
+        /// <summary>
+        /// 초기화가 완료될 때까지 대기합니다. 이미 초기화되어 있으면 즉시 반환합니다.
+        /// </summary>
+        private async Awaitable EnsureInitializedAsync()
+        {
+            if (_isInitialized)
+            {
+                return;
+            }
+
+            if (_initializationTask == null)
+            {
+                _initializationTask = InitializeAsync();
+            }
+
+            await _initializationTask;
         }
         
     
@@ -74,9 +101,11 @@ namespace DungeonShooter
         /// </summary>
         public async Awaitable<Enemy> GetRandomEnemy()
         {
+            await EnsureInitializedAsync();
+
             if (EnemyAddresses == null || EnemyAddresses.Count == 0)
             {
-                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 적 어드레스 목록이 초기화되지 않았습니다. InitializeAsync를 먼저 호출하세요.");
+                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 적 어드레스 목록이 비어있습니다.");
                 return null;
             }
 

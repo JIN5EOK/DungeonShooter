@@ -20,6 +20,8 @@ namespace DungeonShooter
         private List<string> StartRoomDataAddresses { get; set; }
         private List<string> NormalRoomDataAddresses { get; set; }
         private List<string> BossRoomDataAddresses { get; set; }
+        private bool _isInitialized;
+        private Awaitable _initializationTask;
 
         public RoomDataRepository(StageConfig config)
         {
@@ -29,8 +31,13 @@ namespace DungeonShooter
         /// <summary>
         /// StageConfig의 Label 데이터를 기반으로 에셋의 어드레스 목록을 로드하여 저장합니다.
         /// </summary>
-        public async Awaitable InitializeAsync()
+        private async Awaitable InitializeAsync()
         {
+            if (_isInitialized)
+            {
+                return;
+            }
+
             if (!string.IsNullOrEmpty(_stageConfig.StartRoomDataLabel.labelString))
             {
                 var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.StartRoomDataLabel.labelString);
@@ -57,6 +64,26 @@ namespace DungeonShooter
 
                 Addressables.Release(handle);
             }
+
+            _isInitialized = true;
+        }
+
+        /// <summary>
+        /// 초기화가 완료될 때까지 대기합니다. 이미 초기화되어 있으면 즉시 반환합니다.
+        /// </summary>
+        private async Awaitable EnsureInitializedAsync()
+        {
+            if (_isInitialized)
+            {
+                return;
+            }
+
+            if (_initializationTask == null)
+            {
+                _initializationTask = InitializeAsync();
+            }
+
+            await _initializationTask;
         }
 
         /// <summary>
@@ -66,7 +93,16 @@ namespace DungeonShooter
         /// <returns>방 데이터</returns>
         public async Awaitable<RoomData> GetRandomRoom(RoomType type)
         {
+            await EnsureInitializedAsync();
+
             var targetAddresses = type == RoomType.Start ? StartRoomDataAddresses : type == RoomType.Normal ? NormalRoomDataAddresses : BossRoomDataAddresses;
+            
+            if (targetAddresses == null || targetAddresses.Count == 0)
+            {
+                Debug.LogWarning($"[{nameof(RoomDataRepository)}] {type} 타입의 방 데이터 주소 목록이 비어있습니다.");
+                return null;
+            }
+
             var targetAddress = targetAddresses[Random.Range(0, targetAddresses.Count)];
             var handle = _addressablesScope.LoadAssetAsync<TextAsset>(targetAddress);
             await handle.Task;
