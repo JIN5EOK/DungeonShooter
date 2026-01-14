@@ -21,31 +21,29 @@
     * 상호작용 오브젝트로 플레이어가 다가와 상호작용하면 대화 이벤트를 발생시킨다
 
 ## 러프한 설계
-* Entity - Entity 공통 기능 정의, 혹여 공통 기능이 없더라도 Entity들의 공통 인터페이스 역할 수행
-* EntityComponent - 기능 컴포넌트, 예를들면 이동 컴포넌트, 구르기 컴포넌트
-    * 구체 Entity 클래스에 기능을 넣기보단 컴포넌트 기반으로 기능을 확장할 수 있도록 설계
-    * EntityStatsComponent
+* `Entity` - Entity 공통 기능 정의, 혹여 공통 기능이 없더라도 Entity들의 공통 인터페이스 역할 수행
+* `EntityComponent` - 기능 컴포넌트, 예를들면 이동 컴포넌트, 구르기 컴포넌트
+    * 구체 `Entity` 클래스에 기능을 넣기보단 컴포넌트 기반으로 기능을 확장할 수 있도록 설계
+    * `EntityStatsComponent`
         * 스탯 관련 기능과 스탯 수치 접근 담당
         * EntityStats - 체력, 공격력 등 스탯 데이터
             * 현재 상태를 저장하지는 않음, 예) 최대 체력값은 저장하지만 현재 체력값은 저장하지 않는다
-    * EntityBuffComponent
+    * `EntityBuffComponent`
         * 버프 및 상태이상 관리, 다른 컴포넌트에 영향을 줌
             * 예) 최대체력 하락 디버프가 생기면 EntityStatsComponent의 최대 체력 수치를 줄이고 디버프가 사라지면 다시 복구한다
             * 예) 체력회복 버프가 생기면 버프가 사라질때 까지 HealthComponent의 체력을 서서히 증가시킴
 
 ## 클래스 다이어그램
 
-* 확장성을 고려하여 상속구조가 아닌 참조 관계로 설계
-
 ### Entity 컴포넌트 함수/변수 명세
 
 ```mermaid
 classDiagram
     class PlayerComponent{
-        
+        // 플레이어 전용 기능, 입력 이벤트 할당 등
     }
     class EnemyComponent{
-
+        // 적 전용 기능
     }
     class MovementComponent{
         +MoveSpeed : float
@@ -78,4 +76,33 @@ classDiagram
     class DeathComponent{
         +Death() void // 사망 연출 담당
     }
+````
+```mermaid
+classDiagram
+    class BehaviourTreeComponent{
+        +SetBehaviourTree(BehaviourTreeNode bTNode) 
+    }
+```
+
+### 컴포넌트 참조 관계 
+```mermaid
+classDiagram
+    class EntityStatsComponent{
+    }
+
+    HealthComponent --> EntityStatsComponent : 체력 참고
+    MovementComponent --> EntityStatsComponent : 이동속도 참고
+```
+
+### 플레이어 게임 오브젝트 클래스 관계도
+```mermaid
+classDiagram
+    class PlayerCharacterConfig{
+        +Stats : EntityStats
+        // 그 외 초기화에 필요한 정보
+    }
+    
+    PlayerComponent --> PlayerCharacterConfig : 사용하여 플레이어 캐릭터 초기화, (스탯, 스킬 등..)
+    PlayerComponent --> InputManager : 플레이어 입력 이벤트 등록/해제
+    PlayerComponent --> EntityStatsComponent : 스텟 초기화
 ```
