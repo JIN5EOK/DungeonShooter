@@ -1,34 +1,42 @@
 using UnityEngine;
 using System;
+using Jin5eok;
 
 /// <summary>
 /// HP를 가진 엔티티에 부착하는 독립적인 컴포넌트
 /// </summary>
 public class HealthComponent : MonoBehaviour
 {
-    [Header("체력 설정")]
-    [SerializeField] private int maxHealth = 100;
-    [SerializeField] private bool startWithFullHealth = true; 
-    [SerializeField] private int currentHealth;
-
-    // 이벤트 시스템
     public event Action<int, int> OnHealthChanged; // (current, max)
     public event Action<int, int> OnDamaged; // (damage, currentHealth)
     public event Action<int, int> OnHealed; // (amount, currentHealth)
     public event Action OnDeath;
 
-    // 프로퍼티
-    public int CurrentHealth => currentHealth;
-    public int MaxHealth => maxHealth;
-    public bool IsDead => currentHealth <= 0;
-    public float HealthPercent => maxHealth > 0 ? (float)currentHealth / maxHealth : 0f;
+    public int MaxHealth
+    {
+        get => statsComponent.Stats.MaxHealth;
+    }
+    public int CurrentHealth { get; private set; }
+    public float HealthPercent => MaxHealth > 0 ? (float)CurrentHealth / MaxHealth : 0f;
+    public bool IsDead => CurrentHealth <= 0;
+    private Color hitColor = Color.red;
+    private float hitFlashDuration = 0.2f;
+    private Color deathColor = Color.gray;
+    private EntityStatsComponent statsComponent;
+    private SpriteRenderer _spriteRenderer;
+    private Color _originalColor;
+    private Rigidbody2D _rigidbody;
+    private Collider2D _collider;
 
     private void Awake()
     {
-        if (startWithFullHealth)
-        {
-            currentHealth = maxHealth;
-        }
+        statsComponent = ComponentExtension.AddOrGetComponent<EntityStatsComponent>(gameObject);
+        CurrentHealth = MaxHealth;
+
+        _spriteRenderer = ComponentExtension.AddOrGetComponent<SpriteRenderer>(gameObject);
+        _originalColor = _spriteRenderer.color;
+        _rigidbody = ComponentExtension.AddOrGetComponent<Rigidbody2D>(gameObject);
+        _collider = ComponentExtension.AddOrGetComponent<Collider2D>(gameObject);
     }
 
     /// <summary>
@@ -39,13 +47,19 @@ public class HealthComponent : MonoBehaviour
         if (IsDead) return;
         if (damage < 0) damage = 0;
 
-        currentHealth -= damage;
-        currentHealth = Mathf.Max(0, currentHealth);
+        CurrentHealth -= damage;
+        CurrentHealth = Mathf.Max(0, CurrentHealth);
 
-        OnDamaged?.Invoke(damage, currentHealth);
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        OnDamaged?.Invoke(damage, CurrentHealth);
+        OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
 
-        if (currentHealth <= 0)
+        // 피격 이펙트 실행
+        if (damage > 0)
+        {
+            StartCoroutine(HitFlashEffect());
+        }
+
+        if (CurrentHealth <= 0)
         {
             Die();
         }
@@ -59,35 +73,16 @@ public class HealthComponent : MonoBehaviour
         if (IsDead) return;
         if (amount < 0) amount = 0;
 
-        var oldHealth = currentHealth;
-        currentHealth += amount;
-        currentHealth = Mathf.Min(currentHealth, maxHealth);
+        var oldHealth = CurrentHealth;
+        CurrentHealth += amount;
+        CurrentHealth = Mathf.Min(CurrentHealth, MaxHealth);
 
-        var actualHealed = currentHealth - oldHealth;
+        var actualHealed = CurrentHealth - oldHealth;
         if (actualHealed > 0)
         {
-            OnHealed?.Invoke(actualHealed, currentHealth);
-            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            OnHealed?.Invoke(actualHealed, CurrentHealth);
+            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
         }
-    }
-
-    /// <summary>
-    /// 최대 체력을 변경합니다
-    /// </summary>
-    public void SetMaxHealth(int newMax, bool healToFull = false)
-    {
-        maxHealth = Mathf.Max(1, newMax);
-        
-        if (healToFull)
-        {
-            currentHealth = maxHealth;
-        }
-        else
-        {
-            currentHealth = Mathf.Min(currentHealth, maxHealth);
-        }
-
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
     /// <summary>
@@ -97,14 +92,42 @@ public class HealthComponent : MonoBehaviour
     {
         if (IsDead) return;
         
-        currentHealth = 0;
+        CurrentHealth = 0;
         Die();
     }
 
     private void Die()
     {
         OnDeath?.Invoke();
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+
+        // 사망 효과 실행
+        ApplyDeathEffects();
+    }
+
+    /// <summary>
+    /// 사망 시 시각적 효과 적용
+    /// </summary>
+    private void ApplyDeathEffects()
+    {
+        // 색상 변경
+        if (_spriteRenderer != null)
+        {
+            _spriteRenderer.color = deathColor;
+        }
+
+        // Rigidbody 정지
+        if (_rigidbody != null)
+        {
+            _rigidbody.linearVelocity = Vector2.zero;
+            _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
+        }
+
+        // Collider 비활성화
+        if (_collider != null)
+        {
+            _collider.enabled = false;
+        }
     }
 
     /// <summary>
@@ -112,6 +135,22 @@ public class HealthComponent : MonoBehaviour
     /// </summary>
     public void FullHeal()
     {
-        Heal(maxHealth);
+        Heal(MaxHealth);
+    }
+
+    /// <summary>
+    /// 피격 시 색상 변경 효과
+    /// </summary>
+    private System.Collections.IEnumerator HitFlashEffect()
+    {
+        if (_spriteRenderer == null) yield break;
+
+        // 빨간색으로 변경
+        _spriteRenderer.color = hitColor;
+
+        yield return new WaitForSeconds(hitFlashDuration);
+
+        // 원래 색상으로 복구
+        _spriteRenderer.color = _originalColor;
     }
 }

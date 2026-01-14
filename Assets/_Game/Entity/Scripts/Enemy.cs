@@ -27,8 +27,6 @@ public class Enemy : EntityBase
     [Header("피격 설정")]
     [SerializeField] private float hitStunDuration = 0.5f;
     [SerializeField] private float knockbackForce = 3f;
-    [SerializeField] private Color hitColor = Color.red;
-    [SerializeField] private float hitFlashDuration = 0.2f;
 
     [Header("사망 설정")]
     [SerializeField] private float deathDelay = 1f;
@@ -52,8 +50,6 @@ public class Enemy : EntityBase
     private CooldownComponent _cooldownComponent;
     private HealthComponent _healthComponent;
     private MovementComponent _movementComponent;
-    private SpriteRenderer _spriteRenderer;
-    private Color _originalColor;
 
     // AI 상태
     private EnemyState _currentState = EnemyState.Idle;
@@ -78,7 +74,6 @@ public class Enemy : EntityBase
     {
         base.Start();
         statsComponent = statsComponent ?? GetComponent<EntityStatsComponent>();
-        ApplyStatsFromComponent();
         _playerTransform = FindFirstObjectByType<Player>().transform;
 
         // 쿨다운 컴포넌트 초기화
@@ -91,13 +86,6 @@ public class Enemy : EntityBase
         _movementComponent = GetComponent<MovementComponent>();
         _movementComponent = _movementComponent ?? gameObject.AddComponent<MovementComponent>();
         _movementComponent.MoveSpeed = moveSpeed;
-
-        // SpriteRenderer 초기화
-        _spriteRenderer = GetComponent<SpriteRenderer>();
-        if (_spriteRenderer != null)
-        {
-            _originalColor = _spriteRenderer.color;
-        }
 
         // 순찰 초기화
         _patrolStartPos = transform.position;
@@ -139,27 +127,7 @@ public class Enemy : EntityBase
             }
         }
     }
-
-    private void ApplyStatsFromComponent()
-    {
-        if (statsComponent == null) return;
-
-        moveSpeed = statsComponent.MoveSpeed;
-
-        // MovementComponent와 동기화 (있을 경우)
-        if (_movementComponent != null)
-        {
-            _movementComponent.MoveSpeed = moveSpeed;
-        }
-
-        // HealthComponent와 동기화 (있을 경우)
-        var health = GetComponent<HealthComponent>();
-        if (health != null)
-        {
-            health.SetMaxHealth(statsComponent.MaxHealth, true);
-        }
-    }
-
+    
     private void OnDestroy()
     {
         // 이벤트 구독 해제
@@ -454,28 +422,9 @@ public class Enemy : EntityBase
             rb.linearVelocity = _knockbackDirection * knockbackForce;
         }
 
-        // 시각적 피드백
-        StartCoroutine(HitFlashEffect());
-
         // TODO: 추가 피격 효과
         // - 피격 사운드
         // - 파티클 이펙트
-    }
-
-    /// <summary>
-    /// 피격 시 색상 변경 효과
-    /// </summary>
-    private System.Collections.IEnumerator HitFlashEffect()
-    {
-        if (_spriteRenderer == null) yield break;
-
-        // 빨간색으로 변경
-        _spriteRenderer.color = hitColor;
-
-        yield return new WaitForSeconds(hitFlashDuration);
-
-        // 원래 색상으로 복구
-        _spriteRenderer.color = _originalColor;
     }
 
     private void HandleDeath()
@@ -496,19 +445,6 @@ public class Enemy : EntityBase
 
         // AI 및 물리 즉시 중지
         rb.linearVelocity = Vector2.zero;
-
-        // Collider 비활성화 (관통 방지)
-        var collider = GetComponent<Collider2D>();
-        if (collider != null)
-        {
-            collider.enabled = false;
-        }
-
-        // 사망 시각 효과
-        if (_spriteRenderer != null)
-        {
-            _spriteRenderer.color = Color.gray;
-        }
 
         // 즉시 비활성화 옵션
         if (disableOnDeath)

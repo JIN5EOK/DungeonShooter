@@ -23,10 +23,6 @@ public class Player : EntityBase
     [SerializeField] private float jumpDuration = 0.5f;
     [SerializeField] private float jumpHeight = 2f;
 
-    [Header("체력 설정")]
-    [SerializeField] private Color hitColor = Color.red;
-    [SerializeField] private float hitFlashDuration = 0.2f;
-
     [Header("스킬 범위 시각화")]
     [Tooltip("스킬 범위를 시각적으로 표시할지 여부")]
     [SerializeField] private bool showSkillRanges = true;
@@ -36,8 +32,6 @@ public class Player : EntityBase
 
     private CooldownComponent _cooldownComponent;
     private HealthComponent _healthComponent;
-    private SpriteRenderer _spriteRenderer;
-    private Color _originalColor;
     private bool _isJumping;
     private bool _isDead;
     private System.Threading.CancellationTokenSource _jumpCancellationTokenSource;
@@ -80,9 +74,6 @@ public class Player : EntityBase
         _healthComponent = GetComponent<HealthComponent>();
         _healthComponent = _healthComponent ?? gameObject.AddComponent<HealthComponent>();
 
-        // maxHealth 설정
-        _healthComponent.SetMaxHealth(_maxHealthCache, true); // healToFull = true로 체력 가득 채움
-
         // 체력 이벤트 구독
         _healthComponent.OnDamaged += HandleDamaged;
         _healthComponent.OnDeath += HandleDeath;
@@ -92,13 +83,6 @@ public class Player : EntityBase
         _cooldownComponent.RegisterCooldown("skill1", skill1Cooldown);
         _cooldownComponent.RegisterCooldown("skill2", skill2Cooldown);
         _cooldownComponent.RegisterCooldown("skill3", skill3Cooldown);
-        
-        // SpriteRenderer 초기화
-        _spriteRenderer = GetComponent<SpriteRenderer>();
-        if (_spriteRenderer != null)
-        {
-            _originalColor = _spriteRenderer.color;
-        }
 
         Debug.Log($"[{nameof(Player)}] 체력 시스템 초기화 완료: {_healthComponent.CurrentHealth}/{_healthComponent.MaxHealth}");
 
@@ -582,29 +566,10 @@ public class Player : EntityBase
     {
         Debug.Log($"[{nameof(Player)}] 피격! 데미지: {damage}, 남은 HP: {remainingHealth}");
 
-        // 시각적 피드백
-        StartCoroutine(HitFlashEffect());
-
         // TODO: 추가 피격 효과
         // - 피격 사운드
         // - 화면 흔들림
         // - 파티클 이펙트
-    }
-
-    /// <summary>
-    /// 피격 시 색상 변경 효과
-    /// </summary>
-    private System.Collections.IEnumerator HitFlashEffect()
-    {
-        if (_spriteRenderer == null) yield break;
-
-        // 빨간색으로 변경
-        _spriteRenderer.color = hitColor;
-
-        yield return new WaitForSeconds(hitFlashDuration);
-
-        // 원래 색상으로 복구
-        _spriteRenderer.color = _originalColor;
     }
 
     /// <summary>
@@ -618,25 +583,8 @@ public class Player : EntityBase
 
         Debug.Log($"[{nameof(Player)}] 플레이어 사망!");
 
-        // 물리 완전 중지
-        rb.linearVelocity = Vector2.zero;
-        rb.constraints = RigidbodyConstraints2D.FreezeAll; // 모든 움직임 고정
-
         // 모든 입력 및 로직 비활성화
         enabled = false; // MonoBehaviour 비활성화 (Update, FixedUpdate 중지)
-
-        // Collider 비활성화 (적과 충돌 방지)
-        var playerCollider = GetComponent<Collider2D>();
-        if (playerCollider != null)
-        {
-            playerCollider.enabled = false;
-        }
-
-        // 사망 시각 효과
-        if (_spriteRenderer != null)
-        {
-            _spriteRenderer.color = Color.gray;
-        }
 
         // TODO: 사망 효과 추가
         // - 사망 애니메이션
@@ -649,22 +597,23 @@ public class Player : EntityBase
     }
 
     /// <summary>
-    /// 게임 오버 시퀀스
+    /// 게임 오버 시퀀스, 나중에 분리 필요
     /// </summary>
     private System.Collections.IEnumerator GameOverSequence()
     {
         yield return new WaitForSeconds(1f); // 1초 대기
 
         // 페이드 아웃 효과 (선택사항)
-        if (_spriteRenderer != null)
+        var spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
         {
             var fadeTime = 1f;
-            var startColor = _spriteRenderer.color;
+            var startColor = spriteRenderer.color;
 
             for (float t = 0; t < fadeTime; t += Time.deltaTime)
             {
                 var alpha = Mathf.Lerp(1f, 0f, t / fadeTime);
-                _spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+                spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
                 yield return null;
             }
         }
