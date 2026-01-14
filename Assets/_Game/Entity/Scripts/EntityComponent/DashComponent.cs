@@ -1,3 +1,5 @@
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -28,6 +30,11 @@ public class DashComponent : MonoBehaviour
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
+    }
+
+    private void FixedUpdate()
+    {
+        UpdateDash();
     }
 
     /// <summary>
@@ -65,7 +72,7 @@ public class DashComponent : MonoBehaviour
     }
 
     /// <summary>
-    /// 구르기 상태를 업데이트합니다. FixedUpdate에서 호출해야 합니다.
+    /// 구르기 상태를 업데이트합니다.
     /// </summary>
     public void UpdateDash()
     {

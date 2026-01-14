@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -48,7 +49,7 @@ public class GameUIManager : MonoBehaviour
 
         // 플레이어 컴포넌트 참조
         _playerHealth = player.GetComponent<HealthComponent>();
-        _playerCooldowns = player.GetCooldownComponent();
+        _playerCooldowns = player.GetComponent<CooldownComponent>();
 
         // CooldownComponent가 아직 초기화 안 됐으면 재시도
         if (_playerCooldowns == null)
@@ -84,7 +85,7 @@ public class GameUIManager : MonoBehaviour
 
             if (player != null)
             {
-                _playerCooldowns = player.GetCooldownComponent();
+                _playerCooldowns = player.GetComponent<CooldownComponent>();
                 if (_playerCooldowns != null)
                 {
                     Debug.Log($"[{nameof(GameUIManager)}] CooldownComponent 초기화 완료! (재시도: {retryCount + 1}회)");

@@ -31,7 +31,7 @@ public class Player : EntityBase
     [SerializeField] private AttackRangeVisualizer skill1Visualizer; // 전방 슬래시
     [SerializeField] private AttackRangeVisualizer skill2Visualizer; // 회전 공격
     [SerializeField] private AttackRangeVisualizer skill3Visualizer; // 점프 공격
-
+    
     private CooldownComponent _cooldownComponent;
     private HealthComponent _healthComponent;
     private bool _isJumping;
@@ -145,44 +145,6 @@ public class Player : EntityBase
         {
             _healthComponent.OnDeath -= HandleDeath;
         }
-    }
-
-    private void Update()
-    {
-        // 죽었으면 입력 처리 중지
-        if (_isDead) return;
-        
-        if (!_isJumping)
-        {
-            // 입력 매니저에서 현재 이동 입력 값 가져오기
-            var moveInput = Vector2.zero;
-            if (_inputManager != null)
-            {
-                moveInput = _inputManager.MoveInput;
-            }
-            _movementComponent.Direction = moveInput;
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        // 죽었으면 물리 처리 중지
-        if (_isDead) return;
-
-        // 구르기 중에는 입력 업데이트
-        if (_dashComponent.IsDashing)
-        {
-            _dashComponent.SetInputs(_movementComponent.Direction);
-            _dashComponent.UpdateDash();
-            return;
-        }
-
-        if (_isJumping)
-        {
-            return;
-        }
-        
-        _movementComponent.Move();
     }
 
     // ==================== 입력 매니저 이벤트 구독/해제 ====================
@@ -523,20 +485,7 @@ public class Player : EntityBase
             _isJumping = false;
         }
     }
-
-    // ==================== UI 표시용 (옵션) ====================
-    public float GetDashCooldownPercent() => _dashComponent.GetCooldownPercent();
-    public float GetSkill1CooldownPercent() => _cooldownComponent.GetCooldownPercent("skill1");
-    public float GetSkill2CooldownPercent() => _cooldownComponent.GetCooldownPercent("skill2");
-    public float GetSkill3CooldownPercent() => _cooldownComponent.GetCooldownPercent("skill3");
-
-    /// <summary>
-    /// UI에서 쿨다운 컴포넌트 접근용
-    /// </summary>
-    public CooldownComponent GetCooldownComponent() => _cooldownComponent;
-
-    // ==================== 체력 이벤트 핸들러 ====================
-
+    
     /// <summary>
     /// 사망 처리
     /// </summary>
