@@ -3,8 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Jin5eok;
-using VContainer.Unity;
 
 namespace DungeonShooter
 {
@@ -141,7 +139,7 @@ namespace DungeonShooter
             await CreateBaseTilemapsAsync(resourceProvider, room, tilemapsParent);
 
             // RoomData의 타일을 Tilemap_Deco에 배치 (비동기)
-            await InstantiateDecoTilemapsAsync(room.RoomData, tilemapsParent, roomComponent.AddressablesScope);
+            await InstantiateDecoTilemapsAsync(room.RoomData, tilemapsParent, resourceProvider);
 
             // 오브젝트 생성 및 배치 (비동기)
             await InstantiateObjectsAsync(room.RoomData, objectsParent, resourceProvider);
@@ -181,7 +179,7 @@ namespace DungeonShooter
         private static async Task InstantiateDecoTilemapsAsync(
             RoomData roomData,
             Transform tilemapsParent,
-            Jin5eok.AddressablesScope addressablesScope)
+            IStageResourceProvider resourceProvider)
         {
             if (roomData.Tiles.Count == 0)
             {
@@ -221,12 +219,10 @@ namespace DungeonShooter
                     var address = roomData.GetAddress(index);
                     if (string.IsNullOrEmpty(address)) continue;
 
-                    var handle = addressablesScope.LoadAssetAsync<TileBase>(address);
-                    await handle.Task;
-
-                    if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+                    var tileBase = await resourceProvider.GetAsset<TileBase>(address);
+                    if (tileBase != null)
                     {
-                        tileCache[index] = handle.Result;
+                        tileCache[index] = tileBase;
                     }
                 }
 
@@ -298,11 +294,8 @@ namespace DungeonShooter
                 return null;
             }
 
-            // AddressablesScope 생성 (타일맵용, 에디터에서도 사용)
-            using var addressablesScope = new AddressablesScope();
-
             // 타일맵 생성 및 배치 (비동기 메서드를 동기적으로 실행)
-            var tilemapsTask = InstantiateDecoTilemapsAsync(roomData, tilemapsParent, addressablesScope);
+            var tilemapsTask = InstantiateDecoTilemapsAsync(roomData, tilemapsParent, resourceProvider);
             tilemapsTask.Wait();
 
             // 오브젝트 생성 및 배치 (비동기 메서드를 동기적으로 실행)

@@ -18,9 +18,9 @@ namespace DungeonShooter
     {
         Awaitable<TileBase> GetWallTile();
         Awaitable<TileBase> GetGroundTile();
-        Awaitable<TileBase> GetTile(string address);
         Awaitable<Enemy> GetRandomEnemy();
         Awaitable<GameObject> GetInstance(string address);
+        Awaitable<T> GetAsset<T>(string address) where T : Object;
     }
     /// <summary>
     /// 현재 스테이지에 적절한 타일, 캐릭터를 제공하는 클래스
@@ -158,11 +158,11 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 주소에 해당하는 타일을 가져옵니다.
+        /// 주소에 해당하는 에셋을 가져옵니다.
         /// </summary>
-        public async Awaitable<TileBase> GetTile(string address)
+        public async Awaitable<T> GetAsset<T>(string address) where T : Object
         {
-            var handle = _addressablesScope.LoadAssetAsync<TileBase>(address);
+            var handle = _addressablesScope.LoadAssetAsync<T>(address);
             await handle.Task;
             return handle.Result;
         }

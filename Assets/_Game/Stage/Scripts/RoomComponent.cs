@@ -9,10 +9,8 @@ namespace DungeonShooter
     public class RoomComponent : MonoBehaviour
     {
         private Room _room;
-        private AddressablesScope _addressablesScope;
 
         public Room Room => _room;
-        public AddressablesScope AddressablesScope => _addressablesScope;
 
         /// <summary>
         /// Room 데이터와 연결합니다.
@@ -27,7 +25,6 @@ namespace DungeonShooter
 
             _room = room;
             _room.RoomComponent = this;
-            _addressablesScope = new AddressablesScope();
         }
 
         private void OnDestroy()
@@ -35,12 +32,6 @@ namespace DungeonShooter
             if (_room != null)
             {
                 _room.RoomComponent = null;
-            }
-
-            if (_addressablesScope != null)
-            {
-                _addressablesScope.Dispose();
-                _addressablesScope = null;
             }
         }
 
