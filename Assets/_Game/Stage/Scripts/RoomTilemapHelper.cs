@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -110,7 +111,7 @@ namespace DungeonShooter
         /// <summary>
         /// 지정된 이름의 Tilemap을 찾거나 생성합니다.
         /// </summary>
-        public static Tilemap GetOrCreateTilemap(Transform parent, string tilemapName, bool addRenderer = true)
+        public static Tilemap GetOrCreateTilemap(Transform parent, string tilemapName)
         {
             var tilemapObj = GetOrCreateChild(parent, tilemapName);
             var tilemap = tilemapObj.GetComponent<Tilemap>();
@@ -120,18 +121,21 @@ namespace DungeonShooter
                 tilemap = tilemapObj.gameObject.AddComponent<Tilemap>();
             }
             
-            if (addRenderer)
+            var renderer = tilemapObj.GetComponent<TilemapRenderer>();
+            if (renderer == null)
             {
-                var renderer = tilemapObj.GetComponent<TilemapRenderer>();
-                if (renderer == null)
-                {
-                    renderer = tilemapObj.gameObject.AddComponent<TilemapRenderer>();
-                }
-                
-                // 타일맵 이름에 따라 적절한 렌더링 레이어 설정
-                var renderingLayer = GetRenderingLayerForTilemap(tilemapName);
-                renderer.sortingLayerName = renderingLayer.LayerName;
+                renderer = tilemapObj.gameObject.AddComponent<TilemapRenderer>();
             }
+
+            if (tilemapName == RoomConstants.BASE_TILEMAP_WALL_NAME)
+            {
+                tilemapObj.gameObject.AddComponent<TilemapCollider2D>();
+            }
+            
+            // 타일맵 이름에 따라 적절한 렌더링 레이어 설정
+                var renderingLayer = GetRenderingLayerForTilemap(tilemapName);
+            renderer.sortingLayerName = renderingLayer.LayerName;
+        
             
             return tilemap;
         }
