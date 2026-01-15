@@ -257,6 +257,13 @@ namespace DungeonShooter
                     instance.transform.position = new Vector3(objectData.Position.x, objectData.Position.y, 0);
                     instance.transform.rotation = objectData.Rotation;
                 }
+
+                // 생성후 초기화 필요한 객체면 대기
+                if (instance.TryGetComponent(out IInitializationAwaiter initAwaiter))
+                {
+                    Debug.Log($"{nameof(StageInstantiator)} : 초기화 필요한 객체, 대기합니다.");
+                    await initAwaiter.InitializationTask;
+                }
             }
         }
         /// <summary>
