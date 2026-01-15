@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.Tilemaps;
-using Jin5eok;
+using VContainer;
 using VContainer.Unity;
 using Object = UnityEngine.Object;
-using VContainer;
-using UnityEditor.Tilemaps;
-using System.Threading.Tasks;
+using Random = UnityEngine.Random;
 
 namespace DungeonShooter
 {
@@ -29,11 +30,11 @@ namespace DungeonShooter
     {
         private readonly AddressablesScope _addressablesScope;
         private readonly StageConfig _stageConfig;
-        private List<string> EnemyAddresses { get; set; }
-        private bool _isInitialized;
-        private Awaitable _initializationTask;
-        private IObjectResolver _resolver;
 
+        private List<string> EnemyAddresses { get; set; }
+        private IObjectResolver _resolver;
+        private TaskCompletionSource<bool> _initializationTcs;
+        private bool _isInitialized;
         [Inject]
         public StageResourceProvider(StageContext context, IObjectResolver resolver)
         {
@@ -45,13 +46,8 @@ namespace DungeonShooter
         /// <summary>
         /// StageConfig의 Label 데이터를 기반으로 에셋의 어드레스 목록을 로드하여 저장합니다.
         /// </summary>
-        private async Awaitable InitializeAsync()
+        private async Awaitable InitializeAsync(TaskCompletionSource<bool> initializationTcs)
         {
-            if (_isInitialized)
-            {
-                return;
-            }
-
             if (!string.IsNullOrEmpty(_stageConfig.StageEnemyLabel.labelString))
             {
                 var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.StageEnemyLabel.labelString);
@@ -60,24 +56,22 @@ namespace DungeonShooter
 
                 Addressables.Release(handle);
             }
-
+            initializationTcs.SetResult(true);
             _isInitialized = true;
         }
-
+        
         /// <summary>
         /// 초기화가 완료될 때까지 대기합니다. 이미 초기화되어 있으면 즉시 반환합니다.
         /// </summary>
         private async Awaitable EnsureInitializedAsync()
         {
-            if (_isInitialized == false)
+            if (_initializationTcs == null)
             {
-                _initializationTask = InitializeAsync();
+                _initializationTcs = new TaskCompletionSource<bool>();
+                await InitializeAsync(_initializationTcs);
             }
-            
-            if (_initializationTask != null)
-            {
-                await _initializationTask;
-            }
+
+            await _initializationTcs.Task;
         }
     
         /// <summary>
@@ -113,7 +107,7 @@ namespace DungeonShooter
             }
 
             // 랜덤으로 하나 선택
-            var enemyAddress = EnemyAddresses[UnityEngine.Random.Range(0, EnemyAddresses.Count)];
+            var enemyAddress = EnemyAddresses[Random.Range(0, EnemyAddresses.Count)];
 
             var enemyInstance = await GetInstance(enemyAddress);
             if (enemyInstance == null)
@@ -141,7 +135,7 @@ namespace DungeonShooter
             var handle = _addressablesScope.InstantiateAsync(address);
             await handle.Task;
 
-            if (handle.Status != UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+            if (handle.Status != AsyncOperationStatus.Succeeded)
             {
                 Debug.LogWarning($"[{nameof(StageResourceProvider)}] 인스턴스 생성 실패: {address}");
                 return null;
