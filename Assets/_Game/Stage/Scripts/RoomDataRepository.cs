@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -22,7 +23,7 @@ namespace DungeonShooter
         private List<string> NormalRoomDataAddresses { get; set; }
         private List<string> BossRoomDataAddresses { get; set; }
         private bool _isInitialized;
-        private Awaitable _initializationTask;
+        private TaskCompletionSource<bool> _initializationTcs;
 
         [Inject]
         public RoomDataRepository(StageContext stageContext)
@@ -33,41 +34,44 @@ namespace DungeonShooter
         /// <summary>
         /// StageConfig의 Label 데이터를 기반으로 에셋의 어드레스 목록을 로드하여 저장합니다.
         /// </summary>
-        private async Awaitable InitializeAsync()
+        private async Awaitable InitializeAsync(TaskCompletionSource<bool> initializationTcs)
         {
-            if (_isInitialized)
+            try
             {
-                return;
-            }
+                if (!string.IsNullOrEmpty(_stageConfig.StartRoomDataLabel.labelString))
+                {
+                    var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.StartRoomDataLabel.labelString);
+                    await handle.Task;
+                    StartRoomDataAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
 
-            if (!string.IsNullOrEmpty(_stageConfig.StartRoomDataLabel.labelString))
+                    Addressables.Release(handle);
+                }
+
+                if (!string.IsNullOrEmpty(_stageConfig.NormalRoomDataLabel.labelString))
+                {
+                    var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.NormalRoomDataLabel.labelString);
+                    await handle.Task;
+                    NormalRoomDataAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
+
+                    Addressables.Release(handle);
+                }
+
+                if (!string.IsNullOrEmpty(_stageConfig.BossRoomDataLabel.labelString))
+                {
+                    var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.BossRoomDataLabel.labelString);
+                    await handle.Task;
+                    BossRoomDataAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
+
+                    Addressables.Release(handle);
+                }
+                initializationTcs.SetResult(true);
+            }
+            catch (Exception e)
             {
-                var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.StartRoomDataLabel.labelString);
-                await handle.Task;
-                StartRoomDataAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
-
-                Addressables.Release(handle);
+                Debug.LogError($"{nameof(RoomDataRepository)} : 데이터 초기화 실패, {e}");
+                initializationTcs.SetResult(false);
+                throw;
             }
-
-            if (!string.IsNullOrEmpty(_stageConfig.NormalRoomDataLabel.labelString))
-            {
-                var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.NormalRoomDataLabel.labelString);
-                await handle.Task;
-                NormalRoomDataAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
-
-                Addressables.Release(handle);
-            }
-
-            if (!string.IsNullOrEmpty(_stageConfig.BossRoomDataLabel.labelString))
-            {
-                var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.BossRoomDataLabel.labelString);
-                await handle.Task;
-                BossRoomDataAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
-
-                Addressables.Release(handle);
-            }
-
-            _isInitialized = true;
         }
 
         /// <summary>
@@ -80,12 +84,13 @@ namespace DungeonShooter
                 return;
             }
 
-            if (_initializationTask == null)
+            if (_initializationTcs == null)
             {
-                _initializationTask = InitializeAsync();
+                _initializationTcs = new TaskCompletionSource<bool>();
+                await InitializeAsync(_initializationTcs);
             }
 
-            await _initializationTask;
+            await _initializationTcs.Task;
         }
 
         /// <summary>
