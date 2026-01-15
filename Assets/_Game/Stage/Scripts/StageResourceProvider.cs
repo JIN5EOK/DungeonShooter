@@ -20,6 +20,7 @@ namespace DungeonShooter
         Awaitable<TileBase> GetWallTile();
         Awaitable<TileBase> GetGroundTile();
         Awaitable<Enemy> GetRandomEnemy();
+        Awaitable<Player> GetPlayer();
         Awaitable<GameObject> GetInstance(string address);
         Awaitable<T> GetAsset<T>(string address) where T : Object;
     }
@@ -125,6 +126,37 @@ namespace DungeonShooter
             }
 
             return enemy;
+        }
+
+        /// <summary>
+        /// 플레이어 캐릭터를 가져옵니다
+        /// TODO: 다양한 캐릭터 형태에 대응하도록 변경 필요
+        /// </summary>
+        public async Awaitable<Player> GetPlayer()
+        {
+            if (_stageConfig.PlayerPrefab == null || !_stageConfig.PlayerPrefab.RuntimeKeyIsValid())
+            {
+                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 플레이어 프리팹이 설정되지 않았습니다.");
+                return null;
+            }
+
+            var playerAddress = _stageConfig.PlayerPrefab.RuntimeKey.ToString();
+            var playerInstance = await GetInstance(playerAddress);
+            if (playerInstance == null)
+            {
+                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 플레이어 인스턴스 생성 실패: {playerAddress}");
+                return null;
+            }
+
+            var player = playerInstance.GetComponent<Player>();
+            if (player == null)
+            {
+                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 프리팹에 Player 컴포넌트가 없습니다: {playerAddress}");
+                Object.Destroy(playerInstance);
+                return null;
+            }
+
+            return player;
         }
 
         /// <summary>

@@ -43,11 +43,11 @@ namespace DungeonShooter
             // 3. 자연스러워 보이도록 랜덤 엣지 추가 (보스 방 제외)
             AddRandomEdges(stage, roomIds);
 
-            // 4. 시작 방에서 거리상 가장 먼 방을 보스 방으로 설정
-            await SetStartAndBossRooms(stage, roomIds, roomDataRepository);
-
-            // 5. 각 노드를 적절한 방으로 설정 (RoomData 할당)
+            // 4. 각 노드를 랜덤 방으로 설정
             await AssignRoomData(stage, roomIds, roomDataRepository);
+
+            // 5. 시작 방, 보스방 설정 (특수방)
+            await SetStartAndBossRooms(stage, roomIds, roomDataRepository);
 
             Debug.Log($"[{nameof(StageGenerator)}] 스테이지 생성 완료. 방 개수: {roomIds.Count}");
             LogStageMap(stage, roomIds);
@@ -203,7 +203,7 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 시작 방에서 거리상 가장 먼 방을 보스 방으로 설정합니다.
+        /// 시작 방을 설정하고 거리상 가장 먼 방을 보스 방으로 설정합니다.
         /// </summary>
         private static async Awaitable SetStartAndBossRooms(Stage stage, List<int> roomIds, IRoomDataRepository roomDataRepository)
         {
@@ -408,16 +408,11 @@ namespace DungeonShooter
                 var room = stage.GetRoom(roomId);
                 if (room == null) continue;
 
-                // 이미 RoomData가 할당되어 있으면 스킵 (시작 방, 보스 방 등)
-                if (room.RoomData != null && room.RoomData.Tiles.Count > 0)
-                {
-                    continue;
-                }
-
                 // 랜덤하게 RoomData 선택
                 var roomData = await roomDataRepository.GetRandomRoom(RoomType.Normal);
                 if (roomData != null)
                 {
+                    Debug.Log($"[{nameof(StageGenerator)}] RoomData 할당: {roomId}");
                     stage.ReplaceRoomData(roomId, roomData);
                 }
                 else

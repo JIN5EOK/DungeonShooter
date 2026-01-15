@@ -46,15 +46,15 @@ public class Player : EntityBase
     [Inject]
     private void Construct(InputManager inputManager)
     {
+        Debug.Log("Injected Player");
         _inputManager = inputManager;
+        SubscribeInputEvent();
     }
 
     protected override void Start()
     {
         base.Start();
         statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
-        
-        SubscribeInputEvent();
         
         _cooldownComponent = gameObject.AddOrGetComponent<CooldownComponent>();
         _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();

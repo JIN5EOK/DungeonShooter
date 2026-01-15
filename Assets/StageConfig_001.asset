@@ -26,9 +26,15 @@ MonoBehaviour:
     m_EditorAssetChanged: 1
   _stageEnemyLabel:
     m_LabelString: Stage001_Enemy
+  _playerPrefab:
+    m_AssetGUID: 1c540a31334464ba4a5106db508a8412
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   _startRoomDataLabel:
-    m_LabelString: RoomData_001
+    m_LabelString: Stage001_StartRoom
   _normalRoomDataLabel:
-    m_LabelString: RoomData_001
+    m_LabelString: Stage001_NormalRoom
   _bossRoomDataLabel:
-    m_LabelString: RoomData_001
+    m_LabelString: Stage001_NormalRoom

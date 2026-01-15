@@ -19,24 +19,35 @@ MonoBehaviour:
     m_Address: Stage001_0001
     m_ReadOnly: 0
     m_SerializedLabels:
-    - RoomData_001
+    - Stage001_NormalRoom
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0fb156dbd3e134da988e9aa7ce7b2391
     m_Address: RandomEnemySpawn
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2a13c0d69cf8e498e9ab111bc29d5ee1
+    m_Address: Stage001_StartRoom
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Stage001_StartRoom
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 36b9e7a8dc77e4b55b3e0302990009d6
     m_Address: Stage001_0002
     m_ReadOnly: 0
     m_SerializedLabels:
-    - RoomData_001
+    - Stage001_NormalRoom
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 68cbc2d8171cd407f81f321629c6e28a
+    m_Address: PlayerSpawn
+    m_ReadOnly: 0
+    m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8a4d5face077b4eec84984c7e30f619a
     m_Address: Stage001_0003
     m_ReadOnly: 0
     m_SerializedLabels:
-    - RoomData_001
+    - Stage001_NormalRoom
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f5237e1a4b00d4fe0a0f4fa9d094686c
     m_Address: StageConfig_001
