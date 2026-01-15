@@ -12,11 +12,10 @@ namespace DungeonShooter
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterEntryPoint<SceneStartInjector>();
-            builder.Register<CoinInventory>(Lifetime.Singleton);
-            builder.Register<Inventory>(Lifetime.Singleton);
-            builder.Register<EntityFactory>(Lifetime.Singleton);
-            builder.Register<StageResourceProvider>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<RoomDataRepository>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<CoinInventory>(Lifetime.Scoped);
+            builder.Register<Inventory>(Lifetime.Scoped);
+            builder.Register<StageResourceProvider>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<RoomDataRepository>(Lifetime.Scoped).AsImplementedInterfaces();
             base.Configure(builder);
         }
     }

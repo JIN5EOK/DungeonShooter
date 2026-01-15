@@ -62,16 +62,17 @@ public class Enemy : EntityBase
     private bool _isStunned;
     private Vector2 _knockbackDirection;
 
-    private EntityFactory _entityFactory;
+    private IStageResourceProvider _resourceProvider;
 
     [Inject]
-    private void Construct(EntityFactory entityFactory)
+    private void Construct(IStageResourceProvider resourceProvider)
     {
-        _entityFactory = entityFactory;
+        _resourceProvider = resourceProvider;
     }
     
     protected override void Start()
     {
+        return;
         base.Start();
         statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
         _playerTransform = FindFirstObjectByType<Player>().transform;
@@ -136,6 +137,7 @@ public class Enemy : EntityBase
 
     private void Update()
     {
+        return;
         // 죽었으면 AI 중지
         if (_currentState == EnemyState.Dead) return;
 
@@ -180,6 +182,7 @@ public class Enemy : EntityBase
 
     private void FixedUpdate()
     {
+        return;
         // 죽었으면 움직임 중지
         if (_currentState == EnemyState.Dead)
         {
@@ -367,7 +370,7 @@ public class Enemy : EntityBase
     /// </summary>
     private async Awaitable DropCoins()
     {
-        var coinPickup = await _entityFactory.Create(EntityKey.Coin);
+        var coinPickup = await _resourceProvider.GetInstance(EntityKey.Coin);
         var coinPickupPrefab = coinPickup.GetComponent<CoinPickup>();
         if (coinPickupPrefab == null)
         {
