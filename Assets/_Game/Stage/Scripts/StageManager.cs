@@ -7,10 +7,8 @@ namespace DungeonShooter
     {
         private StageContext _context;
         private Stage _stage;
-        private StageComponent _stageComponent;
 
         public Stage Stage => _stage;
-        public StageComponent StageComponent => _stageComponent;
         
         private IRoomDataRepository _roomDataRepository;
         private IStageResourceProvider _stageResourceProvider;
@@ -34,8 +32,7 @@ namespace DungeonShooter
         private async void CreateStageAsync()
         {
             _stage = await StageGenerator.GenerateStage(_roomDataRepository, 15);
-            var stageObj = await StageInstantiator.InstantiateStage(_stageResourceProvider, _stage);
-            _stageComponent = stageObj.GetComponent<StageComponent>();
+            await StageInstantiator.InstantiateStage(_stageResourceProvider, _stage);
         }
         
         private void OnDestroy()
