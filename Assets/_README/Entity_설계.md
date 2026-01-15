@@ -2,88 +2,93 @@
 플레이어, 적, 보물상자, NPC 등 게임 내의 Entity 개체들에 대한 설계 문서입니다.
 
 ---
-## 클래스 다이어그램
-### EntityBase - Entity의 중추 역할, 공통 기능 수행
+## 컴포넌트 위주 설계
+* 괸리자 역할을 담당하는 컴포넌트 + 다수의 기능 컴포넌트로 구성
+* 기능 추가와 변경은 가급적 컴포넌트 추가를 통한 확장 구조로 설계
+
+## EntityBase - Entity의 중추 기반 클래스
 ```mermaid
 classDiagram
-    class EntityBase{
-           
-    }
     EntityBase <|-- Player
     EntityBase <|-- Enemy
 ```
+* `EntityBase`를 상속받은 `Player`같은 스크립트는 작동 로직은 최소화하고 주로 아래 역할을 담당한다
+  * 객체 초기화
+  * 객체 중앙관리
+
+## EntityComponent - Entity의 기능 담당 파트들
 
 ### Entity 컴포넌트 함수/변수 명세
 
 ```mermaid
 classDiagram
-    class MovementComponent{
+    class MovementComponent["MovementComponent<br>캐릭터 이동 기능 담당"]{
         +MoveSpeed : float
         +MoveDirection : Vector2
         +Move() void
     }
-    class DashComponent{
+    class DashComponent["MovementComponent<br>캐릭터 대시 기능 담당"]{
         +IsDashing : bool
         +Dash() bool // 대시 성공여부 반환
         +CancelDash() void // 대시중이라면 취소
     }
+    class EntityStatsComponent["EntityStatsComponent<br>캐릭터 스탯 기능 담당"]{
+        +Stats : EntityStats
+        // 그 외 스탯 관련 연산이 있으면 사용
+    }
 ```
 
 ```mermaid
 classDiagram
-    class EntityStatsComponent{
-        +Stats : EntityStats
-        // 그 외 스탯 관련 연산이 있으면 사용
+    class HealthComponent["HealthComponent<br>캐릭터 체력 기능 담당"]{
+        +TakeDamage() void
+        +Heal() void
+        +Die() void
     }
-    class HealthComponent{
-        +TakeDamage() : void
-        +Heal() : void
+    class CooldownComponent["CooldownComponent<br>캐릭터 쿨타임 업데이트 담당"]{
+        +RegisterCooldown(string name, float time) void
+        +IsReady(string name) bool
+        +StartCooldown(string name) void
+        +GetCooldownPercent(string name) float
     }
-    class CooldownComponent{
-        +RegisterCooldown(string name, float time) : void
-        +IsReady(string name) : bool
-        +StartCooldown(string name) : void
-        +GetCooldownPercent(string name) : float
-    }
-    class DeathComponent{
-        +Death() void // 사망 연출 담당
-    }
-````
+```
+
 ```mermaid
 classDiagram
-    class BehaviourTreeComponent{
+    class BehaviourTreeComponent["BehaviourTreeComponent<br>적 AI등 행동트리 담당"]{
         +SetBehaviourTree(BehaviourTreeNode bTNode) 
     }
 ```
 
-### 컴포넌트 참조 관계 
+### 컴포넌트간 참조는 자유롭게
 ```mermaid
 classDiagram
     class EntityStatsComponent{
     }
 
-    HealthComponent --> EntityStatsComponent : 체력 참고
+    HealthComponent --> EntityStatsComponent : 최대 체력 참고
     MovementComponent --> EntityStatsComponent : 이동속도 참고
 ```
+* `EntityComponent`는 모두 동일한 게임오브젝트에 붙이는걸 전제로 한다
+* 따라서 컴포넌트간 참조가 필요하다면 gameObject.GetComponent를 통해 참조한다
+* 특정 컴포넌트가 존재하지 않을 가능성이 존재하기에 예외처리는 확실히 수행한다
 
-### 플레이어 게임 오브젝트 클래스 관계도
+---
+
+# 임시작성
+
+### 플레이어 게임 오브젝트 클래스 관계
 ```mermaid
 classDiagram
     class PlayerCharacterConfig{
         +Stats : EntityStats
         // 그 외 초기화에 필요한 정보
     }
-    class PlayerConfig{
 
-    }
     Player --> PlayerCharacterConfig : 사용하여 플레이어 캐릭터 초기화, (스탯, 스킬 등..)
     Player --> InputManager : 플레이어 입력 이벤트 등록/해제
     Player --> EntityStatsComponent : 스텟 초기화
 ```
-
----
-
-# 임시작성
 
 ### 플레이어 오브젝트 초기화 관련 구상
 * `PlayerCharacterConfig` 플레이어 오브젝트를 초기화하는데 필요한 데이터를 담는다, 플레이어가 선택한 캐릭터에 맞는 Config을 의존성 주입해 사용한다
@@ -95,12 +100,14 @@ classDiagram
 
 ### 무기 관련 구상
 * 무기 데이터가 담고 있어야 하는 정보들
-  * 무기의 종류 (애니메이션, 공격 방식 결정 위해)
-  * 스킬 정보 (무기 스킬)
-  * 능력치 (공격력 등)
+    * 무기의 종류 (애니메이션, 공격 방식 결정 위해)
+    * 스킬 정보 (무기 스킬)
+    * 능력치 (공격력 등)
 
 ### 스킬 구상
 * 공격스킬을 비롯한 특수한 행동을 스킬로 정의해 분류
+
+---
 
 ## 필요한 기능 나열해보기
 * 플레이어
