@@ -9,13 +9,13 @@ namespace DungeonShooter
     public class RandomEnemySpawn : MonoBehaviour
     {
         [Inject]
-        public async Awaitable Construct(StageResourceProvider resourceProvider)
+        public async Awaitable Construct(IStageResourceProvider resourceProvider)
         {
             Debug.Log("Constructing RandomEnemySpawn");
             await SpawnEnemy(resourceProvider);
         }
 
-        public async Awaitable SpawnEnemy(StageResourceProvider resourceProvider)
+        private async Awaitable SpawnEnemy(IStageResourceProvider resourceProvider)
         {
             var enemy = await resourceProvider.GetRandomEnemy();
             

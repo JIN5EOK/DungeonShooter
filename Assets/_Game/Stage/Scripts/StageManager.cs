@@ -12,11 +12,11 @@ namespace DungeonShooter
         public Stage Stage => _stage;
         public StageComponent StageComponent => _stageComponent;
         
-        private RoomDataRepository _roomDataRepository;
-        private StageResourceProvider _stageResourceProvider;
+        private IRoomDataRepository _roomDataRepository;
+        private IStageResourceProvider _stageResourceProvider;
 
         [Inject]
-        public void Construct(StageContext context, RoomDataRepository roomDataRepository, StageResourceProvider stageResourceProvider)
+        public void Construct(StageContext context, IRoomDataRepository roomDataRepository, IStageResourceProvider stageResourceProvider)
         {
             _context = context;
             _roomDataRepository = roomDataRepository;
