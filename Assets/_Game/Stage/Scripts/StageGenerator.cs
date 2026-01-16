@@ -10,15 +10,12 @@ namespace DungeonShooter
     /// </summary>
     public static class StageGenerator
     {
-        private const int DEFAULT_ROOM_COUNT = 15;
-        private const int DEFAULT_GRID_SIZE = 10;
-
         /// <summary>
         /// 스테이지를 생성합니다.
         /// </summary>
         /// <param name="roomDataRepository">방 데이터 저장소</param>
         /// <param name="roomCount">생성할 방의 개수</param>
-        public static async Awaitable<Stage> GenerateStage(IRoomDataRepository roomDataRepository, int roomCount = DEFAULT_ROOM_COUNT)
+        public static async Awaitable<Stage> GenerateStage(IRoomDataRepository roomDataRepository, int roomCount = RoomConstants.DEFAULT_ROOM_COUNT)
         {
             if (roomDataRepository == null)
             {
@@ -93,9 +90,7 @@ namespace DungeonShooter
                         .Where(direction =>
                         {
                             var newPos = room.Position + direction;
-                            return Mathf.Abs(newPos.x) <= DEFAULT_GRID_SIZE &&
-                                   Mathf.Abs(newPos.y) <= DEFAULT_GRID_SIZE &&
-                                   !usedPositions.Contains(newPos);
+                            return !usedPositions.Contains(newPos);
                         })
                         .ToList();
 
@@ -354,7 +349,7 @@ namespace DungeonShooter
 
                 // 거리가 멀수록 연결 확률 낮음
                 var distance = distances.ContainsKey(roomId) ? distances[roomId] : 0;
-                var probability = Mathf.Max(0.1f, 1.0f - (distance * 0.15f)); // 거리당 15% 감소, 최소 10%
+                var probability = Mathf.Max(0.1f, 1.0f - (distance * 0.50f)); // 거리당 50% 감소, 최소 10%
 
                 if (Random.value < probability)
                 {

@@ -31,7 +31,7 @@ namespace DungeonShooter
         /// </summary>
         private async void CreateStageAsync()
         {
-            _stage = await StageGenerator.GenerateStage(_roomDataRepository, 15);
+            _stage = await StageGenerator.GenerateStage(_roomDataRepository);
             await StageInstantiator.InstantiateStage(_stageResourceProvider, _stage);
         }
         
