@@ -51,24 +51,20 @@ namespace DungeonShooter
             var stageObjectsParent = new GameObject(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
             stageObjectsParent.transform.SetParent(stageObj.transform);
 
-            // 타일맵 생성 (Ground, Wall, Deco)
+            // 타일맵 생성 (Ground, Deco)
             var groundTilemapObj = new GameObject(RoomConstants.TILEMAP_GROUND_NAME);
             groundTilemapObj.transform.SetParent(stageTilemapsParent.transform);
             var groundTilemap = groundTilemapObj.AddComponent<Tilemap>();
+            groundTilemap.gameObject.AddComponent<TilemapCollider2D>().compositeOperation = Collider2D.CompositeOperation.Merge;
             var groundRenderer = groundTilemapObj.AddComponent<TilemapRenderer>();
             groundRenderer.sortingLayerName = RenderingLayers.Ground.LayerName;
-
-            var wallTilemapObj = new GameObject(RoomConstants.TILEMAP_WALL_NAME);
-            wallTilemapObj.transform.SetParent(stageTilemapsParent.transform);
-            var wallTilemap = wallTilemapObj.AddComponent<Tilemap>();
-            var wallRenderer = wallTilemapObj.AddComponent<TilemapRenderer>();
-            wallRenderer.sortingLayerName = RenderingLayers.Wall.LayerName;
-            wallTilemapObj.AddComponent<TilemapCollider2D>();
+            
 
             var decoTilemapObj = new GameObject(RoomConstants.TILEMAP_DECO_NAME);
             decoTilemapObj.transform.SetParent(stageTilemapsParent.transform);
             var decoTilemap = decoTilemapObj.AddComponent<Tilemap>();
             var decoRenderer = decoTilemapObj.AddComponent<TilemapRenderer>();
+            decoTilemap.gameObject.AddComponent<TilemapCollider2D>().compositeOperation = Collider2D.CompositeOperation.Merge;
             decoRenderer.sortingLayerName = RenderingLayers.Deco.LayerName;
 
             // 모든 방의 타일과 오브젝트를 Stage 레벨에 배치
@@ -83,7 +79,7 @@ namespace DungeonShooter
                 var worldPosition = new Vector3(room.Position.x * RoomConstants.ROOM_SPACING, room.Position.y * RoomConstants.ROOM_SPACING, 0);
 
                 // 방의 타일을 Stage 레벨 타일맵에 배치
-                await PlaceRoomTilesAsync(resourceProvider, room, worldPosition, groundTilemap, wallTilemap, decoTilemap);
+                await PlaceRoomTilesAsync(resourceProvider, room, worldPosition, groundTilemap, decoTilemap);
 
                 // 방의 오브젝트를 Stage 레벨 Objects에 배치
                 await InstantiateObjectsAsync(room.RoomData, stageObjectsParent.transform, resourceProvider, worldPosition);
@@ -104,7 +100,6 @@ namespace DungeonShooter
             Room room,
             Vector3 worldPosition,
             Tilemap groundTilemap,
-            Tilemap wallTilemap,
             Tilemap decoTilemap)
         {
             var roomData = room.RoomData;
@@ -114,9 +109,8 @@ namespace DungeonShooter
 
             // 타일 로드
             var groundTile = await resourceProvider.GetGroundTile();
-            var wallTile = await resourceProvider.GetWallTile();
 
-            if (groundTile == null || wallTile == null)
+            if (groundTile == null)
             {
                 Debug.LogError($"[{nameof(StageInstantiator)}] 필수 타일을 로드할 수 없습니다.");
                 return;
@@ -132,98 +126,6 @@ namespace DungeonShooter
                     var localPos = new Vector3Int(startX + x, startY + y, 0);
                     var worldTilePos = localPos + worldPosInt;
                     groundTilemap.SetTile(worldTilePos, groundTile);
-                }
-            }
-
-            // 복도 위치 정보 수집 (Wall 타일 배치 시 제외하기 위해)
-            var corridorPositions = new HashSet<Vector2Int>();
-            var corridorHalfWidth = RoomConstants.ROOM_CORRIDOR_SIZE / 2;
-            var roomCenterX = startX + roomSizeX / 2;
-            var roomCenterY = startY + roomSizeY / 2;
-            
-            foreach (var connection in room.Connections)
-            {
-                var direction = connection.Key;
-                for (int w = -corridorHalfWidth; w < corridorHalfWidth; w++)
-                {
-                    // Wall용 복도 위치 (Y 두께 3에 맞게)
-                    for (int i = 0; i < RoomConstants.WALL_TILE_THICKNESS_Y; i++)
-                    {
-                        var pos = direction switch
-                        {
-                            Direction.Up => new Vector2Int(roomCenterX + w, startY + roomSizeY + i),
-                            Direction.Down => new Vector2Int(roomCenterX + w, startY - 1 - i),
-                            Direction.Right => new Vector2Int(startX + roomSizeX + i, roomCenterY + w),
-                            Direction.Left => new Vector2Int(startX - 1 - i, roomCenterY + w),
-                            _ => Vector2Int.zero
-                        };
-                        
-                        if (pos != Vector2Int.zero)
-                        {
-                            corridorPositions.Add(pos);
-                        }
-                    }
-                }
-            }
-
-            // Wall 타일 배치: X 방향 2타일 두께, Y 방향 3타일 두께 (복도 위치 제외)
-            // 위쪽 (Y 두께 3)
-            for (int i = 0; i < RoomConstants.WALL_TILE_THICKNESS_Y; i++)
-            {
-                for (int x = startX - RoomConstants.WALL_TILE_THICKNESS_X; x < startX + roomSizeX + RoomConstants.WALL_TILE_THICKNESS_X; x++)
-                {
-                    var pos = new Vector2Int(x, startY + roomSizeY + i);
-                    if (!corridorPositions.Contains(pos))
-                    {
-                        var localPos = new Vector3Int(x, startY + roomSizeY + i, 0);
-                        var worldTilePos = localPos + worldPosInt;
-                        wallTilemap.SetTile(worldTilePos, wallTile);
-                    }
-                }
-            }
-            
-            // 아래쪽 (Y 두께 3)
-            for (int i = 0; i < RoomConstants.WALL_TILE_THICKNESS_Y; i++)
-            {
-                for (int x = startX - RoomConstants.WALL_TILE_THICKNESS_X; x < startX + roomSizeX + RoomConstants.WALL_TILE_THICKNESS_X; x++)
-                {
-                    var pos = new Vector2Int(x, startY - 1 - i);
-                    if (!corridorPositions.Contains(pos))
-                    {
-                        var localPos = new Vector3Int(x, startY - 1 - i, 0);
-                        var worldTilePos = localPos + worldPosInt;
-                        wallTilemap.SetTile(worldTilePos, wallTile);
-                    }
-                }
-            }
-            
-            // 왼쪽 (X 두께 2)
-            for (int i = 0; i < RoomConstants.WALL_TILE_THICKNESS_X; i++)
-            {
-                for (int y = startY - RoomConstants.WALL_TILE_THICKNESS_Y; y < startY + roomSizeY + RoomConstants.WALL_TILE_THICKNESS_Y; y++)
-                {
-                    var pos = new Vector2Int(startX - 1 - i, y);
-                    if (!corridorPositions.Contains(pos))
-                    {
-                        var localPos = new Vector3Int(startX - 1 - i, y, 0);
-                        var worldTilePos = localPos + worldPosInt;
-                        wallTilemap.SetTile(worldTilePos, wallTile);
-                    }
-                }
-            }
-            
-            // 오른쪽 (X 두께 2)
-            for (int i = 0; i < RoomConstants.WALL_TILE_THICKNESS_X; i++)
-            {
-                for (int y = startY - RoomConstants.WALL_TILE_THICKNESS_Y; y < startY + roomSizeY + RoomConstants.WALL_TILE_THICKNESS_Y; y++)
-                {
-                    var pos = new Vector2Int(startX + roomSizeX + i, y);
-                    if (!corridorPositions.Contains(pos))
-                    {
-                        var localPos = new Vector3Int(startX + roomSizeX + i, y, 0);
-                        var worldTilePos = localPos + worldPosInt;
-                        wallTilemap.SetTile(worldTilePos, wallTile);
-                    }
                 }
             }
 
@@ -279,8 +181,7 @@ namespace DungeonShooter
                 ClearExistingData(roomObj);
             }
 
-            var (tilemapsParent, objectsParent, _) = RoomTilemapHelper.GetOrCreateRoomStructure(
-                roomObj, parent, roomName, createBaseTilemaps: false);
+            var (tilemapsParent, objectsParent) = RoomTilemapHelper.GetOrCreateRoomStructure(roomObj, parent, roomName);
 
             if (tilemapsParent == null || objectsParent == null)
             {

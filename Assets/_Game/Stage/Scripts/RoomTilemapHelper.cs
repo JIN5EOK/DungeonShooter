@@ -15,14 +15,12 @@ namespace DungeonShooter
         /// <param name="roomObj">Room GameObject (null이면 새로 생성)</param>
         /// <param name="parent">부모 Transform</param>
         /// <param name="roomName">Room 이름</param>
-        /// <param name="createBaseTilemaps">BaseTilemaps 구조도 생성할지 여부</param>
         /// <returns>(tilemapsParent, objectsParent, baseTilemapsParent)</returns>
-        public static (Transform tilemapsParent, Transform objectsParent, Transform baseTilemapsParent) 
+        public static (Transform tilemapsParent, Transform objectsParent) 
             GetOrCreateRoomStructure(
                 GameObject roomObj, 
                 Transform parent, 
-                string roomName,
-                bool createBaseTilemaps = true)
+                string roomName)
         {
             // Room GameObject 생성 또는 가져오기
             if (roomObj == null)
@@ -32,13 +30,6 @@ namespace DungeonShooter
                 {
                     roomObj.transform.SetParent(parent);
                 }
-            }
-
-            // BaseTilemaps 구조 생성 또는 가져오기 (Room GameObject의 직접 자식)
-            Transform baseTilemapsParent = null;
-            if (createBaseTilemaps)
-            {
-                baseTilemapsParent = GetOrCreateBaseTilemaps(roomObj.transform);
             }
 
             // Tilemaps 구조 생성 또는 가져오기 (사용자가 배치하는 타일맵들)
@@ -54,21 +45,7 @@ namespace DungeonShooter
             // Objects 구조 생성 또는 가져오기
             var objectsParent = GetOrCreateChild(roomObj.transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
 
-            return (tilemapsParent, objectsParent, baseTilemapsParent);
-        }
-
-        /// <summary>
-        /// BaseTilemaps GameObject를 찾거나 생성합니다.
-        /// </summary>
-        /// <param name="roomParent">Room GameObject의 Transform</param>
-        public static Transform GetOrCreateBaseTilemaps(Transform roomParent)
-        {
-            var baseTilemaps = GetOrCreateChild(roomParent, RoomConstants.BASE_TILEMAPS_GAMEOBJECT_NAME);
-            if (baseTilemaps.GetComponent<Grid>() == null)
-            {
-                baseTilemaps.gameObject.AddComponent<Grid>();
-            }
-            return baseTilemaps;
+            return (tilemapsParent, objectsParent);
         }
 
         /// <summary>
@@ -126,11 +103,6 @@ namespace DungeonShooter
             {
                 renderer = tilemapObj.gameObject.AddComponent<TilemapRenderer>();
             }
-
-            if (tilemapName == RoomConstants.BASE_TILEMAP_WALL_NAME)
-            {
-                tilemapObj.gameObject.AddComponent<TilemapCollider2D>();
-            }
             
             // 타일맵 이름에 따라 적절한 렌더링 레이어 설정
                 var renderingLayer = GetRenderingLayerForTilemap(tilemapName);
@@ -140,25 +112,6 @@ namespace DungeonShooter
             return tilemap;
         }
 
-        /// <summary>
-        /// BaseTilemap_Ground를 찾거나 생성합니다.
-        /// </summary>
-        /// <param name="roomParent">Room GameObject의 Transform</param>
-        public static Tilemap GetOrCreateGroundTilemap(Transform roomParent)
-        {
-            var baseTilemaps = GetOrCreateBaseTilemaps(roomParent);
-            return GetOrCreateTilemap(baseTilemaps, RoomConstants.BASE_TILEMAP_GROUND_NAME);
-        }
-
-        /// <summary>
-        /// BaseTilemap_Wall을 찾거나 생성합니다.
-        /// </summary>
-        /// <param name="roomParent">Room GameObject의 Transform</param>
-        public static Tilemap GetOrCreateWallTilemap(Transform roomParent)
-        {
-            var baseTilemaps = GetOrCreateBaseTilemaps(roomParent);
-            return GetOrCreateTilemap(baseTilemaps, RoomConstants.BASE_TILEMAP_WALL_NAME);
-        }
 
         /// <summary>
         /// Tilemap_Deco를 찾거나 생성합니다.
@@ -182,7 +135,6 @@ namespace DungeonShooter
         {
             if (roomObj == null) return;
 
-            // Tilemaps 하위의 모든 타일맵 제거 (BaseTilemaps는 제외)
             var tilemapsParent = roomObj.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
             if (tilemapsParent != null)
             {

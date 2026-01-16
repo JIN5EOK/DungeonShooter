@@ -48,7 +48,6 @@ namespace DungeonShooter
         private void EnsureStructure()
         {
             RoomTilemapHelper.ClearRoomObject(gameObject);
-            RoomTilemapHelper.GetOrCreateRoomStructure(gameObject, null, gameObject.name, createBaseTilemaps: true);
             UpdateRoomSizeTiles();
         }
 
@@ -111,7 +110,7 @@ namespace DungeonShooter
 
 
         /// <summary>
-        /// 방 크기에 맞춰 BaseTilemap_Ground에 타일을 배치합니다.
+        /// 방 크기에 맞춰 타일을 배치합니다.
         /// </summary>
         public void UpdateRoomSizeTiles()
         {
@@ -123,13 +122,13 @@ namespace DungeonShooter
                 return;
             }
 
-            // BaseTilemap_Ground 찾기 또는 생성
-            // RoomEditor는 Editor 전용이므로 Tilemaps 구조 없이 직접 BaseTilemaps를 생성
-            var tilemap = RoomTilemapHelper.GetOrCreateGroundTilemap(transform);
-
+            // Tilemap_Ground 찾기 또는 생성
+            var tilemap = RoomTilemapHelper.GetOrCreateRoomStructure(this.gameObject, null, gameObject.name);
+            var groundTilemap = RoomTilemapHelper.GetOrCreateTilemap(tilemap.tilemapsParent, RoomConstants.TILEMAP_GROUND_NAME);
+            
             // 기존 타일 모두 제거
-            tilemap.ClearAllTiles();
-
+            groundTilemap.ClearAllTiles();
+            
             // 중앙 기준으로 타일 배치 (Transform 중앙이 (0,0)이 되도록)
             var startX = -_roomSizeX / 2;
             var startY = -_roomSizeY / 2;
@@ -139,12 +138,12 @@ namespace DungeonShooter
                 for (int y = 0; y < _roomSizeY; y++)
                 {
                     var position = new Vector3Int(startX + x, startY + y, 0);
-                    tilemap.SetTile(position, _exampleTile);
+                    groundTilemap.SetTile(position, _exampleTile);
                 }
             }
 
             EditorUtility.SetDirty(this);
-            EditorUtility.SetDirty(tilemap);
+            EditorUtility.SetDirty(tilemap.tilemapsParent);
         }
 
         /// <summary>

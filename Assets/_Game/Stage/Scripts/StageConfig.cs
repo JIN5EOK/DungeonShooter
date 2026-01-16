@@ -8,7 +8,6 @@ namespace DungeonShooter
     [CreateAssetMenu(fileName = "New StageConfig", menuName = "Stage/Stage Config")]
     public class StageConfig : ScriptableObject
     {
-        [SerializeField] private AssetReferenceT<TileBase> _wallTile;
         [SerializeField] private AssetReferenceT<TileBase> _groundTile;
         [SerializeField] public AssetLabelReference _stageEnemyLabel;
         [SerializeField] private AssetReferenceT<Player> _playerPrefab;
@@ -16,7 +15,6 @@ namespace DungeonShooter
         [SerializeField] public AssetLabelReference _startRoomDataLabel;
         [SerializeField] public AssetLabelReference _normalRoomDataLabel;
         [SerializeField] public AssetLabelReference _bossRoomDataLabel;
-        public AssetReferenceT<TileBase> WallTile => _wallTile;
         public AssetReferenceT<TileBase> GroundTile => _groundTile;
         public AssetLabelReference StageEnemyLabel => _stageEnemyLabel;
         public AssetReferenceT<Player> PlayerPrefab => _playerPrefab;
