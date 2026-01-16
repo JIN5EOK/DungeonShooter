@@ -47,12 +47,12 @@ namespace DungeonShooter
             await SetStartAndBossRooms(stage, roomIds, roomDataRepository);
 
             Debug.Log($"[{nameof(StageGenerator)}] 스테이지 생성 완료. 방 개수: {roomIds.Count}");
-            LogStageMap(stage, roomIds);
+            DEBUG_LogStageMap(stage, roomIds);
             return stage;
         }
 
         /// <summary>
-        /// 방들을 2차원 평면에 배치합니다.
+        /// 방들의 배치,연결관계를 2차원 평면으로 표현합니다.
         /// (0,0) 위치에 루트 노드를 생성하고 이를 시작 방으로 설정합니다.
         /// </summary>
         private static List<int> PlaceRoomsOnGrid(Stage stage, int roomCount)
@@ -60,11 +60,9 @@ namespace DungeonShooter
             var roomIds = new List<int>();
             var usedPositions = new HashSet<Vector2Int>();
 
-            var tempRoomData = new RoomData();
-
             // (0,0) 위치에 루트 노드 생성, 이 노드를 시작 방으로 설정
             var startPos = Vector2Int.zero;
-            var startRoomId = stage.AddRoom(tempRoomData, startPos);
+            var startRoomId = stage.AddRoom(default, startPos);
             roomIds.Add(startRoomId);
             usedPositions.Add(startPos);
 
@@ -115,7 +113,7 @@ namespace DungeonShooter
                 var direction = availableDirs[Random.Range(0, availableDirs.Count)];
                 var newPos = selectedRoom.Position + direction;
 
-                var newRoomId = stage.AddRoom(tempRoomData, newPos);
+                var newRoomId = stage.AddRoom(default, newPos);
                 roomIds.Add(newRoomId);
                 usedPositions.Add(newPos);
             }
@@ -288,10 +286,8 @@ namespace DungeonShooter
                 return;
             }
 
-            // 시작 방 찾기 (첫 번째 방)
+            // 시작 방
             var startRoomId = roomIds[0];
-            var distances = CalculateDistancesFromStart(stage, startRoomId);
-
             // 보스 방 찾기 (시작 방에서 가장 먼 방)
             var bossRoomId = roomIds.Count >= 2 ? FindFarthestRoom(stage, startRoomId) : -1;
             var specialRoomIds = new HashSet<int> { bossRoomId }; // 추후 상점 등 다른 특수방 추가 가능
@@ -332,15 +328,7 @@ namespace DungeonShooter
                 }
             }
 
-            // 엣지를 랜덤하게 섞기
-            for (int i = 0; i < candidateEdges.Count; i++)
-            {
-                int randomIndex = Random.Range(i, candidateEdges.Count);
-                var temp = candidateEdges[i];
-                candidateEdges[i] = candidateEdges[randomIndex];
-                candidateEdges[randomIndex] = temp;
-            }
-
+            var distances = CalculateDistancesFromStart(stage, startRoomId);
             // 거리에 따라 확률적으로 연결
             foreach (var (roomId, direction) in candidateEdges)
             {
@@ -433,26 +421,11 @@ namespace DungeonShooter
             return roomMap.ContainsKey(expectedPos) &&
                    roomMap[expectedPos].Id == connectedRoomId;
         }
-
-        /// <summary>
-        /// 반대 방향을 반환합니다.
-        /// </summary>
-        private static Direction GetOppositeDirection(Direction direction)
-        {
-            return direction switch
-            {
-                Direction.Up => Direction.Down,
-                Direction.Down => Direction.Up,
-                Direction.Right => Direction.Left,
-                Direction.Left => Direction.Right,
-                _ => direction
-            };
-        }
         
-                /// <summary>
-        /// 스테이지 맵을 텍스트로 출력합니다.
+        /// <summary>
+        /// 스테이지 맵을 텍스트로 출력합니다. (디버깅용)
         /// </summary>
-        private static void LogStageMap(Stage stage, List<int> roomIds)
+        private static void DEBUG_LogStageMap(Stage stage, List<int> roomIds)
         {
             if (roomIds.Count == 0)
             {
