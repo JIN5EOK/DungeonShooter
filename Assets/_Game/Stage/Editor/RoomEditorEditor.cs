@@ -7,15 +7,17 @@ namespace DungeonShooter
     [CustomEditor(typeof(RoomEditor))]
     public class RoomEditorEditor : Editor
     {
-        private SerializedProperty _exampleTileProperty;
+        private SerializedProperty _resourceProvider;
         private SerializedProperty _roomSizeXProperty;
         private SerializedProperty _roomSizeYProperty;
+        private SerializedProperty _loadFileProperty;
 
         private void OnEnable()
         {
-            _exampleTileProperty = serializedObject.FindProperty("_exampleTile");
+            _resourceProvider = serializedObject.FindProperty("_resourceProvider");
             _roomSizeXProperty = serializedObject.FindProperty("_roomSizeX");
             _roomSizeYProperty = serializedObject.FindProperty("_roomSizeY");
+            _loadFileProperty = serializedObject.FindProperty("_loadFile");
         }
 
         public override void OnInspectorGUI()
@@ -26,9 +28,10 @@ namespace DungeonShooter
 
             // 방 크기 설정 섹션
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("방 크기 설정, ExampleTile은 실제 게임에 생성되는 타일이 아닙니다.", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Ground 타일은 맵 크기를 보여주기 위한 예시일 뿐 실제 방 파일에 저장되지 않습니다.", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("맵을 수정하려면 Deco 타일을 수정해주세요.", EditorStyles.boldLabel);
             
-            EditorGUILayout.PropertyField(_exampleTileProperty);
+            EditorGUILayout.PropertyField(_resourceProvider);
             EditorGUILayout.IntSlider(_roomSizeXProperty, RoomConstants.ROOM_SIZE_MIN_X, RoomConstants.ROOM_SIZE_MAX_X, "방 크기 X");
             EditorGUILayout.IntSlider(_roomSizeYProperty, RoomConstants.ROOM_SIZE_MIN_Y, RoomConstants.ROOM_SIZE_MAX_Y, "방 크기 Y");
             
@@ -83,24 +86,14 @@ namespace DungeonShooter
             // 로드 섹션
             EditorGUILayout.LabelField("로드", EditorStyles.boldLabel);
             
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("불러오기 경로", GUILayout.Width(80));
-            roomEditor.SetLoadPath(EditorGUILayout.TextField(roomEditor.LoadPath));
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(_loadFileProperty, new GUIContent("불러올 방 데이터 파일"));
+            serializedObject.ApplyModifiedProperties();
             
-            if (GUILayout.Button("선택", GUILayout.Width(50)))
+            if (roomEditor.LoadFile == null)
             {
-                var path = EditorUtility.OpenFilePanel("불러오기 경로 선택", "Assets", "json");
-                if (!string.IsNullOrEmpty(path))
-                {
-                    // Assets 폴더 기준 상대 경로로 변환
-                    if (path.StartsWith(Application.dataPath))
-                    {
-                        path = "Assets" + path.Substring(Application.dataPath.Length);
-                    }
-                    roomEditor.SetLoadPath(path);
-                }
+                EditorGUILayout.HelpBox("불러올 방 데이터 파일(TextAsset)을 지정해주세요.", MessageType.Info);
             }
-            EditorGUILayout.EndHorizontal();
             
             if (GUILayout.Button("방 불러오기", GUILayout.Height(30)))
             {

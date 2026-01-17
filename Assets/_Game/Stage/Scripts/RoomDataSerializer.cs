@@ -36,7 +36,7 @@ namespace DungeonShooter
             roomData.RoomSizeY = roomSizeY;
 
             // 1. Tilemaps 하위의 타일맵 컴포넌트들을 찾아서 TileLayerData로 변환
-            var tilemapsTransform = room.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
+            var tilemapsTransform = room.transform.Find(RoomConstants.TILEMAP_DECO_NAME);
             if (tilemapsTransform != null)
             {
                 SerializeTilemaps(tilemapsTransform, roomData);

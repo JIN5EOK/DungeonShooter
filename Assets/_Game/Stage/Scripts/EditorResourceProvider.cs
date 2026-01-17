@@ -1,0 +1,109 @@
+#if UNITY_EDITOR
+using System;
+using System.Collections;
+using System.Threading.Tasks;
+using Jin5eok;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.Tilemaps;
+using Object = UnityEngine.Object;
+
+namespace DungeonShooter
+{
+    /// <summary>
+    /// 에디터에서 사용하는 ResourceProvider
+    /// 의존성 주입 없이 Addressables를 직접 사용하여 작동
+    /// </summary>
+    [Serializable]
+    public class EditorStageResourceProvider : IStageResourceProvider
+    {
+        [SerializeField]
+        private AssetReferenceT<TileBase> _groundTile;
+        private readonly AddressablesScope _addressablesScope;
+        
+        public EditorStageResourceProvider()
+        {
+            _addressablesScope = new AddressablesScope();
+        }
+
+        /// <summary>
+        /// Ground 타일을 가져옵니다.
+        /// </summary>
+        public async Task<TileBase> GetGroundTile()
+        {
+            var handle = _addressablesScope.LoadAssetAsync<TileBase>(_groundTile);
+            // Task.Wait으로 대기할 경우 데드락 발생해 뻗어버리는 문제로 인해 WaitForCompletion()을 사용한 대기처리로 해결
+            handle.WaitForCompletion();
+            return await handle.Task;
+        }
+
+        /// <summary>
+        /// 랜덤 적을 가져옵니다.
+        /// 에디터에서는 사용하지 않으므로 null을 반환합니다.
+        /// </summary>
+        public async Task<Enemy> GetRandomEnemy()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// 플레이어를 가져옵니다.
+        /// 에디터에서는 사용하지 않으므로 null을 반환합니다.
+        /// </summary>
+        public async Task<Player> GetPlayer()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// 주소에 해당하는 인스턴스를 생성합니다.
+        /// </summary>
+        public async Task<GameObject> GetInstance(string address)
+        {
+            var handle = _addressablesScope.InstantiateAsync(address);
+            // Task.Wait으로 대기할 경우 데드락 발생해 뻗어버리는 문제로 인해 WaitForCompletion()을 사용한 대기처리 사용
+            handle.WaitForCompletion();
+            await handle.Task;
+
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogWarning($"[{nameof(EditorStageResourceProvider)}] 인스턴스 생성 실패: {address}");
+                return null;
+            }
+
+            if (handle.Result == null)
+            {
+                Debug.LogWarning($"[{nameof(EditorStageResourceProvider)}] 인스턴스가 null입니다: {address}");
+                return null;
+            }
+
+            return handle.Result;
+        }
+
+        /// <summary>
+        /// 주소에 해당하는 에셋을 가져옵니다.
+        /// </summary>
+        public async Task<T> GetAsset<T>(string address) where T : Object
+        {
+            var handle = _addressablesScope.LoadAssetAsync<T>(address);
+            // Task.Wait으로 대기할 경우 데드락 발생해 뻗어버리는 문제로 인해 WaitForCompletion()을 사용한 대기처리 사용
+            handle.WaitForCompletion();
+            await handle.Task;
+
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogWarning($"[{nameof(EditorStageResourceProvider)}] 에셋 로드 실패: {address}");
+                return null;
+            }
+
+            return handle.Result;
+        }
+
+        public void Dispose()
+        {
+            _addressablesScope?.Dispose();
+        }
+    }
+}
+#endif

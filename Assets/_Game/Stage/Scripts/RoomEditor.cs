@@ -12,8 +12,8 @@ namespace DungeonShooter
     public class RoomEditor : MonoBehaviour
     {
         [SerializeField]
-        [Tooltip("방 크기 표시를 위해 설치할 타일맵")]
-        private TileBase _exampleTile;
+        [Tooltip("방 에디터 프리셋 리소스 설정")]
+        private EditorStageResourceProvider _resourceProvider;
 
         [SerializeField] 
         private int _roomSizeX;
@@ -29,17 +29,17 @@ namespace DungeonShooter
         private string _fileName;
 
         [SerializeField]
-        [Tooltip("불러오기 경로")]
-        private string _loadPath;
+        [Tooltip("불러올 방 데이터 파일 (TextAsset)")]
+        private TextAsset _loadFile;
 
         public string SavePath => _savePath;
-        public string LoadPath => _loadPath;
+        public TextAsset LoadFile => _loadFile;
         public string FileName => _fileName;
         public int RoomSizeX => _roomSizeX;
         public int RoomSizeY => _roomSizeY;
 
         public void SetSavePath(string path) => _savePath = path;
-        public void SetLoadPath(string path) => _loadPath = path;
+        public void SetLoadFile(TextAsset file) => _loadFile = file;
         public void SetFileName(string fileName) => _fileName = fileName;
 
         /// <summary>
@@ -78,34 +78,67 @@ namespace DungeonShooter
         {
             if (!ValidateEditorMode()) return;
 
-            if (string.IsNullOrEmpty(_loadPath))
+            if (_loadFile == null)
             {
-                Debug.LogError($"[{nameof(RoomEditor)}] 불러올 파일 경로가 지정되지 않았습니다.");
+                Debug.LogError($"[{nameof(RoomEditor)}] 불러올 파일이 지정되지 않았습니다.");
                 return;
             }
 
             EnsureStructure();
 
-            // 파일 경로에서 TextAsset 로드
-            var textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(_loadPath);
-            if (textAsset == null)
-            {
-                Debug.LogError($"[{nameof(RoomEditor)}] 파일을 찾을 수 없습니다: {_loadPath}");
-                return;
-            }
-
-            var roomData = RoomDataSerializer.DeserializeRoom(textAsset);
+            var roomData = RoomDataSerializer.DeserializeRoom(_loadFile);
             if (roomData == null)
             {
                 Debug.LogError($"[{nameof(RoomEditor)}] 방 역직렬화에 실패했습니다.");
                 return;
             }
 
-            // StageInstantiator를 사용하여 데이터 불러오기
-            StageInstantiator.InstantiateRoomEditor(roomData, roomObj: gameObject);
+            if (_resourceProvider == null)
+            {
+                Debug.LogError($"[{nameof(RoomEditor)}] ResourceProvider가 설정되지 않았습니다.");
+                return;
+            }
+
+            // 로드한 파일의 경로와 이름으로 저장 경로 및 파일 이름 갱신
+            var filePath = AssetDatabase.GetAssetPath(_loadFile);
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                var directory = System.IO.Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    _savePath = directory + "/";
+                }
+
+                var fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(filePath);
+                if (!string.IsNullOrEmpty(fileNameWithoutExtension))
+                {
+                    _fileName = fileNameWithoutExtension;
+                }
+            }
+
+            // Room 구조 생성
+            RoomTilemapHelper.GetOrCreateRoomStructure(gameObject, null, gameObject.name);
+
+            // 방 크기 업데이트
+            _roomSizeX = roomData.RoomSizeX;
+            _roomSizeY = roomData.RoomSizeY;
+
+            var centerPos = Vector2.zero; // Room 레벨에서는 중심이 (0,0)
+
+            // 맵 배치
+            RoomTilemapHelper.ClearTiles(gameObject.transform);
+
+            var baseTilesTask = RoomTilemapHelper.PlaceBaseTiles(gameObject.transform, centerPos, roomData, _resourceProvider);
+            baseTilesTask.Wait();
+
+            var additionalTilesTask = RoomTilemapHelper.PlaceAdditionalTiles(gameObject.transform, centerPos, roomData, _resourceProvider);
+            additionalTilesTask.Wait();
+
+            var objectsTask = RoomTilemapHelper.PlaceObjectsAsync(gameObject.transform, roomData, _resourceProvider);
+            objectsTask.Wait();
 
             EditorUtility.SetDirty(this);
-            Debug.Log($"[{nameof(RoomEditor)}] 방 불러오기 완료: {_loadPath}");
+            Debug.Log($"[{nameof(RoomEditor)}] 방 불러오기 완료: {_loadFile.name}");
         }
 
 
@@ -116,34 +149,33 @@ namespace DungeonShooter
         {
             if (!ValidateEditorMode()) return;
 
-            if (_exampleTile == null)
+            if (_resourceProvider == null)
             {
-                Debug.LogWarning($"[{nameof(RoomEditor)}] 예제 타일이 설정되지 않았습니다.");
+                Debug.LogError($"[{nameof(RoomEditor)}] ResourceProvider가 설정되지 않았습니다.");
                 return;
             }
 
-            // Tilemap_Ground 찾기 또는 생성
-            var tilemap = RoomTilemapHelper.GetOrCreateRoomStructure(this.gameObject, null, gameObject.name);
-            var groundTilemap = RoomTilemapHelper.GetOrCreateTilemap(tilemap.tilemapsParent, RoomConstants.TILEMAP_GROUND_NAME);
-            
-            // 기존 타일 모두 제거
-            groundTilemap.ClearAllTiles();
-            
-            // 중앙 기준으로 타일 배치 (Transform 중앙이 (0,0)이 되도록)
-            var startX = -_roomSizeX / 2;
-            var startY = -_roomSizeY / 2;
-            
-            for (int x = 0; x < _roomSizeX; x++)
+            // 임시 RoomData 생성 (방 크기만 설정)
+            var tempRoomData = new RoomData
             {
-                for (int y = 0; y < _roomSizeY; y++)
-                {
-                    var position = new Vector3Int(startX + x, startY + y, 0);
-                    groundTilemap.SetTile(position, _exampleTile);
-                }
-            }
+                RoomSizeX = _roomSizeX,
+                RoomSizeY = _roomSizeY
+            };
+
+            // Room 구조 생성
+            RoomTilemapHelper.GetOrCreateRoomStructure(this.gameObject, null, gameObject.name);
+
+            // 베이스 타일 배치 (동기적으로 실행)
+            var centerPos = Vector2.zero; // Room 레벨에서는 중심이 (0,0)
+            var task = RoomTilemapHelper.PlaceBaseTiles(this.transform, centerPos, tempRoomData, _resourceProvider);
+            task.Wait();
 
             EditorUtility.SetDirty(this);
-            EditorUtility.SetDirty(tilemap.tilemapsParent);
+            var tilemapsParent = this.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
+            if (tilemapsParent != null)
+            {
+                EditorUtility.SetDirty(tilemapsParent);
+            }
         }
 
         /// <summary>

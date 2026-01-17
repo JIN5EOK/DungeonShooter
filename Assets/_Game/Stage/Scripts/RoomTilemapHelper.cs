@@ -245,6 +245,14 @@ namespace DungeonShooter
             }
         }
 
+        public static void ClearTiles(Transform stageRoot)
+        {
+            var tilemapsParent = GetOrCreateChild(stageRoot, RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
+            var groundTilemap = GetOrCreateTilemap(tilemapsParent, RoomConstants.TILEMAP_GROUND_NAME);
+            var decoTilemap = GetOrCreateTilemap(tilemapsParent, RoomConstants.TILEMAP_DECO_NAME);
+            groundTilemap.ClearAllTiles();
+            decoTilemap.ClearAllTiles();
+        }
         /// <summary>
         /// 베이스 타일을 배치합니다.
         /// </summary>
@@ -388,12 +396,6 @@ namespace DungeonShooter
                     instance.transform.position = new Vector3(objectData.Position.x, objectData.Position.y, 0) + worldOffset;
                     instance.transform.rotation = objectData.Rotation;
                     createdObjects.Add(instance);
-
-                    // 초기화 필요한 객체면 대기
-                    if (instance.TryGetComponent(out IInitializationAwaiter initAwaiter))
-                    {
-                        await initAwaiter.InitializationTask;
-                    }
                 }
             }
 
