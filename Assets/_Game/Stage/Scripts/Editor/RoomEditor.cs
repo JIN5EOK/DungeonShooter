@@ -47,7 +47,7 @@ namespace DungeonShooter
         /// </summary>
         private void EnsureStructure()
         {
-            RoomTilemapHelper.ClearRoomObject(gameObject);
+            RoomCreateHelper.ClearRoomObject(transform);
             UpdateRoomSizeTiles();
         }
 
@@ -117,7 +117,7 @@ namespace DungeonShooter
             }
 
             // Room 구조 생성
-            RoomTilemapHelper.GetOrCreateRoomStructure(gameObject, null, gameObject.name);
+            RoomCreateHelper.GetOrCreateRoomStructure(transform, gameObject.name);
 
             // 방 크기 업데이트
             _roomSizeX = roomData.RoomSizeX;
@@ -126,15 +126,15 @@ namespace DungeonShooter
             var centerPos = Vector2.zero; // Room 레벨에서는 중심이 (0,0)
 
             // 맵 배치
-            RoomTilemapHelper.ClearTiles(gameObject.transform);
+            RoomCreateHelper.ClearTiles(gameObject.transform);
 
-            var baseTilesTask = RoomTilemapHelper.PlaceBaseTiles(gameObject.transform, centerPos, roomData, _resourceProvider);
+            var baseTilesTask = RoomCreateHelper.PlaceBaseTiles(gameObject.transform, centerPos, roomData, _resourceProvider);
             baseTilesTask.Wait();
 
-            var additionalTilesTask = RoomTilemapHelper.PlaceAdditionalTiles(gameObject.transform, centerPos, roomData, _resourceProvider);
+            var additionalTilesTask = RoomCreateHelper.PlaceAdditionalTiles(gameObject.transform, centerPos, roomData, _resourceProvider);
             additionalTilesTask.Wait();
 
-            var objectsTask = RoomTilemapHelper.PlaceObjectsAsync(gameObject.transform, roomData, _resourceProvider);
+            var objectsTask = RoomCreateHelper.PlaceObjectsAsync(gameObject.transform, roomData, _resourceProvider);
             objectsTask.Wait();
 
             EditorUtility.SetDirty(this);
@@ -163,11 +163,11 @@ namespace DungeonShooter
             };
 
             // Room 구조 생성
-            RoomTilemapHelper.GetOrCreateRoomStructure(this.gameObject, null, gameObject.name);
+            RoomCreateHelper.GetOrCreateRoomStructure(transform, gameObject.name);
 
             // 베이스 타일 배치 (동기적으로 실행)
             var centerPos = Vector2.zero; // Room 레벨에서는 중심이 (0,0)
-            var task = RoomTilemapHelper.PlaceBaseTiles(this.transform, centerPos, tempRoomData, _resourceProvider);
+            var task = RoomCreateHelper.PlaceBaseTiles(this.transform, centerPos, tempRoomData, _resourceProvider);
             task.Wait();
 
             EditorUtility.SetDirty(this);

@@ -14,15 +14,6 @@ using Random = UnityEngine.Random;
 
 namespace DungeonShooter
 {
-
-    public interface IStageResourceProvider : IDisposable
-    {
-        Task<TileBase> GetGroundTile();
-        Task<Enemy> GetRandomEnemy();
-        Task<Player> GetPlayer();
-        Task<GameObject> GetInstance(string address);
-        Task<T> GetAsset<T>(string address) where T : Object;
-    }
     /// <summary>
     /// 현재 스테이지에 적절한 타일, 캐릭터를 제공하는 클래스
     /// </summary>
