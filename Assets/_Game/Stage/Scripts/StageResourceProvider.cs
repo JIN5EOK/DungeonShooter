@@ -17,11 +17,11 @@ namespace DungeonShooter
 
     public interface IStageResourceProvider : IDisposable
     {
-        Awaitable<TileBase> GetGroundTile();
-        Awaitable<Enemy> GetRandomEnemy();
-        Awaitable<Player> GetPlayer();
-        Awaitable<GameObject> GetInstance(string address);
-        Awaitable<T> GetAsset<T>(string address) where T : Object;
+        Task<TileBase> GetGroundTile();
+        Task<Enemy> GetRandomEnemy();
+        Task<Player> GetPlayer();
+        Task<GameObject> GetInstance(string address);
+        Task<T> GetAsset<T>(string address) where T : Object;
     }
     /// <summary>
     /// 현재 스테이지에 적절한 타일, 캐릭터를 제공하는 클래스
@@ -77,7 +77,7 @@ namespace DungeonShooter
         /// <summary>
         /// Ground 타일을 가져옵니다.
         /// </summary>
-        public async Awaitable<TileBase> GetGroundTile()
+        public async Task<TileBase> GetGroundTile()
         {
             var handle = _addressablesScope.LoadAssetAsync<TileBase>(_stageConfig.GroundTile);
             await handle.Task;
@@ -87,7 +87,7 @@ namespace DungeonShooter
         /// <summary>
         /// 스테이지에 맞는 랜덤 적을 가져옵니다.
         /// </summary>
-        public async Awaitable<Enemy> GetRandomEnemy()
+        public async Task<Enemy> GetRandomEnemy()
         {
             await EnsureInitializedAsync();
             if (EnemyAddresses == null || EnemyAddresses.Count == 0)
@@ -121,7 +121,7 @@ namespace DungeonShooter
         /// 플레이어 캐릭터를 가져옵니다
         /// TODO: 다양한 캐릭터 형태에 대응하도록 변경 필요
         /// </summary>
-        public async Awaitable<Player> GetPlayer()
+        public async Task<Player> GetPlayer()
         {
             if (_stageConfig.PlayerPrefab == null || !_stageConfig.PlayerPrefab.RuntimeKeyIsValid())
             {
@@ -151,7 +151,7 @@ namespace DungeonShooter
         /// <summary>
         /// 주소에 해당하는 인스턴스를 생성하고 의존성 주입
         /// </summary>
-        public async Awaitable<GameObject> GetInstance(string address)
+        public async Task<GameObject> GetInstance(string address)
         {
             var handle = _addressablesScope.InstantiateAsync(address);
             await handle.Task;
@@ -175,7 +175,7 @@ namespace DungeonShooter
         /// <summary>
         /// 주소에 해당하는 에셋을 가져옵니다.
         /// </summary>
-        public async Awaitable<T> GetAsset<T>(string address) where T : Object
+        public async Task<T> GetAsset<T>(string address) where T : Object
         {
             var handle = _addressablesScope.LoadAssetAsync<T>(address);
             await handle.Task;

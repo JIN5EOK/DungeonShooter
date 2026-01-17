@@ -29,5 +29,24 @@ namespace DungeonShooter
         public static readonly RenderingLayer Ground = new("Ground");
         public static readonly RenderingLayer Wall = new("Wall");
         public static readonly RenderingLayer Deco = new("Deco");
+
+        /// <summary>
+        /// SortingLayer ID로부터 이름을 가져옵니다.
+        /// </summary>
+        /// <param name="sortingLayerId">SortingLayer ID</param>
+        /// <returns>레이어 이름, 찾을 수 없으면 "Layer_{ID}" 형식 반환</returns>
+        public static string GetLayerName(int sortingLayerId)
+        {
+            var layers = SortingLayer.layers;
+            foreach (var layer in layers)
+            {
+                if (layer.id == sortingLayerId)
+                {
+                    return layer.name;
+                }
+            }
+
+            return $"Layer_{sortingLayerId}";
+        }
     }
 }

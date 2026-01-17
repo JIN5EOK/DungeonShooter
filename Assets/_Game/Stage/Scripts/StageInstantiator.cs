@@ -43,29 +43,14 @@ namespace DungeonShooter
             }
 
             // Stage 레벨 타일맵 구조 생성
-            var stageTilemapsParent = new GameObject(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
-            stageTilemapsParent.transform.SetParent(stageObj.transform);
-            stageTilemapsParent.AddComponent<Grid>();
+            var (stageTilemapsParent, stageObjectsParent, groundTilemap, decoTilemap) = 
+                RoomTilemapHelper.GetOrCreateStageStructure(stageObj);
 
-            // Stage 레벨 오브젝트 구조 생성
-            var stageObjectsParent = new GameObject(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
-            stageObjectsParent.transform.SetParent(stageObj.transform);
-
-            // 타일맵 생성 (Ground, Deco)
-            var groundTilemapObj = new GameObject(RoomConstants.TILEMAP_GROUND_NAME);
-            groundTilemapObj.transform.SetParent(stageTilemapsParent.transform);
-            var groundTilemap = groundTilemapObj.AddComponent<Tilemap>();
-            groundTilemap.gameObject.AddComponent<TilemapCollider2D>().compositeOperation = Collider2D.CompositeOperation.Merge;
-            var groundRenderer = groundTilemapObj.AddComponent<TilemapRenderer>();
-            groundRenderer.sortingLayerName = RenderingLayers.Ground.LayerName;
-            
-
-            var decoTilemapObj = new GameObject(RoomConstants.TILEMAP_DECO_NAME);
-            decoTilemapObj.transform.SetParent(stageTilemapsParent.transform);
-            var decoTilemap = decoTilemapObj.AddComponent<Tilemap>();
-            var decoRenderer = decoTilemapObj.AddComponent<TilemapRenderer>();
-            decoTilemap.gameObject.AddComponent<TilemapCollider2D>().compositeOperation = Collider2D.CompositeOperation.Merge;
-            decoRenderer.sortingLayerName = RenderingLayers.Deco.LayerName;
+            if (stageTilemapsParent == null || stageObjectsParent == null || groundTilemap == null || decoTilemap == null)
+            {
+                Debug.LogError($"[{nameof(StageInstantiator)}] Stage 구조를 생성할 수 없습니다.");
+                return null;
+            }
 
             // 모든 방의 타일과 오브젝트를 Stage 레벨에 배치
             foreach (var room in stage.Rooms.Values)
@@ -77,12 +62,25 @@ namespace DungeonShooter
                 }
 
                 var worldPosition = new Vector3(room.Position.x * RoomConstants.ROOM_SPACING, room.Position.y * RoomConstants.ROOM_SPACING, 0);
+                var centerPos = new Vector2(worldPosition.x, worldPosition.y);
 
                 // 방의 타일을 Stage 레벨 타일맵에 배치
-                await PlaceRoomTilesAsync(resourceProvider, room, worldPosition, groundTilemap, decoTilemap);
+                await RoomTilemapHelper.PlaceBaseTiles(stageObj.transform, centerPos, room.RoomData, resourceProvider);
+                await RoomTilemapHelper.PlaceAdditionalTiles(stageObj.transform, centerPos, room.RoomData, resourceProvider);
 
                 // 방의 오브젝트를 Stage 레벨 Objects에 배치
-                await InstantiateObjectsAsync(room.RoomData, stageObjectsParent.transform, resourceProvider, worldPosition);
+                var objects = await RoomTilemapHelper.PlaceObjectsAsync(stageObj.transform, room.RoomData, resourceProvider, worldPosition);
+                // 생성후 초기화 필요한 객체면 대기
+
+                foreach (var go in objects)
+                {
+                    if (go != null && go.TryGetComponent(out IInitializationAwaiter initAwaiter))
+                    {
+                        Debug.Log($"{nameof(StageInstantiator)} : 초기화 필요한 객체, 대기합니다.");
+                        await initAwaiter.InitializationTask;
+                    }
+                }
+
             }
 
             // 복도 생성
@@ -92,80 +90,6 @@ namespace DungeonShooter
             return stageObj;
         }
 
-        /// <summary>
-        /// 방의 타일을 Stage 레벨 타일맵에 배치합니다.
-        /// </summary>
-        private static async Awaitable PlaceRoomTilesAsync(
-            IStageResourceProvider resourceProvider,
-            Room room,
-            Vector3 worldPosition,
-            Tilemap groundTilemap,
-            Tilemap decoTilemap)
-        {
-            var roomData = room.RoomData;
-            var roomSizeX = roomData.RoomSizeX;
-            var roomSizeY = roomData.RoomSizeY;
-            var worldPosInt = new Vector3Int((int)worldPosition.x, (int)worldPosition.y, 0);
-
-            // 타일 로드
-            var groundTile = await resourceProvider.GetGroundTile();
-
-            if (groundTile == null)
-            {
-                Debug.LogError($"[{nameof(StageInstantiator)}] 필수 타일을 로드할 수 없습니다.");
-                return;
-            }
-
-            // Ground 타일 배치 (방 내부)
-            var startX = -roomSizeX / 2;
-            var startY = -roomSizeY / 2;
-            for (int x = 0; x < roomSizeX; x++)
-            {
-                for (int y = 0; y < roomSizeY; y++)
-                {
-                    var localPos = new Vector3Int(startX + x, startY + y, 0);
-                    var worldTilePos = localPos + worldPosInt;
-                    groundTilemap.SetTile(worldTilePos, groundTile);
-                }
-            }
-
-            // Deco 타일 배치
-            if (roomData.Tiles.Count > 0)
-            {
-                // 레이어별로 그룹화
-                var tilesByLayer = roomData.Tiles.GroupBy(t => t.Layer);
-
-                foreach (var layerGroup in tilesByLayer)
-                {
-                    // 타일 배치 (비동기 로드)
-                    var uniqueTileIndices = layerGroup.Select(t => t.Index).Distinct().ToList();
-                    var tileCache = new Dictionary<int, TileBase>();
-
-                    // 모든 타일을 먼저 로드
-                    foreach (var index in uniqueTileIndices)
-                    {
-                        var address = roomData.GetAddress(index);
-                        if (string.IsNullOrEmpty(address)) continue;
-
-                        var tileBase = await resourceProvider.GetAsset<TileBase>(address);
-                        if (tileBase != null)
-                        {
-                            tileCache[index] = tileBase;
-                        }
-                    }
-
-                    // 타일 배치 (로컬 좌표를 월드 좌표로 변환)
-                    foreach (var tileData in layerGroup)
-                    {
-                        if (!tileCache.TryGetValue(tileData.Index, out var tileBase)) continue;
-
-                        var localPos = new Vector3Int(tileData.Position.x, tileData.Position.y, 0);
-                        var worldTilePos = localPos + worldPosInt;
-                        decoTilemap.SetTile(worldTilePos, tileBase);
-                    }
-                }
-            }
-        }
 
         /// <summary>
         /// Room 구조를 가져오거나 생성합니다.
@@ -175,12 +99,6 @@ namespace DungeonShooter
             Transform parent,
             string roomName)
         {
-            if (roomObj != null)
-            {
-                // 기존 타일맵과 오브젝트 제거
-                ClearExistingData(roomObj);
-            }
-
             var (tilemapsParent, objectsParent) = RoomTilemapHelper.GetOrCreateRoomStructure(roomObj, parent, roomName);
 
             if (tilemapsParent == null || objectsParent == null)
@@ -192,100 +110,6 @@ namespace DungeonShooter
             return (tilemapsParent, objectsParent);
         }
 
-        /// <summary>
-        /// RoomData의 타일 데이터를 Tilemap_Deco에 배치합니다.
-        /// </summary>
-        private static async Task InstantiateDecoTilemapsAsync(
-            RoomData roomData,
-            Transform tilemapsParent,
-            IStageResourceProvider resourceProvider)
-        {
-            if (roomData.Tiles.Count == 0)
-            {
-                return;
-            }
-
-            var grid = tilemapsParent.GetComponent<Grid>();
-            if (grid == null)
-            {
-                Debug.LogError($"[{nameof(StageInstantiator)}] Grid 컴포넌트가 없습니다.");
-                return;
-            }
-
-            // 레이어별로 그룹화
-            var tilesByLayer = roomData.Tiles.GroupBy(t => t.Layer);
-
-            foreach (var layerGroup in tilesByLayer)
-            {
-                var sortingLayerId = layerGroup.Key;
-                var sortingLayerName = GetSortingLayerName(sortingLayerId);
-
-                // 레이어별 Tilemap 생성 (Deco)
-                var tilemapName = $"Tilemap_{sortingLayerName}";
-                var tilemapObj = new GameObject(tilemapName);
-                tilemapObj.transform.SetParent(tilemapsParent);
-                var tilemap = tilemapObj.AddComponent<Tilemap>();
-                var renderer = tilemapObj.AddComponent<TilemapRenderer>();
-                renderer.sortingLayerID = sortingLayerId;
-
-                // 타일 배치 (비동기 로드)
-                var uniqueTileIndices = layerGroup.Select(t => t.Index).Distinct().ToList();
-                var tileCache = new Dictionary<int, TileBase>();
-
-                // 모든 타일을 먼저 로드
-                foreach (var index in uniqueTileIndices)
-                {
-                    var address = roomData.GetAddress(index);
-                    if (string.IsNullOrEmpty(address)) continue;
-
-                    var tileBase = await resourceProvider.GetAsset<TileBase>(address);
-                    if (tileBase != null)
-                    {
-                        tileCache[index] = tileBase;
-                    }
-                }
-
-                // 타일 배치
-                foreach (var tileData in layerGroup)
-                {
-                    if (!tileCache.TryGetValue(tileData.Index, out var tileBase)) continue;
-
-                    var cellPosition = new Vector3Int(tileData.Position.x, tileData.Position.y, 0);
-                    tilemap.SetTile(cellPosition, tileBase);
-                }
-            }
-        }
-
-        /// <summary>
-        /// RoomData의 오브젝트 데이터를 배치합니다 (비동기).
-        /// </summary>
-        private static async Task InstantiateObjectsAsync(
-            RoomData roomData,
-            Transform objectsParent,
-            IStageResourceProvider resourceProvider,
-            Vector3 worldOffset = default)
-        {
-            foreach (var objectData in roomData.Objects)
-            {
-                var address = roomData.GetAddress(objectData.Index);
-                if (string.IsNullOrEmpty(address)) continue;
-
-                var instance = await resourceProvider.GetInstance(address);
-                if (instance != null)
-                {
-                    instance.transform.SetParent(objectsParent);
-                    instance.transform.position = new Vector3(objectData.Position.x, objectData.Position.y, 0) + worldOffset;
-                    instance.transform.rotation = objectData.Rotation;
-                }
-
-                // 생성후 초기화 필요한 객체면 대기
-                if (instance != null && instance.TryGetComponent(out IInitializationAwaiter initAwaiter))
-                {
-                    Debug.Log($"{nameof(StageInstantiator)} : 초기화 필요한 객체, 대기합니다.");
-                    await initAwaiter.InitializationTask;
-                }
-            }
-        }
         /// <summary>
         /// RoomData를 게임오브젝트로 변환합니다.
         /// roomObj가 null이면 새로 생성하고, null이 아니면 기존 GameObject에 데이터를 불러옵니다.
@@ -321,58 +145,22 @@ namespace DungeonShooter
                 return null;
             }
 
+            var roomGameObject = roomObj ?? tilemapsParent.parent.gameObject;
+            var centerPos = Vector2.zero; // Room 레벨에서는 중심이 (0,0)
+
             // 타일맵 생성 및 배치 (비동기 메서드를 동기적으로 실행)
-            var tilemapsTask = InstantiateDecoTilemapsAsync(roomData, tilemapsParent, resourceProvider);
-            tilemapsTask.Wait();
+            var baseTilesTask = RoomTilemapHelper.PlaceBaseTiles(roomGameObject.transform, centerPos, roomData, resourceProvider);
+            baseTilesTask.Wait();
+
+            var additionalTilesTask = RoomTilemapHelper.PlaceAdditionalTiles(roomGameObject.transform, centerPos, roomData, resourceProvider);
+            additionalTilesTask.Wait();
 
             // 오브젝트 생성 및 배치 (비동기 메서드를 동기적으로 실행)
-            var objectsTask = InstantiateObjectsAsync(roomData, objectsParent, resourceProvider);
+            var objectsTask = RoomTilemapHelper.PlaceObjectsAsync(roomGameObject.transform, roomData, resourceProvider);
             objectsTask.Wait();
 
-            return roomObj ?? tilemapsParent.parent.gameObject;
+            return roomGameObject;
         }
-
-        /// <summary>
-        /// 기존 타일과 오브젝트를 제거합니다.
-        /// </summary>
-        private static void ClearExistingData(GameObject roomObj)
-        {
-            // Tilemaps 하위의 모든 타일맵 제거
-            var tilemapsParent = roomObj.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
-            if (tilemapsParent != null)
-            {
-                for (int i = tilemapsParent.childCount - 1; i >= 0; i--)
-                {
-                    if (Application.isEditor)
-                    {
-                        Object.DestroyImmediate(tilemapsParent.GetChild(i).gameObject);
-                    }
-                    else
-                    {
-                        Object.Destroy(tilemapsParent.GetChild(i).gameObject);
-                    }
-                }
-            }
-
-            // Objects 하위의 모든 오브젝트 제거
-            var objectsParent = roomObj.transform.Find(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
-            if (objectsParent != null)
-            {
-                for (int i = objectsParent.childCount - 1; i >= 0; i--)
-                {
-                    if (Application.isEditor)
-                    {
-                        Object.DestroyImmediate(objectsParent.GetChild(i).gameObject);
-                    }
-                    else
-                    {
-                        Object.Destroy(objectsParent.GetChild(i).gameObject);
-                    }
-                }
-            }
-        }
-
-
 
         /// <summary>
         /// 방들을 연결하는 복도를 생성합니다.
@@ -495,22 +283,6 @@ namespace DungeonShooter
             }
         }
 
-        /// <summary>
-        /// SortingLayer ID로부터 이름을 가져옵니다.
-        /// </summary>
-        private static string GetSortingLayerName(int sortingLayerId)
-        {
-            var layers = SortingLayer.layers;
-            foreach (var layer in layers)
-            {
-                if (layer.id == sortingLayerId)
-                {
-                    return layer.name;
-                }
-            }
-
-            return $"Layer_{sortingLayerId}";
-        }
     }
 }
 
