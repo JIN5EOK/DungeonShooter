@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 using Jin5eok;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -58,27 +59,31 @@ namespace DungeonShooter
 
         /// <summary>
         /// 주소에 해당하는 인스턴스를 생성합니다.
+        /// 에디터에서는 프리팹 연결을 유지하기 위해 PrefabUtility.InstantiatePrefab을 사용합니다.
         /// </summary>
         public async Task<GameObject> GetInstance(string address)
         {
-            var handle = _addressablesScope.InstantiateAsync(address);
-            // Task.Wait으로 대기할 경우 데드락 발생해 뻗어버리는 문제로 인해 WaitForCompletion()을 사용한 대기처리 사용
-            handle.WaitForCompletion();
-            await handle.Task;
+            // 에디터에서는 프리팹 에셋을 로드한 후 PrefabUtility로 인스턴스화
+            var prefabHandle = _addressablesScope.LoadAssetAsync<GameObject>(address);
+            prefabHandle.WaitForCompletion();
+            await prefabHandle.Task;
 
-            if (handle.Status != AsyncOperationStatus.Succeeded)
+            if (prefabHandle.Status != AsyncOperationStatus.Succeeded)
             {
-                Debug.LogWarning($"[{nameof(EditorStageResourceProvider)}] 인스턴스 생성 실패: {address}");
+                Debug.LogWarning($"[{nameof(EditorStageResourceProvider)}] 프리팹 로드 실패: {address}");
                 return null;
             }
 
-            if (handle.Result == null)
+            var prefab = prefabHandle.Result;
+            if (prefab == null)
             {
-                Debug.LogWarning($"[{nameof(EditorStageResourceProvider)}] 인스턴스가 null입니다: {address}");
+                Debug.LogWarning($"[{nameof(EditorStageResourceProvider)}] 프리팹이 null입니다: {address}");
                 return null;
             }
 
-            return handle.Result;
+            // PrefabUtility.InstantiatePrefab을 사용하여 프리팹 연결 유지
+            var instance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+            return instance;
         }
 
         /// <summary>

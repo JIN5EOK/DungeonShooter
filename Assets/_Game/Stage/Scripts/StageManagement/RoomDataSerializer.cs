@@ -36,7 +36,7 @@ namespace DungeonShooter
             roomData.RoomSizeY = roomSizeY;
 
             // 1. Tilemaps 하위의 타일맵 컴포넌트들을 찾아서 TileLayerData로 변환
-            var tilemapsTransform = room.transform.Find(RoomConstants.TILEMAP_DECO_NAME);
+            var tilemapsTransform = RoomCreateHelper.GetOrCreateTilemap(room.transform, RoomConstants.TILEMAP_DECO_NAME);
             if (tilemapsTransform != null)
             {
                 SerializeTilemaps(tilemapsTransform, roomData);
@@ -47,7 +47,7 @@ namespace DungeonShooter
             }
 
             // 2. Objects 하위의 오브젝트들을 찾아서 ObjectData로 변환
-            var objectsTransform = room.transform.Find(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            var objectsTransform = RoomCreateHelper.GetOrCreateChild(room.transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
             if (objectsTransform != null)
             {
                 SerializeObjects(objectsTransform, roomData);
@@ -101,48 +101,42 @@ namespace DungeonShooter
         /// <summary>
         /// 타일맵들을 직렬화합니다.
         /// </summary>
-        private static void SerializeTilemaps(Transform tilemapsParent, RoomData roomData)
+        private static void SerializeTilemaps(Tilemap tilemap, RoomData roomData)
         {
-            // Tilemaps 하위의 모든 Tilemap 컴포넌트 찾기
-            var tilemaps = tilemapsParent.GetComponentsInChildren<Tilemap>();
+            // TilemapRenderer에서 SortingLayer ID 가져오기
+            var renderer = tilemap.GetComponent<TilemapRenderer>();
+            var sortingLayerId = renderer != null ? renderer.sortingLayerID : 0;
 
-            foreach (Tilemap tilemap in tilemaps)
+            // 타일맵의 모든 타일 순회
+            var bounds = tilemap.cellBounds;
+            foreach (Vector3Int pos in bounds.allPositionsWithin)
             {
-                // TilemapRenderer에서 SortingLayer ID 가져오기
-                var renderer = tilemap.GetComponent<TilemapRenderer>();
-                var sortingLayerId = renderer != null ? renderer.sortingLayerID : 0;
-
-                // 타일맵의 모든 타일 순회
-                var bounds = tilemap.cellBounds;
-                foreach (Vector3Int pos in bounds.allPositionsWithin)
+                var tile = tilemap.GetTile(pos);
+                if (tile == null)
                 {
-                    var tile = tilemap.GetTile(pos);
-                    if (tile == null)
-                    {
-                        continue;
-                    }
-
-                    // TileBase의 어드레서블 주소 얻기
-                    var address = GetAddressableAddress(tile);
-                    if (string.IsNullOrEmpty(address))
-                    {
-                        Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 타일 '{tile.name}'의 어드레서블 주소를 찾을 수 없습니다. 위치: {pos}");
-                        continue;
-                    }
-
-                    // 주소 테이블에 추가하고 인덱스 얻기
-                    var addressIndex = roomData.GetOrAddAddress(address);
-
-                    // TileLayerData 생성
-                    var tileData = new TileLayerData
-                    {
-                        Index = addressIndex,
-                        Layer = sortingLayerId,
-                        Position = new Vector2Int(pos.x, pos.y)
-                    };
-
-                    roomData.Tiles.Add(tileData);
+                    continue;
                 }
+
+                // TileBase의 어드레서블 주소 얻기
+                var address = GetAddressableAddress(tile);
+                if (string.IsNullOrEmpty(address))
+                {
+                    Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 타일 '{tile.name}'의 어드레서블 주소를 찾을 수 없습니다. 위치: {pos}");
+                    continue;
+                }
+
+                // 주소 테이블에 추가하고 인덱스 얻기
+                var addressIndex = roomData.GetOrAddAddress(address);
+
+                // TileLayerData 생성
+                var tileData = new TileLayerData
+                {
+                    Index = addressIndex,
+                    Layer = sortingLayerId,
+                    Position = new Vector2Int(pos.x, pos.y)
+                };
+
+                roomData.Tiles.Add(tileData);
             }
         }
 

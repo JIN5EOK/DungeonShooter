@@ -38,7 +38,7 @@ namespace DungeonShooter
         /// <summary>
         /// 지정된 이름의 자식 GameObject를 찾거나 생성합니다.
         /// </summary>
-        private static Transform GetOrCreateChild(Transform parent, string childName)
+        public static Transform GetOrCreateChild(Transform parent, string childName)
         {
             var child = parent.Find(childName);
             if (child == null)
@@ -71,6 +71,9 @@ namespace DungeonShooter
             var tilemap = tilemapObj.gameObject.AddOrGetComponent<Tilemap>();
             var renderer = tilemapObj.gameObject.AddOrGetComponent<TilemapRenderer>();
             var collider = tilemapObj.gameObject.AddOrGetComponent<TilemapCollider2D>();
+            var rigidBody2D = tilemapObj.gameObject.AddOrGetComponent<Rigidbody2D>();
+            rigidBody2D.bodyType = RigidbodyType2D.Kinematic;
+            tilemapObj.gameObject.AddOrGetComponent<CompositeCollider2D>();
             
             // 타일맵 이름에 따라 적절한 렌더링 레이어 설정
             var renderingLayer = GetRenderingLayerForTilemap(tilemapName);

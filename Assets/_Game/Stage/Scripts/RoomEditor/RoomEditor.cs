@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using Jin5eok;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Tilemaps;
@@ -48,7 +49,10 @@ namespace DungeonShooter
         private void EnsureStructure()
         {
             RoomCreateHelper.ClearRoomObject(transform);
+            RoomCreateHelper.ClearTiles(transform);
             UpdateRoomSizeTiles();
+            // 타일 팔레트로 게임오브젝트 배치하기 위해 에디터 한정으로 Tilemap 컴포넌트 추가  
+            RoomCreateHelper.GetOrCreateChild(transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME).gameObject.AddOrGetComponent<Tilemap>();
         }
 
         public void SaveMap()
@@ -118,7 +122,7 @@ namespace DungeonShooter
 
             // Room 구조 생성
             RoomCreateHelper.GetOrCreateRoomStructure(transform, gameObject.name);
-
+            
             // 방 크기 업데이트
             _roomSizeX = roomData.RoomSizeX;
             _roomSizeY = roomData.RoomSizeY;
