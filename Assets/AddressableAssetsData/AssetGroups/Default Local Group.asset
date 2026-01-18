@@ -38,6 +38,16 @@ MonoBehaviour:
     m_SerializedLabels:
     - Stage001_NormalRoom
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5b971ca8ccc0349049228890c3c418bc
+    m_Address: Tile_Tree_001
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 676ca14f427fc4c74a76a8271e618549
+    m_Address: Tile_Tree_002
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 68cbc2d8171cd407f81f321629c6e28a
     m_Address: PlayerSpawn
     m_ReadOnly: 0
@@ -48,6 +58,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - Stage001_NormalRoom
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 93f3e96e2de814f8080f7b6d455b1f50
+    m_Address: Tile_Misc_001
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f11938e1b96cf48b69061ba7452ce2f3
+    m_Address: Tile_Misc_002
+    m_ReadOnly: 0
+    m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f5237e1a4b00d4fe0a0f4fa9d094686c
     m_Address: StageConfig_001
