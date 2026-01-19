@@ -2,10 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.Tilemaps;
 using VContainer;
 using VContainer.Unity;
@@ -17,21 +15,18 @@ namespace DungeonShooter
     /// <summary>
     /// 현재 스테이지에 적절한 타일, 캐릭터를 제공하는 클래스
     /// </summary>
-    public class StageResourceProvider : IStageResourceProvider
+    public class StageResourceProvider : SceneResourceProvider, IStageResourceProvider
     {
-        private readonly AddressablesScope _addressablesScope;
         private readonly StageConfig _stageConfig;
 
         private List<string> EnemyAddresses { get; set; }
-        private IObjectResolver _resolver;
         private TaskCompletionSource<bool> _initializationTcs;
         private bool _isInitialized;
+        
         [Inject]
-        public StageResourceProvider(StageContext context, IObjectResolver resolver)
+        public StageResourceProvider(StageContext context, IObjectResolver resolver) : base(resolver)
         {
-            _addressablesScope = new AddressablesScope();
             _stageConfig = context.StageConfig;
-            _resolver = resolver;
         }
 
         /// <summary>
@@ -139,58 +134,6 @@ namespace DungeonShooter
             return player;
         }
 
-        /// <summary>
-        /// 주소에 해당하는 인스턴스를 생성하고 의존성 주입
-        /// </summary>
-        public async UniTask<GameObject> GetInstance(string address)
-        {
-            var handle = _addressablesScope.InstantiateAsync(address);
-            await handle.Task;
-
-            if (handle.Status != AsyncOperationStatus.Succeeded)
-            {
-                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 인스턴스 생성 실패: {address}");
-                return null;
-            }
-
-            if (handle.Result == null)
-            {
-                Debug.LogWarning($"[{nameof(StageResourceProvider)}] 인스턴스가 null입니다: {address}");
-                return null;
-            }
-
-            _resolver?.InjectGameObject(handle.Result);
-            return handle.Result;
-        }
-
-        /// <summary>
-        /// 주소에 해당하는 에셋을 가져옵니다.
-        /// </summary>
-        public async UniTask<T> GetAsset<T>(string address) where T : Object
-        {
-            var handle = _addressablesScope.LoadAssetAsync<T>(address);
-            await handle.Task;
-            _resolver.Inject(handle.Result);
-            return handle.Result;
-        }
-
-        
-        public T AddOrGetComponentWithInejct<T>(GameObject go) where T : Component
-        {
-            if (go.TryGetComponent(out T comp))
-            {
-                return comp;
-            }
-            return AddComponentWithInejct<T>(go);
-        }
-        
-        public T AddComponentWithInejct<T>(GameObject go) where T : Component
-        {
-            var comp = go.AddComponent<T>();
-            _resolver.Inject(comp);
-            return comp;
-        }
-        
         public void Dispose()
         {
             _addressablesScope?.Dispose();
