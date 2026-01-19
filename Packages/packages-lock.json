@@ -18,6 +18,13 @@
       },
       "url": "https://package.openupm.com"
     },
+    "com.cysharp.unitask": {
+      "version": "2.5.10",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
     "com.jin5eok.jin5eoklibrary": {
       "version": "file:JIN5EOK_Unity_Library/Assets/JIN5EOK",
       "depth": 0,
