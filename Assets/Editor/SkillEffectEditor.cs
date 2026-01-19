@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(Skill))]
+[CustomEditor(typeof(SkillTest))]
 public class SkillEffectEditor : Editor
 {
     private readonly string _skillNameName = "skillName";
@@ -29,7 +29,7 @@ public class SkillEffectEditor : Editor
         _effectsProperty = serializedObject.FindProperty(_effectsName);
         
         // EffectBase를 상속하는 모든 타입 찾기
-        _effectTypes = Jin5eok.ReflectionHelper.GetSubclasses<EffectBase>();
+        _effectTypes = Jin5eok.ReflectionHelper.GetSubclasses<EffectBaseTest>();
         _effectTypeNames = _effectTypes.Select(type => type.Name).ToArray();
     }
 
@@ -182,7 +182,7 @@ public class SkillEffectEditor : Editor
     {
         // 배열이고 형식 문자열에 EffectBase이 포함되어 있는지 확인
         var isArray = property.isArray;
-        var isContainName = property.type.Contains(typeof(EffectBase).Name);
+        var isContainName = property.type.Contains(typeof(EffectBaseTest).Name);
         return isArray && isContainName;
     }
 }
