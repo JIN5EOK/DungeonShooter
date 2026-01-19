@@ -17,6 +17,11 @@ public class Projectile : MonoBehaviour
     [SerializeField] private bool _destroyOnTrigger;
     [SerializeField] private bool _applyToOpponent;
     [SerializeField] private bool _applyToFriend;
-    
+
+    public void Initialize(EntityBase owner, List<EffectBase> effects)
+    {
+        _owner = owner;
+        _effects = effects;
+    }
     // TODO: 구현 예정
 }

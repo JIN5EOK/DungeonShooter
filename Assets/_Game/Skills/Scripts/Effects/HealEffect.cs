@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -9,9 +10,15 @@ public class HealEffect : EffectBase
     [Header("회복 설정")]
     public int healAmount;
     
-    public override bool Execute(EntityBase owner, EntityBase target)
+    public override UniTask<bool> Execute(EntityBase owner, EntityBase target)
     {
-        // TODO: 구현 예정
-        return false;
+        if (target.TryGetComponent(out HealthComponent health))
+        {
+            health.Heal(healAmount);
+            return UniTask.FromResult(true);
+        }
+        
+        Debug.LogError($"{nameof(DamageEffect)} : 체력 회복 실패");
+        return UniTask.FromResult(false);
     }
 }
