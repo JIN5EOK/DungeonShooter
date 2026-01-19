@@ -13,5 +13,7 @@ namespace DungeonShooter
         UniTask<Player> GetPlayer();
         UniTask<GameObject> GetInstance(string address);
         UniTask<T> GetAsset<T>(string address) where T : Object;
+        public T AddOrGetComponentWithInejct<T>(GameObject go) where T : Component;
+        public T AddComponentWithInejct<T>(GameObject go) where T : Component;
     }
 }

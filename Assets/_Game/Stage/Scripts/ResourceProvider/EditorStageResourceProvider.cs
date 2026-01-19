@@ -104,6 +104,16 @@ namespace DungeonShooter
             return handle.Result;
         }
 
+        public T AddOrGetComponentWithInejct<T>(GameObject go) where T : Component
+        {
+            throw new NotImplementedException();
+        }
+
+        public T AddComponentWithInejct<T>(GameObject go) where T : Component
+        {
+            throw new NotImplementedException();
+        }
+
         public void Dispose()
         {
             _addressablesScope?.Dispose();

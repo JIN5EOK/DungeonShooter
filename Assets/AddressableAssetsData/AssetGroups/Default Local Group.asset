@@ -64,6 +64,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e907f54a0dbf414c91dbb241d0c338a
+    m_Address: TestSkill
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f11938e1b96cf48b69061ba7452ce2f3
     m_Address: Tile_Misc_002
     m_ReadOnly: 0

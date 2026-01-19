@@ -1,10 +1,11 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public abstract class EntityBase : MonoBehaviour
 {
     protected Rigidbody2D rb;
 
-    protected virtual void Start()
+    protected async virtual UniTask Start()
     {
         InitializeRigidbody();
     }

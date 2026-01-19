@@ -54,7 +54,7 @@ public class Skill : ISkill
                 
         // 스킬 효과 실행 (비동기로 완료까지 대기)
         bool success = await ExecuteEffectsAsync(owner, target);
-        
+        Debug.Log($"[{nameof(Skill)}] 스킬 실행 : {_skillData.SkillName}");
         OnExecute?.Invoke();
         StartCooldown();
 

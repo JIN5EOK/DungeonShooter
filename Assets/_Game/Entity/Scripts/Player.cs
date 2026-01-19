@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 using DungeonShooter;
@@ -42,18 +44,23 @@ public class Player : EntityBase
 
     private MovementComponent _movementComponent;
     private DashComponent _dashComponent;
-
+    private SkillComponent _skillComponent;
+    private IStageResourceProvider _resourceProvider;
     [Inject]
-    private void Construct(InputManager inputManager)
+    private async UniTask Construct(IStageResourceProvider resourceProvider, InputManager inputManager)
     {
-        Debug.Log("Injected Player");
+        _resourceProvider = resourceProvider;
         _inputManager = inputManager;
         SubscribeInputEvent();
+        
+        _skillComponent = _resourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
+        await _skillComponent.RegistSkill("TestSkill");
     }
 
-    protected override void Start()
+    protected override async UniTask Start()
     {
-        base.Start();
+        await base.Start();
+        
         statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
         
         _cooldownComponent = gameObject.AddOrGetComponent<CooldownComponent>();
@@ -78,6 +85,14 @@ public class Player : EntityBase
         if (showSkillRanges)
         {
             InitializeSkillVisualizers();
+        }
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            _skillComponent.UseSkill("TestSkill", this);
         }
     }
 
@@ -131,7 +146,7 @@ public class Player : EntityBase
             skill3Visualizer.gameObject.SetActive(false); // 기본적으로 비활성화
         }
     }
-
+    
     private void OnDestroy()
     {
         // 취소 토큰 정리
@@ -183,7 +198,7 @@ public class Player : EntityBase
     {
         _movementComponent.Direction = input;
     }
-
+    
     private void HandleDashInput()
     {
         _dashComponent.SetInputs(_movementComponent.Direction);

@@ -3,6 +3,7 @@ using System.Collections;
 using DungeonShooter;
 using Jin5eok;
 using VContainer;
+using Cysharp.Threading.Tasks;
 
 public enum EnemyState
 {
@@ -70,7 +71,7 @@ public class Enemy : EntityBase
         _resourceProvider = resourceProvider;
     }
     
-    protected override void Start()
+    protected override async UniTask Start()
     {
         return;
         base.Start();

@@ -170,9 +170,27 @@ namespace DungeonShooter
         {
             var handle = _addressablesScope.LoadAssetAsync<T>(address);
             await handle.Task;
+            _resolver.Inject(handle.Result);
             return handle.Result;
         }
 
+        
+        public T AddOrGetComponentWithInejct<T>(GameObject go) where T : Component
+        {
+            if (go.TryGetComponent(out T comp))
+            {
+                return comp;
+            }
+            return AddComponentWithInejct<T>(go);
+        }
+        
+        public T AddComponentWithInejct<T>(GameObject go) where T : Component
+        {
+            var comp = go.AddComponent<T>();
+            _resolver.Inject(comp);
+            return comp;
+        }
+        
         public void Dispose()
         {
             _addressablesScope?.Dispose();

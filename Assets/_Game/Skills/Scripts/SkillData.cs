@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using DungeonShooter;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using VContainer;
 
 /// <summary>
 /// 스킬 효과 리스트와 기타 정보를 담는 ScriptableObject
@@ -19,11 +21,24 @@ public class SkillData : ScriptableObject
     [SerializeField] private string _skillName;
     [SerializeField] private string _skillDescription;
     [SerializeField] private AssetReferenceT<Sprite> _skillIcon;
-    
+
     [Header("스킬 설정")]
     [SerializeField] private float _cooldown;
 
     [Header("스킬 효과")]
     [SerializeReference]
     private List<EffectBase> _skillEffects = new List<EffectBase>();
+
+    // 이펙트에 의존성 주입
+    [Inject]
+    private void Construct(IObjectResolver resolver)
+    {
+        foreach(var effect in _skillEffects)
+        {
+            if(effect is SpawnProjectileEffect spawnProjectileEffect)
+            {
+                resolver.Inject(effect);
+            }
+        }
+    }
 }
