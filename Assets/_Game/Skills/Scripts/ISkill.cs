@@ -1,10 +1,11 @@
 using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
 /// 스킬 인스턴스 인터페이스
 /// </summary>
-public interface ISkill
+public interface ISkill : IDisposable
 {
     SkillData SkillData { get; }
     bool IsCooldown { get; }
@@ -20,5 +21,5 @@ public interface ISkill
     /// <param name="owner">스킬을 발동한 Entity</param>
     /// <param name="target">스킬에 적중된 Entity</param>
     /// <returns>실행 성공 여부</returns>
-    bool Execute(EntityBase owner, EntityBase target);
+    UniTask<bool> Execute(EntityBase owner, EntityBase target);
 }

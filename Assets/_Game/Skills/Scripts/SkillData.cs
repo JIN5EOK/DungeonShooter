@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -8,15 +9,21 @@ using UnityEngine.AddressableAssets;
 [CreateAssetMenu(fileName = "New Skill", menuName = "Game/Skill")]
 public class SkillData : ScriptableObject
 {
+    public string SkillName => _skillName;
+    public string SkillDescription => _skillDescription;
+    public float Cooldown => _cooldown;
+    public IReadOnlyList<EffectBase> SkillEffects => _skillEffects;
+    public string SkillIconAddress => _skillIcon.RuntimeKey.ToString();
+
     [Header("스킬 기본 정보")]
-    public string skillName;
-    public string skillDescription;
-    public AssetReferenceT<Sprite> skillIcon;
+    [SerializeField] private string _skillName;
+    [SerializeField] private string _skillDescription;
+    [SerializeField] private AssetReferenceT<Sprite> _skillIcon;
     
     [Header("스킬 설정")]
-    public float cooldown;
-    
+    [SerializeField] private float _cooldown;
+
     [Header("스킬 효과")]
     [SerializeReference]
-    public List<EffectBase> skillEffects = new List<EffectBase>();
+    private List<EffectBase> _skillEffects = new List<EffectBase>();
 }

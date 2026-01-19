@@ -7,11 +7,11 @@ using UnityEngine;
 [CustomEditor(typeof(SkillData))]
 public class SkillDataEditor : Editor
 {
-    private readonly string _skillNameName = "skillName";
-    private readonly string _skillDescriptionName = "skillDescription";
-    private readonly string _skillIconName = "skillIcon";
-    private readonly string _cooldownName = "cooldown";
-    private readonly string _skillEffectsName = "skillEffects";
+    private readonly string _skillNameName = "_skillName";
+    private readonly string _skillDescriptionName = "_skillDescription";
+    private readonly string _skillIconName = "_skillIcon";
+    private readonly string _cooldownName = "_cooldown";
+    private readonly string _skillEffectsName = "_skillEffects";
     
     private SerializedProperty _skillNameProperty;
     private SerializedProperty _skillDescriptionProperty;
