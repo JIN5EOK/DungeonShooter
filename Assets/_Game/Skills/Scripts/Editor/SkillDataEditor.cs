@@ -4,32 +4,34 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(SkillTest))]
-public class SkillEffectEditor : Editor
+[CustomEditor(typeof(SkillData))]
+public class SkillDataEditor : Editor
 {
     private readonly string _skillNameName = "skillName";
     private readonly string _skillDescriptionName = "skillDescription";
     private readonly string _skillIconName = "skillIcon";
-    private readonly string _effectsName = "effects";
+    private readonly string _cooldownName = "cooldown";
+    private readonly string _skillEffectsName = "skillEffects";
     
     private SerializedProperty _skillNameProperty;
     private SerializedProperty _skillDescriptionProperty;
     private SerializedProperty _skillIconProperty;
-    private SerializedProperty _effectsProperty;
+    private SerializedProperty _cooldownProperty;
+    private SerializedProperty _skillEffectsProperty;
     
     private List<Type> _effectTypes;
     private string[] _effectTypeNames;
     
-    private List<SerializedProperty> _effectProperties = new  List<SerializedProperty>(); 
     private void OnEnable()
     {
         _skillNameProperty = serializedObject.FindProperty(_skillNameName);
         _skillDescriptionProperty = serializedObject.FindProperty(_skillDescriptionName);
         _skillIconProperty = serializedObject.FindProperty(_skillIconName);
-        _effectsProperty = serializedObject.FindProperty(_effectsName);
+        _cooldownProperty = serializedObject.FindProperty(_cooldownName);
+        _skillEffectsProperty = serializedObject.FindProperty(_skillEffectsName);
         
         // EffectBase를 상속하는 모든 타입 찾기
-        _effectTypes = Jin5eok.ReflectionHelper.GetSubclasses<EffectBaseTest>();
+        _effectTypes = Jin5eok.ReflectionHelper.GetSubclasses<EffectBase>();
         _effectTypeNames = _effectTypes.Select(type => type.Name).ToArray();
     }
 
@@ -40,9 +42,10 @@ public class SkillEffectEditor : Editor
         EditorGUILayout.PropertyField(_skillNameProperty);
         EditorGUILayout.PropertyField(_skillDescriptionProperty);
         EditorGUILayout.PropertyField(_skillIconProperty);
+        EditorGUILayout.PropertyField(_cooldownProperty);
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("스킬 이펙트 리스트", EditorStyles.boldLabel);
-        DrawEffectList(_effectsProperty, 0);
+        DrawEffectList(_skillEffectsProperty, 0);
         
         serializedObject.ApplyModifiedProperties();
     }
@@ -182,7 +185,7 @@ public class SkillEffectEditor : Editor
     {
         // 배열이고 형식 문자열에 EffectBase이 포함되어 있는지 확인
         var isArray = property.isArray;
-        var isContainName = property.type.Contains(typeof(EffectBaseTest).Name);
+        var isContainName = property.type.Contains(typeof(EffectBase).Name);
         return isArray && isContainName;
     }
 }
