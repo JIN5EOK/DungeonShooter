@@ -9,7 +9,6 @@ public abstract class EffectBase
     /// <summary>
     /// 이펙트를 실행합니다.
     /// </summary>
-    /// <param name="owner">스킬을 발동한 Entity</param>
     /// <returns>실행 성공 여부</returns>
-    public abstract bool Execute(EntityBase owner);
+    public abstract bool Execute(EntityBase owner, EntityBase target);
 }

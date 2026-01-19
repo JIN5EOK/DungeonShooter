@@ -16,7 +16,7 @@ public class SpawnProjectileEffect : EffectBase
     [SerializeReference]
     public List<EffectBase> effects = new List<EffectBase>();
     
-    public override bool Execute(EntityBase owner)
+    public override bool Execute(EntityBase owner, EntityBase target)
     {
         // TODO: 구현 예정
         return false;

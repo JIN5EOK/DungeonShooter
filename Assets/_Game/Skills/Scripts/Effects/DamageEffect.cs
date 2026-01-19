@@ -9,7 +9,7 @@ public class DamageEffect : EffectBase
     [Header("데미지 설정")]
     public int damage;
     
-    public override bool Execute(EntityBase owner)
+    public override bool Execute(EntityBase owner, EntityBase target)
     {
         // TODO: 구현 예정
         return false;
