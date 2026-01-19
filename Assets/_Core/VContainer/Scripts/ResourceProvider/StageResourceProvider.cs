@@ -133,10 +133,5 @@ namespace DungeonShooter
 
             return player;
         }
-
-        public void Dispose()
-        {
-            _addressablesScope?.Dispose();
-        }
     }
 }

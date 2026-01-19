@@ -1,10 +1,11 @@
+using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace DungeonShooter
 {
-    public interface ISceneResourceProvider
+    public interface ISceneResourceProvider : IDisposable
     {
         UniTask<GameObject> GetInstance(string address);
         UniTask<T> GetAsset<T>(string address) where T : Object;

@@ -90,5 +90,10 @@ namespace DungeonShooter
             _resolver?.Inject(comp);
             return comp;
         }
+
+        public void Dispose()
+        {
+            _addressablesScope?.Dispose();
+        }
     }
 }

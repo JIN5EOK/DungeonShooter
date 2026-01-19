@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 namespace DungeonShooter
 {
-    public interface IStageResourceProvider : ISceneResourceProvider, IDisposable
+    public interface IStageResourceProvider : ISceneResourceProvider
     {
         UniTask<TileBase> GetGroundTile();
         UniTask<Enemy> GetRandomEnemy();
