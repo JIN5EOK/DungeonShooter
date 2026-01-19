@@ -1,5 +1,5 @@
-using System;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 
@@ -15,15 +15,15 @@ namespace DungeonShooter
         public Task<bool> InitializationTask { get; private set; }
         private IStageResourceProvider _resourceProvider;
         [Inject]
-        public async Awaitable Construct(IStageResourceProvider resourceProvider)
+        public async UniTask Construct(IStageResourceProvider resourceProvider)
         {
             _resourceProvider = resourceProvider;
-            InitializationTask = SpawnPlayer();
+            InitializationTask = SpawnPlayer().AsTask();
             await InitializationTask;
             Destroy(gameObject); // 스테이지에서 많이 사용하게 된다면 오브젝트 풀링 사용해야 할수도?, 지금은 스테이지 생성시에만 사용하므로 보류
         }
 
-        private async Task<bool> SpawnPlayer()
+        private async UniTask<bool> SpawnPlayer()
         {
             var player = await _resourceProvider.GetPlayer();
             

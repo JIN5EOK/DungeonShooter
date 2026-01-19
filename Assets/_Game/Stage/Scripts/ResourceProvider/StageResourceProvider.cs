@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -37,7 +37,7 @@ namespace DungeonShooter
         /// <summary>
         /// StageConfig의 Label 데이터를 기반으로 에셋의 어드레스 목록을 로드하여 저장합니다.
         /// </summary>
-        private async Awaitable InitializeAsync(TaskCompletionSource<bool> initializationTcs)
+        private async UniTask InitializeAsync(TaskCompletionSource<bool> initializationTcs)
         {
             if (!string.IsNullOrEmpty(_stageConfig.StageEnemyLabel.labelString))
             {
@@ -54,7 +54,7 @@ namespace DungeonShooter
         /// <summary>
         /// 초기화가 완료될 때까지 대기합니다. 이미 초기화되어 있으면 즉시 반환합니다.
         /// </summary>
-        private async Awaitable EnsureInitializedAsync()
+        private async UniTask EnsureInitializedAsync()
         {
             if (_initializationTcs == null)
             {
@@ -68,7 +68,7 @@ namespace DungeonShooter
         /// <summary>
         /// Ground 타일을 가져옵니다.
         /// </summary>
-        public async Task<TileBase> GetGroundTile()
+        public async UniTask<TileBase> GetGroundTile()
         {
             var handle = _addressablesScope.LoadAssetAsync<TileBase>(_stageConfig.GroundTile);
             await handle.Task;
@@ -78,7 +78,7 @@ namespace DungeonShooter
         /// <summary>
         /// 스테이지에 맞는 랜덤 적을 가져옵니다.
         /// </summary>
-        public async Task<Enemy> GetRandomEnemy()
+        public async UniTask<Enemy> GetRandomEnemy()
         {
             await EnsureInitializedAsync();
             if (EnemyAddresses == null || EnemyAddresses.Count == 0)
@@ -112,7 +112,7 @@ namespace DungeonShooter
         /// 플레이어 캐릭터를 가져옵니다
         /// TODO: 다양한 캐릭터 형태에 대응하도록 변경 필요
         /// </summary>
-        public async Task<Player> GetPlayer()
+        public async UniTask<Player> GetPlayer()
         {
             if (_stageConfig.PlayerPrefab == null || !_stageConfig.PlayerPrefab.RuntimeKeyIsValid())
             {
@@ -142,7 +142,7 @@ namespace DungeonShooter
         /// <summary>
         /// 주소에 해당하는 인스턴스를 생성하고 의존성 주입
         /// </summary>
-        public async Task<GameObject> GetInstance(string address)
+        public async UniTask<GameObject> GetInstance(string address)
         {
             var handle = _addressablesScope.InstantiateAsync(address);
             await handle.Task;
@@ -166,7 +166,7 @@ namespace DungeonShooter
         /// <summary>
         /// 주소에 해당하는 에셋을 가져옵니다.
         /// </summary>
-        public async Task<T> GetAsset<T>(string address) where T : Object
+        public async UniTask<T> GetAsset<T>(string address) where T : Object
         {
             var handle = _addressablesScope.LoadAssetAsync<T>(address);
             await handle.Task;

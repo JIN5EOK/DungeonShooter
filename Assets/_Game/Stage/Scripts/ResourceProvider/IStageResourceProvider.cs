@@ -1,5 +1,5 @@
 using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Object = UnityEngine.Object;
@@ -8,10 +8,10 @@ namespace DungeonShooter
 {
     public interface IStageResourceProvider : IDisposable
     {
-        Task<TileBase> GetGroundTile();
-        Task<Enemy> GetRandomEnemy();
-        Task<Player> GetPlayer();
-        Task<GameObject> GetInstance(string address);
-        Task<T> GetAsset<T>(string address) where T : Object;
+        UniTask<TileBase> GetGroundTile();
+        UniTask<Enemy> GetRandomEnemy();
+        UniTask<Player> GetPlayer();
+        UniTask<GameObject> GetInstance(string address);
+        UniTask<T> GetAsset<T>(string address) where T : Object;
     }
 }

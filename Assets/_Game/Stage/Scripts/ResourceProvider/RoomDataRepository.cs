@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -12,7 +13,7 @@ namespace DungeonShooter
 {
     public interface IRoomDataRepository : IDisposable
     {
-        Awaitable<RoomData> GetRandomRoom(RoomType type);
+        UniTask<RoomData> GetRandomRoom(RoomType type);
     }
 
     public class RoomDataRepository : IRoomDataRepository
@@ -34,7 +35,7 @@ namespace DungeonShooter
         /// <summary>
         /// StageConfig의 Label 데이터를 기반으로 에셋의 어드레스 목록을 로드하여 저장합니다.
         /// </summary>
-        private async Awaitable InitializeAsync(TaskCompletionSource<bool> initializationTcs)
+        private async UniTask InitializeAsync(TaskCompletionSource<bool> initializationTcs)
         {
             try
             {
@@ -77,7 +78,7 @@ namespace DungeonShooter
         /// <summary>
         /// 초기화가 완료될 때까지 대기합니다. 이미 초기화되어 있으면 즉시 반환합니다.
         /// </summary>
-        private async Awaitable EnsureInitializedAsync()
+        private async UniTask EnsureInitializedAsync()
         {
             if (_isInitialized)
             {
@@ -98,7 +99,7 @@ namespace DungeonShooter
         /// </summary>
         /// <param name="type">방 타입</param>
         /// <returns>방 데이터</returns>
-        public async Awaitable<RoomData> GetRandomRoom(RoomType type)
+        public async UniTask<RoomData> GetRandomRoom(RoomType type)
         {
             await EnsureInitializedAsync();
 

@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
 using System;
-using System.Collections;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEditor;
 using UnityEngine;
@@ -31,7 +30,7 @@ namespace DungeonShooter
         /// <summary>
         /// Ground 타일을 가져옵니다.
         /// </summary>
-        public async Task<TileBase> GetGroundTile()
+        public async UniTask<TileBase> GetGroundTile()
         {
             var handle = _addressablesScope.LoadAssetAsync<TileBase>(_groundTile);
             // Task.Wait으로 대기할 경우 데드락 발생해 뻗어버리는 문제로 인해 WaitForCompletion()을 사용한 대기처리로 해결
@@ -43,7 +42,7 @@ namespace DungeonShooter
         /// 랜덤 적을 가져옵니다.
         /// 에디터에서는 사용하지 않으므로 null을 반환합니다.
         /// </summary>
-        public async Task<Enemy> GetRandomEnemy()
+        public async UniTask<Enemy> GetRandomEnemy()
         {
             return null;
         }
@@ -52,7 +51,7 @@ namespace DungeonShooter
         /// 플레이어를 가져옵니다.
         /// 에디터에서는 사용하지 않으므로 null을 반환합니다.
         /// </summary>
-        public async Task<Player> GetPlayer()
+        public async UniTask<Player> GetPlayer()
         {
             return null;
         }
@@ -61,7 +60,7 @@ namespace DungeonShooter
         /// 주소에 해당하는 인스턴스를 생성합니다.
         /// 에디터에서는 프리팹 연결을 유지하기 위해 PrefabUtility.InstantiatePrefab을 사용합니다.
         /// </summary>
-        public async Task<GameObject> GetInstance(string address)
+        public async UniTask<GameObject> GetInstance(string address)
         {
             // 에디터에서는 프리팹 에셋을 로드한 후 PrefabUtility로 인스턴스화
             var prefabHandle = _addressablesScope.LoadAssetAsync<GameObject>(address);
@@ -89,7 +88,7 @@ namespace DungeonShooter
         /// <summary>
         /// 주소에 해당하는 에셋을 가져옵니다.
         /// </summary>
-        public async Task<T> GetAsset<T>(string address) where T : Object
+        public async UniTask<T> GetAsset<T>(string address) where T : Object
         {
             var handle = _addressablesScope.LoadAssetAsync<T>(address);
             // Task.Wait으로 대기할 경우 데드락 발생해 뻗어버리는 문제로 인해 WaitForCompletion()을 사용한 대기처리 사용
