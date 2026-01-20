@@ -10,7 +10,26 @@ public class MovementComponent : MonoBehaviour
     [Header("이동 설정")]
     [SerializeField] private float _moveSpeed = 5f;
 
-    public Vector2 Direction { get; set; }
+    private Vector2 _direction;
+    public Vector2 Direction
+    {
+        get => _direction;
+        set
+        {
+            _direction = value;
+
+            if (value != Vector2.zero)
+            {
+                LookDirection =  value.normalized;
+            }
+        }
+    }
+
+    public Vector2 LookDirection
+    {
+        get;
+        private set;
+    }
     public float MoveSpeed { get; set; }
     private Rigidbody2D _rigidbody;
 

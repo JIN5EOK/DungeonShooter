@@ -22,15 +22,15 @@ MonoBehaviour:
     m_EditorAssetChanged: 0
   _cooldown: 2
   _skillEffects:
-  - rid: 7692257427368706449
+  - rid: 7692257427368706450
   references:
     version: 2
     RefIds:
-    - rid: 7692257427368706449
+    - rid: 7692257427368706450
       type: {class: SpawnProjectileEffect, ns: , asm: Assembly-CSharp}
       data:
         projectile:
-          m_AssetGUID: 3fae26c07712a44a7b29ac1841826ab6
+          m_AssetGUID: 1654f787912fc4307b0db38dc6acf3a7
           m_SubObjectName: 
           m_SubObjectType: 
           m_SubObjectGUID: 

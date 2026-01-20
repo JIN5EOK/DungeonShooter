@@ -23,10 +23,18 @@ public class Projectile : MonoBehaviour
     private bool _stopTrigger = false;
     private float _elapsedTime = 0f;
     
+    private Vector2 _direction;
     public void Initialize(EntityBase owner, List<EffectBase> effects)
     {
         _owner = owner;
         _effects = effects;
+
+        // TODO: 이동 전략에 대한 커스텀 기능 필요
+        if (_owner.TryGetComponent(out MovementComponent movement))
+        {
+            _direction = movement.LookDirection;
+        }
+        transform.position = _owner.transform.position;
     }
 
     private void Update()
@@ -51,7 +59,7 @@ public class Projectile : MonoBehaviour
         }
         
         // 전진 이동
-        transform.position += transform.right * _speed * Time.deltaTime;
+        transform.position += (Vector3)_direction * _speed * Time.deltaTime;
     }
 
     private void OnTriggerStay2D(Collider2D other)
