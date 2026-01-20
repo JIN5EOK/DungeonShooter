@@ -2,12 +2,14 @@ using UnityEngine;
 using DungeonShooter;
 using VContainer;
 
-/// <summary>
-/// 필드에 떨어져 있는 아이템
-/// </summary>
-[RequireComponent(typeof(Collider2D))]
-public class FieldItem : MonoBehaviour, IInteractable
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 필드에 떨어져 있는 아이템
+    /// </summary>
+    [RequireComponent(typeof(Collider2D))]
+    public class FieldItem : MonoBehaviour, IInteractable
+    {
     [Header("아이템 설정")]
     [Tooltip("아이템 인스턴스 (런타임에 설정)")]
     [SerializeField] private ItemBase item;
@@ -113,6 +115,7 @@ public class FieldItem : MonoBehaviour, IInteractable
             interactionPrompt.SetActive(false);
         }
         Destroy(gameObject);
+    }
     }
 }
 

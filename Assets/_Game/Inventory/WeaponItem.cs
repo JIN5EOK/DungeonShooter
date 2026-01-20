@@ -1,10 +1,12 @@
 using System;
 
-/// <summary>
-/// 무기 아이템. 장착하면 고유 능력(필살기)을 사용할 수 있습니다.
-/// </summary>
-public class WeaponItem : ItemBase, IEquipable, IUseable
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 무기 아이템. 장착하면 고유 능력(필살기)을 사용할 수 있습니다.
+    /// </summary>
+    public class WeaponItem : ItemBase, IEquipable, IUseable
+    {
     private readonly Action _onUse;
 
     /// <summary>
@@ -26,6 +28,7 @@ public class WeaponItem : ItemBase, IEquipable, IUseable
     {
         // 고유 능력 사용
         _onUse?.Invoke();
+    }
     }
 }
 

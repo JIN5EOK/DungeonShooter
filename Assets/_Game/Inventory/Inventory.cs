@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// 플레이어의 인벤토리를 관리하는 클래스
-/// </summary>
-public class Inventory
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 플레이어의 인벤토리를 관리하는 클래스
+    /// </summary>
+    public class Inventory
+    {
     private readonly List<ItemBase> _items = new(); // 통합 인벤토리 리스트
     private WeaponItem _equippedWeapon;
     private ActiveItem _equippedActive;
@@ -161,4 +163,5 @@ public class Inventory
     public event Action<WeaponItem> OnWeaponUnequipped;
     public event Action<ActiveItem> OnActiveEquipped;
     public event Action<ActiveItem> OnActiveUnequipped;
+    }
 }

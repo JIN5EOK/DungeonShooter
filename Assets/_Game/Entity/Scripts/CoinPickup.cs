@@ -3,14 +3,16 @@ using UnityEngine;
 using DungeonShooter;
 using VContainer;
 
-/// <summary>
-/// 플레이어가 접촉하면 코인이 흡수되어 사라지는 단순 수집 오브젝트.
-/// 실제 보상 처리(골드 증가 등)는 플레이어 측에서 OnCollected 이벤트를 구독해 구현한다.
-/// </summary>
-[RequireComponent(typeof(Collider2D))]
-[DisallowMultipleComponent]
-public class CoinPickup : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 플레이어가 접촉하면 코인이 흡수되어 사라지는 단순 수집 오브젝트.
+    /// 실제 보상 처리(골드 증가 등)는 플레이어 측에서 OnCollected 이벤트를 구독해 구현한다.
+    /// </summary>
+    [RequireComponent(typeof(Collider2D))]
+    [DisallowMultipleComponent]
+    public class CoinPickup : MonoBehaviour
+    {
     [Tooltip("흡수 감지 후 오브젝트를 파괴하기까지의 지연 시간(연출용).")]
     [SerializeField] private float destroyDelay = 0.05f;
 
@@ -95,6 +97,7 @@ public class CoinPickup : MonoBehaviour
 
         _coinInventory.AddCoins(coinValue);
         Debug.Log($"[{nameof(CoinPickup)}] {player.name}이(가) 코인 {coinValue}개 획득! 총 {_coinInventory.CurrentCoins}");
+    }
     }
 }
 

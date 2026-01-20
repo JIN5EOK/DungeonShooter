@@ -1,10 +1,12 @@
 using System;
 
-/// <summary>
-/// 액티브 아이템. 게임 중 사용 버튼을 눌러 사용할 수 있습니다.
-/// </summary>
-public class ActiveItem : ItemBase, IEquipable, IUseable
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 액티브 아이템. 게임 중 사용 버튼을 눌러 사용할 수 있습니다.
+    /// </summary>
+    public class ActiveItem : ItemBase, IEquipable, IUseable
+    {
     private readonly Action _onUse;
 
     /// <summary>
@@ -25,6 +27,7 @@ public class ActiveItem : ItemBase, IEquipable, IUseable
     public void Use()
     {
         _onUse?.Invoke();
+    }
     }
 }
 

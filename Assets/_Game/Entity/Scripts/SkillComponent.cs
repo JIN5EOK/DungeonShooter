@@ -4,11 +4,13 @@ using DungeonShooter;
 using UnityEngine;
 using VContainer;
 
-/// <summary>
-/// Entity의 스킬을 관리하는 컴포넌트
-/// </summary>
-public class SkillComponent : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// Entity의 스킬을 관리하는 컴포넌트
+    /// </summary>
+    public class SkillComponent : MonoBehaviour
+    {
     private Dictionary<string, ISkill> _skills = new Dictionary<string, ISkill>();
     private IStageResourceProvider _resourceProvider;
     private EntityBase _owner;
@@ -140,6 +142,7 @@ public class SkillComponent : MonoBehaviour
             skill.Dispose();
         }
         
-        _skills.Clear();
+            _skills.Clear();
+        }
     }
 }

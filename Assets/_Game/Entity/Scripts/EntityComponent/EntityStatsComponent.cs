@@ -1,11 +1,13 @@
 using UnityEngine;
 
-/// <summary>
-/// EntityStats를 MonoBehaviour에 연결하여 사용하는 컴포넌트
-/// Inspector에서 스테이터스를 설정하고 다른 컴포넌트에서 참조할 수 있습니다.
-/// </summary>
-public class EntityStatsComponent : MonoBehaviour, IEntityStats
+namespace DungeonShooter
 {
+    /// <summary>
+    /// EntityStats를 MonoBehaviour에 연결하여 사용하는 컴포넌트
+    /// Inspector에서 스테이터스를 설정하고 다른 컴포넌트에서 참조할 수 있습니다.
+    /// </summary>
+    public class EntityStatsComponent : MonoBehaviour, IEntityStats
+    {
     [Header("스테이터스 설정")]
     [SerializeField] private EntityStats stats = new EntityStats();
 
@@ -66,6 +68,7 @@ public class EntityStatsComponent : MonoBehaviour, IEntityStats
     {
         get => stats.KnockbackResistance;
         set => stats.KnockbackResistance = value;
+    }
     }
 }
 

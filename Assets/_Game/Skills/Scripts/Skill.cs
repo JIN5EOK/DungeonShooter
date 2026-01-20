@@ -3,11 +3,13 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-/// <summary>
-/// 스킬 인스턴스 구현 클래스
-/// </summary>
-public class Skill : ISkill
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 스킬 인스턴스 구현 클래스
+    /// </summary>
+    public class Skill : ISkill
+    {
     private readonly SkillData _skillData;
     private CancellationTokenSource _cooldownCancellationTokenSource;
     
@@ -155,5 +157,6 @@ public class Skill : ISkill
         _cooldownCancellationTokenSource?.Cancel();
         _cooldownCancellationTokenSource?.Dispose();
         _cooldownCancellationTokenSource = null;
+    }
     }
 }

@@ -2,12 +2,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// 아이템의 기본 클래스
-/// itemEffects는 초기화시 ItemData에서 복사해와 사용
-/// </summary>
-public abstract class ItemBase
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 아이템의 기본 클래스
+    /// itemEffects는 초기화시 ItemData에서 복사해와 사용
+    /// </summary>
+    public abstract class ItemBase
+    {
     protected readonly ItemData _itemData;
     protected readonly List<ItemEffect> _itemEffects;
 
@@ -84,6 +86,7 @@ public abstract class ItemBase
                 effect.Remove(player);
             }
         }
+    }
     }
 }
 

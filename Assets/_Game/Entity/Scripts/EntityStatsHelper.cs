@@ -1,10 +1,12 @@
 using UnityEngine;
 
-/// <summary>
-/// Entity 스테이터스 관련 정적 유틸리티
-/// </summary>
-public static class EntityStatsHelper
+namespace DungeonShooter
 {
+    /// <summary>
+    /// Entity 스테이터스 관련 정적 유틸리티
+    /// </summary>
+    public static class EntityStatsHelper
+    {
     /// <summary>
     /// 방어력 적용 최종 데미지 계산
     /// </summary>
@@ -38,6 +40,7 @@ public static class EntityStatsHelper
         target.AttackCooldown = source.AttackCooldown;
         target.Defense = source.Defense;
         target.KnockbackResistance = source.KnockbackResistance;
+    }
     }
 }
 

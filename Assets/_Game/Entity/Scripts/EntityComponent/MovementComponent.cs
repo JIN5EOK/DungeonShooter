@@ -1,12 +1,14 @@
 using System;
 using UnityEngine;
 
-/// <summary>
-/// 캐릭터 이동을 담당하는 MonoBehaviour 컴포넌트
-/// </summary>
-[RequireComponent(typeof(Rigidbody2D))]
-public class MovementComponent : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 캐릭터 이동을 담당하는 MonoBehaviour 컴포넌트
+    /// </summary>
+    [RequireComponent(typeof(Rigidbody2D))]
+    public class MovementComponent : MonoBehaviour
+    {
     [Header("이동 설정")]
     [SerializeField] private float _moveSpeed = 5f;
 
@@ -47,8 +49,9 @@ public class MovementComponent : MonoBehaviour
         _rigidbody.linearVelocity = velocity;
     }
 
-    public void Update()
-    {
-        Move();
+        public void Update()
+        {
+            Move();
+        }
     }
 }

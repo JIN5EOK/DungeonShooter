@@ -1,12 +1,14 @@
 using System;
 using UnityEngine;
 
-/// <summary>
-/// 플레이어(또는 다른 소유자)의 코인/골드 보유량을 관리한다.
-/// </summary>
-[DisallowMultipleComponent]
-public class CoinInventory 
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 플레이어(또는 다른 소유자)의 코인/골드 보유량을 관리한다.
+    /// </summary>
+    [DisallowMultipleComponent]
+    public class CoinInventory 
+    {
     [SerializeField, Min(0)]
     private int startingCoins = 0;
 
@@ -48,6 +50,7 @@ public class CoinInventory
     private void NotifyChanged()
     {
         OnCoinsChanged?.Invoke(CurrentCoins);
+    }
     }
 }
 

@@ -3,13 +3,16 @@ using System.Collections;
 using UnityEngine;
 using DungeonShooter;
 using VContainer;
-/// <summary>
-/// 보물상자. 플레이어가 가까이 다가가서 상호작용 키를 누르면 열리고 보상을 지급합니다.
-/// </summary>
-[RequireComponent(typeof(Collider2D))]
-[DisallowMultipleComponent]
-public class TreasureChest : MonoBehaviour, IInteractable
+
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 보물상자. 플레이어가 가까이 다가가서 상호작용 키를 누르면 열리고 보상을 지급합니다.
+    /// </summary>
+    [RequireComponent(typeof(Collider2D))]
+    [DisallowMultipleComponent]
+    public class TreasureChest : MonoBehaviour, IInteractable
+    {
     [Header("상호작용 설정")]
     [Tooltip("상호작용 가능한 거리")]
     [SerializeField] private float interactionRange = 2f;
@@ -254,6 +257,7 @@ public class TreasureChest : MonoBehaviour, IInteractable
         // 상호작용 범위 시각화
         Gizmos.color = _playerInRange ? Color.green : Color.yellow;
         Gizmos.DrawWireSphere(transform.position, interactionRange);
+    }
     }
 }
 

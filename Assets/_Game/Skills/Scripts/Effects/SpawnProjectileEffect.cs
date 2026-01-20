@@ -6,12 +6,14 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using VContainer;
 
-/// <summary>
-/// 투사체를 소환하는 이펙트
-/// </summary>
-[System.Serializable]
-public class SpawnProjectileEffect : EffectBase
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 투사체를 소환하는 이펙트
+    /// </summary>
+    [System.Serializable]
+    public class SpawnProjectileEffect : EffectBase
+    {
     [Header("투사체 프리팹")]
     [SerializeField]
     public AssetReferenceGameObject projectile;
@@ -48,5 +50,6 @@ public class SpawnProjectileEffect : EffectBase
             Console.WriteLine($"{nameof(SpawnProjectileEffect)} : {e}");
             throw;
         }
+    }
     }
 }

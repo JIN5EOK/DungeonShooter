@@ -1,96 +1,97 @@
-using System;
 using System.Collections.Generic;
-using DungeonShooter;
 using UnityEngine;
 
-/// <summary>
-/// 투사체 인스턴스 프리팹
-/// </summary>
-public class Projectile : MonoBehaviour
+namespace DungeonShooter
 {
-    private EntityBase _owner;
-    private List<EffectBase> _effects = new List<EffectBase>();
-    
-    [Header("투사체 설정")]
-    [SerializeField] private float _speed;
-    [SerializeField] private float _lifeTime;
-    [SerializeField] private float _triggerStartTime;
-    [SerializeField] private float _triggerEndTime;
-    [SerializeField] private bool _destroyOnTrigger;
-    [SerializeField] private bool _applyToOpponent;
-    [SerializeField] private bool _applyToFriend;
-
-    private bool _stopTrigger = false;
-    private float _elapsedTime = 0f;
-    
-    private Vector2 _direction;
-    public void Initialize(EntityBase owner, List<EffectBase> effects)
+    /// <summary>
+    /// 투사체 인스턴스 프리팹
+    /// </summary>
+    public class Projectile : MonoBehaviour
     {
-        _owner = owner;
-        _effects = effects;
+        private EntityBase _owner;
+        private List<EffectBase> _effects = new List<EffectBase>();
+        
+        [Header("투사체 설정")]
+        [SerializeField] private float _speed;
+        [SerializeField] private float _lifeTime;
+        [SerializeField] private float _triggerStartTime;
+        [SerializeField] private float _triggerEndTime;
+        [SerializeField] private bool _destroyOnTrigger;
+        [SerializeField] private bool _applyToOpponent;
+        [SerializeField] private bool _applyToFriend;
 
-        // TODO: 이동 전략에 대한 커스텀 기능 필요
-        if (_owner.TryGetComponent(out MovementComponent movement))
+        private bool _stopTrigger = false;
+        private float _elapsedTime = 0f;
+        
+        private Vector2 _direction;
+        public void Initialize(EntityBase owner, List<EffectBase> effects)
         {
-            _direction = movement.LookDirection;
+            _owner = owner;
+            _effects = effects;
+
+            // TODO: 이동 전략에 대한 커스텀 기능 필요
+            if (_owner.TryGetComponent(out MovementComponent movement))
+            {
+                _direction = movement.LookDirection;
+            }
+            transform.position = _owner.transform.position;
         }
-        transform.position = _owner.transform.position;
-    }
 
-    private void Update()
-    {
-        _elapsedTime += Time.deltaTime;
-        
-        // 생명주기 체크
-        if (_elapsedTime >= _lifeTime)
+        private void Update()
         {
-            Destroy(gameObject);
-            return;
+            _elapsedTime += Time.deltaTime;
+            
+            // 생명주기 체크
+            if (_elapsedTime >= _lifeTime)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            
+            // 충돌 가능 시간 체크
+            if (_elapsedTime < _triggerStartTime || _elapsedTime >= _triggerEndTime)
+            {
+                _stopTrigger = true;
+            }
+            else
+            {
+                _stopTrigger = false;
+            }
+            
+            // 전진 이동
+            transform.position += (Vector3)_direction * _speed * Time.deltaTime;
         }
-        
-        // 충돌 가능 시간 체크
-        if (_elapsedTime < _triggerStartTime || _elapsedTime >= _triggerEndTime)
-        {
-            _stopTrigger = true;
-        }
-        else
-        {
-            _stopTrigger = false;
-        }
-        
-        // 전진 이동
-        transform.position += (Vector3)_direction * _speed * Time.deltaTime;
-    }
 
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        if (_stopTrigger == true)
-            return;
-        
-        var otherEntity = other.GetComponent<EntityBase>();
-        
-        if(otherEntity == null)
-            return;
-        
-        var ownerLayer = _owner.gameObject.layer;
-        var otherLayer = other.gameObject.layer;
-
-        // 아군에게 적용 체크
-        if (ownerLayer == otherLayer && !_applyToFriend)
-            return;
-
-        // 상대편에게 적용 체크
-        if (ownerLayer != otherLayer && !_applyToOpponent)
-            return;
-
-        foreach (var effect in _effects)
+        private void OnTriggerStay2D(Collider2D other)
         {
-            effect.Execute(otherEntity);
-        }
-        
-        if (_destroyOnTrigger == true)
-        {
-            Destroy(gameObject);
+            if (_stopTrigger == true)
+                return;
+            
+            var otherEntity = other.GetComponent<EntityBase>();
+            
+            if(otherEntity == null)
+                return;
+            
+            var ownerLayer = _owner.gameObject.layer;
+            var otherLayer = other.gameObject.layer;
+
+            // 아군에게 적용 체크
+            if (ownerLayer == otherLayer && !_applyToFriend)
+                return;
+
+            // 상대편에게 적용 체크
+            if (ownerLayer != otherLayer && !_applyToOpponent)
+                return;
+
+            foreach (var effect in _effects)
+            {
+                effect.Execute(otherEntity);
+            }
+            
+            if (_destroyOnTrigger == true)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

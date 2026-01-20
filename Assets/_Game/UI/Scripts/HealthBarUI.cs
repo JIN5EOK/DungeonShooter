@@ -2,11 +2,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// 플레이어 체력을 표시하는 UI 컴포넌트
-/// </summary>
-public class HealthBarUI : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 플레이어 체력을 표시하는 UI 컴포넌트
+    /// </summary>
+    public class HealthBarUI : MonoBehaviour
+    {
     [Header("UI 요소")]
     [SerializeField] private Image healthFillImage;
     [SerializeField] private TextMeshProUGUI healthText;
@@ -147,5 +149,6 @@ public class HealthBarUI : MonoBehaviour
         {
             _healthComponent.OnDamaged -= OnHealthChanged;
         }
+    }
     }
 }

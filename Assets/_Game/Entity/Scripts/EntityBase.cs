@@ -1,8 +1,10 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public abstract class EntityBase : MonoBehaviour
+namespace DungeonShooter
 {
+    public abstract class EntityBase : MonoBehaviour
+    {
     protected Rigidbody2D rb;
 
     protected async virtual UniTask Start()
@@ -35,5 +37,6 @@ public abstract class EntityBase : MonoBehaviour
 
             Debug.DrawLine(point1, point2, color, duration);
         }
+    }
     }
 }

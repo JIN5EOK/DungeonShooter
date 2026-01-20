@@ -6,8 +6,10 @@ using VContainer;
 using DungeonShooter;
 using Jin5eok;
 
-public class Player : EntityBase
+namespace DungeonShooter
 {
+    public class Player : EntityBase
+    {
     [Header("스탯 컴포넌트")]
     [SerializeField] private EntityStatsComponent statsComponent;
 
@@ -548,5 +550,6 @@ public class Player : EntityBase
         UnityEngine.SceneManagement.SceneManager.LoadScene(
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
         );
+    }
     }
 }

@@ -3,11 +3,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-/// <summary>
-/// ESC 입력 또는 버튼을 통해 게임 일시정지 상태를 토글하는 UI 컨트롤러
-/// </summary>
-public class PauseMenuUI : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// ESC 입력 또는 버튼을 통해 게임 일시정지 상태를 토글하는 UI 컨트롤러
+    /// </summary>
+    public class PauseMenuUI : MonoBehaviour
+    {
     [Header("UI 참조")]
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private RectTransform windowRoot;
@@ -190,6 +192,7 @@ public class PauseMenuUI : MonoBehaviour
             Time.timeScale = 1f;
             AudioListener.pause = false;
         }
+    }
     }
 }
 

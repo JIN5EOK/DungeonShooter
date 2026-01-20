@@ -1,11 +1,13 @@
 using UnityEngine;
 
-/// <summary>
-/// 공격 범위를 시각적으로 표시하는 컴포넌트.
-/// 원형 범위를 LineRenderer로 그립니다.
-/// </summary>
-public class AttackRangeVisualizer : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 공격 범위를 시각적으로 표시하는 컴포넌트.
+    /// 원형 범위를 LineRenderer로 그립니다.
+    /// </summary>
+    public class AttackRangeVisualizer : MonoBehaviour
+    {
     [Header("범위 설정")]
     [SerializeField] private float radius = 1.5f;
     [SerializeField] private int segments = 32; // 원의 세밀도
@@ -163,5 +165,6 @@ public class AttackRangeVisualizer : MonoBehaviour
     /// 현재 반경 반환
     /// </summary>
     public float GetRadius() => radius;
+    }
 }
 

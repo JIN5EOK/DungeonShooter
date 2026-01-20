@@ -1,11 +1,13 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-/// <summary>
-/// 게임 내 UI 요소들을 통합 관리하는 매니저
-/// </summary>
-public class GameUIManager : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 게임 내 UI 요소들을 통합 관리하는 매니저
+    /// </summary>
+    public class GameUIManager : MonoBehaviour
+    {
     [Header("체력 UI")]
     [SerializeField] private HealthBarUI healthBarUI;
 
@@ -142,5 +144,6 @@ public class GameUIManager : MonoBehaviour
                 }
             }
         }
+    }
     }
 }

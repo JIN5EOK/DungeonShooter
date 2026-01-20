@@ -2,12 +2,14 @@ using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
-/// <summary>
-/// 캐릭터 구르기(회피)를 담당하는 MonoBehaviour 컴포넌트
-/// </summary>
-[RequireComponent(typeof(Rigidbody2D))]
-public class DashComponent : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 캐릭터 구르기(회피)를 담당하는 MonoBehaviour 컴포넌트
+    /// </summary>
+    [RequireComponent(typeof(Rigidbody2D))]
+    public class DashComponent : MonoBehaviour
+    {
     [Header("구르기 설정")]
     [SerializeField] private float _dashSpeed = 15f;
     [SerializeField] private float _dashDuration = 0.3f;
@@ -103,5 +105,6 @@ public class DashComponent : MonoBehaviour
             return 0f;
         }
         return _cooldownComponent.GetCooldownPercent("dash");
+    }
     }
 }

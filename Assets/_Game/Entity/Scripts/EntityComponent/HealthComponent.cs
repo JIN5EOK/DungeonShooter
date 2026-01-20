@@ -2,11 +2,13 @@ using UnityEngine;
 using System;
 using Jin5eok;
 
-/// <summary>
-/// HP를 가진 엔티티에 부착하는 독립적인 컴포넌트
-/// </summary>
-public class HealthComponent : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// HP를 가진 엔티티에 부착하는 독립적인 컴포넌트
+    /// </summary>
+    public class HealthComponent : MonoBehaviour
+    {
     public event Action<int, int> OnHealthChanged; // (current, max)
     public event Action<int, int> OnDamaged; // (damage, currentHealth)
     public event Action<int, int> OnHealed; // (amount, currentHealth)
@@ -152,5 +154,6 @@ public class HealthComponent : MonoBehaviour
 
         // 원래 색상으로 복구
         _spriteRenderer.color = _originalColor;
+    }
     }
 }

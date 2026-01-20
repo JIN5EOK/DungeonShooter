@@ -1,11 +1,13 @@
 using UnityEngine;
 
-/// <summary>
-/// 쿨다운 관리를 담당하는 MonoBehaviour 컴포넌트
-/// Unity 생명주기와 통합하여 자동으로 쿨다운을 업데이트합니다.
-/// </summary>
-public class CooldownComponent : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 쿨다운 관리를 담당하는 MonoBehaviour 컴포넌트
+    /// Unity 생명주기와 통합하여 자동으로 쿨다운을 업데이트합니다.
+    /// </summary>
+    public class CooldownComponent : MonoBehaviour
+    {
     private CooldownManager _manager = new CooldownManager();
 
     private void Update()
@@ -59,6 +61,7 @@ public class CooldownComponent : MonoBehaviour
     public float GetTotalCooldown(string name)
     {
         return _manager.GetTotalCooldown(name);
+    }
     }
 }
 

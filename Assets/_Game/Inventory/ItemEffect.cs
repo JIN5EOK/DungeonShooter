@@ -1,9 +1,11 @@
-/// <summary>
-/// 아이템 효과를 나타내는 클래스
-/// </summary>
-[System.Serializable]
-public abstract class ItemEffect
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 아이템 효과를 나타내는 클래스
+    /// </summary>
+    [System.Serializable]
+    public abstract class ItemEffect
+    {
     /// <summary>
     /// 효과를 플레이어에 적용
     /// </summary>
@@ -25,6 +27,7 @@ public abstract class ItemEffect
     public virtual string GetDescription()
     {
         return "";
+    }
     }
 }
 

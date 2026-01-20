@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// 쿨다운 관리를 담당하는 순수 로직 클래스
-/// MonoBehaviour 없이도 사용 가능하며, 테스트 및 재사용이 용이합니다.
-/// </summary>
-public class CooldownManager
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 쿨다운 관리를 담당하는 순수 로직 클래스
+    /// MonoBehaviour 없이도 사용 가능하며, 테스트 및 재사용이 용이합니다.
+    /// </summary>
+    public class CooldownManager
+    {
     private Dictionary<string, float> _cooldowns = new Dictionary<string, float>();
     private Dictionary<string, float> _cooldownTimers = new Dictionary<string, float>();
 
@@ -84,6 +86,7 @@ public class CooldownManager
             return 0f;
 
         return _cooldowns[name];
+    }
     }
 }
 

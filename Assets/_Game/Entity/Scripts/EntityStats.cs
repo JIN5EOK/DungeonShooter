@@ -1,12 +1,14 @@
 using UnityEngine;
 using System;
 
-/// <summary>
-/// Entity들이 공통적으로 사용하는 스테이터스를 관리하는 클래스
-/// </summary>
-[Serializable]
-public class EntityStats : IEntityStats
+namespace DungeonShooter
 {
+    /// <summary>
+    /// Entity들이 공통적으로 사용하는 스테이터스를 관리하는 클래스
+    /// </summary>
+    [Serializable]
+    public class EntityStats : IEntityStats
+    {
     [Header("기본 스테이터스")]
     [Tooltip("이동 속도")]
     [SerializeField] private float moveSpeed = 5f;
@@ -93,6 +95,7 @@ public class EntityStats : IEntityStats
     public EntityStats Clone()
     {
         return new EntityStats(this);
+    }
     }
 }
 

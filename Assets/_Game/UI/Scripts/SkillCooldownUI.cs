@@ -2,11 +2,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// 스킬 쿨다운을 표시하는 UI 컴포넌트
-/// </summary>
-public class SkillCooldownUI : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 스킬 쿨다운을 표시하는 UI 컴포넌트
+    /// </summary>
+    public class SkillCooldownUI : MonoBehaviour
+    {
     [Header("UI 요소")]
     [SerializeField] private Image skillIcon;
     [SerializeField] private Image cooldownOverlay;
@@ -200,5 +202,6 @@ public class SkillCooldownUI : MonoBehaviour
         }
 
         skillIcon.transform.localScale = originalScale;
+    }
     }
 }

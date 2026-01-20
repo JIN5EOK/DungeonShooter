@@ -1,11 +1,14 @@
 using UnityEngine;
 using DungeonShooter;
-/// <summary>
-/// 카메라 추적 시스템
-/// 플레이어나 다른 대상을 자연스럽게 따라다니거나, 원하는 위치로 이동할 수 있습니다.
-/// </summary>
-public class CameraController : MonoBehaviour
+
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 카메라 추적 시스템
+    /// 플레이어나 다른 대상을 자연스럽게 따라다니거나, 원하는 위치로 이동할 수 있습니다.
+    /// </summary>
+    public class CameraController : MonoBehaviour
+    {
     [Header("추적 설정")]
     [Tooltip("추적할 대상 Transform (null이면 자동으로 Player 태그 찾기)")]
     [SerializeField] private Transform _target;
@@ -198,6 +201,7 @@ public class CameraController : MonoBehaviour
         var pos = transform.position;
         pos.z = 0; // Z축 오프셋 제거
         return pos - _offset;
+    }
     }
 }
 

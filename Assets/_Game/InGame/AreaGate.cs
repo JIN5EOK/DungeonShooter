@@ -1,14 +1,16 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// 플레이어의 출입을 통제하는 차단막.
-/// Open() 메서드가 호출되면 플레이어가 통과할 수 있게 됩니다.
-/// </summary>
-[RequireComponent(typeof(Collider2D))]
-[DisallowMultipleComponent]
-public class AreaGate : MonoBehaviour
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 플레이어의 출입을 통제하는 차단막.
+    /// Open() 메서드가 호출되면 플레이어가 통과할 수 있게 됩니다.
+    /// </summary>
+    [RequireComponent(typeof(Collider2D))]
+    [DisallowMultipleComponent]
+    public class AreaGate : MonoBehaviour
+    {
     [Header("시각적 설정")]
     [Tooltip("클리어 시 비활성화될 시각 요소들")]
     [SerializeField] private GameObject[] visualElements;
@@ -172,4 +174,5 @@ public class AreaGate : MonoBehaviour
     /// 게이트 열림 상태 반환
     /// </summary>
     public bool IsOpen => _isOpen;
+    }
 }

@@ -1,12 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DungeonShooter;
-/// <summary>
-/// 구역 클리어 조건을 체크하는 컴포넌트.
-/// 조건이 만족되면 연결된 AreaGate에 알림을 보냅니다.
-/// </summary>
-public class AreaClearCondition : MonoBehaviour
+
+namespace DungeonShooter
 {
+    /// <summary>
+    /// 구역 클리어 조건을 체크하는 컴포넌트.
+    /// 조건이 만족되면 연결된 AreaGate에 알림을 보냅니다.
+    /// </summary>
+    public class AreaClearCondition : MonoBehaviour
+    {
     [Header("클리어 조건 설정")]
     [Tooltip("자동으로 영역 내 적을 찾을지 여부 (false면 수동으로 할당)")]
     [SerializeField] private bool autoDetectEnemies = true;
@@ -319,6 +322,7 @@ public class AreaClearCondition : MonoBehaviour
                 }
             }
         }
+    }
     }
 }
 

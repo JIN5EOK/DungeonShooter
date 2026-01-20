@@ -2,23 +2,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-/// <summary>
-/// 아이템 타입
-/// </summary>
-public enum ItemType
+namespace DungeonShooter
 {
-    Passive,
-    Active,
-    Weapon
-}
+    /// <summary>
+    /// 아이템 타입
+    /// </summary>
+    public enum ItemType
+    {
+        Passive,
+        Active,
+        Weapon
+    }
 
-/// <summary>
-/// 아이템 데이터를 나타내는 ScriptableObject
-/// 원본 데이터 참조용, 여기있는 이펙트를 실제로 사용하지 않음
-/// </summary>
-[CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item Data")]
-public class ItemData : ScriptableObject
-{
+    /// <summary>
+    /// 아이템 데이터를 나타내는 ScriptableObject
+    /// 원본 데이터 참조용, 여기있는 이펙트를 실제로 사용하지 않음
+    /// </summary>
+    [CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item Data")]
+    public class ItemData : ScriptableObject
+    {
     [Header("기본 정보")]
     [SerializeField] private string itemName;
     [SerializeField, TextArea(3, 5)] private string description;
@@ -38,5 +40,6 @@ public class ItemData : ScriptableObject
     /// 실제 사용은 ItemBase에서 복사된 효과를 사용
     /// </summary>
     public IReadOnlyList<ItemEffect> ItemEffects => itemEffects;
+    }
 }
 

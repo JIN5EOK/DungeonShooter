@@ -5,8 +5,10 @@ using Jin5eok;
 using VContainer;
 using Cysharp.Threading.Tasks;
 
-public enum EnemyState
+namespace DungeonShooter
 {
+    public enum EnemyState
+    {
     Idle,
     Patrol,
     Chase,
@@ -456,5 +458,6 @@ public class Enemy : EntityBase
 
         // 일정 시간 후 파괴
         Destroy(gameObject, deathDelay);
+    }
     }
 }
