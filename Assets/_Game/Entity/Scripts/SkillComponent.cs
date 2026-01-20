@@ -48,7 +48,7 @@ public class SkillComponent : MonoBehaviour
             return false;
         }
         
-        return await skill.Execute(_owner, target);
+        return await skill.Execute(_owner);
     }
     
     /// <summary>

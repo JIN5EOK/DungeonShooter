@@ -14,31 +14,31 @@ public class SpawnProjectileEffect : EffectBase
 {
     [Header("투사체 프리팹")]
     [SerializeField]
-    public AssetReferenceT<Projectile> projectile;
+    public AssetReferenceGameObject projectile;
     
     [Header("투사체 적중시 효과")]
     [SerializeReference]
     public List<EffectBase> effects = new List<EffectBase>();
 
-    private string ProjectileAddress => projectile.RuntimeKey.ToString();
+    private string ProjectileAddress => projectile.AssetGUID.ToString();
     private IStageResourceProvider _resourceProvider;
     
     [Inject]
-    public SpawnProjectileEffect(IStageResourceProvider resourceProvider)
+    public void Construct(IStageResourceProvider resourceProvider)
     {
         // 미리 메모리에 올려두기
-        resourceProvider.GetAsset<GameObject>(ProjectileAddress);
         _resourceProvider = resourceProvider;
+        resourceProvider.GetAsset<GameObject>(ProjectileAddress);
     }
     
-    public override async UniTask<bool> Execute(EntityBase owner, EntityBase target)
+    public override async UniTask<bool> Execute(EntityBase target)
     {
         try
         {
             var obj = await _resourceProvider.GetInstance(ProjectileAddress);
             if (obj.TryGetComponent(out Projectile proj))
             {
-                proj.Initialize(owner, effects);
+                proj.Initialize(target, effects);
             }
 
             return true;

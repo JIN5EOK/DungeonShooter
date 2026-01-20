@@ -18,8 +18,7 @@ public interface ISkill : IDisposable
     /// <summary>
     /// 스킬을 실행합니다.
     /// </summary>
-    /// <param name="owner">스킬을 발동한 Entity</param>
-    /// <param name="target">스킬에 적중된 Entity</param>
+    /// <param name="target">스킬을 적용할 Entity</param>
     /// <returns>실행 성공 여부</returns>
-    UniTask<bool> Execute(EntityBase owner, EntityBase target);
+    UniTask<bool> Execute(EntityBase target);
 }

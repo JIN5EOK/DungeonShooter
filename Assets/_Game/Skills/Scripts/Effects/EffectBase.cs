@@ -11,5 +11,5 @@ public abstract class EffectBase
     /// 이펙트를 실행합니다.
     /// </summary>
     /// <returns>실행 성공 여부</returns>
-    public abstract UniTask<bool> Execute(EntityBase owner, EntityBase target);
+    public abstract UniTask<bool> Execute(EntityBase target);
 }

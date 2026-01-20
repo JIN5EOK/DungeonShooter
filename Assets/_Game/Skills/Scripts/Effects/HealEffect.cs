@@ -10,7 +10,7 @@ public class HealEffect : EffectBase
     [Header("회복 설정")]
     public int healAmount;
     
-    public override UniTask<bool> Execute(EntityBase owner, EntityBase target)
+    public override UniTask<bool> Execute(EntityBase target)
     {
         if (target.TryGetComponent(out HealthComponent health))
         {
