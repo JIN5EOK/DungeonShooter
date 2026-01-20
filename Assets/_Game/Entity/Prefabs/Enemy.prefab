@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7001560364046731188}
   - component: {fileID: 399146359455650338}
   - component: {fileID: 4560199198152073960}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -177,16 +177,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 325ac37a0e9164e528fb7f9ea9c965d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
   statsComponent: {fileID: 0}
   detectionRange: 10
   patrolRange: 5
-  patrolSpeed: 2
   idleTime: 2
   hitStunDuration: 0.5
   knockbackForce: 3
-  hitColor: {r: 1, g: 0, b: 0, a: 1}
-  hitFlashDuration: 0.2
   deathDelay: 1
   disableOnDeath: 1
   showAttackRange: 1
@@ -226,6 +222,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ceae8b9499194fe7bead2cf9e9ce5db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  startWithFullHealth: 1
-  currentHealth: 0

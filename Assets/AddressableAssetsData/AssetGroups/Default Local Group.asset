@@ -27,7 +27,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1654f787912fc4307b0db38dc6acf3a7
-    m_Address: Projectile
+    m_Address: Fireball_Projectile
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -70,7 +70,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9e907f54a0dbf414c91dbb241d0c338a
-    m_Address: TestSkill
+    m_Address: FireballSkillData
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

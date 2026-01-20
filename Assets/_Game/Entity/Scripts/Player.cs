@@ -56,14 +56,12 @@ namespace DungeonShooter
         SubscribeInputEvent();
         
         _skillComponent = _resourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
-        await _skillComponent.RegistSkill("TestSkill");
+        await _skillComponent.RegistSkill("FireballSkillData");
     }
 
     protected override async UniTask Start()
     {
         await base.Start();
-        
-        statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
         
         _cooldownComponent = gameObject.AddOrGetComponent<CooldownComponent>();
         _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
@@ -94,7 +92,7 @@ namespace DungeonShooter
     {
         if(Input.GetKeyDown(KeyCode.Alpha0))
         {
-            _skillComponent.UseSkill("TestSkill", this);
+            _skillComponent.UseSkill("FireballSkillData", this);
         }
     }
 
