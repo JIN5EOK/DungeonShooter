@@ -51,6 +51,13 @@ classDiagram
         +StartCooldown(string name) void
         +GetCooldownPercent(string name) float
     }
+    class InteractComponent["InteractComponent<br>플레이어와 상호작용 가능 물체 상호작용 담당"]{
+        +TryInteract() void 
+        // () 후보에 있는 IInteractable 객체와 상호작용
+        -RegisterInteractable() void
+        -UnRegisterInteractable() void
+        // () 범위내 객체를 후보로 등록/해제하거나 외부등록
+    }
 ```
 
 ```mermaid

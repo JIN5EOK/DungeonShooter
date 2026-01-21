@@ -27,7 +27,7 @@ namespace DungeonShooter
         /// <summary>
         /// 상호작용 가능한 오브젝트를 등록합니다.
         /// </summary>
-        public void RegisterInteractable(Component component)
+        private void RegisterInteractable(Component component)
         {
             var interactable = component as IInteractable;
             if (interactable == null)
@@ -41,7 +41,7 @@ namespace DungeonShooter
         /// <summary>
         /// 상호작용 가능한 오브젝트를 제거합니다.
         /// </summary>
-        public void UnregisterInteractable(Component component)
+        private void UnregisterInteractable(Component component)
         {
             var interactable = component as IInteractable;
             if (interactable == null)
