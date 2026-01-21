@@ -8,67 +8,67 @@ namespace DungeonShooter
     /// </summary>
     public class EntityStatsComponent : MonoBehaviour, IEntityStats
     {
-    [Header("스테이터스 설정")]
-    [SerializeField] private EntityStats stats = new EntityStats();
+        [Header("스테이터스 설정")]
+        [SerializeField] private EntityStats stats = new EntityStats();
 
-    /// <summary>
-    /// 현재 스테이터스 (읽기 전용)
-    /// </summary>
-    public EntityStats Stats => stats;
+        /// <summary>
+        /// 현재 스테이터스 (읽기 전용)
+        /// </summary>
+        public EntityStats Stats => stats;
 
-    /// <summary>
-    /// 스테이터스 초기화 (다른 EntityStats로 설정)
-    /// </summary>
-    public void Initialize(EntityStats newStats)
-    {
-        if (newStats != null)
+        /// <summary>
+        /// 스테이터스 초기화 (다른 EntityStats로 설정)
+        /// </summary>
+        public void Initialize(EntityStats newStats)
         {
-            stats = newStats.Clone();
+            if (newStats != null)
+            {
+                stats = newStats.Clone();
+            }
         }
-    }
 
-    // IEntityStats 구현 (stats에 위임)
-    public float MoveSpeed
-    {
-        get => stats.MoveSpeed;
-        set => stats.MoveSpeed = value;
-    }
+        // IEntityStats 구현 (stats에 위임)
+        public float MoveSpeed
+        {
+            get => stats.MoveSpeed;
+            set => stats.MoveSpeed = value;
+        }
 
-    public int MaxHealth
-    {
-        get => stats.MaxHealth;
-        set => stats.MaxHealth = value;
-    }
+        public int MaxHealth
+        {
+            get => stats.MaxHealth;
+            set => stats.MaxHealth = value;
+        }
 
-    public int AttackDamage
-    {
-        get => stats.AttackDamage;
-        set => stats.AttackDamage = value;
-    }
+        public int AttackDamage
+        {
+            get => stats.AttackDamage;
+            set => stats.AttackDamage = value;
+        }
 
-    public float AttackRange
-    {
-        get => stats.AttackRange;
-        set => stats.AttackRange = value;
-    }
+        public float AttackRange
+        {
+            get => stats.AttackRange;
+            set => stats.AttackRange = value;
+        }
 
-    public float AttackCooldown
-    {
-        get => stats.AttackCooldown;
-        set => stats.AttackCooldown = value;
-    }
+        public float AttackCooldown
+        {
+            get => stats.AttackCooldown;
+            set => stats.AttackCooldown = value;
+        }
 
-    public int Defense
-    {
-        get => stats.Defense;
-        set => stats.Defense = value;
-    }
+        public int Defense
+        {
+            get => stats.Defense;
+            set => stats.Defense = value;
+        }
 
-    public float KnockbackResistance
-    {
-        get => stats.KnockbackResistance;
-        set => stats.KnockbackResistance = value;
-    }
+        public float KnockbackResistance
+        {
+            get => stats.KnockbackResistance;
+            set => stats.KnockbackResistance = value;
+        }
     }
 }
 

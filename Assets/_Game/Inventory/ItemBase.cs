@@ -10,83 +10,83 @@ namespace DungeonShooter
     /// </summary>
     public abstract class ItemBase
     {
-    protected readonly ItemData _itemData;
-    protected readonly List<ItemEffect> _itemEffects;
+        protected readonly ItemData _itemData;
+        protected readonly List<ItemEffect> _itemEffects;
 
-    public ItemData ItemData => _itemData;
-    
-    /// <summary>
-    /// 아이템 효과 목록 (읽기 전용)
-    /// </summary>
-    public IReadOnlyList<ItemEffect> ItemEffects => _itemEffects;
-
-    protected ItemBase(ItemData itemData)
-    {
-        if (itemData == null)
-        {
-            Debug.LogError($"[{nameof(ItemBase)}] ItemData가 null입니다.");
-            _itemEffects = new List<ItemEffect>();
-            return;
-        }
-
-        _itemData = itemData;
+        public ItemData ItemData => _itemData;
         
-        // ItemData에서 효과를 복사해와 사용 (각 인스턴스마다 독립적)
-        _itemEffects = itemData.ItemEffects != null 
-            ? itemData.ItemEffects.ToList() 
-            : new List<ItemEffect>();
-    }
+        /// <summary>
+        /// 아이템 효과 목록 (읽기 전용)
+        /// </summary>
+        public IReadOnlyList<ItemEffect> ItemEffects => _itemEffects;
 
-    /// <summary>
-    /// 추가 효과 부여
-    /// </summary>
-    public void AddEffect(ItemEffect effect)
-    {
-        if (effect != null)
+        protected ItemBase(ItemData itemData)
         {
-            _itemEffects.Add(effect);
+            if (itemData == null)
+            {
+                Debug.LogError($"[{nameof(ItemBase)}] ItemData가 null입니다.");
+                _itemEffects = new List<ItemEffect>();
+                return;
+            }
+
+            _itemData = itemData;
+            
+            // ItemData에서 효과를 복사해와 사용 (각 인스턴스마다 독립적)
+            _itemEffects = itemData.ItemEffects != null 
+                ? itemData.ItemEffects.ToList() 
+                : new List<ItemEffect>();
         }
-    }
 
-    /// <summary>
-    /// 효과 제거
-    /// </summary>
-    public bool RemoveEffect(ItemEffect effect)
-    {
-        return _itemEffects.Remove(effect);
-    }
-
-    /// <summary>
-    /// 모든 효과를 플레이어에 적용
-    /// </summary>
-    public void ApplyEffects(Player player)
-    {
-        if (player == null) return;
-
-        foreach (var effect in _itemEffects)
+        /// <summary>
+        /// 추가 효과 부여
+        /// </summary>
+        public void AddEffect(ItemEffect effect)
         {
             if (effect != null)
             {
-                effect.Apply(player);
+                _itemEffects.Add(effect);
             }
         }
-    }
 
-    /// <summary>
-    /// 모든 효과를 플레이어에서 제거
-    /// </summary>
-    public void RemoveEffects(Player player)
-    {
-        if (player == null) return;
-
-        foreach (var effect in _itemEffects)
+        /// <summary>
+        /// 효과 제거
+        /// </summary>
+        public bool RemoveEffect(ItemEffect effect)
         {
-            if (effect != null)
+            return _itemEffects.Remove(effect);
+        }
+
+        /// <summary>
+        /// 모든 효과를 플레이어에 적용
+        /// </summary>
+        public void ApplyEffects(Player player)
+        {
+            if (player == null) return;
+
+            foreach (var effect in _itemEffects)
             {
-                effect.Remove(player);
+                if (effect != null)
+                {
+                    effect.Apply(player);
+                }
             }
         }
-    }
+
+        /// <summary>
+        /// 모든 효과를 플레이어에서 제거
+        /// </summary>
+        public void RemoveEffects(Player player)
+        {
+            if (player == null) return;
+
+            foreach (var effect in _itemEffects)
+            {
+                if (effect != null)
+                {
+                    effect.Remove(player);
+                }
+            }
+        }
     }
 }
 

@@ -9,48 +9,48 @@ namespace DungeonShooter
     [DisallowMultipleComponent]
     public class CoinInventory 
     {
-    [SerializeField, Min(0)]
-    private int startingCoins = 0;
+        [SerializeField, Min(0)]
+        private int startingCoins = 0;
 
-    public int CurrentCoins { get; private set; }
+        public int CurrentCoins { get; private set; }
 
-    /// <summary>
-    /// 코인 보유량이 변경되었을 때 (변경 후 값 전달)
-    /// </summary>
-    public event Action<int> OnCoinsChanged;
+        /// <summary>
+        /// 코인 보유량이 변경되었을 때 (변경 후 값 전달)
+        /// </summary>
+        public event Action<int> OnCoinsChanged;
 
-    private void Awake()
-    {
-        CurrentCoins = Mathf.Max(0, startingCoins);
-        NotifyChanged();
-    }
+        private void Awake()
+        {
+            CurrentCoins = Mathf.Max(0, startingCoins);
+            NotifyChanged();
+        }
 
-    public void AddCoins(int amount)
-    {
-        if (amount <= 0)
-            return;
+        public void AddCoins(int amount)
+        {
+            if (amount <= 0)
+                return;
 
-        CurrentCoins += amount;
-        NotifyChanged();
-    }
+            CurrentCoins += amount;
+            NotifyChanged();
+        }
 
-    public bool TrySpendCoins(int amount)
-    {
-        if (amount <= 0)
+        public bool TrySpendCoins(int amount)
+        {
+            if (amount <= 0)
+                return true;
+
+            if (CurrentCoins < amount)
+                return false;
+
+            CurrentCoins -= amount;
+            NotifyChanged();
             return true;
+        }
 
-        if (CurrentCoins < amount)
-            return false;
-
-        CurrentCoins -= amount;
-        NotifyChanged();
-        return true;
-    }
-
-    private void NotifyChanged()
-    {
-        OnCoinsChanged?.Invoke(CurrentCoins);
-    }
+        private void NotifyChanged()
+        {
+            OnCoinsChanged?.Invoke(CurrentCoins);
+        }
     }
 }
 

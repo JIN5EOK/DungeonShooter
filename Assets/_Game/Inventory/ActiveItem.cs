@@ -7,27 +7,27 @@ namespace DungeonShooter
     /// </summary>
     public class ActiveItem : ItemBase, IEquipable, IUseable
     {
-    private readonly Action _onUse;
+        private readonly Action _onUse;
 
-    /// <summary>
-    /// 액티브 아이템 생성자
-    /// </summary>
-    /// <param name="itemData">아이템 데이터</param>
-    /// <param name="onUse">사용 시 실행할 액션 (선택 사항)</param>
-    public ActiveItem(ItemData itemData, Action onUse = null) : base(itemData)
-    {
-        _onUse = onUse;
-    }
+        /// <summary>
+        /// 액티브 아이템 생성자
+        /// </summary>
+        /// <param name="itemData">아이템 데이터</param>
+        /// <param name="onUse">사용 시 실행할 액션 (선택 사항)</param>
+        public ActiveItem(ItemData itemData, Action onUse = null) : base(itemData)
+        {
+            _onUse = onUse;
+        }
 
-    public void Equip()
-    {
-        // 장착 시 처리 (필요시 구현)
-    }
+        public void Equip()
+        {
+            // 장착 시 처리 (필요시 구현)
+        }
 
-    public void Use()
-    {
-        _onUse?.Invoke();
-    }
+        public void Use()
+        {
+            _onUse?.Invoke();
+        }
     }
 }
 
