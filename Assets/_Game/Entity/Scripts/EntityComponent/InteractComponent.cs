@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Jin5eok;
 using UnityEngine;
 
 namespace DungeonShooter
@@ -8,28 +10,46 @@ namespace DungeonShooter
     /// </summary>
     public class InteractComponent : MonoBehaviour
     {
+        [Header("감지할 트리거")]
+        [SerializeField]
+        private TriggerDetector2D _triggerDetector2D;
+        
         private HashSet<IInteractable> _nearbyInteractables = new HashSet<IInteractable>();
+
+        private void Start()
+        {
+            // 상호작용 객체만 찾도록
+            _triggerDetector2D.TargetType = typeof(IInteractable);
+            _triggerDetector2D.OnTargetEntered += RegisterInteractable;
+            _triggerDetector2D.OnTargetExited += UnregisterInteractable;
+        }
 
         /// <summary>
         /// 상호작용 가능한 오브젝트를 등록합니다.
         /// </summary>
-        public void RegisterInteractable(IInteractable interactable)
+        public void RegisterInteractable(Component component)
         {
-            if (interactable != null)
+            var interactable = component as IInteractable;
+            if (interactable == null)
             {
-                _nearbyInteractables.Add(interactable);
+                return;
             }
+            Debug.Log($"[{nameof(InteractComponent)}] Registering interactable {interactable})]");
+            _nearbyInteractables.Add(interactable);
         }
 
         /// <summary>
         /// 상호작용 가능한 오브젝트를 제거합니다.
         /// </summary>
-        public void UnregisterInteractable(IInteractable interactable)
+        public void UnregisterInteractable(Component component)
         {
-            if (interactable != null)
+            var interactable = component as IInteractable;
+            if (interactable == null)
             {
-                _nearbyInteractables.Remove(interactable);
+                return;
             }
+            Debug.Log($"[{nameof(InteractComponent)}] UnRegistering interactable {interactable})]");
+            _nearbyInteractables.Remove(interactable);
         }
 
         /// <summary>

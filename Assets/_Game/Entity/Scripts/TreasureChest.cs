@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using DungeonShooter;
 using VContainer;
 
 namespace DungeonShooter
@@ -13,10 +12,6 @@ namespace DungeonShooter
     [DisallowMultipleComponent]
     public class TreasureChest : MonoBehaviour, IInteractable
     {
-    [Header("상호작용 설정")]
-    [Tooltip("상호작용 가능한 거리")]
-    [SerializeField] private float interactionRange = 2f;
-
     [Header("보상 설정")]
     [Tooltip("상자에서 나올 코인 수")]
     [SerializeField, Min(0)] private int coinReward = 10;
@@ -46,7 +41,6 @@ namespace DungeonShooter
     private Collider2D _interactionCollider;
     private SpriteRenderer _spriteRenderer;
     private bool _isOpen = false;
-    private bool _playerInRange = false;
     private CoinInventory _coinInventory;
 
     /// <summary>
@@ -82,59 +76,6 @@ namespace DungeonShooter
     public void Construct(CoinInventory coinInventory)
     {
         _coinInventory = coinInventory;
-    }
-
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag(GameTags.Player))
-        {
-            _playerInRange = true;
-
-            // PlayerProto에 상호작용 가능한 오브젝트로 등록
-            var player = other.GetComponent<Player>();
-            if (player != null)
-            {
-                player.RegisterInteractable(this);
-            }
-
-            // 상호작용 프롬프트 표시
-            if (interactionPrompt != null && !_isOpen)
-            {
-                interactionPrompt.SetActive(true);
-            }
-
-            if (showDebugInfo)
-            {
-                Debug.Log($"[{nameof(TreasureChest)}] {gameObject.name}: 플레이어가 범위 내에 들어왔습니다.");
-            }
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag(GameTags.Player))
-        {
-            _playerInRange = false;
-
-            // PlayerProto에서 상호작용 가능한 오브젝트에서 제거
-            var player = other.GetComponent<Player>();
-            if (player != null)
-            {
-                player.UnregisterInteractable(this);
-            }
-
-            // 상호작용 프롬프트 숨기기
-            if (interactionPrompt != null)
-            {
-                interactionPrompt.SetActive(false);
-            }
-
-            if (showDebugInfo)
-            {
-                Debug.Log($"[{nameof(TreasureChest)}] {gameObject.name}: 플레이어가 범위를 벗어났습니다.");
-            }
-        }
     }
 
     /// <summary>
@@ -234,29 +175,14 @@ namespace DungeonShooter
     /// </summary>
     public bool IsOpen => _isOpen;
 
-    /// <summary>
-    /// 플레이어가 범위 내에 있는지 여부
-    /// </summary>
-    public bool IsPlayerInRange => _playerInRange;
-
     // IInteractable 구현
-    public bool CanInteract => !_isOpen && _playerInRange;
+    public bool CanInteract => !_isOpen;
 
     public void Interact()
     {
-        if (CanInteract)
-        {
-            OpenChest();
-        }
-    }
+        if (!CanInteract) return;
 
-    private void OnDrawGizmosSelected()
-    {
-        if (!showDebugInfo) return;
-
-        // 상호작용 범위 시각화
-        Gizmos.color = _playerInRange ? Color.green : Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, interactionRange);
+        OpenChest();
     }
     }
 }
