@@ -35,11 +35,6 @@ public class Enemy : EntityBase
     [SerializeField] private float deathDelay = 1f;
     [SerializeField] private bool disableOnDeath = true;
 
-    [Header("공격 범위 시각화")]
-    [Tooltip("공격 범위를 시각적으로 표시할지 여부")]
-    [SerializeField] private bool showAttackRange = true;
-    [SerializeField] private AttackRangeVisualizer attackRangeVisualizer;
-
     [Header("코인 드롭 설정")]
     
     [Tooltip("코인 드롭 확률 (0~1)")]
@@ -101,30 +96,6 @@ public class Enemy : EntityBase
         else
         {
             Debug.LogWarning($"[{gameObject.name}] HealthComponent가 없습니다. 적이 죽지 않습니다!");
-        }
-
-        // 공격 범위 시각화 초기화
-        if (showAttackRange)
-        {
-            if (attackRangeVisualizer == null)
-            {
-                attackRangeVisualizer = GetComponent<AttackRangeVisualizer>();
-                if (attackRangeVisualizer == null)
-                {
-                    // 자동으로 생성 (LineRenderer 먼저 추가 필요)
-                    var visualizerObj = new GameObject("AttackRangeVisualizer");
-                    visualizerObj.transform.SetParent(transform);
-                    visualizerObj.transform.localPosition = Vector3.zero;
-                    visualizerObj.AddComponent<LineRenderer>(); // LineRenderer 먼저 추가
-                    attackRangeVisualizer = visualizerObj.AddComponent<AttackRangeVisualizer>();
-                }
-            }
-            
-            if (attackRangeVisualizer != null)
-            {
-                attackRangeVisualizer.SetRadius(GetAttackRange());
-                attackRangeVisualizer.SetColor(new Color(1f, 0f, 0f, 0.3f)); // 반투명 빨간색
-            }
         }
     }
     
@@ -320,51 +291,11 @@ public class Enemy : EntityBase
                 playerHealth.TakeDamage(damage);
             }
         }
-
-        // 공격 범위 시각화
-        if (showAttackRange && attackRangeVisualizer != null)
-        {
-            attackRangeVisualizer.Show();
-        }
-        else
-        {
-            DebugDrawCircle(transform.position, GetAttackRange(), Color.red, 0.3f);
-        }
     }
-
-    // ==================== 검사용 함수 ====================
-    public bool IsChasing => _currentState == EnemyState.Chase;
-    public bool IsDead => _currentState == EnemyState.Dead;
-    public bool IsStunned => _isStunned;
-    public EnemyState GetCurrentState() => _currentState;
-    public float GetDetectionRange() => detectionRange;
+    
     public float GetAttackRange() => statsComponent != null ? statsComponent.AttackRange : 0f;
     private int GetAttackDamage() => statsComponent != null ? statsComponent.AttackDamage : 0;
     private float GetAttackCooldown() => statsComponent != null ? statsComponent.AttackCooldown : 0f;
-
-    // ==================== 디버그 시각화 ====================
-    private void OnDrawGizmosSelected()
-    {
-        // 감지 범위
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
-
-        // 공격 범위
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, GetAttackRange());
-
-        // 순찰 범위
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(_patrolStartPos, patrolRange);
-
-        // 순찰 목표 지점
-        if (Application.isPlaying)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(_patrolTargetPos, 0.5f);
-            Gizmos.DrawLine(transform.position, _patrolTargetPos);
-        }
-    }
 
     // ==================== 코인 드롭 ====================
 
@@ -425,13 +356,13 @@ public class Enemy : EntityBase
 
     private void HandleDeath()
     {
-        _ = HandleDeathAsync();
+        HandleDeathAsync().Forget();
     }
     
     /// <summary>
     /// 사망 처리
     /// </summary>
-    private async Awaitable HandleDeathAsync()
+    private async UniTask HandleDeathAsync()
     {
         if (_currentState == EnemyState.Dead) return; // 중복 호출 방지
 
