@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
-using DungeonShooter;
 using Jin5eok;
 
 namespace DungeonShooter
@@ -36,17 +34,16 @@ namespace DungeonShooter
     [SerializeField] private AttackRangeVisualizer skill2Visualizer; // 회전 공격
     [SerializeField] private AttackRangeVisualizer skill3Visualizer; // 점프 공격
     
-    private CooldownComponent _cooldownComponent;
     private HealthComponent _healthComponent;
     private bool _isJumping;
     private bool _isDead;
     private System.Threading.CancellationTokenSource _jumpCancellationTokenSource;
-    private HashSet<IInteractable> _nearbyInteractables = new HashSet<IInteractable>();
     private int _maxHealthCache = 0;
 
     private MovementComponent _movementComponent;
     private DashComponent _dashComponent;
     private SkillComponent _skillComponent;
+    private InteractComponent _interactComponent;
     private IStageResourceProvider _resourceProvider;
     [Inject]
     private async UniTask Construct(IStageResourceProvider resourceProvider, InputManager inputManager)
@@ -63,29 +60,17 @@ namespace DungeonShooter
     {
         await base.Start();
         
-        _cooldownComponent = gameObject.AddOrGetComponent<CooldownComponent>();
         _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
         
         _dashComponent = gameObject.AddOrGetComponent<DashComponent>();
-        _dashComponent.Initialize(_cooldownComponent);
+        
+        _interactComponent = gameObject.AddOrGetComponent<InteractComponent>();
         
         // 체력 이벤트 구독
         _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();
         _healthComponent.OnDeath += HandleDeath;
 
-        // 쿨타임 등록
-        _cooldownComponent.RegisterCooldown("dash", _dashComponent.DashCooldown);
-        _cooldownComponent.RegisterCooldown("skill1", skill1Cooldown);
-        _cooldownComponent.RegisterCooldown("skill2", skill2Cooldown);
-        _cooldownComponent.RegisterCooldown("skill3", skill3Cooldown);
-
         Debug.Log($"[{nameof(Player)}] 체력 시스템 초기화 완료: {_healthComponent.CurrentHealth}/{_healthComponent.MaxHealth}");
-
-        // 스킬 범위 시각화 초기화
-        if (showSkillRanges)
-        {
-            InitializeSkillVisualizers();
-        }
     }
 
     private void Update()
@@ -96,57 +81,6 @@ namespace DungeonShooter
         }
     }
 
-    /// <summary>
-    /// 스킬 범위 시각화 초기화
-    /// </summary>
-    private void InitializeSkillVisualizers()
-    {
-        // 스킬1 (전방 슬래시) 시각화 - 독립 GameObject (공격 위치에 표시)
-        if (skill1Visualizer == null)
-        {
-            var skill1Obj = new GameObject("Skill1RangeVisualizer");
-            skill1Obj.transform.SetParent(null); // 부모 없이 독립적으로
-            skill1Obj.AddComponent<LineRenderer>();
-            skill1Visualizer = skill1Obj.AddComponent<AttackRangeVisualizer>();
-        }
-        if (skill1Visualizer != null)
-        {
-            skill1Visualizer.SetRadius(1f); // 스킬1 반경
-            skill1Visualizer.SetColor(new Color(1f, 0.5f, 0f, 0.3f)); // 반투명 주황색
-            skill1Visualizer.gameObject.SetActive(false); // 기본적으로 비활성화
-        }
-
-        // 스킬2 (회전 공격) 시각화 - 플레이어 중심
-        if (skill2Visualizer == null)
-        {
-            var skill2Obj = new GameObject("Skill2RangeVisualizer");
-            skill2Obj.transform.SetParent(transform);
-            skill2Obj.transform.localPosition = Vector3.zero;
-            skill2Obj.AddComponent<LineRenderer>();
-            skill2Visualizer = skill2Obj.AddComponent<AttackRangeVisualizer>();
-        }
-        if (skill2Visualizer != null)
-        {
-            skill2Visualizer.SetRadius(2.5f); // 스킬2 반경
-            skill2Visualizer.SetColor(new Color(1f, 1f, 0f, 0.3f)); // 반투명 노란색
-        }
-
-        // 스킬3 (점프 공격) 시각화 - 독립 GameObject (착지 위치에 고정)
-        if (skill3Visualizer == null)
-        {
-            var skill3Obj = new GameObject("Skill3RangeVisualizer");
-            skill3Obj.transform.SetParent(null); // 부모 없이 독립적으로
-            skill3Obj.AddComponent<LineRenderer>();
-            skill3Visualizer = skill3Obj.AddComponent<AttackRangeVisualizer>();
-        }
-        if (skill3Visualizer != null)
-        {
-            skill3Visualizer.SetRadius(2f); // 스킬3 반경
-            skill3Visualizer.SetColor(new Color(1f, 0f, 1f, 0.3f)); // 반투명 마젠타
-            skill3Visualizer.gameObject.SetActive(false); // 기본적으로 비활성화
-        }
-    }
-    
     private void OnDestroy()
     {
         // 취소 토큰 정리
@@ -171,10 +105,6 @@ namespace DungeonShooter
         if (_inputManager == null) return;
 
         _inputManager.OnMoveInputChanged += HandleMoveInputChanged;
-        _inputManager.OnDashPressed += HandleDashInput;
-        _inputManager.OnSkill1Pressed += HandleSkill1Input;
-        _inputManager.OnSkill2Pressed += HandleSkill2Input;
-        _inputManager.OnSkill3Pressed += HandleSkill3Input;
         _inputManager.OnInteractPressed += HandleInteractInput;
     }
 
@@ -207,31 +137,25 @@ namespace DungeonShooter
 
     private void HandleSkill1Input()
     {
-        if (_cooldownComponent.IsReady("skill1"))
-        {
-            CastSkill1();
-        }
+        // TODO: 스킬 1 비활성화 (쿨다운 시스템 제거 작업 중)
+        // CastSkill1();
     }
 
     private void HandleSkill2Input()
     {
-        if (_cooldownComponent.IsReady("skill2"))
-        {
-            CastSkill2();
-        }
+        // TODO: 스킬 2 비활성화 (쿨다운 시스템 제거 작업 중)
+        // CastSkill2();
     }
 
     private void HandleSkill3Input()
     {
-        if (_cooldownComponent.IsReady("skill3"))
-        {
-            CastSkill3Async();
-        }
+        // TODO: 스킬 3 비활성화 (쿨다운 시스템 제거 작업 중)
+        // CastSkill3Async();
     }
 
     private void HandleInteractInput()
     {
-        TryInteract();
+        _interactComponent?.TryInteract();
     }
 
     // ==================== 상호작용 ====================
@@ -240,10 +164,7 @@ namespace DungeonShooter
     /// </summary>
     public void RegisterInteractable(IInteractable interactable)
     {
-        if (interactable != null)
-        {
-            _nearbyInteractables.Add(interactable);
-        }
+        _interactComponent?.RegisterInteractable(interactable);
     }
 
     /// <summary>
@@ -251,117 +172,24 @@ namespace DungeonShooter
     /// </summary>
     public void UnregisterInteractable(IInteractable interactable)
     {
-        if (interactable != null)
-        {
-            _nearbyInteractables.Remove(interactable);
-        }
-    }
-
-    /// <summary>
-    /// 상호작용을 시도합니다.
-    /// </summary>
-    private void TryInteract()
-    {
-        // 가장 가까운 상호작용 가능한 오브젝트 찾기
-        IInteractable closestInteractable = null;
-        var closestDistance = float.MaxValue;
-
-        foreach (IInteractable interactable in _nearbyInteractables)
-        {
-            if (interactable != null && interactable.CanInteract)
-            {
-                // MonoBehaviour인 경우 거리 계산
-                if (interactable is MonoBehaviour mb)
-                {
-                    var distance = Vector2.Distance(transform.position, mb.transform.position);
-                    if (distance < closestDistance)
-                    {
-                        closestDistance = distance;
-                        closestInteractable = interactable;
-                    }
-                }
-                else
-                {
-                    // MonoBehaviour가 아닌 경우 첫 번째로 발견된 것 사용
-                    closestInteractable = interactable;
-                    break;
-                }
-            }
-        }
-
-        // 상호작용 수행
-        if (closestInteractable != null)
-        {
-            closestInteractable.Interact();
-        }
+        _interactComponent?.UnregisterInteractable(interactable);
     }
 
 
     // ==================== 스킬 ====================
     private void CastSkill1()
     {
-        _cooldownComponent.StartCooldown("skill1");
-
-        Debug.Log("스킬 1 - 전방 슬래시 공격");
-        
-        // 실제 공격 위치 계산 (PerformRangeAttack과 동일한 로직)
-        var attackPos = (Vector2)transform.position + _movementComponent.Direction * (3f / 2f);
-        
-        // 스킬 범위 시각화 (실제 공격 위치에 정확히 표시)
-        if (showSkillRanges && skill1Visualizer != null)
-        {
-            skill1Visualizer.transform.position = attackPos;
-            skill1Visualizer.gameObject.SetActive(true);
-            skill1Visualizer.UpdatePosition(); // 위치 변경 후 원 다시 그리기
-            skill1Visualizer.Show();
-        }
-        
-        PerformRangeAttack(_movementComponent.Direction, range: 3f, radius: 1f, damage: skill1Damage);
+        // TODO: 스킬 1 비활성화 (쿨다운 시스템 제거 작업 중)
     }
 
     private void CastSkill2()
     {
-        _cooldownComponent.StartCooldown("skill2");
-
-        Debug.Log("스킬 2 - 회전 공격");
-        
-        // 스킬 범위 시각화
-        if (showSkillRanges && skill2Visualizer != null)
-        {
-            skill2Visualizer.Show();
-        }
-        
-        PerformSpinAttack(radius: 2.5f, damage: skill2Damage);
+        // TODO: 스킬 2 비활성화 (쿨다운 시스템 제거 작업 중)
     }
 
-    private async void CastSkill3Async()
+    private void CastSkill3Async()
     {
-        _cooldownComponent.StartCooldown("skill3");
-        
-        Debug.Log("스킬 3 - 점프 공격");
-        
-        // 기존 점프 취소
-        _jumpCancellationTokenSource?.Cancel();
-        _jumpCancellationTokenSource?.Dispose();
-        _jumpCancellationTokenSource = new System.Threading.CancellationTokenSource();
-        
-        try
-        {
-            await PerformJumpAttackAsync(
-                targetDistance: 4f, 
-                radius: 2f, 
-                damage: skill3Damage,
-                _jumpCancellationTokenSource.Token
-            );
-        }
-        catch (System.OperationCanceledException)
-        {
-            Debug.Log("[스킬3] 점프 취소됨");
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"[스킬3] 오류: {ex.Message}");
-        }
+        // TODO: 스킬 3 비활성화 (쿨다운 시스템 제거 작업 중)
     }
 
     // ==================== 스킬 효과 함수들 ====================

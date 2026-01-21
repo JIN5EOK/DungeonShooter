@@ -1,5 +1,3 @@
-using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace DungeonShooter
@@ -20,32 +18,28 @@ namespace DungeonShooter
     public float DashCooldown => _dashCooldown;
     
     private Rigidbody2D _rigidbody;
-    private CooldownComponent _cooldownComponent;
     
     private bool _isDashing;
     private float _dashTimer;
+    private float _cooldownRemaining;
     private Vector2 _moveInput;
-    private Vector2 _lastFacingDirection;
 
     public bool IsDashing => _isDashing;
+    public bool IsReady => _cooldownRemaining <= 0f;
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
     }
 
+    private void Update()
+    {
+        UpdateCooldown(Time.deltaTime);
+    }
+
     private void FixedUpdate()
     {
         UpdateDash();
-    }
-
-    /// <summary>
-    /// CooldownComponent를 초기화합니다.
-    /// </summary>
-    public void Initialize(CooldownComponent cooldownComponent)
-    {
-        _cooldownComponent = cooldownComponent;
-        _cooldownComponent.RegisterCooldown("dash", _dashCooldown);
     }
 
     /// <summary>
@@ -61,14 +55,14 @@ namespace DungeonShooter
     /// </summary>
     public void StartDash()
     {
-        if (_cooldownComponent == null || !_cooldownComponent.IsReady("dash"))
+        if (!IsReady)
         {
             return;
         }
 
         _isDashing = true;
         _dashTimer = _dashDuration;
-        _cooldownComponent.StartCooldown("dash");
+        _cooldownRemaining = _dashCooldown;
         
         Debug.Log("구르기!");
     }
@@ -100,11 +94,32 @@ namespace DungeonShooter
     /// </summary>
     public float GetCooldownPercent()
     {
-        if (_cooldownComponent == null)
+        if (_dashCooldown <= 0f)
         {
             return 0f;
         }
-        return _cooldownComponent.GetCooldownPercent("dash");
+
+        return Mathf.Clamp01(_cooldownRemaining / _dashCooldown);
+    }
+
+    public float GetRemainingCooldown()
+    {
+        return Mathf.Max(0f, _cooldownRemaining);
+    }
+
+    private void UpdateCooldown(float deltaTime)
+    {
+        if (_cooldownRemaining <= 0f)
+        {
+            _cooldownRemaining = 0f;
+            return;
+        }
+
+        _cooldownRemaining -= deltaTime;
+        if (_cooldownRemaining < 0f)
+        {
+            _cooldownRemaining = 0f;
+        }
     }
     }
 }
