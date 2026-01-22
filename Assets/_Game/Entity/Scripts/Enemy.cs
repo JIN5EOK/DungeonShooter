@@ -95,7 +95,7 @@ namespace DungeonShooter
             }
             else
             {
-                Debug.LogWarning($"[{gameObject.name}] HealthComponent가 없습니다. 적이 죽지 않습니다!");
+                LogHandler.LogWarning<Enemy>($"{gameObject.name}: HealthComponent가 없습니다. 적이 죽지 않습니다!");
             }
         }
         
@@ -280,7 +280,7 @@ namespace DungeonShooter
             _cooldownComponent.StartCooldown("attack");
 
             var damage = GetAttackDamage();
-            Debug.Log($"적이 플레이어를 공격! 데미지: {damage}");
+            LogHandler.Log<Enemy>($"적이 플레이어를 공격! 데미지: {damage}");
 
             // 플레이어에게 데미지 주기
             if (_playerTransform != null)
@@ -308,7 +308,7 @@ namespace DungeonShooter
             var coinPickupPrefab = coinPickup.GetComponent<CoinPickup>();
             if (coinPickupPrefab == null)
             {
-                Debug.LogWarning($"[{gameObject.name}] 코인 프리팹이 설정되지 않아 코인을 드롭하지 않습니다.");
+                LogHandler.LogWarning<Enemy>($"{gameObject.name}: 코인 프리팹이 설정되지 않아 코인을 드롭하지 않습니다.");
                 return;
             }
 
@@ -328,7 +328,7 @@ namespace DungeonShooter
 
                 // 코인 인스턴스 생성
                 var coin = Instantiate(coinPickupPrefab, dropPosition, Quaternion.identity);
-                Debug.Log($"[{gameObject.name}] 코인 {coinCount}개 드롭!");
+                LogHandler.Log<Enemy>($"{gameObject.name}: 코인 {coinCount}개 드롭!");
             }
         }
 
@@ -339,7 +339,7 @@ namespace DungeonShooter
         /// </summary>
         private void HandleDamaged(int damage, int remainingHealth)
         {
-            Debug.Log($"[{gameObject.name}] 피격! 데미지: {damage}, 남은 HP: {remainingHealth}");
+            LogHandler.Log<Enemy>($"{gameObject.name}: 피격! 데미지: {damage}, 남은 HP: {remainingHealth}");
 
             // 상태 변경
             _currentState = EnemyState.Hit;
@@ -368,7 +368,7 @@ namespace DungeonShooter
 
             _currentState = EnemyState.Dead;
 
-            Debug.Log($"[{gameObject.name}] 사망!");
+            LogHandler.Log<Enemy>($"{gameObject.name}: 사망!");
 
             // AI 및 물리 즉시 중지
             rb.linearVelocity = Vector2.zero;

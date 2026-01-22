@@ -127,7 +127,7 @@ namespace DungeonShooter
         {
             if (stageRoot == null || roomData == null || stageResourceProvider == null)
             {
-                Debug.LogError($"[{nameof(RoomCreateHelper)}] 파라미터가 올바르지 않습니다.");
+                LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
                 return;
             }
 
@@ -142,7 +142,7 @@ namespace DungeonShooter
 
             if (groundTile == null)
             {
-                Debug.LogError($"[{nameof(RoomCreateHelper)}] Ground 타일을 로드할 수 없습니다.");
+                LogHandler.LogError(nameof(RoomCreateHelper), "Ground 타일을 로드할 수 없습니다.");
                 return;
             }
 
@@ -172,7 +172,7 @@ namespace DungeonShooter
         {
             if (stageRoot == null || roomData == null || stageResourceProvider == null)
             {
-                Debug.LogError($"[{nameof(RoomCreateHelper)}] 파라미터가 올바르지 않습니다.");
+                LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
                 return;
             }
 
@@ -220,7 +220,7 @@ namespace DungeonShooter
         {
             if (stageRoot == null || roomData == null || stageResourceProvider == null)
             {
-                Debug.LogError($"[{nameof(RoomCreateHelper)}] 파라미터가 올바르지 않습니다.");
+                LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
                 return new List<GameObject>();
             }
 

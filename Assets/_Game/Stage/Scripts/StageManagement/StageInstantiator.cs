@@ -26,13 +26,13 @@ namespace DungeonShooter
         {
             if (stage == null)
             {
-                Debug.LogError($"[{nameof(StageInstantiator)}] Stage가 null입니다.");
+                LogHandler.LogError(nameof(StageInstantiator), "Stage가 null입니다.");
                 return null;
             }
 
             if (resourceProvider == null)
             {
-                Debug.LogError($"[{nameof(StageInstantiator)}] ResourceProvider가 null입니다.");
+                LogHandler.LogError(nameof(StageInstantiator), "ResourceProvider가 null입니다.");
                 return null;
             }
 
@@ -50,7 +50,7 @@ namespace DungeonShooter
             {
                 if (room.RoomData == null)
                 {
-                    Debug.LogWarning($"[{nameof(StageInstantiator)}] Room {room.Id}의 RoomData가 null입니다. 스킵합니다.");
+                    LogHandler.LogWarning(nameof(StageInstantiator), $"Room {room.Id}의 RoomData가 null입니다. 스킵합니다.");
                     continue;
                 }
 
@@ -69,7 +69,7 @@ namespace DungeonShooter
                 {
                     if (go != null && go.TryGetComponent(out IInitializationAwaiter initAwaiter))
                     {
-                        Debug.Log($"{nameof(StageInstantiator)} : 초기화 필요한 객체, 대기합니다.");
+                        LogHandler.Log(nameof(StageInstantiator), "초기화 필요한 객체, 대기합니다.");
                         await initAwaiter.InitializationTask;
                     }
                 }
@@ -79,7 +79,7 @@ namespace DungeonShooter
             // 복도 생성
             await CreateCorridorsAsync(resourceProvider, stage, RoomCreateHelper.GetOrCreateTilemap(stageObj.transform, RoomConstants.TILEMAP_GROUND_NAME));
 
-            Debug.Log($"[{nameof(StageInstantiator)}] 스테이지 생성 완료. 방 개수: {stage.Rooms.Count}");
+            LogHandler.Log(nameof(StageInstantiator), $"스테이지 생성 완료. 방 개수: {stage.Rooms.Count}");
             return stageObj;
         }
 
@@ -93,14 +93,14 @@ namespace DungeonShooter
         {
             if (resourceProvider == null || stage == null || groundTilemap == null)
             {
-                Debug.LogError($"[{nameof(StageInstantiator)}] 파라미터가 올바르지 않습니다.");
+                LogHandler.LogError(nameof(StageInstantiator), "파라미터가 올바르지 않습니다.");
                 return;
             }
 
             var groundTile = await resourceProvider.GetGroundTile();
             if (groundTile == null)
             {
-                Debug.LogError($"[{nameof(StageInstantiator)}] Ground 타일을 로드할 수 없습니다.");
+                LogHandler.LogError(nameof(StageInstantiator), "Ground 타일을 로드할 수 없습니다.");
                 return;
             }
 

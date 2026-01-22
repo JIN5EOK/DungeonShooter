@@ -64,7 +64,7 @@ namespace DungeonShooter
             _dashTimer = _dashDuration;
             _cooldownRemaining = _dashCooldown;
             
-            Debug.Log("구르기!");
+            LogHandler.Log<DashComponent>("구르기!");
         }
 
         /// <summary>

@@ -68,7 +68,7 @@ namespace DungeonShooter
 
             if (showDebugInfo)
             {
-                Debug.Log($"[{nameof(AreaGate)}] {gameObject.name} 열림!");
+                LogHandler.Log<AreaGate>($"{gameObject.name} 열림!");
             }
 
             // Collider 비활성화 (플레이어 통과 가능)
@@ -89,7 +89,7 @@ namespace DungeonShooter
 
             if (showDebugInfo)
             {
-                Debug.Log($"[{nameof(AreaGate)}] {gameObject.name} 닫힘!");
+                LogHandler.Log<AreaGate>($"{gameObject.name} 닫힘!");
             }
 
             // Collider 활성화 (플레이어 차단)

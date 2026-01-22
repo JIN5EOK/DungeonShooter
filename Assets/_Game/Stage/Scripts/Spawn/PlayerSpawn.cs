@@ -29,11 +29,11 @@ namespace DungeonShooter
             
             if (player == null)
             {
-                Debug.LogWarning($"[{nameof(PlayerSpawn)}] 플레이어 생성 실패");
+                LogHandler.LogWarning<PlayerSpawn>("플레이어 생성 실패");
                 return false;
             }
 
-            Debug.Log($"[{nameof(PlayerSpawn)}] 플레이어 생성 성공: {player.name}");
+            LogHandler.Log<PlayerSpawn>($"플레이어 생성 성공: {player.name}");
             player.transform.SetParent(transform.parent);
             player.transform.position = transform.position;
             return true;

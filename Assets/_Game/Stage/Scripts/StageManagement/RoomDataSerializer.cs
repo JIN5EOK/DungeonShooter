@@ -22,12 +22,12 @@ namespace DungeonShooter
         {
             if (Application.isEditor == false)
             {
-                Debug.LogError($"[{nameof(RoomDataSerializer)}] SerializeRoom은 에디터에서만 사용할 수 있습니다.");
+                LogHandler.LogError(nameof(RoomDataSerializer), "SerializeRoom은 에디터에서만 사용할 수 있습니다.");
                 return null;
             }
             if (room == null)
             {
-                Debug.LogError($"[{nameof(RoomDataSerializer)}] 게임오브젝트가 null입니다.");
+                LogHandler.LogError(nameof(RoomDataSerializer), "게임오브젝트가 null입니다.");
                 return null;
             }
 
@@ -43,7 +43,7 @@ namespace DungeonShooter
             }
             else
             {
-                Debug.LogWarning($"[{nameof(RoomDataSerializer)}] '{room.name}'에 '{RoomConstants.TILEMAPS_GAMEOBJECT_NAME}' 자식이 없습니다.");
+                LogHandler.LogWarning(nameof(RoomDataSerializer), $"'{room.name}'에 '{RoomConstants.TILEMAPS_GAMEOBJECT_NAME}' 자식이 없습니다.");
             }
 
             // 2. Objects 하위의 오브젝트들을 찾아서 ObjectData로 변환
@@ -54,7 +54,7 @@ namespace DungeonShooter
             }
             else
             {
-                Debug.LogWarning($"[{nameof(RoomDataSerializer)}] '{room.name}'에 '{RoomConstants.OBJECTS_GAMEOBJECT_NAME}' 자식이 없습니다.");
+                LogHandler.LogWarning(nameof(RoomDataSerializer),$"'{room.name}'에 '{RoomConstants.OBJECTS_GAMEOBJECT_NAME}' 자식이 없습니다.");
             }
 
             return roomData;
@@ -84,7 +84,7 @@ namespace DungeonShooter
             var settings = AddressableAssetSettingsDefaultObject.Settings;
             if (settings == null)
             {
-                Debug.LogWarning($"[{nameof(RoomDataSerializer)}] AddressableAssetSettings를 찾을 수 없습니다.");
+                LogHandler.LogWarning(nameof(RoomDataSerializer),"AddressableAssetSettings를 찾을 수 없습니다.");
                 return null;
             }
 
@@ -94,7 +94,7 @@ namespace DungeonShooter
                 return entry.address;
             }
 
-            Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 오브젝트 '{obj.name}'의 어드레서블 주소를 찾을 수 없습니다. 어드레서블로 등록되어 있는지 확인하세요.");
+            LogHandler.LogWarning(nameof(RoomDataSerializer),$"오브젝트 '{obj.name}'의 어드레서블 주소를 찾을 수 없습니다. 어드레서블로 등록되어 있는지 확인하세요.");
             return null;
         }
 
@@ -121,7 +121,7 @@ namespace DungeonShooter
                 var address = GetAddressableAddress(tile);
                 if (string.IsNullOrEmpty(address))
                 {
-                    Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 타일 '{tile.name}'의 어드레서블 주소를 찾을 수 없습니다. 위치: {pos}");
+                    LogHandler.LogWarning(nameof(RoomDataSerializer),$"타일 '{tile.name}'의 어드레서블 주소를 찾을 수 없습니다. 위치: {pos}");
                     continue;
                 }
 
@@ -159,7 +159,7 @@ namespace DungeonShooter
                     var prefabRoot = PrefabUtility.GetCorrespondingObjectFromSource(obj);
                     if (prefabRoot == null)
                     {
-                        Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 오브젝트 '{obj.name}'는 프리팹이 아닙니다. 어드레서블로 등록된 프리팹을 사용해야 합니다.");
+                        LogHandler.LogWarning(nameof(RoomDataSerializer),$"오브젝트 '{obj.name}'는 프리팹이 아닙니다. 어드레서블로 등록된 프리팹을 사용해야 합니다.");
                         continue;
                     }
 
@@ -167,7 +167,7 @@ namespace DungeonShooter
                     var address = GetAddressableAddress(prefabRoot);
                     if (string.IsNullOrEmpty(address))
                     {
-                        Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 프리팹 '{prefabRoot.name}'의 어드레서블 주소를 찾을 수 없습니다.");
+                        LogHandler.LogWarning(nameof(RoomDataSerializer),$"프리팹 '{prefabRoot.name}'의 어드레서블 주소를 찾을 수 없습니다.");
                         continue;
                     }
 
@@ -197,7 +197,7 @@ namespace DungeonShooter
                     var address = GetAddressableAddress(prefabAsset);
                     if (string.IsNullOrEmpty(address))
                     {
-                        Debug.LogWarning($"[{nameof(RoomDataSerializer)}] 프리팹 '{prefabAsset.name}'의 어드레서블 주소를 찾을 수 없습니다.");
+                        LogHandler.LogWarning(nameof(RoomDataSerializer),$"프리팹 '{prefabAsset.name}'의 어드레서블 주소를 찾을 수 없습니다.");
                         continue;
                     }
 
@@ -223,7 +223,7 @@ namespace DungeonShooter
         {
             if (textAsset == null)
             {
-                Debug.LogError($"[{nameof(RoomDataSerializer)}] TextAsset이 null입니다.");
+                LogHandler.LogError(nameof(RoomDataSerializer),"TextAsset이 null입니다.");
                 return null;
             }
 
@@ -234,7 +234,7 @@ namespace DungeonShooter
                 
                 if (serialized == null)
                 {
-                    Debug.LogError($"[{nameof(RoomDataSerializer)}] 역직렬화된 데이터가 null입니다.");
+                    LogHandler.LogError(nameof(RoomDataSerializer),"역직렬화된 데이터가 null입니다.");
                     return null;
                 }
                 
@@ -243,7 +243,7 @@ namespace DungeonShooter
             }
             catch (Exception e)
             {
-                Debug.LogError($"[{nameof(RoomDataSerializer)}] 역직렬화 실패: {e.Message}");
+                LogHandler.LogError(nameof(RoomDataSerializer), e, "역직렬화 실패");
                 return null;
             }
         }
@@ -255,7 +255,7 @@ namespace DungeonShooter
         {
             if (roomData == null)
             {
-                Debug.LogError($"[{nameof(RoomDataSerializer)}] roomData가 null입니다.");
+                LogHandler.LogError(nameof(RoomDataSerializer),"roomData가 null입니다.");
                 return;
             }
 
@@ -265,7 +265,7 @@ namespace DungeonShooter
                 var serialized = SerializedRoomData.FromRoomData(roomData);
                 if (serialized == null)
                 {
-                    Debug.LogError($"[{nameof(RoomDataSerializer)}] 직렬화 변환에 실패했습니다.");
+                    LogHandler.LogError(nameof(RoomDataSerializer),"직렬화 변환에 실패했습니다.");
                     return;
                 }
 
@@ -278,11 +278,11 @@ namespace DungeonShooter
                 }
 
                 File.WriteAllText(path, json);
-                Debug.Log($"[{nameof(RoomDataSerializer)}] 저장 완료: {path}");
+                LogHandler.Log(nameof(RoomDataSerializer),$"저장 완료: {path}");
             }
             catch (Exception e)
             {
-                Debug.LogError($"[{nameof(RoomDataSerializer)}] 저장 실패: {e.Message}");
+                LogHandler.LogError(nameof(RoomDataSerializer), e, "저장 실패");
             }
         }
 

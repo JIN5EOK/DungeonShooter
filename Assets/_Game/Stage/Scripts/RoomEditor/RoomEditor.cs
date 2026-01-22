@@ -62,7 +62,7 @@ namespace DungeonShooter
             var roomData = RoomDataSerializer.SerializeRoom(gameObject, _roomSizeX, _roomSizeY);
             if (roomData == null)
             {
-                Debug.LogError($"[{nameof(RoomEditor)}] 방 직렬화에 실패했습니다.");
+                LogHandler.LogError<RoomEditor>("방 직렬화에 실패했습니다.");
                 return;
             }
 
@@ -84,7 +84,7 @@ namespace DungeonShooter
 
             if (_loadFile == null)
             {
-                Debug.LogError($"[{nameof(RoomEditor)}] 불러올 파일이 지정되지 않았습니다.");
+                LogHandler.LogError<RoomEditor>("불러올 파일이 지정되지 않았습니다.");
                 return;
             }
 
@@ -93,13 +93,13 @@ namespace DungeonShooter
             var roomData = RoomDataSerializer.DeserializeRoom(_loadFile);
             if (roomData == null)
             {
-                Debug.LogError($"[{nameof(RoomEditor)}] 방 역직렬화에 실패했습니다.");
+                LogHandler.LogError<RoomEditor>("방 역직렬화에 실패했습니다.");
                 return;
             }
 
             if (_resourceProvider == null)
             {
-                Debug.LogError($"[{nameof(RoomEditor)}] ResourceProvider가 설정되지 않았습니다.");
+                LogHandler.LogError<RoomEditor>("ResourceProvider가 설정되지 않았습니다.");
                 return;
             }
 
@@ -142,7 +142,7 @@ namespace DungeonShooter
             objectsTask.Wait();
 
             EditorUtility.SetDirty(this);
-            Debug.Log($"[{nameof(RoomEditor)}] 방 불러오기 완료: {_loadFile.name}");
+            LogHandler.Log<RoomEditor>($"방 불러오기 완료: {_loadFile.name}");
         }
 
 
@@ -155,7 +155,7 @@ namespace DungeonShooter
 
             if (_resourceProvider == null)
             {
-                Debug.LogError($"[{nameof(RoomEditor)}] ResourceProvider가 설정되지 않았습니다.");
+                LogHandler.LogError<RoomEditor>("ResourceProvider가 설정되지 않았습니다.");
                 return;
             }
 
@@ -195,7 +195,7 @@ namespace DungeonShooter
             EnsureStructure();
 
             EditorUtility.SetDirty(this);
-            Debug.Log($"[{nameof(RoomEditor)}] 방이 초기 상태로 리셋되었습니다.");
+            LogHandler.Log<RoomEditor>("방이 초기 상태로 리셋되었습니다.");
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace DungeonShooter
         {
             if (Application.isPlaying)
             {
-                Debug.LogWarning($"[{nameof(RoomEditor)}] 플레이 모드에서는 사용할 수 없습니다.");
+                LogHandler.LogWarning<RoomEditor>("플레이 모드에서는 사용할 수 없습니다.");
                 return false;
             }
             return true;

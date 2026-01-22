@@ -36,7 +36,7 @@ namespace DungeonShooter
         {
             if (item == null)
             {
-                Debug.LogWarning($"[{nameof(Inventory)}] 아이템이 null입니다.");
+                LogHandler.LogWarning<Inventory>("아이템이 null입니다.");
                 return;
             }
 
@@ -55,7 +55,7 @@ namespace DungeonShooter
             // 장착된 아이템인지 확인
             if (item == _equippedWeapon || item == _equippedActive)
             {
-                Debug.LogWarning($"[{nameof(Inventory)}] 장착된 아이템은 제거할 수 없습니다. 먼저 해제하세요.");
+                LogHandler.LogWarning<Inventory>("장착된 아이템은 제거할 수 없습니다. 먼저 해제하세요.");
                 return false;
             }
 
@@ -74,14 +74,14 @@ namespace DungeonShooter
         {
             if (weapon == null)
             {
-                Debug.LogWarning($"[{nameof(Inventory)}] 무기가 null입니다.");
+                LogHandler.LogWarning<Inventory>("무기가 null입니다.");
                 return false;
             }
 
             // 인벤토리에 있는지 확인
             if (!_items.Contains(weapon))
             {
-                Debug.LogWarning($"[{nameof(Inventory)}] 인벤토리에 없는 무기입니다.");
+                LogHandler.LogWarning<Inventory>("인벤토리에 없는 무기입니다.");
                 return false;
             }
 
@@ -105,14 +105,14 @@ namespace DungeonShooter
         {
             if (activeItem == null)
             {
-                Debug.LogWarning($"[{nameof(Inventory)}] 액티브 아이템이 null입니다.");
+                LogHandler.LogWarning<Inventory>("액티브 아이템이 null입니다.");
                 return false;
             }
 
             // 인벤토리에 있는지 확인
             if (!_items.Contains(activeItem))
             {
-                Debug.LogWarning($"[{nameof(Inventory)}] 인벤토리에 없는 액티브 아이템입니다.");
+                LogHandler.LogWarning<Inventory>("인벤토리에 없는 액티브 아이템입니다.");
                 return false;
             }
 

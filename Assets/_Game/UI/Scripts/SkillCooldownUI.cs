@@ -47,7 +47,7 @@ namespace DungeonShooter
         {
             if (cooldownComponent == null || string.IsNullOrEmpty(_skillCooldownKey))
             {
-                Debug.LogWarning($"[{nameof(SkillCooldownUI)}] UpdateCooldown 실패: cooldownComponent={cooldownComponent != null}, key='{_skillCooldownKey}'");
+                LogHandler.LogWarning<SkillCooldownUI>($"UpdateCooldown 실패: cooldownComponent={cooldownComponent != null}, key='{_skillCooldownKey}'");
                 return;
             }
 
@@ -58,7 +58,7 @@ namespace DungeonShooter
             // 디버그 로그 (쿨다운 중일 때만)
             if (!skillReady)
             {
-                Debug.Log($"[{nameof(SkillCooldownUI)}] {_skillCooldownKey}: {remainingTime:F1}s / {totalCooldown:F1}s");
+                LogHandler.Log<SkillCooldownUI>($"{_skillCooldownKey}: {remainingTime:F1}s / {totalCooldown:F1}s");
             }
 
             if (skillReady)

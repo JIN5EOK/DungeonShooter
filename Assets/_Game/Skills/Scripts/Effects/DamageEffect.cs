@@ -21,7 +21,7 @@ namespace DungeonShooter
                 return UniTask.FromResult(true);
             }
             
-            Debug.LogError($"{nameof(DamageEffect)} : 데미지 주기 실패");
+            LogHandler.LogError<DamageEffect>("데미지 주기 실패");
             return UniTask.FromResult(false);
         }
     }

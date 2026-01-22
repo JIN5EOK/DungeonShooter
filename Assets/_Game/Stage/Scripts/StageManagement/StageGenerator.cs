@@ -19,7 +19,7 @@ namespace DungeonShooter
         {
             if (roomDataRepository == null)
             {
-                Debug.LogError($"[{nameof(StageGenerator)}] 방 데이터가 없습니다.");
+                LogHandler.LogError(nameof(StageGenerator), "방 데이터가 없습니다.");
                 return null;
             }
 
@@ -30,7 +30,7 @@ namespace DungeonShooter
 
             if (roomIds.Count == 0)
             {
-                Debug.LogError($"[{nameof(StageGenerator)}] 방 배치에 실패했습니다.");
+                LogHandler.LogError(nameof(StageGenerator), "방 배치에 실패했습니다.");
                 return stage;
             }
 
@@ -46,7 +46,7 @@ namespace DungeonShooter
             // 5. 시작 방, 보스방 설정 (특수방)
             await SetStartAndBossRooms(stage, roomIds, roomDataRepository);
 
-            Debug.Log($"[{nameof(StageGenerator)}] 스테이지 생성 완료. 방 개수: {roomIds.Count}");
+            LogHandler.Log(nameof(StageGenerator), $"스테이지 생성 완료. 방 개수: {roomIds.Count}");
             DEBUG_LogStageMap(stage, roomIds);
             return stage;
         }
@@ -101,7 +101,7 @@ namespace DungeonShooter
                 // 인접 빈 위치가 있는 방이 없으면 종료
                 if (candidates.Count == 0)
                 {
-                    Debug.LogWarning($"[{nameof(StageGenerator)}] 더 이상 배치할 수 있는 위치가 없습니다.");
+                    LogHandler.LogWarning(nameof(StageGenerator), "더 이상 배치할 수 있는 위치가 없습니다.");
                     break;
                 }
 
@@ -191,7 +191,7 @@ namespace DungeonShooter
 
             if (connectedCount < targetConnections)
             {
-                Debug.LogWarning($"[{nameof(StageGenerator)}] 모든 방이 연결되지 않았습니다. 연결된 엣지: {connectedCount}/{targetConnections}");
+                LogHandler.LogWarning(nameof(StageGenerator), $"모든 방이 연결되지 않았습니다. 연결된 엣지: {connectedCount}/{targetConnections}");
             }
         }
 
@@ -217,7 +217,7 @@ namespace DungeonShooter
             }
             else
             {
-                Debug.LogWarning($"[{nameof(StageGenerator)}] 시작 방 RoomData 로드 실패");
+                LogHandler.LogWarning(nameof(StageGenerator), "시작 방 RoomData 로드 실패");
             }
 
             // 보스 방의 RoomData 교체
@@ -228,7 +228,7 @@ namespace DungeonShooter
             }
             else
             {
-                Debug.LogWarning($"[{nameof(StageGenerator)}] 보스 방 RoomData 로드 실패");
+                LogHandler.LogWarning(nameof(StageGenerator), "보스 방 RoomData 로드 실패");
             }
         }
 
@@ -395,12 +395,12 @@ namespace DungeonShooter
                 var roomData = await roomDataRepository.GetRandomRoom(RoomType.Normal);
                 if (roomData != null)
                 {
-                    Debug.Log($"[{nameof(StageGenerator)}] RoomData 할당: {roomId}");
+                    LogHandler.Log(nameof(StageGenerator), $"RoomData 할당: {roomId}");
                     stage.ReplaceRoomData(roomId, roomData);
                 }
                 else
                 {
-                    Debug.LogWarning($"[{nameof(StageGenerator)}] RoomData 로드 실패");
+                    LogHandler.LogWarning(nameof(StageGenerator), "RoomData 로드 실패");
                 }
             }
         }
@@ -574,7 +574,7 @@ namespace DungeonShooter
                 }
             }
 
-            Debug.Log(string.Join("\n", mapLines));
+            LogHandler.Log(nameof(StageGenerator), string.Join("\n", mapLines));
         }
     }
 }

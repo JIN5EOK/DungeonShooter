@@ -53,11 +53,11 @@ namespace DungeonShooter
                 if (player != null)
                 {
                     _target = player.transform;
-                    Debug.Log($"[{nameof(CameraController)}] Player 자동 찾기 완료: {player.name}");
+                    LogHandler.Log<CameraController>($"Player 자동 찾기 완료: {player.name}");
                 }
                 else
                 {
-                    Debug.LogWarning($"[{nameof(CameraController)}] Player 태그를 가진 오브젝트를 찾을 수 없습니다.");
+                    LogHandler.LogWarning<CameraController>("Player 태그를 가진 오브젝트를 찾을 수 없습니다.");
                 }
             }
         }
@@ -140,11 +140,11 @@ namespace DungeonShooter
             
             if (target == null)
             {
-                Debug.Log($"[{nameof(CameraController)}] 추적 대상이 null로 설정되어 추적이 중지됩니다.");
+                LogHandler.Log<CameraController>("추적 대상이 null로 설정되어 추적이 중지됩니다.");
             }
             else
             {
-                Debug.Log($"[{nameof(CameraController)}] 추적 대상 변경: {target.name}");
+                LogHandler.Log<CameraController>($"추적 대상 변경: {target.name}");
             }
         }
 

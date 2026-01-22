@@ -29,11 +29,11 @@ namespace DungeonShooter
             
             if (enemy == null)
             {
-                Debug.LogWarning($"[{nameof(RandomEnemySpawn)}] 적 생성 실패");
+                LogHandler.LogWarning<RandomEnemySpawn>("적 생성 실패");
                 return false;
             }
 
-            Debug.Log($"[{nameof(RandomEnemySpawn)}] 적 생성 성공: {enemy.name}");
+            LogHandler.Log<RandomEnemySpawn>($"적 생성 성공: {enemy.name}");
             enemy.transform.SetParent(transform.parent);
             enemy.transform.position = transform.position;
             return true;

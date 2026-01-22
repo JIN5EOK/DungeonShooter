@@ -26,7 +26,7 @@ namespace DungeonShooter
         _owner = GetComponent<EntityBase>();
         if (_owner == null)
         {
-            Debug.LogError($"[{nameof(SkillComponent)}] EntityBase 컴포넌트를 찾을 수 없습니다.");
+            LogHandler.LogError<SkillComponent>("EntityBase 컴포넌트를 찾을 수 없습니다.");
         }
     }
     
@@ -40,13 +40,13 @@ namespace DungeonShooter
     {
         if (!_skills.TryGetValue(skillKey, out var skill))
         {
-            Debug.LogWarning($"[{nameof(SkillComponent)}] 스킬을 찾을 수 없습니다: {skillKey}");
+            LogHandler.LogWarning<SkillComponent>($"스킬을 찾을 수 없습니다: {skillKey}");
             return false;
         }
         
         if (_owner == null)
         {
-            Debug.LogError($"[{nameof(SkillComponent)}] Owner가 null입니다.");
+            LogHandler.LogError<SkillComponent>("Owner가 null입니다.");
             return false;
         }
         
@@ -62,19 +62,19 @@ namespace DungeonShooter
     {
         if (string.IsNullOrEmpty(skillKey))
         {
-            Debug.LogError($"[{nameof(SkillComponent)}] skillKey가 null이거나 비어있습니다.");
+            LogHandler.LogError<SkillComponent>("skillKey가 null이거나 비어있습니다.");
             return false;
         }
         
         if (_skills.ContainsKey(skillKey))
         {
-            Debug.LogWarning($"[{nameof(SkillComponent)}] 이미 등록된 스킬입니다: {skillKey}");
+            LogHandler.LogWarning<SkillComponent>($"이미 등록된 스킬입니다: {skillKey}");
             return false;
         }
         
         if (_resourceProvider == null)
         {
-            Debug.LogError($"[{nameof(SkillComponent)}] ResourceProvider가 null입니다.");
+            LogHandler.LogError<SkillComponent>("ResourceProvider가 null입니다.");
             return false;
         }
         
@@ -85,7 +85,7 @@ namespace DungeonShooter
             
             if (skillData == null)
             {
-                Debug.LogError($"[{nameof(SkillComponent)}] SkillData를 로드할 수 없습니다: {skillKey}");
+                LogHandler.LogError<SkillComponent>($"SkillData를 로드할 수 없습니다: {skillKey}");
                 return false;
             }
             
@@ -99,12 +99,12 @@ namespace DungeonShooter
                 skill.Activate(_owner);
             }
             
-            Debug.Log($"[{nameof(SkillComponent)}] 스킬 등록 완료: {skillKey} ({skillData.SkillName})");
+            LogHandler.Log<SkillComponent>($"스킬 등록 완료: {skillKey} ({skillData.SkillName})");
             return true;
         }
         catch (Exception e)
         {
-            Debug.LogError($"[{nameof(SkillComponent)}] 스킬 등록 중 오류 발생: {e.Message}");
+            LogHandler.LogError<SkillComponent>(e, "스킬 등록 중 오류 발생");
             return false;
         }
     }
@@ -118,13 +118,13 @@ namespace DungeonShooter
     {
         if (string.IsNullOrEmpty(skillKey))
         {
-            Debug.LogError($"[{nameof(SkillComponent)}] skillKey가 null이거나 비어있습니다.");
+            LogHandler.LogError<SkillComponent>("skillKey가 null이거나 비어있습니다.");
             return false;
         }
         
         if (!_skills.TryGetValue(skillKey, out var skill))
         {
-            Debug.LogWarning($"[{nameof(SkillComponent)}] 등록되지 않은 스킬입니다: {skillKey}");
+            LogHandler.LogWarning<SkillComponent>($"등록되지 않은 스킬입니다: {skillKey}");
             return false;
         }
         
@@ -141,7 +141,7 @@ namespace DungeonShooter
         }
         
         _skills.Remove(skillKey);
-        Debug.Log($"[{nameof(SkillComponent)}] 스킬 등록 해제 완료: {skillKey}");
+        LogHandler.Log<SkillComponent>($"스킬 등록 해제 완료: {skillKey}");
         
         return true;
     }

@@ -24,7 +24,7 @@ namespace DungeonShooter
         {
             if (itemData == null)
             {
-                Debug.LogError($"[{nameof(ItemBase)}] ItemData가 null입니다.");
+                LogHandler.LogError<ItemBase>("ItemData가 null입니다.");
                 _itemEffects = new List<ItemEffect>();
                 return;
             }

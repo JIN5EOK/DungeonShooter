@@ -90,7 +90,7 @@ namespace DungeonShooter
 
             if (showDebugInfo)
             {
-                Debug.Log($"[{nameof(TreasureChest)}] {gameObject.name}: 상자가 열렸습니다!");
+                LogHandler.Log<TreasureChest>($"{gameObject.name}: 상자가 열렸습니다!");
             }
 
             // 상호작용 프롬프트 숨기기
@@ -149,7 +149,7 @@ namespace DungeonShooter
 
                 if (showDebugInfo)
                 {
-                    Debug.Log($"[{nameof(TreasureChest)}] {gameObject.name}: 코인 {coinReward}개를 드롭했습니다.");
+                    LogHandler.Log<TreasureChest>($"{gameObject.name}: 코인 {coinReward}개를 드롭했습니다.");
                 }
             }
             else
@@ -160,12 +160,12 @@ namespace DungeonShooter
                     _coinInventory.AddCoins(coinReward);
                     if (showDebugInfo)
                     {
-                        Debug.Log($"[{nameof(TreasureChest)}] {gameObject.name}: 코인 {coinReward}개를 지급했습니다. 총 {_coinInventory.CurrentCoins}개");
+                        LogHandler.Log<TreasureChest>($"{gameObject.name}: 코인 {coinReward}개를 지급했습니다. 총 {_coinInventory.CurrentCoins}개");
                     }
                 }
                 else
                 {
-                    Debug.LogWarning($"[{nameof(TreasureChest)}] {gameObject.name}: CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
+                    LogHandler.LogWarning<TreasureChest>($"{gameObject.name}: CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
                 }
             }
         }

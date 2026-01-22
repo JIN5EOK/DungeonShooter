@@ -36,7 +36,7 @@ namespace DungeonShooter
         {
             if (!_rooms.TryGetValue(roomId, out Room room))
             {
-                Debug.LogWarning($"[{nameof(Stage)}] 방을 찾을 수 없습니다. RoomId: {roomId}");
+                LogHandler.LogWarning<Stage>($"방을 찾을 수 없습니다. RoomId: {roomId}");
                 return false;
             }
 

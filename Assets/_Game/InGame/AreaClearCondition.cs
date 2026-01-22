@@ -51,7 +51,7 @@ namespace DungeonShooter
 
             if (targetGate == null && showDebugInfo)
             {
-                Debug.LogWarning($"[{nameof(AreaClearCondition)}] {gameObject.name}: 연결된 AreaGate를 찾을 수 없습니다.");
+                LogHandler.LogWarning<AreaClearCondition>($"{gameObject.name}: 연결된 AreaGate를 찾을 수 없습니다.");
             }
 
             InitializeEnemies();
@@ -86,7 +86,7 @@ namespace DungeonShooter
 
                     if (showDebugInfo && count > 0)
                     {
-                        Debug.Log($"[{nameof(AreaClearCondition)}] {gameObject.name}: {count}개의 Collider 감지됨");
+                        LogHandler.Log<AreaClearCondition>($"{gameObject.name}: {count}개의 Collider 감지됨");
                     }
 
                     foreach (Collider2D col in colliders)
@@ -105,7 +105,7 @@ namespace DungeonShooter
                 {
                     if (showDebugInfo)
                     {
-                        Debug.LogWarning($"[{nameof(AreaClearCondition)}] {gameObject.name}: detectionArea와 Collider가 없어 자동 감지가 불가능합니다.");
+                        LogHandler.LogWarning<AreaClearCondition>($"{gameObject.name}: detectionArea와 Collider가 없어 자동 감지가 불가능합니다.");
                     }
                 }
             }
@@ -125,7 +125,7 @@ namespace DungeonShooter
 
             if (showDebugInfo)
             {
-                Debug.Log($"[{nameof(AreaClearCondition)}] {gameObject.name} 초기화 완료. 추적 중인 적: {_trackedEnemies.Count}마리");
+                LogHandler.Log<AreaClearCondition>($"{gameObject.name} 초기화 완료. 추적 중인 적: {_trackedEnemies.Count}마리");
             }
         }
 
@@ -190,7 +190,7 @@ namespace DungeonShooter
             
             if (showDebugInfo)
             {
-                Debug.Log($"[{nameof(AreaClearCondition)}] {gameObject.name}: 적 사망 감지. 남은 적: {_trackedEnemies.Count}마리");
+                LogHandler.Log<AreaClearCondition>($"{gameObject.name}: 적 사망 감지. 남은 적: {_trackedEnemies.Count}마리");
             }
 
             // 클리어 조건 체크
@@ -234,7 +234,7 @@ namespace DungeonShooter
 
             if (showDebugInfo)
             {
-                Debug.Log($"[{nameof(AreaClearCondition)}] {gameObject.name} 클리어 조건 만족!");
+                LogHandler.Log<AreaClearCondition>($"{gameObject.name} 클리어 조건 만족!");
             }
 
             // AreaGate에 알림

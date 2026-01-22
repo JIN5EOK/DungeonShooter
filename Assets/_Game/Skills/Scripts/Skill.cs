@@ -25,7 +25,7 @@ namespace DungeonShooter
     {
         if (skillData == null)
         {
-            Debug.LogError($"[{nameof(Skill)}] SkillData가 null입니다.");
+            LogHandler.LogError<Skill>("SkillData가 null입니다.");
             return;
         }
         
@@ -43,19 +43,19 @@ namespace DungeonShooter
     {
         if (IsCooldown)
         {
-            Debug.Log($"[{nameof(Skill)}] 스킬 쿨다운 중: {_skillData.SkillName}");
+            LogHandler.Log<Skill>($"스킬 쿨다운 중: {_skillData.SkillName}");
             return false;
         }
         
         if (_skillData == null)
         {
-            Debug.LogError($"[{nameof(Skill)}] SkillData가 null입니다.");
+            LogHandler.LogError<Skill>("SkillData가 null입니다.");
             return false;
         }
                 
         // 스킬 효과 실행 (비동기로 완료까지 대기)
         bool success = await ExecuteEffectsAsync(target);
-        Debug.Log($"[{nameof(Skill)}] 스킬 실행 : {_skillData.SkillName}");
+        LogHandler.Log<Skill>($"스킬 실행 : {_skillData.SkillName}");
         OnExecute?.Invoke();
         StartCooldown();
 
@@ -83,7 +83,7 @@ namespace DungeonShooter
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"[{nameof(Skill)}] 이펙트 실행 중 오류 발생: {e.Message}");
+                    LogHandler.LogError<Skill>(e, "이펙트 실행 중 오류 발생");
                     allSuccess = false;
                 }
             }
@@ -113,7 +113,7 @@ namespace DungeonShooter
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"[{nameof(Skill)}] 패시브 이펙트 활성화 중 오류 발생: {e.Message}");
+                    LogHandler.LogError<Skill>(e, "패시브 이펙트 활성화 중 오류 발생");
                 }
             }
         }
@@ -140,7 +140,7 @@ namespace DungeonShooter
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"[{nameof(Skill)}] 패시브 이펙트 비활성화 중 오류 발생: {e.Message}");
+                    LogHandler.LogError<Skill>(e, "패시브 이펙트 비활성화 중 오류 발생");
                 }
             }
         }

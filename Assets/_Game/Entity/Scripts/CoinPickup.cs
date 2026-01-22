@@ -91,12 +91,12 @@ namespace DungeonShooter
     {
         if (_coinInventory == null)
         {
-            Debug.LogWarning($"[{nameof(CoinPickup)}] CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
+            LogHandler.LogWarning<CoinPickup>("CoinInventory를 찾을 수 없어 보상을 지급하지 못했습니다.");
             return;
         }
 
         _coinInventory.AddCoins(coinValue);
-        Debug.Log($"[{nameof(CoinPickup)}] {player.name}이(가) 코인 {coinValue}개 획득! 총 {_coinInventory.CurrentCoins}");
+        LogHandler.Log<CoinPickup>($"{player.name}이(가) 코인 {coinValue}개 획득! 총 {_coinInventory.CurrentCoins}");
     }
     }
 }

@@ -20,7 +20,7 @@ namespace DungeonShooter
                 return UniTask.FromResult(true);
             }
             
-            Debug.LogError($"{nameof(DamageEffect)} : 체력 회복 실패");
+            LogHandler.LogError<HealEffect>("체력 회복 실패");
             return UniTask.FromResult(false);
         }
     }

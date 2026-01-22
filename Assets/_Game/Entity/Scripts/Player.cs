@@ -79,7 +79,7 @@ namespace DungeonShooter
 
             _isDead = true;
 
-            Debug.Log($"[{nameof(Player)}] 플레이어 사망!");
+            LogHandler.Log<Player>("플레이어 사망!");
 
             // 모든 입력 및 로직 비활성화
             enabled = false;
@@ -111,7 +111,7 @@ namespace DungeonShooter
 
             yield return new WaitForSeconds(0.5f); // 추가 대기
 
-            Debug.Log($"[{nameof(Player)}] 게임 오버! 씬 재시작 중...");
+            LogHandler.Log<Player>("게임 오버! 씬 재시작 중...");
 
             // 씬 재시작
             UnityEngine.SceneManagement.SceneManager.LoadScene(

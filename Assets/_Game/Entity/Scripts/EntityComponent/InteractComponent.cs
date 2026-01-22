@@ -34,7 +34,7 @@ namespace DungeonShooter
             {
                 return;
             }
-            Debug.Log($"[{nameof(InteractComponent)}] Registering interactable {interactable})]");
+            LogHandler.Log<InteractComponent>($"Registering interactable {interactable})]");
             _nearbyInteractables.Add(interactable);
         }
 
@@ -48,7 +48,7 @@ namespace DungeonShooter
             {
                 return;
             }
-            Debug.Log($"[{nameof(InteractComponent)}] UnRegistering interactable {interactable})]");
+            LogHandler.Log<InteractComponent>($"UnRegistering interactable {interactable})]");
             _nearbyInteractables.Remove(interactable);
         }
 
