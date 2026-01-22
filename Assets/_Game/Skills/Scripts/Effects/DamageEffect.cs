@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -6,7 +7,7 @@ namespace DungeonShooter
     /// <summary>
     /// 데미지를 주는 이펙트
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class DamageEffect : EffectBase
     {
         [Header("데미지 설정")]

@@ -69,7 +69,7 @@ namespace DungeonShooter
     {
         bool allSuccess = true;
         
-        foreach (var effect in _skillData.SkillEffects)
+        foreach (var effect in _skillData.ActiveEffects)
         {
             if (effect != null)
             {
@@ -90,6 +90,60 @@ namespace DungeonShooter
         }
         
         return allSuccess;
+    }
+    
+    /// <summary>
+    /// 패시브 효과를 활성화합니다.
+    /// </summary>
+    /// <param name="owner">스킬 소유자</param>
+    public void Activate(EntityBase owner)
+    {
+        if (_skillData == null || owner == null)
+        {
+            return;
+        }
+        
+        foreach (var effect in _skillData.PassiveEffects)
+        {
+            if (effect != null)
+            {
+                try
+                {
+                    effect.Activate(owner);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[{nameof(Skill)}] 패시브 이펙트 활성화 중 오류 발생: {e.Message}");
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 패시브 효과를 비활성화합니다.
+    /// </summary>
+    /// <param name="owner">스킬 소유자</param>
+    public void Deactivate(EntityBase owner)
+    {
+        if (_skillData == null || owner == null)
+        {
+            return;
+        }
+        
+        foreach (var effect in _skillData.PassiveEffects)
+        {
+            if (effect != null)
+            {
+                try
+                {
+                    effect.Deactivate(owner);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[{nameof(Skill)}] 패시브 이펙트 비활성화 중 오류 발생: {e.Message}");
+                }
+            }
+        }
     }
     
     /// <summary>

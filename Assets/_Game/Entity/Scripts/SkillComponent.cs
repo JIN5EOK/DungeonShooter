@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using DungeonShooter;
 using UnityEngine;
 using VContainer;
 
@@ -93,10 +93,16 @@ namespace DungeonShooter
             var skill = new Skill(skillData);
             _skills[skillKey] = skill;
             
+            // 패시브 효과 자동 활성화
+            if (skillData.IsPassiveSkill)
+            {
+                skill.Activate(_owner);
+            }
+            
             Debug.Log($"[{nameof(SkillComponent)}] 스킬 등록 완료: {skillKey} ({skillData.SkillName})");
             return true;
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogError($"[{nameof(SkillComponent)}] 스킬 등록 중 오류 발생: {e.Message}");
             return false;
@@ -122,8 +128,14 @@ namespace DungeonShooter
             return false;
         }
         
+        // 패시브 효과 비활성화
+        if (skill.SkillData.IsPassiveSkill)
+        {
+            skill.Deactivate(_owner);
+        }
+        
         // 리소스 정리
-        if (skill is System.IDisposable disposable)
+        if (skill is IDisposable disposable)
         {
             disposable.Dispose();
         }

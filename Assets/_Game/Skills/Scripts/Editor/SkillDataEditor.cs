@@ -13,13 +13,15 @@ namespace DungeonShooter
         private readonly string _skillDescriptionName = "_skillDescription";
         private readonly string _skillIconName = "_skillIcon";
         private readonly string _cooldownName = "_cooldown";
-        private readonly string _skillEffectsName = "_skillEffects";
+        private readonly string _activeEffectsName = "_activeEffects";
+        private readonly string _passiveEffectsName = "_passiveEffects";
         
         private SerializedProperty _skillNameProperty;
         private SerializedProperty _skillDescriptionProperty;
         private SerializedProperty _skillIconProperty;
         private SerializedProperty _cooldownProperty;
-        private SerializedProperty _skillEffectsProperty;
+        private SerializedProperty _activeEffectsProperty;
+        private SerializedProperty _passiveEffectsProperty;
         
         private List<Type> _effectTypes;
         private string[] _effectTypeNames;
@@ -30,7 +32,8 @@ namespace DungeonShooter
             _skillDescriptionProperty = serializedObject.FindProperty(_skillDescriptionName);
             _skillIconProperty = serializedObject.FindProperty(_skillIconName);
             _cooldownProperty = serializedObject.FindProperty(_cooldownName);
-            _skillEffectsProperty = serializedObject.FindProperty(_skillEffectsName);
+            _activeEffectsProperty = serializedObject.FindProperty(_activeEffectsName);
+            _passiveEffectsProperty = serializedObject.FindProperty(_passiveEffectsName);
             
             // EffectBase를 상속하는 모든 타입 찾기
             _effectTypes = Jin5eok.ReflectionHelper.GetSubclasses<EffectBase>();
@@ -46,8 +49,16 @@ namespace DungeonShooter
             EditorGUILayout.PropertyField(_skillIconProperty);
             EditorGUILayout.PropertyField(_cooldownProperty);
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("스킬 이펙트 리스트", EditorStyles.boldLabel);
-            DrawEffectList(_skillEffectsProperty, 0);
+            
+            // 액티브 스킬 효과
+            EditorGUILayout.LabelField("액티브 스킬 효과", EditorStyles.boldLabel);
+            DrawEffectList(_activeEffectsProperty, 0);
+            
+            EditorGUILayout.Space(10);
+            
+            // 패시브 스킬 효과
+            EditorGUILayout.LabelField("패시브 스킬 효과", EditorStyles.boldLabel);
+            DrawEffectList(_passiveEffectsProperty, 0);
             
             serializedObject.ApplyModifiedProperties();
         }

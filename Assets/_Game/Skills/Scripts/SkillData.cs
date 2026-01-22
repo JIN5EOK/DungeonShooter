@@ -16,26 +16,38 @@ namespace DungeonShooter
         public string SkillName => _skillName;
         public string SkillDescription => _skillDescription;
         public float Cooldown => _cooldown;
-        public IReadOnlyList<EffectBase> SkillEffects => _skillEffects;
+        public IReadOnlyList<EffectBase> ActiveEffects => _activeEffects;
+        public IReadOnlyList<EffectBase> PassiveEffects => _passiveEffects;
+        public bool IsActiveSkill => _activeEffects.Count > 0;
+        public bool IsPassiveSkill => _passiveEffects.Count > 0;
         public string SkillIconAddress => _skillIcon.RuntimeKey.ToString();
 
         [Header("스킬 기본 정보")]
         [SerializeField] private string _skillName;
-        [SerializeField] private string _skillDescription;
+        [SerializeField, TextArea(3, 10)] private string _skillDescription;
         [SerializeField] private AssetReferenceT<Sprite> _skillIcon;
 
         [Header("스킬 설정")]
         [SerializeField] private float _cooldown;
 
-        [Header("스킬 효과")]
+        [Header("액티브 스킬 효과")]
         [SerializeReference]
-        private List<EffectBase> _skillEffects = new List<EffectBase>();
+        private List<EffectBase> _activeEffects = new List<EffectBase>();
+
+        [Header("패시브 스킬 효과")]
+        [SerializeReference]
+        private List<EffectBase> _passiveEffects = new List<EffectBase>();
 
         // 이펙트에 의존성 주입
         [Inject]
         private void Construct(IObjectResolver resolver)
         {
-            foreach(var effect in _skillEffects)
+            foreach(var effect in _activeEffects)
+            {
+                resolver.Inject(effect);
+            }
+            
+            foreach(var effect in _passiveEffects)
             {
                 resolver.Inject(effect);
             }

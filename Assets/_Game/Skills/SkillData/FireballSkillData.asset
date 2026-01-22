@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: FireballSkillData
   m_EditorClassIdentifier: 
   _skillName: "\uD30C\uC774\uC5B4\uBCFC"
-  _skillDescription: "\uC804\uBC29\uC5D0 \uC791\uC740 \uD30C\uC774\uC5B4\uBCFC\uC744
-    \uBC1C\uC0AC\uD55C\uB2E4"
+  _skillDescription: "\uC804\uBC29\uC5D0 \uD30C\uC774\uC5B4\uBCFC\uC744 \uBC1C\uC0AC\uD55C\uB2E4"
   _skillIcon:
     m_AssetGUID: 
     m_SubObjectName: 
@@ -22,13 +21,13 @@ MonoBehaviour:
     m_SubObjectGUID: 
     m_EditorAssetChanged: 0
   _cooldown: 0.5
-  _skillEffects:
-  - rid: 7692257427368706451
-  - rid: 7692257427368706453
+  _activeEffects:
+  - rid: 7692257427368706456
+  _passiveEffects: []
   references:
     version: 2
     RefIds:
-    - rid: 7692257427368706451
+    - rid: 7692257427368706456
       type: {class: SpawnProjectileEffect, ns: DungeonShooter, asm: Assembly-CSharp}
       data:
         projectile:
@@ -38,12 +37,8 @@ MonoBehaviour:
           m_SubObjectGUID: 
           m_EditorAssetChanged: 0
         effects:
-        - rid: 7692257427368706455
-    - rid: 7692257427368706453
+        - rid: 7692257427368706457
+    - rid: 7692257427368706457
       type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}
       data:
-        damage: 0
-    - rid: 7692257427368706455
-      type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}
-      data:
-        damage: 10
+        damage: 5
