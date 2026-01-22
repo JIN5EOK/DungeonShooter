@@ -37,10 +37,7 @@ namespace DungeonShooter
         {
             foreach(var effect in _skillEffects)
             {
-                if(effect is SpawnProjectileEffect spawnProjectileEffect)
-                {
-                    resolver.Inject(effect);
-                }
+                resolver.Inject(effect);
             }
         }
     }
