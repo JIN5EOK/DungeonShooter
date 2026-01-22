@@ -4,7 +4,8 @@
 ---
 ## 컴포넌트 위주 설계
 * 괸리자 역할을 담당하는 컴포넌트 + 다수의 기능 컴포넌트로 구성
-* 기능 추가와 변경은 가급적 컴포넌트 추가를 통한 확장 구조로 설계
+* 기능 추가는 단일 책임 원칙을 베이스로 하는 여러 기능 컴포넌트 추가를 통한 확장 구조를 통해 수행
+	* 예: 이동 컴포넌트는 이동만 담당하기
 
 ## EntityBase - Entity의 중추 기반 클래스
 ```mermaid
@@ -18,7 +19,7 @@ classDiagram
 
 ## EntityComponent - Entity의 기능 담당 파트들
 
-### Entity 컴포넌트 함수/변수 명세
+### Entity 컴포넌트 예시
 
 ```mermaid
 classDiagram
@@ -45,12 +46,6 @@ classDiagram
         +Heal() void
         +Die() void
     }
-    class CooldownComponent["CooldownComponent<br>캐릭터 쿨타임 업데이트 담당"]{
-        +RegisterCooldown(string name, float time) void
-        +IsReady(string name) bool
-        +StartCooldown(string name) void
-        +GetCooldownPercent(string name) float
-    }
     class InteractComponent["InteractComponent<br>플레이어와 상호작용 가능 물체 상호작용 담당"]{
         +TryInteract() void 
         // () 후보에 있는 IInteractable 객체와 상호작용
@@ -76,9 +71,9 @@ classDiagram
     HealthComponent --> EntityStatsComponent : 최대 체력 참고
     MovementComponent --> EntityStatsComponent : 이동속도 참고
 ```
-* `EntityComponent`는 모두 동일한 게임오브젝트에 붙이는걸 전제로 한다
-* 따라서 컴포넌트간 참조가 필요하다면 gameObject.GetComponent를 통해 참조한다
-* 특정 컴포넌트가 존재하지 않을 가능성이 존재하기에 예외처리는 확실히 수행한다
+* `EntityComponent`는 모두 동일한 게임오브젝트에 붙이는걸 전제함
+* 따라서 컴포넌트간 참조가 필요하다면 gameObject.GetComponent를 통해 참조
+* 특정 컴포넌트가 존재하지 않을 가능성이 존재하므로 다른 컴포넌트를 참조할때 예외처리 반드시 수행
 
 ---
 
