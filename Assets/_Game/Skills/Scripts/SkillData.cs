@@ -15,7 +15,6 @@ namespace DungeonShooter
     {
         public string SkillName => _skillName;
         public string SkillDescription => _skillDescription;
-        public float Cooldown => _cooldown;
         public IReadOnlyList<EffectBase> ActiveEffects => _activeEffects;
         public IReadOnlyList<EffectBase> PassiveEffects => _passiveEffects;
         public bool IsActiveSkill => _activeEffects.Count > 0;
@@ -26,9 +25,6 @@ namespace DungeonShooter
         [SerializeField] private string _skillName;
         [SerializeField, TextArea(3, 10)] private string _skillDescription;
         [SerializeField] private AssetReferenceT<Sprite> _skillIcon;
-
-        [Header("스킬 설정")]
-        [SerializeField] private float _cooldown;
 
         [Header("액티브 스킬 효과")]
         [SerializeReference]

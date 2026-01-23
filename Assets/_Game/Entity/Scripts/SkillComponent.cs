@@ -11,149 +11,148 @@ namespace DungeonShooter
     /// </summary>
     public class SkillComponent : MonoBehaviour
     {
-    private Dictionary<string, ISkill> _skills = new Dictionary<string, ISkill>();
-    private IStageResourceProvider _resourceProvider;
-    private EntityBase _owner;
-    
-    [Inject]
-    private void Construct(IStageResourceProvider resourceProvider)
-    {
-        _resourceProvider = resourceProvider;
-    }
-    
-    private void Awake()
-    {
-        _owner = GetComponent<EntityBase>();
-        if (_owner == null)
+        private Dictionary<int, Skill> _skills = new Dictionary<int, Skill>();
+        private IStageResourceProvider _resourceProvider;
+        private ITableRepository _tableRepository;
+        private EntityBase _owner;
+
+        [Inject]
+        private void Construct(IStageResourceProvider resourceProvider, ITableRepository tableRepository)
         {
-            LogHandler.LogError<SkillComponent>("EntityBase 컴포넌트를 찾을 수 없습니다.");
+            _resourceProvider = resourceProvider;
+            _tableRepository = tableRepository;
         }
-    }
-    
-    /// <summary>
-    /// 스킬을 사용합니다.
-    /// </summary>
-    /// <param name="skillKey">사용할 스킬의 키</param>
-    /// <param name="target">스킬에 적중된 Entity (선택적)</param>
-    /// <returns>사용 성공 여부</returns>
-    public async UniTask<bool> UseSkill(string skillKey, EntityBase target = null)
-    {
-        if (!_skills.TryGetValue(skillKey, out var skill))
+
+        private void Awake()
         {
-            LogHandler.LogWarning<SkillComponent>($"스킬을 찾을 수 없습니다: {skillKey}");
-            return false;
-        }
-        
-        if (_owner == null)
-        {
-            LogHandler.LogError<SkillComponent>("Owner가 null입니다.");
-            return false;
-        }
-        
-        return await skill.Execute(_owner);
-    }
-    
-    /// <summary>
-    /// 스킬을 등록합니다.
-    /// </summary>
-    /// <param name="skillKey">스킬의 Addressable 키</param>
-    /// <returns>등록 성공 여부</returns>
-    public async UniTask<bool> RegistSkill(string skillKey)
-    {
-        if (string.IsNullOrEmpty(skillKey))
-        {
-            LogHandler.LogError<SkillComponent>("skillKey가 null이거나 비어있습니다.");
-            return false;
-        }
-        
-        if (_skills.ContainsKey(skillKey))
-        {
-            LogHandler.LogWarning<SkillComponent>($"이미 등록된 스킬입니다: {skillKey}");
-            return false;
-        }
-        
-        if (_resourceProvider == null)
-        {
-            LogHandler.LogError<SkillComponent>("ResourceProvider가 null입니다.");
-            return false;
-        }
-        
-        try
-        {
-            // SkillData 로드
-            var skillData = await _resourceProvider.GetAsset<SkillData>(skillKey);
-            
-            if (skillData == null)
+            _owner = GetComponent<EntityBase>();
+            if (_owner == null)
             {
-                LogHandler.LogError<SkillComponent>($"SkillData를 로드할 수 없습니다: {skillKey}");
+                LogHandler.LogError<SkillComponent>("EntityBase 컴포넌트를 찾을 수 없습니다.");
+            }
+        }
+
+        /// <summary>
+        /// 스킬을 사용합니다.
+        /// </summary>
+        /// <param name="skillEntryId">사용할 스킬의 Entry ID</param>
+        /// <param name="target">스킬에 적중된 Entity (선택적)</param>
+        /// <returns>사용 성공 여부</returns>
+        public async UniTask<bool> UseSkill(int skillEntryId, EntityBase target = null)
+        {
+            if (!_skills.TryGetValue(skillEntryId, out var skill))
+            {
+                LogHandler.LogWarning<SkillComponent>($"스킬을 찾을 수 없습니다: {skillEntryId}");
                 return false;
             }
-            
-            // ISkill 인스턴스 생성
-            var skill = new Skill(skillData);
-            _skills[skillKey] = skill;
-            
-            // 패시브 효과 자동 활성화
-            if (skillData.IsPassiveSkill)
+
+            if (_owner == null)
             {
-                skill.Activate(_owner);
+                LogHandler.LogError<SkillComponent>("Target이 null입니다.");
+                return false;
             }
-            
-            LogHandler.Log<SkillComponent>($"스킬 등록 완료: {skillKey} ({skillData.SkillName})");
-            return true;
+
+            var actualTarget = target ?? _owner;
+            return await skill.Execute(actualTarget);
         }
-        catch (Exception e)
+
+        /// <summary>
+        /// 스킬을 등록합니다.
+        /// </summary>
+        /// <param name="skillEntryId">스킬의 Entry ID</param>
+        /// <returns>등록 성공 여부</returns>
+        public async UniTask<bool> RegistSkill(int skillEntryId)
         {
-            LogHandler.LogError<SkillComponent>(e, "스킬 등록 중 오류 발생");
-            return false;
+            if (_skills.ContainsKey(skillEntryId))
+            {
+                LogHandler.LogWarning<SkillComponent>($"이미 등록된 스킬입니다: {skillEntryId}");
+                return false;
+            }
+
+            if (_resourceProvider == null)
+            {
+                LogHandler.LogError<SkillComponent>("ResourceProvider가 null입니다.");
+                return false;
+            }
+
+            if (_tableRepository == null)
+            {
+                LogHandler.LogError<SkillComponent>("TableRepository가 null입니다.");
+                return false;
+            }
+
+            try
+            {
+                // SkillTableEntry 조회
+                var skillTableEntry = _tableRepository.GetTableEntry<SkillTableEntry>(skillEntryId);
+                if (skillTableEntry == null)
+                {
+                    LogHandler.LogError<SkillComponent>($"SkillTableEntry를 찾을 수 없습니다: {skillEntryId}");
+                    return false;
+                }
+
+                // SkillData 로드
+                var skillData = await _resourceProvider.GetAsset<SkillData>(skillTableEntry.SkillDataKey);
+
+                if (skillData == null)
+                {
+                    LogHandler.LogError<SkillComponent>($"SkillData를 로드할 수 없습니다: {skillTableEntry.SkillDataKey}");
+                    return false;
+                }
+
+                // Skill 인스턴스 생성
+                var skill = new Skill(skillData, skillTableEntry);
+                _skills[skillEntryId] = skill;
+
+                // 패시브 효과 자동 활성화
+                if (skillData.IsPassiveSkill)
+                {
+                    skill.Activate(_owner);
+                }
+
+                LogHandler.Log<SkillComponent>($"스킬 등록 완료: {skillEntryId} ({skillData.SkillName})");
+                return true;
+            }
+            catch (Exception e)
+            {
+                LogHandler.LogError<SkillComponent>(e, "스킬 등록 중 오류 발생");
+                return false;
+            }
         }
-    }
-    
-    /// <summary>
-    /// 스킬 등록을 해제합니다.
-    /// </summary>
-    /// <param name="skillKey">스킬의 키</param>
-    /// <returns>해제 성공 여부</returns>
-    public bool UnRegistSkill(string skillKey)
-    {
-        if (string.IsNullOrEmpty(skillKey))
+
+        /// <summary>
+        /// 스킬 등록을 해제합니다.
+        /// </summary>
+        /// <param name="skillEntryId">스킬의 Entry ID</param>
+        public void UnregistSkill(int skillEntryId)
         {
-            LogHandler.LogError<SkillComponent>("skillKey가 null이거나 비어있습니다.");
-            return false;
-        }
-        
-        if (!_skills.TryGetValue(skillKey, out var skill))
-        {
-            LogHandler.LogWarning<SkillComponent>($"등록되지 않은 스킬입니다: {skillKey}");
-            return false;
-        }
-        
-        // 패시브 효과 비활성화
-        if (skill.SkillData.IsPassiveSkill)
-        {
-            skill.Deactivate(_owner);
-        }
-        
-        // 리소스 정리
-        if (skill is IDisposable disposable)
-        {
-            disposable.Dispose();
-        }
-        
-        _skills.Remove(skillKey);
-        LogHandler.Log<SkillComponent>($"스킬 등록 해제 완료: {skillKey}");
-        
-        return true;
-    }
-    
-    private void OnDestroy()
-    {
-        // 모든 스킬 리소스 정리
-        foreach (var skill in _skills.Values)
-        {
+            if (!_skills.TryGetValue(skillEntryId, out var skill))
+            {
+                LogHandler.LogWarning<SkillComponent>($"등록되지 않은 스킬입니다: {skillEntryId}");
+                return;
+            }
+
+            // 패시브 효과 비활성화
+            if (skill.SkillData.IsPassiveSkill)
+            {
+                skill.Deactivate(_owner);
+            }
+
+            // 리소스 정리
             skill.Dispose();
+
+            _skills.Remove(skillEntryId);
+            LogHandler.Log<SkillComponent>($"스킬 등록 해제 완료: {skillEntryId}");
         }
-        
+
+        private void OnDestroy()
+        {
+            // 모든 스킬 리소스 정리
+            foreach (var skill in _skills.Values)
+            {
+                skill.Dispose();
+            }
+
             _skills.Clear();
         }
     }

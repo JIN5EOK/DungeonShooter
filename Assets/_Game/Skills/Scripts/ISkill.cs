@@ -10,6 +10,7 @@ namespace DungeonShooter
     public interface ISkill : IDisposable
     {
         SkillData SkillData { get; }
+        SkillTableEntry SkillTableEntry { get; }
         bool IsCooldown { get; }
         float Cooldown { get; }
         

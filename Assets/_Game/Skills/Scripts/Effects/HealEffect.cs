@@ -9,19 +9,29 @@ namespace DungeonShooter
     [System.Serializable]
     public class HealEffect : EffectBase
     {
-        [Header("회복 설정")]
-        public int healAmount;
-        
-        public override UniTask<bool> Execute(EntityBase target)
+        public override async UniTask<bool> Execute(EntityBase target, SkillTableEntry entry)
         {
+            if (entry == null)
+            {
+                LogHandler.LogError<HealEffect>("SkillTableEntry가 null입니다.");
+                return false;
+            }
+
+            var healAmount = entry.GetAmount<HealAmount>();
+            if (healAmount == null)
+            {
+                LogHandler.LogError<HealEffect>("HealAmount를 찾을 수 없습니다.");
+                return false;
+            }
+
             if (target.TryGetComponent(out HealthComponent health))
             {
-                health.Heal(healAmount);
-                return UniTask.FromResult(true);
+                health.Heal(healAmount.Amount);
+                return true;
             }
             
             LogHandler.LogError<HealEffect>("체력 회복 실패");
-            return UniTask.FromResult(false);
+            return false;
         }
     }
 }

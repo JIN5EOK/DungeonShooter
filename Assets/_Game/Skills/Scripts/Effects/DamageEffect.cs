@@ -10,19 +10,29 @@ namespace DungeonShooter
     [Serializable]
     public class DamageEffect : EffectBase
     {
-        [Header("데미지 설정")]
-        public int damage;
-        
-        public override UniTask<bool> Execute(EntityBase target)
+        public override async UniTask<bool> Execute(EntityBase target, SkillTableEntry entry)
         {
+            if (entry == null)
+            {
+                LogHandler.LogError<DamageEffect>("SkillTableEntry가 null입니다.");
+                return false;
+            }
+
+            var damageAmount = entry.GetAmount<DamageAmount>();
+            if (damageAmount == null)
+            {
+                LogHandler.LogError<DamageEffect>("DamageAmount를 찾을 수 없습니다.");
+                return false;
+            }
+
             if (target.TryGetComponent(out HealthComponent health))
             {
-                health.TakeDamage(damage);
-                return UniTask.FromResult(true);
+                health.TakeDamage(damageAmount.Amount);
+                return true;
             }
             
             LogHandler.LogError<DamageEffect>("데미지 주기 실패");
-            return UniTask.FromResult(false);
+            return false;
         }
     }
 }

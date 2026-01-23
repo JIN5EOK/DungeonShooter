@@ -27,7 +27,7 @@ namespace DungeonShooter
             SubscribeInputEvent();
             
             _skillComponent = _resourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
-            await _skillComponent.RegistSkill("FireballSkillData");
+            await _skillComponent.RegistSkill(0); // 수정 필요
         }
 
         protected override async UniTask Start()
@@ -63,7 +63,7 @@ namespace DungeonShooter
 
         private void HandleSkill1Input()
         {
-            _skillComponent.UseSkill("FireballSkillData", this).Forget();
+            _skillComponent.UseSkill(0, this).Forget();
         }
         private void HandleInteractInput()
         {

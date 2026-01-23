@@ -33,14 +33,14 @@ namespace DungeonShooter
         resourceProvider.GetAsset<GameObject>(ProjectileAddress);
     }
     
-    public override async UniTask<bool> Execute(EntityBase target)
+    public override async UniTask<bool> Execute(EntityBase target, SkillTableEntry entry)
     {
         try
         {
             var obj = await _resourceProvider.GetInstance(ProjectileAddress);
             if (obj.TryGetComponent(out Projectile proj))
             {
-                proj.Initialize(target, effects);
+                proj.Initialize(target, effects, entry);
             }
 
             return true;

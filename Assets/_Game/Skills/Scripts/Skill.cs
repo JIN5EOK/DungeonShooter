@@ -11,9 +11,11 @@ namespace DungeonShooter
     public class Skill : ISkill
     {
         private readonly SkillData _skillData;
+        private readonly SkillTableEntry _skillTableEntry;
         private CancellationTokenSource _cooldownCancellationTokenSource;
         
         public SkillData SkillData => _skillData;
+        public SkillTableEntry SkillTableEntry => _skillTableEntry;
         public bool IsCooldown { get; private set; }
         public float Cooldown { get; private set; }
         
@@ -21,15 +23,22 @@ namespace DungeonShooter
         public Action<float> OnCooldownChanged { get; set; }
         public Action OnCooldownEnded { get; set; }
         
-        public Skill(SkillData skillData)
+        public Skill(SkillData skillData, SkillTableEntry skillTableEntry)
         {
             if (skillData == null)
             {
                 LogHandler.LogError<Skill>("SkillData가 null입니다.");
                 return;
             }
+
+            if (skillTableEntry == null)
+            {
+                LogHandler.LogError<Skill>("SkillTableEntry가 null입니다.");
+                return;
+            }
             
             _skillData = skillData;
+            _skillTableEntry = skillTableEntry;
             Cooldown = 0f;
             IsCooldown = false;
         }
@@ -75,7 +84,7 @@ namespace DungeonShooter
                 {
                     try
                     {
-                        bool result = await effect.Execute(target);
+                        bool result = await effect.Execute(target, _skillTableEntry);
                         if (!result)
                         {
                             allSuccess = false;
@@ -98,7 +107,7 @@ namespace DungeonShooter
         /// <param name="owner">스킬 소유자</param>
         public void Activate(EntityBase owner)
         {
-            if (_skillData == null || owner == null)
+            if (_skillData == null || owner == null || _skillTableEntry == null)
             {
                 return;
             }
@@ -109,7 +118,7 @@ namespace DungeonShooter
                 {
                     try
                     {
-                        effect.Activate(owner);
+                        effect.Activate(owner, _skillTableEntry);
                     }
                     catch (Exception e)
                     {
@@ -125,7 +134,7 @@ namespace DungeonShooter
         /// <param name="owner">스킬 소유자</param>
         public void Deactivate(EntityBase owner)
         {
-            if (_skillData == null || owner == null)
+            if (_skillData == null || owner == null || _skillTableEntry == null)
             {
                 return;
             }
@@ -136,7 +145,7 @@ namespace DungeonShooter
                 {
                     try
                     {
-                        effect.Deactivate(owner);
+                        effect.Deactivate(owner, _skillTableEntry);
                     }
                     catch (Exception e)
                     {
@@ -151,7 +160,7 @@ namespace DungeonShooter
         /// </summary>
         private void StartCooldown()
         {
-            if (_skillData.Cooldown <= 0f)
+            if (_skillTableEntry == null || _skillTableEntry.Cooldown <= 0f)
             {
                 return;
             }
@@ -161,7 +170,7 @@ namespace DungeonShooter
             _cooldownCancellationTokenSource?.Dispose();
             
             IsCooldown = true;
-            Cooldown = _skillData.Cooldown;
+            Cooldown = _skillTableEntry.Cooldown;
             
             // 새로운 취소 토큰 생성
             _cooldownCancellationTokenSource = new CancellationTokenSource();

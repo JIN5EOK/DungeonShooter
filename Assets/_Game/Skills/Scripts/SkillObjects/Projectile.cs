@@ -22,9 +22,9 @@ namespace DungeonShooter
 
         private bool _stopTrigger = false;
         private float _elapsedTime = 0f;
-        
+        private SkillTableEntry _skillTableEntry;
         private Vector2 _direction;
-        public void Initialize(EntityBase owner, List<EffectBase> effects)
+        public void Initialize(EntityBase owner, List<EffectBase> effects, SkillTableEntry skillTableEntry)
         {
             _owner = owner;
             _effects = effects;
@@ -85,7 +85,7 @@ namespace DungeonShooter
 
             foreach (var effect in _effects)
             {
-                effect.Execute(otherEntity);
+                effect.Execute(otherEntity, _skillTableEntry);
             }
             
             if (_destroyOnTrigger == true)
