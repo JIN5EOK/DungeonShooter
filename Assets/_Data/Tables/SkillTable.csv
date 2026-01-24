@@ -1,2 +1,4 @@
-﻿Id,SkillName,SkillDescription,SkillIconKey,SkillDataKey,FloatAmounts,IntAmounts,Damage,Heal,Delay,Cooldown,TargetCount,KnockbackForce
-1,파이어볼,적을 태우는 화염구,skill_fireball_icon,skill_example,range:5.0/speed:2.5,damage:30/count:3,30,0,0.5,5.0,1,10.0
+Id,SkillName,SkillDescription,SkillIconKey,SkillDataKey,FloatAmounts,IntAmounts,Damage,Heal,Delay,Cooldown,TargetCount,KnockbackForce
+14000101,파이어볼 LV1,데미지 150%의 화염구를 1발 발사합니다,FireballIcon,FireballLV1SkillData,,,150,0,0.5,1,1,10.0
+14000102,파이어볼 LV2,데미지 125%의 화염구를 2발 발사합니다,FireballIcon,FireballLV2SkillData,,,125,0,0.5,1,1,10.0
+14000103,파이어볼 LV3,데미지 100%의 화염구를 3발 발사합니다,FireballIcon,FireballLV3SkillData,,,100,0,0.5,1,1,10.0
