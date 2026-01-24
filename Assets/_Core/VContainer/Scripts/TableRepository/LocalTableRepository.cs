@@ -10,19 +10,7 @@ namespace DungeonShooter
     /// </summary>
     public class LocalTableRepository : ITableRepository
     {
-        /// <summary>
-        /// 타입별 캐시: Dictionary<타입, Dictionary<ID, 엔트리>>
-        /// </summary>
         private readonly Dictionary<Type, Dictionary<int, object>> _cache = new();
-
-        /// <summary>
-        /// CSV 파일 경로 설정
-        /// </summary>
-        private struct CSVTableConfig
-        {
-            public string AssetPath;
-            public Type EntryType;
-        }
 
         /// <summary>
         /// 테이블 리포지토리를 초기화합니다.
@@ -30,15 +18,14 @@ namespace DungeonShooter
         /// </summary>
         public void Initialize()
         {
-            var tableConfigs = new[]
+            (string address, Type type)[] tableConfigs = new[]
             {
-                new CSVTableConfig { AssetPath = "Assets/_Data/Tables/SkillTable.csv", EntryType = typeof(SkillTableEntry) },
-                new CSVTableConfig { AssetPath = "Assets/_Data/Tables/ItemTable.csv", EntryType = typeof(ItemTableEntry) },
+                ("SkillTable", typeof(SkillTableEntry)),
+                ("ItemTable", typeof(ItemTableEntry))
             };
-
             foreach (var config in tableConfigs)
             {
-                LoadAndCacheTable(config.AssetPath, config.EntryType);
+                LoadAndCacheTable(config.address, config.type);
             }
         }
 

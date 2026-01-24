@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using Newtonsoft.Json;
 
 namespace DungeonShooter
 {
@@ -135,36 +134,50 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// JSON 형식의 Amounts 문자열을 Dictionary<string, T>로 파싱합니다.
-        /// 예: {"damage":30,"heal":10} 또는 {"range":5.0,"speed":2.5}
+        /// 커스텀 형식의 Amounts 문자열을 Dictionary<string, T>로 파싱합니다.
+        /// 예: "damage:30/heal:10" 또는 "range:5.0/speed:2.5"
         /// </summary>
-        private static Dictionary<string, T> ParseAmountsDictionary<T>(string json) where T : struct
+        private static Dictionary<string, T> ParseAmountsDictionary<T>(string data) where T : struct
         {
-            var amountsDict = new Dictionary<string, T>();
-
-            if (string.IsNullOrEmpty(json))
-                return amountsDict;
+            var result = new Dictionary<string, T>();
+            
+            if (string.IsNullOrEmpty(data))
+                return result;
 
             try
             {
-                // Newtonsoft.Json으로 Dictionary 직접 파싱
-                var jsonDict = JsonConvert.DeserializeObject<Dictionary<string, T>>(json);
+                // '/' 구분자로 각 키-값 쌍 분리
+                var pairs = data.Split('/');
                 
-                if (jsonDict != null)
+                foreach (var pair in pairs)
                 {
-                    foreach (var kvp in jsonDict)
-                    {
-                        amountsDict[kvp.Key] = kvp.Value;
-                    }
+                    var trimmedPair = pair.Trim();
+                    if (string.IsNullOrEmpty(trimmedPair))
+                        continue;
+                    
+                    // ':' 구분자로 키와 값 분리
+                    var parts = trimmedPair.Split(':');
+                    if (parts.Length != 2)
+                        continue;
+                    
+                    var key = parts[0].Trim();
+                    var valueString = parts[1].Trim();
+                    
+                    if (string.IsNullOrEmpty(key))
+                        continue;
+                    
+                    // 타입 변환
+                    var value = (T)Convert.ChangeType(valueString, typeof(T));
+                    result[key] = value;
                 }
             }
             catch (Exception ex)
             {
                 var typeName = typeof(T).Name;
-                LogHandler.LogError(nameof(CSVTableParser), $"{typeName} JSON 파싱 실패: {json}, 에러: {ex.Message}");
+                LogHandler.LogError(nameof(CSVTableParser), $"{typeName} 커스텀 파싱 실패: {data}, 에러: {ex.Message}");
             }
 
-            return amountsDict;
+            return result;
         }
     }
 }

@@ -33,7 +33,7 @@ namespace DungeonShooter
 
         /// <summary>
         /// CSV 템플릿 파일을 생성합니다.
-        /// 헤더만 포함하고 데이터는 비워둡니다.
+        /// 헤더와 예시 데이터를 포함합니다.
         /// </summary>
         private static void GenerateCSVTemplate(System.Type tableEntryType, string fileName)
         {
@@ -60,7 +60,16 @@ namespace DungeonShooter
             using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
             {
                 writer.WriteLine(headerBuilder.ToString());
-                // 데이터 행은 비워둠 (사용자가 직접 입력하도록)
+                
+                // 예시 데이터 추가 (SkillTable인 경우)
+                if (tableEntryType == typeof(SkillTableEntry))
+                {
+                    writer.WriteLine("1,skill_example,range:5.0/speed:2.5,damage:30/count:3,30,0,0.5,5.0,1,10.0");
+                }
+                else if (tableEntryType == typeof(ItemTableEntry))
+                {
+                    writer.WriteLine("1,item_example,Example Item,Consume,10,1,0,0,0,item_icon");
+                }
             }
 
             AssetDatabase.Refresh();

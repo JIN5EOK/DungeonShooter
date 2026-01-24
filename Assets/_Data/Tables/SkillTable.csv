@@ -1,1 +1,2 @@
-﻿Id,SkillDataKey,FloatAmounts,IntAmounts,Damage,Heal,Delay,Cooldown,TargetCount,KnockbackForce
+Id,SkillDataKey,FloatAmounts,IntAmounts,Damage,Heal,Delay,Cooldown,TargetCount,KnockbackForce
+1,,range:3.0/speed:3.0,,3,5,4,5,5,5
