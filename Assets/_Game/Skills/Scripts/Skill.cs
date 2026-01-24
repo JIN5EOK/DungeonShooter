@@ -52,19 +52,13 @@ namespace DungeonShooter
         {
             if (IsCooldown)
             {
-                LogHandler.Log<Skill>($"스킬 쿨다운 중: {_skillData.SkillName}");
-                return false;
-            }
-            
-            if (_skillData == null)
-            {
-                LogHandler.LogError<Skill>("SkillData가 null입니다.");
+                LogHandler.Log<Skill>($"스킬 쿨다운 중: {SkillTableEntry.Id}({_skillTableEntry.SkillName})");
                 return false;
             }
                     
             // 스킬 효과 실행 (비동기로 완료까지 대기)
             bool success = await ExecuteEffectsAsync(target);
-            LogHandler.Log<Skill>($"스킬 실행 : {_skillData.SkillName}");
+            LogHandler.Log<Skill>($"스킬 실행 : {SkillTableEntry.Id}({_skillTableEntry.SkillName})");
             OnExecute?.Invoke();
             StartCooldown();
 

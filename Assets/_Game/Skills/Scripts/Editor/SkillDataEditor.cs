@@ -9,15 +9,9 @@ namespace DungeonShooter
     [CustomEditor(typeof(SkillData))]
     public class SkillDataEditor : Editor
     {
-        private readonly string _skillNameName = "_skillName";
-        private readonly string _skillDescriptionName = "_skillDescription";
-        private readonly string _skillIconName = "_skillIcon";
         private readonly string _activeEffectsName = "_activeEffects";
         private readonly string _passiveEffectsName = "_passiveEffects";
         
-        private SerializedProperty _skillNameProperty;
-        private SerializedProperty _skillDescriptionProperty;
-        private SerializedProperty _skillIconProperty;
         private SerializedProperty _activeEffectsProperty;
         private SerializedProperty _passiveEffectsProperty;
         
@@ -26,9 +20,6 @@ namespace DungeonShooter
         
         private void OnEnable()
         {
-            _skillNameProperty = serializedObject.FindProperty(_skillNameName);
-            _skillDescriptionProperty = serializedObject.FindProperty(_skillDescriptionName);
-            _skillIconProperty = serializedObject.FindProperty(_skillIconName);
             _activeEffectsProperty = serializedObject.FindProperty(_activeEffectsName);
             _passiveEffectsProperty = serializedObject.FindProperty(_passiveEffectsName);
             
@@ -40,11 +31,6 @@ namespace DungeonShooter
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            
-            EditorGUILayout.PropertyField(_skillNameProperty);
-            EditorGUILayout.PropertyField(_skillDescriptionProperty);
-            EditorGUILayout.PropertyField(_skillIconProperty);
-            EditorGUILayout.Space();
             
             // 액티브 스킬 효과
             EditorGUILayout.LabelField("액티브 스킬 효과", EditorStyles.boldLabel);

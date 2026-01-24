@@ -1,1 +1,2 @@
 ﻿Id,ItemName,ItemDescription,ItemType,MaxStackCount,UseEffect,PassiveEffect,EquipEffect,ActiveEffect,ItemIcon
+1,item_example,Example Item,Consume,10,1,0,0,0,item_icon

@@ -110,7 +110,7 @@ namespace DungeonShooter
                     skill.Activate(_owner);
                 }
 
-                LogHandler.Log<SkillComponent>($"스킬 등록 완료: {skillEntryId} ({skillData.SkillName})");
+                LogHandler.Log<SkillComponent>($"스킬 등록 완료: {skillEntryId} ({skillTableEntry.SkillName})");
                 return true;
             }
             catch (Exception e)

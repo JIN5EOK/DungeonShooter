@@ -13,18 +13,10 @@ namespace DungeonShooter
     [CreateAssetMenu(fileName = "New Skill", menuName = "Game/Skill")]
     public class SkillData : ScriptableObject
     {
-        public string SkillName => _skillName;
-        public string SkillDescription => _skillDescription;
         public IReadOnlyList<EffectBase> ActiveEffects => _activeEffects;
         public IReadOnlyList<EffectBase> PassiveEffects => _passiveEffects;
         public bool IsActiveSkill => _activeEffects.Count > 0;
         public bool IsPassiveSkill => _passiveEffects.Count > 0;
-        public string SkillIconAddress => _skillIcon.RuntimeKey.ToString();
-
-        [Header("스킬 기본 정보")]
-        [SerializeField] private string _skillName;
-        [SerializeField, TextArea(3, 10)] private string _skillDescription;
-        [SerializeField] private AssetReferenceT<Sprite> _skillIcon;
 
         [Header("액티브 스킬 효과")]
         [SerializeReference]
