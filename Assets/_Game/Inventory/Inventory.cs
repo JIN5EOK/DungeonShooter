@@ -14,19 +14,21 @@ namespace DungeonShooter
         public event Action<Item> OnItemRemoved;
         public event Action<Item> OnWeaponEquipped;
         public event Action<Item> OnWeaponUnequipped;
+        
+        // 스킬 등록 이벤트 (skillEntryId)
+        public event Action<int> OnItemSkillRegister;
+        
+        // 스킬 해제 이벤트 (skillEntryId)
+        public event Action<int> OnItemSkillUnregister;
+        
         private readonly List<Item> _items = new List<Item>();
         private Item _equippedWeapon;
         private readonly ITableRepository _tableRepository;
-        private SkillComponent _skillComponent;
 
-        /// <summary>
-        /// 인벤토리 아이템 목록 (읽기 전용)
-        /// </summary>
+        // 인벤토리 아이템 목록 (읽기 전용)
         public IReadOnlyList<Item> Items => _items;
 
-        /// <summary>
-        /// 현재 장착된 무기
-        /// </summary>
+        // 현재 장착된 무기
         public Item EquippedWeapon => _equippedWeapon;
 
         [Inject]
@@ -36,24 +38,15 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// SkillComponent 설정
-        /// </summary>
-        /// <param name="skillComponent">스킬 컴포넌트</param>
-        public void SetSkillComponent(SkillComponent skillComponent)
-        {
-            _skillComponent = skillComponent;
-        }
-
-        /// <summary>
         /// 아이템 추가
         /// </summary>
         /// <param name="item">추가할 아이템</param>
-        public async UniTask AddItem(Item item)
+        public UniTask AddItem(Item item)
         {
             if (item == null)
             {
                 LogHandler.LogWarning<Inventory>("아이템이 null입니다.");
-                return;
+                return UniTask.CompletedTask;
             }
 
             // 스택 가능한 아이템인지 확인
@@ -67,57 +60,59 @@ namespace DungeonShooter
                     // 스택이 넘치면 새 아이템 생성
                     var newItem = new Item(item.ItemTableEntry, remaining);
                     _items.Add(newItem);
-                    await RegisterItemSkills(newItem);
+                    NotifySkillRegistration(newItem);
                 }
             }
             else
             {
                 // 새 아이템 추가
                 _items.Add(item);
-                await RegisterItemSkills(item);
+                NotifySkillRegistration(item);
             }
 
             OnItemAdded?.Invoke(item);
+            return UniTask.CompletedTask;
         }
 
         /// <summary>
         /// 아이템 장착
         /// </summary>
         /// <param name="item">장착할 아이템</param>
-        public async UniTask EquipItem(Item item)
+        public UniTask EquipItem(Item item)
         {
             if (item == null)
             {
                 LogHandler.LogWarning<Inventory>("아이템이 null입니다.");
-                return;
+                return UniTask.CompletedTask;
             }
 
             // 무기 타입인지 확인
             if (item.ItemTableEntry.ItemType != ItemType.Weapon)
             {
                 LogHandler.LogWarning<Inventory>("무기 타입의 아이템만 장착할 수 있습니다.");
-                return;
+                return UniTask.CompletedTask;
             }
 
             // 인벤토리에 있는지 확인
             if (!_items.Contains(item))
             {
                 LogHandler.LogWarning<Inventory>("인벤토리에 없는 아이템입니다.");
-                return;
+                return UniTask.CompletedTask;
             }
 
             // 기존 무기 해제
             if (_equippedWeapon != null)
             {
-                UnregisterItemSkills(_equippedWeapon, true);
+                NotifySkillUnregistration(_equippedWeapon, true);
                 OnWeaponUnequipped?.Invoke(_equippedWeapon);
             }
 
             // 새 무기 장착
             _equippedWeapon = item;
-            await RegisterItemSkills(item, true);
+            NotifySkillRegistration(item, true);
 
             OnWeaponEquipped?.Invoke(item);
+            return UniTask.CompletedTask;
         }
 
         /// <summary>
@@ -134,12 +129,12 @@ namespace DungeonShooter
             // 장착된 아이템인지 확인
             if (item == _equippedWeapon)
             {
-                UnregisterItemSkills(item, isEquipped: true);
+                NotifySkillUnregistration(item, isEquipped: true);
                 _equippedWeapon = null;
             }
             else
             {
-                UnregisterItemSkills(item, isEquipped: false);
+                NotifySkillUnregistration(item, isEquipped: false);
             }
 
             _items.Remove(item);
@@ -156,21 +151,16 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 아이템의 스킬 등록
+        /// 아이템의 스킬 등록 이벤트 발생
         /// </summary>
-        private async UniTask RegisterItemSkills(Item item, bool isEquipped = false)
+        private void NotifySkillRegistration(Item item, bool isEquipped = false)
         {
-            if (_skillComponent == null)
-            {
-                return;
-            }
-
             var entry = item.ItemTableEntry;
 
             // PassiveEffect 등록 (인벤토리에 들어온 모든 아이템)
             if (entry.PassiveEffect > 0)
             {
-                await _skillComponent.RegistSkill(entry.PassiveEffect);
+                OnItemSkillRegister?.Invoke(entry.PassiveEffect);
             }
 
             // EquipEffect, ActiveEffect 등록 (무기 장착 시)
@@ -178,32 +168,27 @@ namespace DungeonShooter
             {
                 if (entry.EquipEffect > 0)
                 {
-                    await _skillComponent.RegistSkill(entry.EquipEffect);
+                    OnItemSkillRegister?.Invoke(entry.EquipEffect);
                 }
 
                 if (entry.ActiveEffect > 0)
                 {
-                    await _skillComponent.RegistSkill(entry.ActiveEffect);
+                    OnItemSkillRegister?.Invoke(entry.ActiveEffect);
                 }
             }
         }
 
         /// <summary>
-        /// 아이템의 스킬 해제
+        /// 아이템의 스킬 해제 이벤트 발생
         /// </summary>
-        private void UnregisterItemSkills(Item item, bool isEquipped = false)
+        private void NotifySkillUnregistration(Item item, bool isEquipped = false)
         {
-            if (_skillComponent == null)
-            {
-                return;
-            }
-
             var entry = item.ItemTableEntry;
 
             // PassiveEffect 해제
             if (entry.PassiveEffect > 0)
             {
-                _skillComponent.UnregistSkill(entry.PassiveEffect);
+                OnItemSkillUnregister?.Invoke(entry.PassiveEffect);
             }
 
             // EquipEffect, ActiveEffect 해제 (무기 해제 시)
@@ -211,12 +196,12 @@ namespace DungeonShooter
             {
                 if (entry.EquipEffect > 0)
                 {
-                    _skillComponent.UnregistSkill(entry.EquipEffect);
+                    OnItemSkillUnregister?.Invoke(entry.EquipEffect);
                 }
 
                 if (entry.ActiveEffect > 0)
                 {
-                    _skillComponent.UnregistSkill(entry.ActiveEffect);
+                    OnItemSkillUnregister?.Invoke(entry.ActiveEffect);
                 }
             }
         }
