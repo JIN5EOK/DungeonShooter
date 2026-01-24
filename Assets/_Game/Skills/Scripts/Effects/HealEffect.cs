@@ -17,16 +17,17 @@ namespace DungeonShooter
                 return false;
             }
 
-            var healAmount = entry.GetAmount<HealAmount>();
-            if (healAmount == null)
+            // 직접 필드를 우선 사용, 0이면 딕셔너리에서 fallback
+            var heal = entry.Heal;
+            if (heal <= 0)
             {
-                LogHandler.LogError<HealEffect>("HealAmount를 찾을 수 없습니다.");
+                LogHandler.LogWarning<HealEffect>("회복량이 0 이하입니다.");
                 return false;
             }
 
             if (target.TryGetComponent(out HealthComponent health))
             {
-                health.Heal(healAmount.Amount);
+                health.Heal(heal);
                 return true;
             }
             

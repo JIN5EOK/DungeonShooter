@@ -18,16 +18,17 @@ namespace DungeonShooter
                 return false;
             }
 
-            var damageAmount = entry.GetAmount<DamageAmount>();
-            if (damageAmount == null)
+            // 직접 필드를 우선 사용, 0이면 딕셔너리에서 fallback
+            var damage = entry.Damage;
+            if (damage <= 0)
             {
-                LogHandler.LogError<DamageEffect>("DamageAmount를 찾을 수 없습니다.");
+                LogHandler.LogWarning<DamageEffect>("데미지 값이 0 이하입니다.");
                 return false;
             }
 
             if (target.TryGetComponent(out HealthComponent health))
             {
-                health.TakeDamage(damageAmount.Amount);
+                health.TakeDamage(damage);
                 return true;
             }
             

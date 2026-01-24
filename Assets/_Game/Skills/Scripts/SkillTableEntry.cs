@@ -10,55 +10,46 @@ namespace DungeonShooter
     [Serializable]
     public class SkillTableEntry
     {
-        /// <summary>
-        /// 식별 ID
-        /// </summary>
+        /// <summary>식별 ID </summary>
         public int Id { get; set; }
 
-        /// <summary>
-        /// SkillData 에셋 주소
-        /// </summary>
+        /// <summary>SkillData 에셋 주소</summary>
         public string SkillDataKey { get; set; }
 
-        /// <summary>
-        /// 스킬 수치 딕셔너리 (Type을 키로, AmountBase를 값으로)
-        /// </summary>
-        public Dictionary<Type, AmountBase> Amounts { get; set; } = new Dictionary<Type, AmountBase>();
+        /// <summary>Float 타입 수치 딕셔너리 </summary>
+        public Dictionary<string, float> FloatAmounts { get; set; } = new Dictionary<string, float>();
 
-        /// <summary>
-        /// 스킬 지연 시간
-        /// </summary>
+        /// <summary>Int 타입 수치 딕셔너리 </summary>
+        public Dictionary<string, int> IntAmounts { get; set; } = new Dictionary<string, int>();
+
+        /// <summary>데미지 </summary>
+        public int Damage { get; set; }
+
+        /// <summary>치유량 </summary>
+        public int Heal { get; set; }
+
+        /// <summary> 스킬 지연 시간 </summary>
         public float Delay { get; set; }
 
-        /// <summary>
-        /// 스킬 쿨다운 시간
-        /// </summary>
+        /// <summary>스킬 쿨다운 시간 </summary>
         public float Cooldown { get; set; }
 
-        /// <summary>
-        /// 타겟 개수
-        /// </summary>
+        /// <summary>타겟 개수 </summary>
         public int TargetCount { get; set; }
 
-        /// <summary>
-        /// 넉백 힘
-        /// </summary>
+        /// <summary>넉백 힘 </summary>
         public float KnockbackForce { get; set; }
 
-        /// <summary>
-        /// 지정된 타입의 Amount를 가져옵니다.
-        /// </summary>
-        /// <typeparam name="T">AmountBase를 상속한 타입</typeparam>
-        /// <returns>Amount 인스턴스, 없으면 null</returns>
-        public T GetAmount<T>() where T : AmountBase
+        /// <summary>Int 타입 수치를 가져옵니다.</summary>
+        public int GetIntAmount(string key)
         {
-            var type = typeof(T);
-            if (Amounts.TryGetValue(type, out var amount) && amount is T result)
-            {
-                return result;
-            }
+            return IntAmounts.GetValueOrDefault(key);
+        }
 
-            return null;
+        /// <summary>Float 타입 수치를 가져옵니다. </summary>
+        public float GetFloatAmount(string key)
+        {
+            return FloatAmounts.GetValueOrDefault(key);
         }
     }
 }

@@ -15,11 +15,6 @@ MonoBehaviour:
   m_GroupName: CommonTiles
   m_GUID: 36ee7fd43d4aa4393bb6fbc30819000b
   m_SerializeEntries:
-  - m_GUID: 8ae768ec2eaa94277b11eadec1b2f793
-    m_Address: Tile_Wall_001
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9beeeaf2af1f147bf831eb97ccd8c772
     m_Address: Tile_Ground_001
     m_ReadOnly: 0

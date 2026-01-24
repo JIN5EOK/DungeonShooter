@@ -12,14 +12,12 @@ namespace DungeonShooter
         private readonly string _skillNameName = "_skillName";
         private readonly string _skillDescriptionName = "_skillDescription";
         private readonly string _skillIconName = "_skillIcon";
-        private readonly string _cooldownName = "_cooldown";
         private readonly string _activeEffectsName = "_activeEffects";
         private readonly string _passiveEffectsName = "_passiveEffects";
         
         private SerializedProperty _skillNameProperty;
         private SerializedProperty _skillDescriptionProperty;
         private SerializedProperty _skillIconProperty;
-        private SerializedProperty _cooldownProperty;
         private SerializedProperty _activeEffectsProperty;
         private SerializedProperty _passiveEffectsProperty;
         
@@ -31,7 +29,6 @@ namespace DungeonShooter
             _skillNameProperty = serializedObject.FindProperty(_skillNameName);
             _skillDescriptionProperty = serializedObject.FindProperty(_skillDescriptionName);
             _skillIconProperty = serializedObject.FindProperty(_skillIconName);
-            _cooldownProperty = serializedObject.FindProperty(_cooldownName);
             _activeEffectsProperty = serializedObject.FindProperty(_activeEffectsName);
             _passiveEffectsProperty = serializedObject.FindProperty(_passiveEffectsName);
             
@@ -47,7 +44,6 @@ namespace DungeonShooter
             EditorGUILayout.PropertyField(_skillNameProperty);
             EditorGUILayout.PropertyField(_skillDescriptionProperty);
             EditorGUILayout.PropertyField(_skillIconProperty);
-            EditorGUILayout.PropertyField(_cooldownProperty);
             EditorGUILayout.Space();
             
             // 액티브 스킬 효과

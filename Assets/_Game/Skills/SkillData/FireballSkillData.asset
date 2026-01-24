@@ -13,14 +13,15 @@ MonoBehaviour:
   m_Name: FireballSkillData
   m_EditorClassIdentifier: 
   _skillName: "\uD30C\uC774\uC5B4\uBCFC"
-  _skillDescription: "\uC804\uBC29\uC5D0 \uD30C\uC774\uC5B4\uBCFC\uC744 \uBC1C\uC0AC\uD55C\uB2E4"
+  _skillDescription: "\uC804\uBC29\uC5D0 \uD30C\uC774\uC5B4\uBCFC\uC744 \uBC1C\uC0AC\uD55C\uB2E4,
+    \uC2A4\uD0AC \uB808\uBCA8\uC774 \uC99D\uAC00\uD558\uBA74 \uBC1C\uC0AC \uD69F\uC218\uAC00
+    \uC99D\uAC00\uD55C\uB2E4"
   _skillIcon:
     m_AssetGUID: 
     m_SubObjectName: 
     m_SubObjectType: 
     m_SubObjectGUID: 
     m_EditorAssetChanged: 0
-  _cooldown: 0.5
   _activeEffects:
   - rid: 7692257427368706456
   _passiveEffects: []
@@ -40,5 +41,4 @@ MonoBehaviour:
         - rid: 7692257427368706457
     - rid: 7692257427368706457
       type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}
-      data:
-        damage: 5
+      data: 
