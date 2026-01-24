@@ -1,4 +1,5 @@
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 using DungeonShooter;
 using VContainer;
 
@@ -12,7 +13,7 @@ namespace DungeonShooter
     {
         [Header("아이템 설정")]
         [Tooltip("아이템 인스턴스 (런타임에 설정)")]
-        [SerializeField] private ItemBase item;
+        [SerializeField] private Item item;
 
         [Header("상호작용 설정")]
         [Tooltip("상호작용 가능한 거리")]
@@ -26,7 +27,7 @@ namespace DungeonShooter
         private Inventory _inventory;
 
         public bool CanInteract => _canInteract;
-        public ItemBase Item => item;
+        public Item Item => item;
 
         private void Awake()
         {
@@ -70,7 +71,7 @@ namespace DungeonShooter
         /// <summary>
         /// 아이템을 설정합니다. (런타임에 호출)
         /// </summary>
-        public void SetItem(ItemBase itemToSet)
+        public void SetItem(Item itemToSet)
         {
             item = itemToSet;
         }
@@ -92,15 +93,15 @@ namespace DungeonShooter
                 return;
             }
 
-            AddToInventory();
+            AddToInventory().Forget();
         }
 
         /// <summary>
         /// 아이템을 인벤토리에 추가합니다.
         /// </summary>
-        private void AddToInventory()
+        private async UniTaskVoid AddToInventory()
         {
-            _inventory.AddItem(item);
+            await _inventory.AddItem(item);
             OnCollected();
         }
 

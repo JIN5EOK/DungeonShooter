@@ -1,38 +1,54 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+using Cysharp.Threading.Tasks;
+using VContainer;
 
 namespace DungeonShooter
 {
     /// <summary>
-    /// 플레이어의 인벤토리를 관리하는 클래스
+    /// 아이템 장착/소지 관리 인벤토리
     /// </summary>
     public class Inventory
     {
-        private readonly List<ItemBase> _items = new(); // 통합 인벤토리 리스트
-        private WeaponItem _equippedWeapon;
-        private ActiveItem _equippedActive;
+        public event Action<Item> OnItemAdded;
+        public event Action<Item> OnItemRemoved;
+        public event Action<Item> OnWeaponEquipped;
+        public event Action<Item> OnWeaponUnequipped;
+        private readonly List<Item> _items = new List<Item>();
+        private Item _equippedWeapon;
+        private readonly ITableRepository _tableRepository;
+        private SkillComponent _skillComponent;
 
         /// <summary>
         /// 인벤토리 아이템 목록 (읽기 전용)
         /// </summary>
-        public IReadOnlyList<ItemBase> Items => _items;
+        public IReadOnlyList<Item> Items => _items;
 
         /// <summary>
         /// 현재 장착된 무기
         /// </summary>
-        public WeaponItem EquippedWeapon => _equippedWeapon;
+        public Item EquippedWeapon => _equippedWeapon;
+
+        [Inject]
+        public Inventory(ITableRepository tableRepository)
+        {
+            _tableRepository = tableRepository;
+        }
 
         /// <summary>
-        /// 현재 장착된 액티브 아이템
+        /// SkillComponent 설정
         /// </summary>
-        public ActiveItem EquippedActive => _equippedActive;
+        /// <param name="skillComponent">스킬 컴포넌트</param>
+        public void SetSkillComponent(SkillComponent skillComponent)
+        {
+            _skillComponent = skillComponent;
+        }
 
         /// <summary>
         /// 아이템 추가
         /// </summary>
-        public void AddItem(ItemBase item)
+        /// <param name="item">추가할 아이템</param>
+        public async UniTask AddItem(Item item)
         {
             if (item == null)
             {
@@ -40,128 +56,170 @@ namespace DungeonShooter
                 return;
             }
 
-            _items.Add(item);
+            // 스택 가능한 아이템인지 확인
+            var existingItem = FindStackableItem(item.ItemTableEntry.Id);
+            if (existingItem != null && existingItem.CanAddStack(item.StackCount))
+            {
+                // 기존 아이템에 스택 추가
+                var remaining = item.StackCount - existingItem.AddStack(item.StackCount);
+                if (remaining > 0)
+                {
+                    // 스택이 넘치면 새 아이템 생성
+                    var newItem = new Item(item.ItemTableEntry, remaining);
+                    _items.Add(newItem);
+                    await RegisterItemSkills(newItem);
+                }
+            }
+            else
+            {
+                // 새 아이템 추가
+                _items.Add(item);
+                await RegisterItemSkills(item);
+            }
+
             OnItemAdded?.Invoke(item);
+        }
+
+        /// <summary>
+        /// 아이템 장착
+        /// </summary>
+        /// <param name="item">장착할 아이템</param>
+        public async UniTask EquipItem(Item item)
+        {
+            if (item == null)
+            {
+                LogHandler.LogWarning<Inventory>("아이템이 null입니다.");
+                return;
+            }
+
+            // 무기 타입인지 확인
+            if (item.ItemTableEntry.ItemType != ItemType.Weapon)
+            {
+                LogHandler.LogWarning<Inventory>("무기 타입의 아이템만 장착할 수 있습니다.");
+                return;
+            }
+
+            // 인벤토리에 있는지 확인
+            if (!_items.Contains(item))
+            {
+                LogHandler.LogWarning<Inventory>("인벤토리에 없는 아이템입니다.");
+                return;
+            }
+
+            // 기존 무기 해제
+            if (_equippedWeapon != null)
+            {
+                UnregisterItemSkills(_equippedWeapon, true);
+                OnWeaponUnequipped?.Invoke(_equippedWeapon);
+            }
+
+            // 새 무기 장착
+            _equippedWeapon = item;
+            await RegisterItemSkills(item, true);
+
+            OnWeaponEquipped?.Invoke(item);
         }
 
         /// <summary>
         /// 아이템 제거
         /// </summary>
-        public bool RemoveItem(ItemBase item)
+        /// <param name="item">제거할 아이템</param>
+        public void RemoveItem(Item item)
         {
             if (item == null)
-                return false;
+            {
+                return;
+            }
 
             // 장착된 아이템인지 확인
-            if (item == _equippedWeapon || item == _equippedActive)
+            if (item == _equippedWeapon)
             {
-                LogHandler.LogWarning<Inventory>("장착된 아이템은 제거할 수 없습니다. 먼저 해제하세요.");
-                return false;
+                UnregisterItemSkills(item, isEquipped: true);
+                _equippedWeapon = null;
+            }
+            else
+            {
+                UnregisterItemSkills(item, isEquipped: false);
             }
 
-            var removed = _items.Remove(item);
-            if (removed)
-            {
-                OnItemRemoved?.Invoke(item);
-            }
-            return removed;
+            _items.Remove(item);
+            OnItemRemoved?.Invoke(item);
         }
 
         /// <summary>
-        /// 무기 장착 (기존 무기가 있으면 교체)
+        /// 스택 가능한 아이템 찾기
         /// </summary>
-        public bool EquipWeapon(WeaponItem weapon)
+        private Item FindStackableItem(int itemEntryId)
         {
-            if (weapon == null)
-            {
-                LogHandler.LogWarning<Inventory>("무기가 null입니다.");
-                return false;
-            }
-
-            // 인벤토리에 있는지 확인
-            if (!_items.Contains(weapon))
-            {
-                LogHandler.LogWarning<Inventory>("인벤토리에 없는 무기입니다.");
-                return false;
-            }
-
-            var oldWeapon = _equippedWeapon;
-            _equippedWeapon = weapon;
-            weapon.Equip();
-
-            if (oldWeapon != null)
-            {
-                OnWeaponUnequipped?.Invoke(oldWeapon);
-            }
-
-            OnWeaponEquipped?.Invoke(weapon);
-            return true;
+            return _items.Find(i => i.ItemTableEntry.Id == itemEntryId && 
+                                   i.StackCount < i.ItemTableEntry.MaxStackCount);
         }
 
         /// <summary>
-        /// 액티브 아이템 장착 (기존 액티브 아이템이 있으면 교체)
+        /// 아이템의 스킬 등록
         /// </summary>
-        public bool EquipActive(ActiveItem activeItem)
+        private async UniTask RegisterItemSkills(Item item, bool isEquipped = false)
         {
-            if (activeItem == null)
+            if (_skillComponent == null)
             {
-                LogHandler.LogWarning<Inventory>("액티브 아이템이 null입니다.");
-                return false;
+                return;
             }
 
-            // 인벤토리에 있는지 확인
-            if (!_items.Contains(activeItem))
+            var entry = item.ItemTableEntry;
+
+            // PassiveEffect 등록 (인벤토리에 들어온 모든 아이템)
+            if (entry.PassiveEffect > 0)
             {
-                LogHandler.LogWarning<Inventory>("인벤토리에 없는 액티브 아이템입니다.");
-                return false;
+                await _skillComponent.RegistSkill(entry.PassiveEffect);
             }
 
-            var oldActive = _equippedActive;
-            _equippedActive = activeItem;
-            activeItem.Equip();
-
-            if (oldActive != null)
+            // EquipEffect, ActiveEffect 등록 (무기 장착 시)
+            if (isEquipped && entry.ItemType == ItemType.Weapon)
             {
-                OnActiveUnequipped?.Invoke(oldActive);
-            }
+                if (entry.EquipEffect > 0)
+                {
+                    await _skillComponent.RegistSkill(entry.EquipEffect);
+                }
 
-            OnActiveEquipped?.Invoke(activeItem);
-            return true;
+                if (entry.ActiveEffect > 0)
+                {
+                    await _skillComponent.RegistSkill(entry.ActiveEffect);
+                }
+            }
         }
 
         /// <summary>
-        /// 특정 아이템 데이터를 소지하고 있는지 확인
+        /// 아이템의 스킬 해제
         /// </summary>
-        public int GetItemCount(ItemData itemData)
+        private void UnregisterItemSkills(Item item, bool isEquipped = false)
         {
-            if (itemData == null)
-                return 0;
+            if (_skillComponent == null)
+            {
+                return;
+            }
 
-            return _items.Count(i => i.ItemData == itemData);
+            var entry = item.ItemTableEntry;
+
+            // PassiveEffect 해제
+            if (entry.PassiveEffect > 0)
+            {
+                _skillComponent.UnregistSkill(entry.PassiveEffect);
+            }
+
+            // EquipEffect, ActiveEffect 해제 (무기 해제 시)
+            if (isEquipped && entry.ItemType == ItemType.Weapon)
+            {
+                if (entry.EquipEffect > 0)
+                {
+                    _skillComponent.UnregistSkill(entry.EquipEffect);
+                }
+
+                if (entry.ActiveEffect > 0)
+                {
+                    _skillComponent.UnregistSkill(entry.ActiveEffect);
+                }
+            }
         }
 
-        /// <summary>
-        /// 특정 아이템 데이터를 소지하고 있는지 확인
-        /// </summary>
-        public bool HasItem(ItemData itemData)
-        {
-            return GetItemCount(itemData) > 0;
-        }
-
-        /// <summary>
-        /// 특정 타입의 아이템 목록 조회
-        /// </summary>
-        public List<T> GetItemsOfType<T>() where T : ItemBase
-        {
-            return _items.OfType<T>().ToList();
-        }
-
-        // 이벤트들
-        public event Action<ItemBase> OnItemAdded;
-        public event Action<ItemBase> OnItemRemoved;
-        public event Action<WeaponItem> OnWeaponEquipped;
-        public event Action<WeaponItem> OnWeaponUnequipped;
-        public event Action<ActiveItem> OnActiveEquipped;
-        public event Action<ActiveItem> OnActiveUnequipped;
     }
 }
