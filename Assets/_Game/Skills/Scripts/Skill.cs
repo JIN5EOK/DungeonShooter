@@ -10,7 +10,7 @@ namespace DungeonShooter
     /// </summary>
     public class Skill : ISkill
     {
-        private SkillData _skillData;
+        private readonly SkillData _skillData;
         private readonly SkillTableEntry _skillTableEntry;
         private CancellationTokenSource _cooldownCancellationTokenSource;
         
@@ -18,61 +18,29 @@ namespace DungeonShooter
         public SkillTableEntry SkillTableEntry => _skillTableEntry;
         public bool IsCooldown { get; private set; }
         public float Cooldown { get; private set; }
-        public bool IsInitialized => _skillData != null;
         
         public event Action OnExecute;
         public Action<float> OnCooldownChanged { get; set; }
         public Action OnCooldownEnded { get; set; }
         
-        public Skill(SkillTableEntry skillTableEntry)
+        public Skill(SkillTableEntry skillTableEntry, SkillData skillData)
         {
             if (skillTableEntry == null)
             {
                 LogHandler.LogError<Skill>("SkillTableEntry가 null입니다.");
                 return;
             }
+
+            if (skillData == null)
+            {
+                LogHandler.LogError<Skill>("SkillData가 null입니다.");
+                return;
+            }
             
             _skillTableEntry = skillTableEntry;
+            _skillData = skillData;
             Cooldown = 0f;
             IsCooldown = false;
-        }
-
-        /// <summary>
-        /// SkillTableEntry의 SkillDataKey를 사용하여 SkillData를 로드합니다.
-        /// </summary>
-        /// <param name="resourceProvider">리소스 프로바이더</param>
-        public async UniTask InitializeAsync(IStageResourceProvider resourceProvider)
-        {
-            if (_skillTableEntry == null)
-            {
-                LogHandler.LogError<Skill>("SkillTableEntry가 null입니다.");
-                return;
-            }
-
-            if (resourceProvider == null)
-            {
-                LogHandler.LogError<Skill>("ResourceProvider가 null입니다.");
-                return;
-            }
-
-            if (_skillData != null)
-            {
-                LogHandler.LogWarning<Skill>("이미 초기화된 스킬입니다.");
-                return;
-            }
-
-            try
-            {
-                _skillData = await resourceProvider.GetAsset<SkillData>(_skillTableEntry.SkillDataKey);
-                if (_skillData == null)
-                {
-                    LogHandler.LogError<Skill>($"SkillData를 로드할 수 없습니다: {_skillTableEntry.SkillDataKey}");
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHandler.LogError<Skill>(ex, $"SkillData 로드 실패: {_skillTableEntry.SkillDataKey}");
-            }
         }
         
         /// <summary>
@@ -82,12 +50,6 @@ namespace DungeonShooter
         /// <returns>실행 성공 여부</returns>
         public async UniTask<bool> Execute(EntityBase target)
         {
-            if (_skillData == null)
-            {
-                LogHandler.LogError<Skill>($"SkillData가 초기화되지 않았습니다: {_skillTableEntry?.Id}");
-                return false;
-            }
-
             if (IsCooldown)
             {
                 LogHandler.Log<Skill>($"스킬 쿨다운 중: {SkillTableEntry.Id}({_skillTableEntry.SkillName})");

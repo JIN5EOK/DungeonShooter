@@ -17,8 +17,6 @@ namespace DungeonShooter
         
         private readonly List<Item> _items = new List<Item>();
         private Item _equippedWeapon;
-        private readonly ITableRepository _tableRepository;
-        private readonly IStageResourceProvider _resourceProvider;
         private EntityBase _owner;
 
         // 인벤토리 아이템 목록 (읽기 전용)
@@ -27,12 +25,6 @@ namespace DungeonShooter
         // 현재 장착된 무기
         public Item EquippedWeapon => _equippedWeapon;
 
-        [Inject]
-        public Inventory(ITableRepository tableRepository, IStageResourceProvider resourceProvider)
-        {
-            _tableRepository = tableRepository;
-            _resourceProvider = resourceProvider;
-        }
 
         /// <summary>
         /// 인벤토리 소유자를 설정합니다.
@@ -63,22 +55,26 @@ namespace DungeonShooter
                 var remaining = item.StackCount - existingItem.AddStack(item.StackCount);
                 if (remaining > 0)
                 {
-                    // 스택이 넘치면 새 아이템 생성
-                    var newItem = new Item(item.ItemTableEntry, remaining);
-                    await newItem.InitializeSkillsAsync(_tableRepository, _resourceProvider);
-                    _items.Add(newItem);
+                    // 받은 아이템의 스택 개수를 남은 개수로 설정하고 사용
+                    item.StackCount = remaining;
+                    _items.Add(item);
                     
                     // 패시브 스킬 활성화
-                    if (newItem.PassiveSkill != null)
+                    if (item.PassiveSkill != null)
                     {
-                        newItem.ActivatePassiveSkill(_owner);
+                        item.ActivatePassiveSkill(_owner);
                     }
                 }
             }
             else
             {
-                // 새 아이템 추가
-                await item.InitializeSkillsAsync(_tableRepository, _resourceProvider);
+                // 새 아이템 추가 (이미 초기화되어 있다고 가정)
+                // 초기화되지 않은 경우를 대비해 확인
+                if (!item.IsSkillsInitialized())
+                {
+                    await item.InitializeSkillsAsync();
+                }
+                
                 _items.Add(item);
                 
                 // 패시브 스킬 활성화

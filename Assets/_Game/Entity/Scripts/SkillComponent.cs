@@ -12,15 +12,13 @@ namespace DungeonShooter
     public class SkillComponent : MonoBehaviour
     {
         private Dictionary<int, Skill> _skills = new Dictionary<int, Skill>();
-        private IStageResourceProvider _resourceProvider;
-        private ITableRepository _tableRepository;
+        private SkillFactory _skillFactory;
         private EntityBase _owner;
 
         [Inject]
-        private void Construct(IStageResourceProvider resourceProvider, ITableRepository tableRepository)
+        private void Construct(SkillFactory skillFactory)
         {
-            _resourceProvider = resourceProvider;
-            _tableRepository = tableRepository;
+            _skillFactory = skillFactory;
         }
 
         private void Awake()
@@ -69,37 +67,19 @@ namespace DungeonShooter
                 return false;
             }
 
-            if (_resourceProvider == null)
+            if (_skillFactory == null)
             {
-                LogHandler.LogError<SkillComponent>("ResourceProvider가 null입니다.");
-                return false;
-            }
-
-            if (_tableRepository == null)
-            {
-                LogHandler.LogError<SkillComponent>("TableRepository가 null입니다.");
+                LogHandler.LogError<SkillComponent>("SkillFactory가 null입니다.");
                 return false;
             }
 
             try
             {
-                // SkillTableEntry 조회
-                var skillTableEntry = _tableRepository.GetTableEntry<SkillTableEntry>(skillEntryId);
-                if (skillTableEntry == null)
+                // SkillFactory를 통해 Skill 생성
+                var skill = await _skillFactory.CreateSkillAsync(skillEntryId);
+                if (skill == null)
                 {
-                    LogHandler.LogError<SkillComponent>($"SkillTableEntry를 찾을 수 없습니다: {skillEntryId}");
-                    return false;
-                }
-
-                // Skill 인스턴스 생성
-                var skill = new Skill(skillTableEntry);
-                
-                // SkillData 로드 및 초기화
-                await skill.InitializeAsync(_resourceProvider);
-                
-                if (!skill.IsInitialized)
-                {
-                    LogHandler.LogError<SkillComponent>($"Skill 초기화 실패: {skillEntryId}");
+                    LogHandler.LogError<SkillComponent>($"Skill 생성 실패: {skillEntryId}");
                     return false;
                 }
 
@@ -111,7 +91,7 @@ namespace DungeonShooter
                     skill.Activate(_owner);
                 }
 
-                LogHandler.Log<SkillComponent>($"스킬 등록 완료: {skillEntryId} ({skillTableEntry.SkillName})");
+                LogHandler.Log<SkillComponent>($"스킬 등록 완료: {skillEntryId} ({skill.SkillTableEntry.SkillName})");
                 return true;
             }
             catch (Exception e)

@@ -19,7 +19,6 @@ namespace DungeonShooter
         private SkillComponent _skillComponent;
         private InteractComponent _interactComponent;
         private IStageResourceProvider _resourceProvider;
-        private Inventory _inventory;
         
         [Inject]
         private async UniTask Construct(
@@ -29,14 +28,10 @@ namespace DungeonShooter
         {
             _resourceProvider = resourceProvider;
             _inputManager = inputManager;
-            _inventory = inventory;
             SubscribeInputEvent();
             
             _skillComponent = _resourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
             await _skillComponent.RegistSkill(0); // 수정 필요
-            
-            // Inventory 이벤트 구독
-            SubscribeInventoryEvents();
         }
 
         protected override async UniTask Start()
@@ -64,28 +59,6 @@ namespace DungeonShooter
             _inputManager.OnInteractPressed += HandleInteractInput;
         }
 
-        // ==================== 인벤토리 이벤트 구독/해제 ====================
-        /// <summary>
-        /// 인벤토리 이벤트를 구독합니다.
-        /// </summary>
-        private void SubscribeInventoryEvents()
-        {
-            if (_inventory == null) return;
-
-            _inventory.OnItemSkillRegister += HandleSkillRegister;
-            _inventory.OnItemSkillUnregister += HandleSkillUnregister;
-        }
-
-        /// <summary>
-        /// 인벤토리 이벤트 구독을 해제합니다.
-        /// </summary>
-        private void UnsubscribeInventoryEvents()
-        {
-            if (_inventory == null) return;
-
-            _inventory.OnItemSkillRegister -= HandleSkillRegister;
-            _inventory.OnItemSkillUnregister -= HandleSkillUnregister;
-        }
 
         /// <summary>
         /// 스킬 등록 처리
@@ -172,7 +145,6 @@ namespace DungeonShooter
         private void OnDestroy()
         {
             UnsubscribeInputEvent();
-            UnsubscribeInventoryEvents();
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -18,6 +19,8 @@ namespace DungeonShooter
         /// 스택 개수
         /// </summary>
         public int StackCount { get; set; }
+
+        private readonly SkillFactory _skillFactory;
 
         /// <summary>
         /// 소비 아이템 사용 스킬 (Consume 전용)
@@ -43,8 +46,9 @@ namespace DungeonShooter
         /// 아이템 생성자
         /// </summary>
         /// <param name="itemTableEntry">아이템 테이블 엔트리</param>
-        /// <param name="stackCount">초기 스택 개수 (기본값: 1)</param>
-        public Item(ItemTableEntry itemTableEntry, int stackCount = 1)
+        /// <param name="skillFactory">스킬 팩토리</param>
+        [Inject]
+        public Item(ItemTableEntry itemTableEntry, SkillFactory skillFactory)
         {
             if (itemTableEntry == null)
             {
@@ -53,7 +57,8 @@ namespace DungeonShooter
             }
 
             ItemTableEntry = itemTableEntry;
-            StackCount = Math.Max(1, Math.Min(stackCount, itemTableEntry.MaxStackCount));
+            StackCount = 1;
+            _skillFactory = skillFactory;
         }
 
         /// <summary>
@@ -80,15 +85,28 @@ namespace DungeonShooter
         }
 
         /// <summary>
+        /// 스킬이 초기화되었는지 확인합니다.
+        /// </summary>
+        public bool IsSkillsInitialized()
+        {
+            // 스킬이 하나라도 생성되어 있으면 초기화된 것으로 간주
+            return UseSkill != null || PassiveSkill != null || EquipSkill != null || ActiveSkill != null;
+        }
+
+        /// <summary>
         /// ItemTableEntry를 참고하여 스킬을 초기화합니다.
         /// </summary>
-        /// <param name="tableRepository">테이블 리포지토리</param>
-        /// <param name="resourceProvider">리소스 프로바이더</param>
-        public async UniTask InitializeSkillsAsync(ITableRepository tableRepository, IStageResourceProvider resourceProvider)
+        public async UniTask InitializeSkillsAsync()
         {
-            if (ItemTableEntry == null || tableRepository == null || resourceProvider == null)
+            if (ItemTableEntry == null || _skillFactory == null)
             {
                 LogHandler.LogError<Item>("스킬 초기화에 필요한 데이터가 null입니다.");
+                return;
+            }
+
+            // 이미 초기화된 경우 스킵
+            if (IsSkillsInitialized())
+            {
                 return;
             }
 
@@ -99,59 +117,31 @@ namespace DungeonShooter
                 // UseSkill 생성 (Consume 전용)
                 if (entry.UseEffect > 0)
                 {
-                    UseSkill = await CreateSkill(entry.UseEffect, tableRepository, resourceProvider);
+                    UseSkill = await _skillFactory.CreateSkillAsync(entry.UseEffect);
                 }
 
                 // PassiveSkill 생성 (Passive 전용)
                 if (entry.PassiveEffect > 0)
                 {
-                    PassiveSkill = await CreateSkill(entry.PassiveEffect, tableRepository, resourceProvider);
+                    PassiveSkill = await _skillFactory.CreateSkillAsync(entry.PassiveEffect);
                 }
 
                 // EquipSkill 생성 (Weapon 전용)
                 if (entry.ItemType == ItemType.Weapon && entry.EquipEffect > 0)
                 {
-                    EquipSkill = await CreateSkill(entry.EquipEffect, tableRepository, resourceProvider);
+                    EquipSkill = await _skillFactory.CreateSkillAsync(entry.EquipEffect);
                 }
 
                 // ActiveSkill 생성 (Weapon 전용)
                 if (entry.ItemType == ItemType.Weapon && entry.ActiveEffect > 0)
                 {
-                    ActiveSkill = await CreateSkill(entry.ActiveEffect, tableRepository, resourceProvider);
+                    ActiveSkill = await _skillFactory.CreateSkillAsync(entry.ActiveEffect);
                 }
             }
             catch (Exception ex)
             {
                 LogHandler.LogError<Item>(ex, $"아이템 스킬 초기화 실패: {entry.Id}");
             }
-        }
-
-        /// <summary>
-        /// 스킬을 생성합니다.
-        /// </summary>
-        private async UniTask<Skill> CreateSkill(int skillEntryId, ITableRepository tableRepository, IStageResourceProvider resourceProvider)
-        {
-            // SkillTableEntry 조회
-            var skillTableEntry = tableRepository.GetTableEntry<SkillTableEntry>(skillEntryId);
-            if (skillTableEntry == null)
-            {
-                LogHandler.LogError<Item>($"SkillTableEntry를 찾을 수 없습니다: {skillEntryId}");
-                return null;
-            }
-
-            // Skill 인스턴스 생성
-            var skill = new Skill(skillTableEntry);
-            
-            // SkillData 로드 및 초기화
-            await skill.InitializeAsync(resourceProvider);
-            
-            if (!skill.IsInitialized)
-            {
-                LogHandler.LogError<Item>($"Skill 초기화 실패: {skillEntryId}");
-                return null;
-            }
-
-            return skill;
         }
 
         /// <summary>
