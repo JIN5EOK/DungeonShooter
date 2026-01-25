@@ -18,47 +18,29 @@ namespace DungeonShooter
     public class StageResourceProvider : SceneResourceProvider, IStageResourceProvider
     {
         private readonly StageConfig _stageConfig;
-
         private List<string> EnemyAddresses { get; set; }
-        private TaskCompletionSource<bool> _initializationTcs;
-        private bool _isInitialized;
-        
         [Inject]
         public StageResourceProvider(StageContext context, IObjectResolver resolver) : base(resolver)
         {
             _stageConfig = context.StageConfig;
+            Initialize();
         }
 
         /// <summary>
         /// StageConfig의 Label 데이터를 기반으로 에셋의 어드레스 목록을 로드하여 저장합니다.
         /// </summary>
-        private async UniTask InitializeAsync(TaskCompletionSource<bool> initializationTcs)
+        private void Initialize()
         {
             if (!string.IsNullOrEmpty(_stageConfig.StageEnemyLabel.labelString))
             {
                 var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.StageEnemyLabel.labelString);
-                await handle.Task;
+                handle.WaitForCompletion();
                 EnemyAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
 
                 Addressables.Release(handle);
             }
-            initializationTcs.SetResult(true);
-            _isInitialized = true;
         }
         
-        /// <summary>
-        /// 초기화가 완료될 때까지 대기합니다. 이미 초기화되어 있으면 즉시 반환합니다.
-        /// </summary>
-        private async UniTask EnsureInitializedAsync()
-        {
-            if (_initializationTcs == null)
-            {
-                _initializationTcs = new TaskCompletionSource<bool>();
-                await InitializeAsync(_initializationTcs);
-            }
-
-            await _initializationTcs.Task;
-        }
     
         /// <summary>
         /// Ground 타일을 가져옵니다.
@@ -75,7 +57,6 @@ namespace DungeonShooter
         /// </summary>
         public async UniTask<Enemy> GetRandomEnemy()
         {
-            await EnsureInitializedAsync();
             if (EnemyAddresses == null || EnemyAddresses.Count == 0)
             {
                 Debug.LogWarning($"[{nameof(StageResourceProvider)}] 적 어드레스 목록이 비어있습니다.");

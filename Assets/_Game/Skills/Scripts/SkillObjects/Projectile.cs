@@ -28,7 +28,7 @@ namespace DungeonShooter
         {
             _owner = owner;
             _effects = effects;
-
+            _skillTableEntry = skillTableEntry;
             // TODO: 이동 전략에 대한 커스텀 기능 필요
             if (_owner.TryGetComponent(out MovementComponent movement))
             {

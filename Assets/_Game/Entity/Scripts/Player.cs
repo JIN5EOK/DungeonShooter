@@ -18,20 +18,20 @@ namespace DungeonShooter
         private MovementComponent _movementComponent;
         private SkillComponent _skillComponent;
         private InteractComponent _interactComponent;
-        private IStageResourceProvider _resourceProvider;
+        private ISceneResourceProvider _resourceProvider;
         
         [Inject]
         private async UniTask Construct(
-            IStageResourceProvider resourceProvider, 
+            ISceneResourceProvider resourceProvider, 
             InputManager inputManager,
             Inventory inventory)
         {
             _resourceProvider = resourceProvider;
             _inputManager = inputManager;
-            SubscribeInputEvent();
-            
+
             _skillComponent = _resourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
-            await _skillComponent.RegistSkill(0); // 수정 필요
+            await _skillComponent.RegistSkill(14000101);
+            SubscribeInputEvent();
         }
 
         protected override async UniTask Start()
@@ -58,25 +58,6 @@ namespace DungeonShooter
             _inputManager.OnSkill1Pressed += HandleSkill1Input;
             _inputManager.OnInteractPressed += HandleInteractInput;
         }
-
-
-        /// <summary>
-        /// 스킬 등록 처리
-        /// </summary>
-        private async void HandleSkillRegister(int skillEntryId)
-        {
-            if (_skillComponent == null) return;
-            await _skillComponent.RegistSkill(skillEntryId);
-        }
-
-        /// <summary>
-        /// 스킬 해제 처리
-        /// </summary>
-        private void HandleSkillUnregister(int skillEntryId)
-        {
-            if (_skillComponent == null) return;
-            _skillComponent.UnregistSkill(skillEntryId);
-        }
         
         // ==================== 입력 처리 ====================
         private void HandleMoveInputChanged(Vector2 input)
@@ -86,7 +67,7 @@ namespace DungeonShooter
 
         private void HandleSkill1Input()
         {
-            _skillComponent.UseSkill(0, this).Forget();
+            _skillComponent.UseSkill(14000101, this).Forget();
         }
         private void HandleInteractInput()
         {
