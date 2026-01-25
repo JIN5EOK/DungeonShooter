@@ -91,21 +91,22 @@ namespace DungeonShooter
                     return false;
                 }
 
-                // SkillData 로드
-                var skillData = await _resourceProvider.GetAsset<SkillData>(skillTableEntry.SkillDataKey);
-
-                if (skillData == null)
+                // Skill 인스턴스 생성
+                var skill = new Skill(skillTableEntry);
+                
+                // SkillData 로드 및 초기화
+                await skill.InitializeAsync(_resourceProvider);
+                
+                if (!skill.IsInitialized)
                 {
-                    LogHandler.LogError<SkillComponent>($"SkillData를 로드할 수 없습니다: {skillTableEntry.SkillDataKey}");
+                    LogHandler.LogError<SkillComponent>($"Skill 초기화 실패: {skillEntryId}");
                     return false;
                 }
 
-                // Skill 인스턴스 생성
-                var skill = new Skill(skillData, skillTableEntry);
                 _skills[skillEntryId] = skill;
 
                 // 패시브 효과 자동 활성화
-                if (skillData.IsPassiveSkill)
+                if (skill.SkillData.IsPassiveSkill)
                 {
                     skill.Activate(_owner);
                 }
