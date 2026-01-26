@@ -20,13 +20,17 @@ namespace DungeonShooter
         private SkillComponent _skillComponent;
         private InteractComponent _interactComponent;
         private ISceneResourceProvider _resourceProvider;
-        
+        private Inventory _inventory;
         [Inject]
-        private async UniTaskVoid Construct(ISceneResourceProvider resourceProvider, InputManager inputManager)
+        private async UniTaskVoid Construct(ISceneResourceProvider resourceProvider, InputManager inputManager, Inventory inventory, ItemFactory itemFactory)
         {
             _resourceProvider = resourceProvider;
             _inputManager = inputManager;
-            
+            _inventory = inventory;
+
+            var item = await itemFactory.CreateItemAsync(15000001);
+            await _inventory.AddItem(item);
+            await _inventory.EquipItem(item);
             _skillComponent = _resourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
             await _skillComponent.RegistSkill(14000101);
             
@@ -50,6 +54,7 @@ namespace DungeonShooter
 
             _inputManager.OnMoveInputChanged += HandleMoveInputChanged;
             _inputManager.OnSkill1Pressed += HandleSkill1Input;
+            _inputManager.OnSkill2Pressed += HandleSkill2Input;
             _inputManager.OnInteractPressed += HandleInteractInput;
         }
         
@@ -60,6 +65,11 @@ namespace DungeonShooter
         }
 
         private void HandleSkill1Input()
+        {
+            _inventory.EquippedWeapon.ActiveSkill.Execute(this).Forget();
+        }
+        
+        private void HandleSkill2Input()
         {
             _skillComponent.UseSkill(14000101, this).Forget();
         }
@@ -131,6 +141,7 @@ namespace DungeonShooter
 
             _inputManager.OnMoveInputChanged -= HandleMoveInputChanged;
             _inputManager.OnSkill1Pressed -= HandleSkill1Input;
+            _inputManager.OnSkill1Pressed -= HandleSkill2Input;
             _inputManager.OnInteractPressed -= HandleInteractInput;
         }
 

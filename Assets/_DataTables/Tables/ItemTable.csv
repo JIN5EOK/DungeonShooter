@@ -1,2 +1,2 @@
-﻿Id,ItemName,ItemDescription,ItemType,MaxStackCount,UseEffect,PassiveEffect,EquipEffect,ActiveEffect,ItemIcon
-1,item_example,Example Item,Consume,10,1,0,0,0,item_icon
+Id,ItemName,ItemDescription,ItemType,MaxStackCount,UseEffect,PassiveEffect,EquipEffect,ActiveEffect,ItemIcon
+15000001,롱소드,평범한 철제 장검입니다.,Weapon,1,,,,14000104,item_icon
