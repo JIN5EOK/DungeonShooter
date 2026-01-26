@@ -8,7 +8,7 @@ namespace DungeonShooter
     /// CSV 등 테이블을 통해 편집되는 스킬의 수치 정보
     /// </summary>
     [Serializable]
-    public class SkillTableEntry
+    public class SkillTableEntry : ITableEntry
     {
         /// <summary>식별 ID </summary>
         public int Id { get; set; }

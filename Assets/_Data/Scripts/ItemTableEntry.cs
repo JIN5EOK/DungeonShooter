@@ -17,7 +17,7 @@ namespace DungeonShooter
     /// CSV 등 테이블을 통해 편집되는 아이템의 수치 정보
     /// </summary>
     [Serializable]
-    public class ItemTableEntry
+    public class ItemTableEntry : ITableEntry
     {
         /// <summary>
         /// 식별 ID

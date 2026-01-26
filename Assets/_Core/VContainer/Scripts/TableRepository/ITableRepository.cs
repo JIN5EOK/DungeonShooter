@@ -12,6 +12,6 @@ namespace DungeonShooter
         /// <typeparam name="T">테이블 엔트리 타입</typeparam>
         /// <param name="id">엔트리 ID</param>
         /// <returns>테이블 엔트리, 없으면 null</returns>
-        T GetTableEntry<T>(int id) where T : class;
+        T GetTableEntry<T>(int id) where T : class, ITableEntry;
     }
 }
