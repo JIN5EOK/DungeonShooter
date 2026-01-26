@@ -255,9 +255,9 @@ namespace DungeonShooter
                 var address = roomData.GetAddress(objectData.Index);
 
                 GameObject instance = 
-                    address == RoomConstants.RANDOM_ENEMY_SPAWN_ADDRESS
+                    address == RoomConstants.RANDOM_ENEMY_SPAWN_ADDRESS && Application.isPlaying
                     ? (await resourceProvider.GetRandomEnemyAsync()).gameObject : 
-                    address == RoomConstants.PLAYER_SPAWN_ADDRESS 
+                    address == RoomConstants.PLAYER_SPAWN_ADDRESS  && Application.isPlaying
                     ? (await resourceProvider.GetPlayerAsync()).gameObject
                     : await resourceProvider.GetInstanceAsync(roomData.GetAddress(objectData.Index));
                 
@@ -284,9 +284,9 @@ namespace DungeonShooter
                 var address = roomData.GetAddress(objectData.Index);
 
                 GameObject instance = 
-                    address == RoomConstants.RANDOM_ENEMY_SPAWN_ADDRESS
+                    address == RoomConstants.RANDOM_ENEMY_SPAWN_ADDRESS && Application.isPlaying
                     ? resourceProvider.GetRandomEnemySync().gameObject : 
-                    address == RoomConstants.PLAYER_SPAWN_ADDRESS 
+                    address == RoomConstants.PLAYER_SPAWN_ADDRESS && Application.isPlaying
                     ? resourceProvider.GetPlayerSync().gameObject
                     : resourceProvider.GetInstanceSync(roomData.GetAddress(objectData.Index));
                 

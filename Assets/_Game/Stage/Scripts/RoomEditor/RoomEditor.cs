@@ -160,7 +160,7 @@ namespace DungeonShooter
                 RoomSizeX = _roomSizeX,
                 RoomSizeY = _roomSizeY
             };
-
+            RoomCreateHelper.ClearTiles(transform);
             // Room 구조 생성
             RoomCreateHelper.GetOrCreateRoomStructure(transform, gameObject.name);
 

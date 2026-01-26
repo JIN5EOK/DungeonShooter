@@ -26,14 +26,7 @@ namespace DungeonShooter
         {
             _addressablesScope = new AddressablesScope();
         }
-
-        /// <summary>
-        /// Ground 타일을 비동기로 가져옵니다.
-        /// </summary>
-        public async UniTask<TileBase> GetGroundTileAsync()
-        {
-            return GetGroundTileSync();
-        }
+        
         /// <summary>
         /// Ground 타일을 동기로 가져옵니다.
         /// </summary>
@@ -43,50 +36,22 @@ namespace DungeonShooter
             handle.WaitForCompletion();
             return handle.Result;
         }
-
+        
         /// <summary>
-        /// 랜덤 적을 가져옵니다.
-        /// 에디터에서는 사용하지 않으므로 null을 반환합니다.
+        /// 주소에 해당하는 에셋을 동기적으로 가져옵니다.
         /// </summary>
-        public async UniTask<Enemy> GetRandomEnemyAsync()
+        public T GetAssetSync<T>(string address) where T : Object
         {
-            return null;
-        }
+            var handle = _addressablesScope.LoadAssetAsync<T>(address);
+            handle.WaitForCompletion();
 
-        /// <summary>
-        /// 랜덤 적을 동기적으로 가져옵니다.
-        /// 에디터에서는 사용하지 않으므로 null을 반환합니다.
-        /// </summary>
-        public Enemy GetRandomEnemySync()
-        {
-            return null;
-        }
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogWarning($"[{nameof(EditorStageResourceProvider)}] 에셋 로드 실패: {address}");
+                return null;
+            }
 
-        /// <summary>
-        /// 플레이어를 가져옵니다.
-        /// 에디터에서는 사용하지 않으므로 null을 반환합니다.
-        /// </summary>
-        public async UniTask<Player> GetPlayerAsync()
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// 플레이어를 동기적으로 가져옵니다.
-        /// 에디터에서는 사용하지 않으므로 null을 반환합니다.
-        /// </summary>
-        public Player GetPlayerSync()
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// 주소에 해당하는 인스턴스를 생성합니다.
-        /// 에디터에서는 프리팹 연결을 유지하기 위해 PrefabUtility.InstantiatePrefab을 사용합니다.
-        /// </summary>
-        public async UniTask<GameObject> GetInstanceAsync(string address)
-        {
-            return GetInstanceSync(address);
+            return handle.Result;
         }
 
         /// <summary>
@@ -116,46 +81,21 @@ namespace DungeonShooter
             var instance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
             return instance;
         }
-
-        /// <summary>
-        /// 주소에 해당하는 에셋을 가져옵니다.
-        /// </summary>
-        public async UniTask<T> GetAssetAsync<T>(string address) where T : Object
-        {
-            return GetAssetSync<T>(address);
-        }
-
-        /// <summary>
-        /// 주소에 해당하는 에셋을 동기적으로 가져옵니다.
-        /// </summary>
-        public T GetAssetSync<T>(string address) where T : Object
-        {
-            var handle = _addressablesScope.LoadAssetAsync<T>(address);
-            handle.WaitForCompletion();
-
-            if (handle.Status != AsyncOperationStatus.Succeeded)
-            {
-                Debug.LogWarning($"[{nameof(EditorStageResourceProvider)}] 에셋 로드 실패: {address}");
-                return null;
-            }
-
-            return handle.Result;
-        }
-
-        public T AddOrGetComponentWithInejct<T>(GameObject go) where T : Component
-        {
-            throw new NotImplementedException();
-        }
-
-        public T AddComponentWithInejct<T>(GameObject go) where T : Component
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public void Dispose()
         {
             _addressablesScope?.Dispose();
         }
+        
+        public async UniTask<TileBase> GetGroundTileAsync() => throw new NotImplementedException();
+        public async UniTask<Enemy> GetRandomEnemyAsync() => throw new NotImplementedException();
+        public Enemy GetRandomEnemySync() => throw new NotImplementedException();
+        public async UniTask<Player> GetPlayerAsync() => throw new NotImplementedException();
+        public Player GetPlayerSync() => throw new NotImplementedException();
+        public async UniTask<GameObject> GetInstanceAsync(string address) => throw new NotImplementedException();
+        public async UniTask<T> GetAssetAsync<T>(string address) where T : Object => throw new NotImplementedException();
+        public T AddOrGetComponentWithInejct<T>(GameObject go) where T : Component => throw new NotImplementedException();
+        public T AddComponentWithInejct<T>(GameObject go) where T : Component => throw new NotImplementedException();
     }
 }
 #endif
