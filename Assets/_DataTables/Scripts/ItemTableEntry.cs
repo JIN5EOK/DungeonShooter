@@ -19,34 +19,11 @@ namespace DungeonShooter
     [Serializable]
     public class ItemTableEntry : ITableEntry
     {
-        /// <summary>
-        /// 식별 ID
-        /// </summary>
         public int Id { get; set; }
-
-        /// <summary>
-        /// 아이템 이름
-        /// </summary>
         public string ItemName { get; set; }
-
-        /// <summary>
-        /// 아이템 설명
-        /// </summary>
         public string ItemDescription { get; set; }
-
-        /// <summary>
-        /// 아이템 타입
-        /// </summary>
         public ItemType ItemType { get; set; }
-
-        /// <summary>
-        /// 최대 스택 개수
-        /// </summary>
         public int MaxStackCount { get; set; }
-
-        /// <summary>
-        /// 아이템 사용 효과 (SkillTableEntry ID, Consume 전용)
-        /// </summary>
         public int UseEffect { get; set; }
 
         /// <summary>
