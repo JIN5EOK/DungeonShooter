@@ -116,31 +116,6 @@ namespace DungeonShooter
             groundTilemap.ClearAllTiles();
             decoTilemap.ClearAllTiles();
         }
-        /// <summary>
-        /// 베이스 타일을 비동기적으로 배치합니다.
-        /// </summary>
-        /// <param name="stageRoot">스테이지 루트 Transform</param>
-        /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
-        /// <param name="roomData">방 데이터</param>
-        /// <param name="tileRepository">타일 리포지토리</param>
-        public static async Task PlaceBaseTiles(Transform stageRoot, Vector2 centerPos, RoomData roomData, ITileRepository tileRepository)
-        {
-            var groundTile = await tileRepository.GetGroundTileAsync();
-            PlaceBaseTiles(stageRoot, centerPos, roomData, groundTile);
-        }
-
-        /// <summary>
-        /// 베이스 타일을 동기적으로 배치합니다.
-        /// </summary>
-        /// <param name="stageRoot">스테이지 루트 Transform</param>
-        /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
-        /// <param name="roomData">방 데이터</param>
-        /// <param name="tileRepository">타일 리포지토리</param>
-        public static void PlaceBaseTilesSync(Transform stageRoot, Vector2 centerPos, RoomData roomData, ITileRepository tileRepository)
-        {
-            var groundTile = tileRepository.GetGroundTileSync();
-            PlaceBaseTiles(stageRoot, centerPos, roomData, groundTile);
-        }
 
         /// <summary>
         /// 베이스 타일 배치 로직
