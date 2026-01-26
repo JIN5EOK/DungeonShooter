@@ -15,7 +15,7 @@ namespace DungeonShooter
     {
         [SerializeField]
         [Tooltip("방 에디터 프리셋 리소스 설정")]
-        private EditorStageResourceProvider _resourceProvider;
+        private SceneResourceProviderEditor _resourceProvider;
 
         [SerializeField]
         [Tooltip("Ground 타일 (방 크기 표시용)")]
