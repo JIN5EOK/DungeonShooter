@@ -79,17 +79,21 @@ classDiagram
 
 # 임시작성
 
-### 플레이어 게임 오브젝트 클래스 관계
+### 플레이어 캐릭터 초기화 과정
 ```mermaid
 classDiagram
-    class PlayerCharacterConfig{
-        +Stats : EntityStats
-        // 그 외 초기화에 필요한 정보
+    class PlayerConfigTableEntry["Player 캐릭터별 데이터 테이블 데이터"]{
+        int id
+        string Name
+        string Description
+        string GameObjectKey // 플레이어 게임오브젝트 어드레서블 주소
+        string StartWeaponId // 시작 무기 ItemTableEntry.Id
+        string Skill1Id // 1번 스킬 SkillTableEntry.Id
+        string Skill2Id // 2번 스킬 SkillTableEntry.Id
     }
-
-    Player --> PlayerCharacterConfig : 사용하여 플레이어 캐릭터 초기화, (스탯, 스킬 등..)
-    Player --> InputManager : 플레이어 입력 이벤트 등록/해제
-    Player --> EntityStatsComponent : 스텟 초기화
+    ITableEntry <|.. PlayerConfigTableEntry
+    
+    PlayerConfigTableEntry <-- PlayerFactory : 플레이어 생성시 참조
 ```
 
 ### 플레이어 오브젝트 초기화 관련 구상
