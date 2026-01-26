@@ -1,5 +1,1 @@
-* 플레이어 수정
-  * PlayerConfig 추가
-
-* 스킬 팩토리 추가
-  * 스킬 인스턴스 생성시 필요한 의존성 주입 포함
+* PlayerCharacterConfig, StageConfig 테이블 기반으로 변경하기
