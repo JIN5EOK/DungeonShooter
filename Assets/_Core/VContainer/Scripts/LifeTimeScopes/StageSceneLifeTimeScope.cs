@@ -12,7 +12,10 @@ namespace DungeonShooter
         {
             builder.Register<CoinInventory>(Lifetime.Scoped);
             builder.Register<Inventory>(Lifetime.Scoped);
-            builder.Register<StageResourceProvider>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<SceneResourceProvider>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<TileRepository>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<PlayerFactory>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<EnemyFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<RoomDataRepository>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<ItemFactory>(Lifetime.Scoped);
             builder.Register<SkillFactory>(Lifetime.Scoped);

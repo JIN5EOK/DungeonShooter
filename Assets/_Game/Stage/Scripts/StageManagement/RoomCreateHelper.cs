@@ -122,10 +122,10 @@ namespace DungeonShooter
         /// <param name="stageRoot">스테이지 루트 Transform</param>
         /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
         /// <param name="roomData">방 데이터</param>
-        /// <param name="stageResourceProvider">리소스 제공자</param>
-        public static async Task PlaceBaseTiles(Transform stageRoot, Vector2 centerPos, RoomData roomData, IStageResourceProvider stageResourceProvider)
+        /// <param name="tileRepository">타일 리포지토리</param>
+        public static async Task PlaceBaseTiles(Transform stageRoot, Vector2 centerPos, RoomData roomData, ITileRepository tileRepository)
         {
-            var groundTile = await stageResourceProvider.GetGroundTileAsync();
+            var groundTile = await tileRepository.GetGroundTileAsync();
             PlaceBaseTiles(stageRoot, centerPos, roomData, groundTile);
         }
 
@@ -135,10 +135,10 @@ namespace DungeonShooter
         /// <param name="stageRoot">스테이지 루트 Transform</param>
         /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
         /// <param name="roomData">방 데이터</param>
-        /// <param name="stageResourceProvider">리소스 제공자</param>
-        public static void PlaceBaseTilesSync(Transform stageRoot, Vector2 centerPos, RoomData roomData, IStageResourceProvider stageResourceProvider)
+        /// <param name="tileRepository">타일 리포지토리</param>
+        public static void PlaceBaseTilesSync(Transform stageRoot, Vector2 centerPos, RoomData roomData, ITileRepository tileRepository)
         {
-            var groundTile = stageResourceProvider.GetGroundTileSync();
+            var groundTile = tileRepository.GetGroundTileSync();
             PlaceBaseTiles(stageRoot, centerPos, roomData, groundTile);
         }
 
@@ -174,10 +174,10 @@ namespace DungeonShooter
         /// <param name="stageRoot">스테이지 루트 Transform</param>
         /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
         /// <param name="roomData">방 데이터</param>
-        /// <param name="stageResourceProvider">리소스 제공자</param>
-        public static async Task PlaceAdditionalTilesAsync(Transform stageRoot, Vector2 centerPos, RoomData roomData, IStageResourceProvider stageResourceProvider)
+        /// <param name="sceneResourceProvider">씬 리소스 제공자</param>
+        public static async Task PlaceAdditionalTilesAsync(Transform stageRoot, Vector2 centerPos, RoomData roomData, ISceneResourceProvider sceneResourceProvider)
         {
-            if (stageRoot == null || roomData == null || stageResourceProvider == null)
+            if (stageRoot == null || roomData == null || sceneResourceProvider == null)
             {
                 LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
                 return;
@@ -188,7 +188,7 @@ namespace DungeonShooter
             foreach (var tileData in roomData.Tiles)
             {
                 var address = roomData.GetAddress(tileData.Index);
-                tileBases.Add(await stageResourceProvider.GetAssetAsync<TileBase>(address));
+                tileBases.Add(await sceneResourceProvider.GetAssetAsync<TileBase>(address));
             }
             
             PlaceAdditionalTilesInternal(stageRoot, centerPos, roomData.Tiles, tileBases);
@@ -200,10 +200,10 @@ namespace DungeonShooter
         /// <param name="stageRoot">스테이지 루트 Transform</param>
         /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
         /// <param name="roomData">방 데이터</param>
-        /// <param name="stageResourceProvider">리소스 제공자</param>
-        public static void PlaceAdditionalTilesSync(Transform stageRoot, Vector2 centerPos, RoomData roomData, IStageResourceProvider stageResourceProvider)
+        /// <param name="sceneResourceProvider">씬 리소스 제공자</param>
+        public static void PlaceAdditionalTilesSync(Transform stageRoot, Vector2 centerPos, RoomData roomData, ISceneResourceProvider sceneResourceProvider)
         {
-            if (stageRoot == null || roomData == null || stageResourceProvider == null)
+            if (stageRoot == null || roomData == null || sceneResourceProvider == null)
             {
                 LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
                 return;
@@ -214,7 +214,7 @@ namespace DungeonShooter
             foreach (var tileData in roomData.Tiles)
             {
                 var address = roomData.GetAddress(tileData.Index);
-                tileBases.Add(stageResourceProvider.GetAssetSync<TileBase>(address));
+                tileBases.Add(sceneResourceProvider.GetAssetSync<TileBase>(address));
             }
             
             PlaceAdditionalTilesInternal(stageRoot, centerPos, roomData.Tiles, tileBases);
@@ -243,10 +243,12 @@ namespace DungeonShooter
         /// </summary>
         /// <param name="stageRoot">스테이지 루트 Transform</param>
         /// <param name="roomData">방 데이터</param>
-        /// <param name="resourceProvider">리소스 제공자</param>
+        /// <param name="playerFactory">플레이어 팩토리</param>
+        /// <param name="enemyFactory">적 팩토리</param>
+        /// <param name="sceneResourceProvider">씬 리소스 제공자</param>
         /// <param name="worldOffset">월드 오프셋 (기본값: Vector3.zero)</param>
         /// <returns>생성된 오브젝트 리스트를 반환하는 Task</returns>
-        public static async Task<List<GameObject>> PlaceObjectsAsync(Transform stageRoot, RoomData roomData, IStageResourceProvider resourceProvider, Vector3 worldOffset = default)
+        public static async Task<List<GameObject>> PlaceObjectsAsync(Transform stageRoot, RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, Vector3 worldOffset = default)
         {
             var instances = new List<GameObject>();
             
@@ -256,10 +258,10 @@ namespace DungeonShooter
 
                 GameObject instance = 
                     address == RoomConstants.RANDOM_ENEMY_SPAWN_ADDRESS && Application.isPlaying
-                    ? (await resourceProvider.GetRandomEnemyAsync()).gameObject : 
+                    ? (await enemyFactory.GetRandomEnemyAsync()).gameObject : 
                     address == RoomConstants.PLAYER_SPAWN_ADDRESS  && Application.isPlaying
-                    ? (await resourceProvider.GetPlayerAsync()).gameObject
-                    : await resourceProvider.GetInstanceAsync(roomData.GetAddress(objectData.Index));
+                    ? (await playerFactory.GetPlayerAsync()).gameObject
+                    : await sceneResourceProvider.GetInstanceAsync(roomData.GetAddress(objectData.Index));
                 
                 instances.Add(instance);
             }
@@ -272,10 +274,12 @@ namespace DungeonShooter
         /// </summary>
         /// <param name="stageRoot">스테이지 루트 Transform</param>
         /// <param name="roomData">방 데이터</param>
-        /// <param name="resourceProvider">리소스 제공자</param>
+        /// <param name="playerFactory">플레이어 팩토리</param>
+        /// <param name="enemyFactory">적 팩토리</param>
+        /// <param name="sceneResourceProvider">씬 리소스 제공자</param>
         /// <param name="worldOffset">월드 오프셋 (기본값: Vector3.zero)</param>
         /// <returns>생성된 오브젝트 리스트</returns>
-        public static List<GameObject> PlaceObjectsSync(Transform stageRoot, RoomData roomData, IStageResourceProvider resourceProvider, Vector3 worldOffset = default)
+        public static List<GameObject> PlaceObjectsSync(Transform stageRoot, RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, Vector3 worldOffset = default)
         {
             var instances = new List<GameObject>();
             
@@ -285,10 +289,10 @@ namespace DungeonShooter
 
                 GameObject instance = 
                     address == RoomConstants.RANDOM_ENEMY_SPAWN_ADDRESS && Application.isPlaying
-                    ? resourceProvider.GetRandomEnemySync().gameObject : 
+                    ? enemyFactory.GetRandomEnemySync().gameObject : 
                     address == RoomConstants.PLAYER_SPAWN_ADDRESS && Application.isPlaying
-                    ? resourceProvider.GetPlayerSync().gameObject
-                    : resourceProvider.GetInstanceSync(roomData.GetAddress(objectData.Index));
+                    ? playerFactory.GetPlayerSync().gameObject
+                    : sceneResourceProvider.GetInstanceSync(roomData.GetAddress(objectData.Index));
                 
                 instances.Add(instance);
             }

@@ -13,11 +13,11 @@ namespace DungeonShooter
     {
         public bool IsInitialized => false; // 어차피 초기화 직후 바로 파괴되므로 false
         public Task<bool> InitializationTask { get; private set; }
-        private IStageResourceProvider _resourceProvider;
+        private IPlayerFactory _playerFactory;
         [Inject]
-        public async UniTask Construct(IStageResourceProvider resourceProvider)
+        public async UniTask Construct(IPlayerFactory playerFactory)
         {
-            _resourceProvider = resourceProvider;
+            _playerFactory = playerFactory;
             InitializationTask = SpawnPlayer().AsTask();
             await InitializationTask;
             Destroy(gameObject); // 스테이지에서 많이 사용하게 된다면 오브젝트 풀링 사용해야 할수도?, 지금은 스테이지 생성시에만 사용하므로 보류
@@ -25,7 +25,7 @@ namespace DungeonShooter
 
         private async UniTask<bool> SpawnPlayer()
         {
-            var player = await _resourceProvider.GetPlayerAsync();
+            var player = await _playerFactory.GetPlayerAsync();
             
             if (player == null)
             {

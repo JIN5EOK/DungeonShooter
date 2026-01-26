@@ -11,14 +11,20 @@ namespace DungeonShooter
         public Stage Stage => _stage;
         
         private IRoomDataRepository _roomDataRepository;
-        private IStageResourceProvider _stageResourceProvider;
+        private ITileRepository _tileRepository;
+        private IPlayerFactory _playerFactory;
+        private IEnemyFactory _enemyFactory;
+        private ISceneResourceProvider _sceneResourceProvider;
 
         [Inject]
-        public void Construct(StageContext context, IRoomDataRepository roomDataRepository, IStageResourceProvider stageResourceProvider)
+        public void Construct(StageContext context, IRoomDataRepository roomDataRepository, ITileRepository tileRepository, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
         {
             _context = context;
             _roomDataRepository = roomDataRepository;
-            _stageResourceProvider = stageResourceProvider;
+            _tileRepository = tileRepository;
+            _playerFactory = playerFactory;
+            _enemyFactory = enemyFactory;
+            _sceneResourceProvider = sceneResourceProvider;
         }
         
         public void Start()
@@ -32,7 +38,7 @@ namespace DungeonShooter
         private async void CreateStageAsync()
         {
             _stage = await StageGenerator.GenerateStage(_roomDataRepository);
-            await StageInstantiator.InstantiateStage(_stageResourceProvider, _stage);
+            await StageInstantiator.InstantiateStage(_tileRepository, _playerFactory, _enemyFactory, _sceneResourceProvider, _stage);
         }
         
         private void OnDestroy()

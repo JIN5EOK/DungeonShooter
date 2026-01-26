@@ -23,10 +23,10 @@ namespace DungeonShooter
     public List<EffectBase> effects = new List<EffectBase>();
 
     private string ProjectileAddress => projectile.AssetGUID.ToString();
-    private IStageResourceProvider _resourceProvider;
+    private ISceneResourceProvider _resourceProvider;
     
     [Inject]
-    public void Construct(IStageResourceProvider resourceProvider)
+    public void Construct(ISceneResourceProvider resourceProvider)
     {
         // 미리 메모리에 올려두기
         _resourceProvider = resourceProvider;

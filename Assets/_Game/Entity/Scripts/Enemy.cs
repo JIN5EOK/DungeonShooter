@@ -60,10 +60,10 @@ namespace DungeonShooter
         private bool _isStunned;
         private Vector2 _knockbackDirection;
 
-        private IStageResourceProvider _resourceProvider;
+        private ISceneResourceProvider _resourceProvider;
 
         [Inject]
-        private void Construct(IStageResourceProvider resourceProvider)
+        private void Construct(ISceneResourceProvider resourceProvider)
         {
             _resourceProvider = resourceProvider;
         }

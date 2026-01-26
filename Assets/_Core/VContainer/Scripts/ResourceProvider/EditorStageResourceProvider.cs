@@ -6,7 +6,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.Tilemaps;
 using Object = UnityEngine.Object;
 
 namespace DungeonShooter
@@ -16,25 +15,13 @@ namespace DungeonShooter
     /// 의존성 주입 없이 Addressables를 직접 사용하여 작동
     /// </summary>
     [Serializable]
-    public class EditorStageResourceProvider : IStageResourceProvider
+    public class EditorStageResourceProvider : ISceneResourceProvider
     {
-        [SerializeField]
-        private AssetReferenceT<TileBase> _groundTile;
         private readonly AddressablesScope _addressablesScope;
         
         public EditorStageResourceProvider()
         {
             _addressablesScope = new AddressablesScope();
-        }
-        
-        /// <summary>
-        /// Ground 타일을 동기로 가져옵니다.
-        /// </summary>
-        public TileBase GetGroundTileSync()
-        {
-            var handle = _addressablesScope.LoadAssetAsync<TileBase>(_groundTile);
-            handle.WaitForCompletion();
-            return handle.Result;
         }
         
         /// <summary>
@@ -87,13 +74,8 @@ namespace DungeonShooter
             _addressablesScope?.Dispose();
         }
         
-        public async UniTask<TileBase> GetGroundTileAsync() => throw new NotImplementedException();
-        public async UniTask<Enemy> GetRandomEnemyAsync() => throw new NotImplementedException();
-        public Enemy GetRandomEnemySync() => throw new NotImplementedException();
-        public async UniTask<Player> GetPlayerAsync() => throw new NotImplementedException();
-        public Player GetPlayerSync() => throw new NotImplementedException();
-        public async UniTask<GameObject> GetInstanceAsync(string address) => throw new NotImplementedException();
-        public async UniTask<T> GetAssetAsync<T>(string address) where T : Object => throw new NotImplementedException();
+        public UniTask<GameObject> GetInstanceAsync(string address) => throw new NotImplementedException();
+        public UniTask<T> GetAssetAsync<T>(string address) where T : Object => throw new NotImplementedException();
         public T AddOrGetComponentWithInejct<T>(GameObject go) where T : Component => throw new NotImplementedException();
         public T AddComponentWithInejct<T>(GameObject go) where T : Component => throw new NotImplementedException();
     }

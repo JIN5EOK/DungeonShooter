@@ -3,6 +3,7 @@ using Jin5eok;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Tilemaps;
+using UnityEngine.AddressableAssets;
 
 namespace DungeonShooter
 {
@@ -15,6 +16,10 @@ namespace DungeonShooter
         [SerializeField]
         [Tooltip("방 에디터 프리셋 리소스 설정")]
         private EditorStageResourceProvider _resourceProvider;
+
+        [SerializeField]
+        [Tooltip("Ground 타일 (방 크기 표시용)")]
+        private AssetReferenceT<TileBase> _groundTile;
 
         [SerializeField] 
         private int _roomSizeX;
@@ -132,9 +137,17 @@ namespace DungeonShooter
             // 맵 배치
             RoomCreateHelper.ClearTiles(gameObject.transform);
 
-            RoomCreateHelper.PlaceBaseTilesSync(gameObject.transform, centerPos, roomData, _resourceProvider);
+            // Ground 타일 로드
+            var groundTile = LoadGroundTile();
+            if (groundTile == null)
+            {
+                LogHandler.LogError<RoomEditor>("Ground 타일을 로드할 수 없습니다.");
+                return;
+            }
+
+            RoomCreateHelper.PlaceBaseTiles(gameObject.transform, centerPos, roomData, groundTile);
             RoomCreateHelper.PlaceAdditionalTilesSync(gameObject.transform, centerPos, roomData, _resourceProvider);
-            RoomCreateHelper.PlaceObjectsSync(gameObject.transform, roomData, _resourceProvider);
+            RoomCreateHelper.PlaceObjectsSync(gameObject.transform, roomData, null, null, _resourceProvider);
 
             EditorUtility.SetDirty(this);
             LogHandler.Log<RoomEditor>($"방 불러오기 완료: {_loadFile.name}");
@@ -166,7 +179,16 @@ namespace DungeonShooter
 
             // 베이스 타일 배치 (동기적으로 실행)
             var centerPos = Vector2.zero; // Room 레벨에서는 중심이 (0,0)
-            RoomCreateHelper.PlaceBaseTilesSync(this.transform, centerPos, tempRoomData, _resourceProvider);
+            
+            // Ground 타일 로드
+            var groundTile = LoadGroundTile();
+            if (groundTile == null)
+            {
+                LogHandler.LogError<RoomEditor>("Ground 타일을 로드할 수 없습니다.");
+                return;
+            }
+
+            RoomCreateHelper.PlaceBaseTiles(this.transform, centerPos, tempRoomData, groundTile);
 
             EditorUtility.SetDirty(this);
             var tilemapsParent = this.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
@@ -190,6 +212,27 @@ namespace DungeonShooter
 
             EditorUtility.SetDirty(this);
             LogHandler.Log<RoomEditor>("방이 초기 상태로 리셋되었습니다.");
+        }
+
+        /// <summary>
+        /// Ground 타일을 로드합니다.
+        /// </summary>
+        private TileBase LoadGroundTile()
+        {
+            if (_groundTile == null || !_groundTile.RuntimeKeyIsValid())
+            {
+                LogHandler.LogWarning<RoomEditor>("Ground 타일이 설정되지 않았습니다.");
+                return null;
+            }
+
+            if (_resourceProvider == null)
+            {
+                LogHandler.LogError<RoomEditor>("ResourceProvider가 설정되지 않았습니다.");
+                return null;
+            }
+
+            var address = _groundTile.RuntimeKey.ToString();
+            return _resourceProvider.GetAssetSync<TileBase>(address);
         }
 
         /// <summary>
