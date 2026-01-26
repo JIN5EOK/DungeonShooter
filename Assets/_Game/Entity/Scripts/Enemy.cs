@@ -1,9 +1,7 @@
-using UnityEngine;
-using System.Collections;
-using DungeonShooter;
-using Jin5eok;
-using VContainer;
 using Cysharp.Threading.Tasks;
+using Jin5eok;
+using UnityEngine;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -49,6 +47,7 @@ namespace DungeonShooter
         private HealthComponent _healthComponent;
         private MovementComponent _movementComponent;
 
+        private Rigidbody2D _rb;
         // AI 상태
         private EnemyState _currentState = EnemyState.Idle;
         private Vector2 _patrolStartPos;
@@ -66,12 +65,9 @@ namespace DungeonShooter
         private void Construct(ISceneResourceProvider resourceProvider)
         {
             _resourceProvider = resourceProvider;
-        }
-        
-        protected override async UniTask Start()
-        {
+
             return;
-            base.Start();
+            _rb = gameObject.AddOrGetComponent<Rigidbody2D>();
             statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
             _playerTransform = FindFirstObjectByType<Player>().transform;
             
@@ -160,14 +156,14 @@ namespace DungeonShooter
             // 죽었으면 움직임 중지
             if (_currentState == EnemyState.Dead)
             {
-                rb.linearVelocity = Vector2.zero;
+                _rb.linearVelocity = Vector2.zero;
                 return;
             }
 
             // 넉백 처리
             if (_isStunned)
             {
-                rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, Vector2.zero, Time.fixedDeltaTime * 5f);
+                _rb.linearVelocity = Vector2.Lerp(_rb.linearVelocity, Vector2.zero, Time.fixedDeltaTime * 5f);
                 return;
             }
 
@@ -350,7 +346,7 @@ namespace DungeonShooter
             if (_playerTransform != null)
             {
                 _knockbackDirection = ((Vector2)transform.position - (Vector2)_playerTransform.position).normalized;
-                rb.linearVelocity = _knockbackDirection * knockbackForce;
+                _rb.linearVelocity = _knockbackDirection * knockbackForce;
             }
         }
 
@@ -371,7 +367,7 @@ namespace DungeonShooter
             LogHandler.Log<Enemy>($"{gameObject.name}: 사망!");
 
             // AI 및 물리 즉시 중지
-            rb.linearVelocity = Vector2.zero;
+            _rb.linearVelocity = Vector2.zero;
 
             // 즉시 비활성화 옵션
             if (disableOnDeath)

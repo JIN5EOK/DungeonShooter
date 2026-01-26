@@ -1,8 +1,9 @@
-using System;
+using System.Collections;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
-using VContainer;
 using Jin5eok;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -21,22 +22,13 @@ namespace DungeonShooter
         private ISceneResourceProvider _resourceProvider;
         
         [Inject]
-        private async UniTask Construct(
-            ISceneResourceProvider resourceProvider, 
-            InputManager inputManager,
-            Inventory inventory)
+        private async UniTaskVoid Construct(ISceneResourceProvider resourceProvider, InputManager inputManager)
         {
             _resourceProvider = resourceProvider;
             _inputManager = inputManager;
-
+            
             _skillComponent = _resourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
             await _skillComponent.RegistSkill(14000101);
-            SubscribeInputEvent();
-        }
-
-        protected override async UniTask Start()
-        {
-            await base.Start();
             
             _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
             _interactComponent = gameObject.AddOrGetComponent<InteractComponent>();
@@ -44,6 +36,8 @@ namespace DungeonShooter
             // 체력 이벤트 구독
             _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();
             _healthComponent.OnDeath += HandleDeath;
+            
+            SubscribeInputEvent();
         }
 
         // ==================== 입력 매니저 이벤트 구독/해제 ====================
@@ -94,7 +88,7 @@ namespace DungeonShooter
         /// <summary>
         /// 게임 오버 시퀀스, 나중에 분리 필요
         /// </summary>
-        private System.Collections.IEnumerator GameOverSequence()
+        private IEnumerator GameOverSequence()
         {
             yield return new WaitForSeconds(1f); // 1초 대기
 
@@ -118,8 +112,8 @@ namespace DungeonShooter
             LogHandler.Log<Player>("게임 오버! 씬 재시작 중...");
 
             // 씬 재시작
-            UnityEngine.SceneManagement.SceneManager.LoadScene(
-                UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
+            SceneManager.LoadScene(
+                SceneManager.GetActiveScene().name
             );
         }
         
