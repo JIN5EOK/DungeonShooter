@@ -30,14 +30,14 @@ namespace DungeonShooter
     {
         // 미리 메모리에 올려두기
         _resourceProvider = resourceProvider;
-        resourceProvider.GetAsset<GameObject>(ProjectileAddress);
+        resourceProvider.GetAssetAsync<GameObject>(ProjectileAddress);
     }
     
     public override async UniTask<bool> Execute(EntityBase target, SkillTableEntry entry)
     {
         try
         {
-            var obj = await _resourceProvider.GetInstance(ProjectileAddress);
+            var obj = await _resourceProvider.GetInstanceAsync(ProjectileAddress);
             if (obj.TryGetComponent(out Projectile proj))
             {
                 proj.Initialize(target, effects, entry);

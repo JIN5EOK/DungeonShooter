@@ -79,7 +79,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            var enemyInstance = await GetInstance(enemyAddress);
+            var enemyInstance = await GetInstanceAsync(enemyAddress);
             return GetEnemyFromInstance(enemyInstance, enemyAddress);
         }
 
@@ -146,7 +146,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            var playerInstance = await GetInstance(playerAddress);
+            var playerInstance = await GetInstanceAsync(playerAddress);
             return GetPlayerFromInstance(playerInstance, playerAddress);
         }
 

@@ -26,7 +26,7 @@ namespace DungeonShooter
         /// <summary>
         /// 주소에 해당하는 인스턴스를 생성하고 의존성 주입
         /// </summary>
-        public async UniTask<GameObject> GetInstance(string address)
+        public async UniTask<GameObject> GetInstanceAsync(string address)
         {
             var handle = _addressablesScope.InstantiateAsync(address);
             await handle.Task;
@@ -67,7 +67,7 @@ namespace DungeonShooter
         /// <summary>
         /// 주소에 해당하는 에셋을 가져옵니다.
         /// </summary>
-        public async UniTask<T> GetAsset<T>(string address) where T : Object
+        public async UniTask<T> GetAssetAsync<T>(string address) where T : Object
         {
             var handle = _addressablesScope.LoadAssetAsync<T>(address);
             await handle.Task;

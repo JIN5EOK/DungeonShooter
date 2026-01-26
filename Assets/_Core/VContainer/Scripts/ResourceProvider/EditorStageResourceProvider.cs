@@ -84,7 +84,7 @@ namespace DungeonShooter
         /// 주소에 해당하는 인스턴스를 생성합니다.
         /// 에디터에서는 프리팹 연결을 유지하기 위해 PrefabUtility.InstantiatePrefab을 사용합니다.
         /// </summary>
-        public async UniTask<GameObject> GetInstance(string address)
+        public async UniTask<GameObject> GetInstanceAsync(string address)
         {
             return GetInstanceSync(address);
         }
@@ -120,7 +120,7 @@ namespace DungeonShooter
         /// <summary>
         /// 주소에 해당하는 에셋을 가져옵니다.
         /// </summary>
-        public async UniTask<T> GetAsset<T>(string address) where T : Object
+        public async UniTask<T> GetAssetAsync<T>(string address) where T : Object
         {
             return GetAssetSync<T>(address);
         }

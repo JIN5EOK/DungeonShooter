@@ -48,7 +48,7 @@ namespace DungeonShooter
                 }
 
                 // SkillData 로드
-                var skillData = await _resourceProvider.GetAsset<SkillData>(skillTableEntry.SkillDataKey);
+                var skillData = await _resourceProvider.GetAssetAsync<SkillData>(skillTableEntry.SkillDataKey);
                 if (skillData == null)
                 {
                     LogHandler.LogError<SkillFactory>($"SkillData를 로드할 수 없습니다: {skillTableEntry.SkillDataKey}");

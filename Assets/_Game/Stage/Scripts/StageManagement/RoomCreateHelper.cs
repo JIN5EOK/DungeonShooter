@@ -183,24 +183,15 @@ namespace DungeonShooter
                 return;
             }
 
-            if (roomData.Tiles.Count == 0)
-            {
-                return;
-            }
-
-            var centerPosInt = new Vector3Int((int)centerPos.x, (int)centerPos.y, 0);
-
             // 타일 배치
+            var tileBases = new List<TileBase>();
             foreach (var tileData in roomData.Tiles)
             {
                 var address = roomData.GetAddress(tileData.Index);
-                if (string.IsNullOrEmpty(address)) continue;
-
-                var tileBase = await stageResourceProvider.GetAsset<TileBase>(address);
-                if (tileBase == null) continue;
-
-                PlaceAdditionalTileInternal(stageRoot, centerPosInt, tileData, tileBase);
+                tileBases.Add(await stageResourceProvider.GetAssetAsync<TileBase>(address));
             }
+            
+            PlaceAdditionalTilesInternal(stageRoot, centerPos, roomData.Tiles, tileBases);
         }
 
         /// <summary>
@@ -218,80 +209,62 @@ namespace DungeonShooter
                 return;
             }
 
-            if (roomData.Tiles.Count == 0)
-            {
-                return;
-            }
-
-            var centerPosInt = new Vector3Int((int)centerPos.x, (int)centerPos.y, 0);
-
             // 타일 배치
+            var tileBases = new List<TileBase>();
             foreach (var tileData in roomData.Tiles)
             {
                 var address = roomData.GetAddress(tileData.Index);
-                if (string.IsNullOrEmpty(address)) continue;
-
-                var tileBase = stageResourceProvider.GetAssetSync<TileBase>(address);
-                if (tileBase == null) continue;
-
-                PlaceAdditionalTileInternal(stageRoot, centerPosInt, tileData, tileBase);
+                tileBases.Add(stageResourceProvider.GetAssetSync<TileBase>(address));
             }
-        }
-
-        /// <summary>
-        /// 추가 타일 배치 로직 (내부 구현)
-        /// </summary>
-        private static void PlaceAdditionalTileInternal(Transform stageRoot, Vector3Int centerPosInt, TileLayerData tileData, TileBase tileBase)
-        {
-            var sortingLayerName = RenderingLayers.GetLayerName(tileData.Layer);
-            var tilemapName = $"Tilemap_{sortingLayerName}";
-            var tilemap = GetOrCreateTilemap(stageRoot, tilemapName);
             
-            var renderer = tilemap.GetComponent<TilemapRenderer>();
-            if (renderer != null)
-            {
-                renderer.sortingLayerID = tileData.Layer;
-            }
-
-            var localPos = new Vector3Int(tileData.Position.x, tileData.Position.y, 0);
-            var worldTilePos = localPos + centerPosInt;
-            tilemap.SetTile(worldTilePos, tileBase);
+            PlaceAdditionalTilesInternal(stageRoot, centerPos, roomData.Tiles, tileBases);
         }
+        
+        /// <summary>
+        /// 추가 타일 배치 로직
+        /// </summary>
+        private static void PlaceAdditionalTilesInternal(Transform stageRoot, Vector3 centerPos, List<TileLayerData> tileDatas, List<TileBase> tileBases)
+        {
+            var centerPosInt = new Vector3Int((int)centerPos.x, (int)centerPos.y, 0);
 
+            for (int i = 0; i < tileDatas.Count; i++)
+            {
+                var sortingLayerName = RenderingLayers.GetLayerName(tileDatas[i].Layer);
+                var tilemapName = $"{RoomConstants.TILEMAP_COMPONENT_NAME_BASE}{sortingLayerName}";
+                var tilemap = GetOrCreateTilemap(stageRoot, tilemapName);
+                var localPos = new Vector3Int(tileDatas[i].Position.x, tileDatas[i].Position.y, 0);
+                var worldTilePos = localPos + centerPosInt;
+                tilemap.SetTile(worldTilePos, tileBases[i]);
+            }
+        }
 
         /// <summary>
         /// 오브젝트를 비동기적으로 배치합니다.
         /// </summary>
         /// <param name="stageRoot">스테이지 루트 Transform</param>
         /// <param name="roomData">방 데이터</param>
-        /// <param name="stageResourceProvider">리소스 제공자</param>
+        /// <param name="resourceProvider">리소스 제공자</param>
         /// <param name="worldOffset">월드 오프셋 (기본값: Vector3.zero)</param>
         /// <returns>생성된 오브젝트 리스트를 반환하는 Task</returns>
-        public static async Task<List<GameObject>> PlaceObjectsAsync(Transform stageRoot, RoomData roomData, IStageResourceProvider stageResourceProvider, Vector3 worldOffset = default)
+        public static async Task<List<GameObject>> PlaceObjectsAsync(Transform stageRoot, RoomData roomData, IStageResourceProvider resourceProvider, Vector3 worldOffset = default)
         {
-            if (stageRoot == null || roomData == null || stageResourceProvider == null)
-            {
-                LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
-                return new List<GameObject>();
-            }
-
-            var objectsParent = GetOrCreateChild(stageRoot, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
-            var createdObjects = new List<GameObject>();
-
+            var instances = new List<GameObject>();
+            
             foreach (var objectData in roomData.Objects)
             {
                 var address = roomData.GetAddress(objectData.Index);
-                if (string.IsNullOrEmpty(address)) continue;
 
-                var instance = await stageResourceProvider.GetInstance(address);
-                if (instance != null)
-                {
-                    PlaceObjectInternal(instance, objectsParent, objectData, worldOffset);
-                    createdObjects.Add(instance);
-                }
+                GameObject instance = 
+                    address == RoomConstants.RANDOM_ENEMY_SPAWN_ADDRESS
+                    ? (await resourceProvider.GetRandomEnemyAsync()).gameObject : 
+                    address == RoomConstants.PLAYER_SPAWN_ADDRESS 
+                    ? (await resourceProvider.GetPlayerAsync()).gameObject
+                    : await resourceProvider.GetInstanceAsync(roomData.GetAddress(objectData.Index));
+                
+                instances.Add(instance);
             }
-
-            return createdObjects;
+            PlaceObjectsInternal(stageRoot, worldOffset, roomData.Objects, instances);
+            return instances;
         }
 
         /// <summary>
@@ -299,44 +272,42 @@ namespace DungeonShooter
         /// </summary>
         /// <param name="stageRoot">스테이지 루트 Transform</param>
         /// <param name="roomData">방 데이터</param>
-        /// <param name="stageResourceProvider">리소스 제공자</param>
+        /// <param name="resourceProvider">리소스 제공자</param>
         /// <param name="worldOffset">월드 오프셋 (기본값: Vector3.zero)</param>
         /// <returns>생성된 오브젝트 리스트</returns>
-        public static List<GameObject> PlaceObjectsSync(Transform stageRoot, RoomData roomData, IStageResourceProvider stageResourceProvider, Vector3 worldOffset = default)
+        public static List<GameObject> PlaceObjectsSync(Transform stageRoot, RoomData roomData, IStageResourceProvider resourceProvider, Vector3 worldOffset = default)
         {
-            if (stageRoot == null || roomData == null || stageResourceProvider == null)
-            {
-                LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
-                return new List<GameObject>();
-            }
-
-            var objectsParent = GetOrCreateChild(stageRoot, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
-            var createdObjects = new List<GameObject>();
-
+            var instances = new List<GameObject>();
+            
             foreach (var objectData in roomData.Objects)
             {
                 var address = roomData.GetAddress(objectData.Index);
-                if (string.IsNullOrEmpty(address)) continue;
 
-                var instance = stageResourceProvider.GetInstanceSync(address);
-                if (instance != null)
-                {
-                    PlaceObjectInternal(instance, objectsParent, objectData, worldOffset);
-                    createdObjects.Add(instance);
-                }
+                GameObject instance = 
+                    address == RoomConstants.RANDOM_ENEMY_SPAWN_ADDRESS
+                    ? resourceProvider.GetRandomEnemySync().gameObject : 
+                    address == RoomConstants.PLAYER_SPAWN_ADDRESS 
+                    ? resourceProvider.GetPlayerSync().gameObject
+                    : resourceProvider.GetInstanceSync(roomData.GetAddress(objectData.Index));
+                
+                instances.Add(instance);
             }
-
-            return createdObjects;
+            PlaceObjectsInternal(stageRoot, worldOffset, roomData.Objects, instances);
+            return instances;
         }
 
-        /// <summary>
-        /// 오브젝트 배치 로직 (내부 구현)
-        /// </summary>
-        private static void PlaceObjectInternal(GameObject instance, Transform objectsParent, ObjectData objectData, Vector3 worldOffset)
+        private static void PlaceObjectsInternal(Transform stageRoot, Vector3 worldOffset, List<ObjectData> objectDatas, List<GameObject> createdObjects)
         {
-            instance.transform.SetParent(objectsParent);
-            instance.transform.position = new Vector3(objectData.Position.x, objectData.Position.y, 0) + worldOffset;
-            instance.transform.rotation = objectData.Rotation;
+            var objectsParent = GetOrCreateChild(stageRoot, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+
+            for (int i = 0; i < objectDatas.Count; i++)
+            {
+                var objectData = objectDatas[i];
+                var instance = createdObjects[i];
+                instance.transform.SetParent(objectsParent);
+                instance.transform.position = new Vector3(objectData.Position.x, objectData.Position.y, 0) + worldOffset;
+                instance.transform.rotation = objectData.Rotation;
+            }
         }
     }
 }

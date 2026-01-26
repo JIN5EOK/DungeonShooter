@@ -7,8 +7,8 @@ namespace DungeonShooter
 {
     public interface ISceneResourceProvider : IDisposable
     {
-        UniTask<GameObject> GetInstance(string address);
-        UniTask<T> GetAsset<T>(string address) where T : Object;
+        UniTask<GameObject> GetInstanceAsync(string address);
+        UniTask<T> GetAssetAsync<T>(string address) where T : Object;
         
         GameObject GetInstanceSync(string address);
         T GetAssetSync<T>(string address) where T : Object;

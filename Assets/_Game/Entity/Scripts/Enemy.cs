@@ -304,7 +304,7 @@ namespace DungeonShooter
         /// </summary>
         private async Awaitable DropCoins()
         {
-            var coinPickup = await _resourceProvider.GetInstance(EntityKey.Coin);
+            var coinPickup = await _resourceProvider.GetInstanceAsync(EntityKey.Coin);
             var coinPickupPrefab = coinPickup.GetComponent<CoinPickup>();
             if (coinPickupPrefab == null)
             {
