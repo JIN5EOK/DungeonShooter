@@ -11,17 +11,7 @@ namespace DungeonShooter
         protected override void Configure(IContainerBuilder builder)
         {
             builder.Register<InputManager>(Lifetime.Singleton);
-            
-            // 테이블 리포지토리 등록
-            builder.Register<LocalTableRepository>(Lifetime.Singleton);
-            builder.Register<ITableRepository>(provider => provider.Resolve<LocalTableRepository>(), Lifetime.Singleton);
-            
-            // 테이블 리포지토리 초기화
-            builder.RegisterBuildCallback(container =>
-            {
-                var tableRepository = container.Resolve<LocalTableRepository>();
-                tableRepository.Initialize();
-            });
+            builder.Register<LocalTableRepository>(Lifetime.Singleton).AsImplementedInterfaces();
             
             base.Configure(builder);
         }

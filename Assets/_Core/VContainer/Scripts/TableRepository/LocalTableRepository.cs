@@ -16,7 +16,8 @@ namespace DungeonShooter
         /// 테이블 리포지토리를 초기화합니다.
         /// 모든 CSV 파일을 로드하고 파싱하여 캐시에 저장합니다.
         /// </summary>
-        public void Initialize()
+        
+        public LocalTableRepository()
         {
             (string address, Type type)[] tableConfigs = new[]
             {
