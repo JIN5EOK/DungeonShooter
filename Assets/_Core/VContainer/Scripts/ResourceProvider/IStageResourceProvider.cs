@@ -7,8 +7,11 @@ namespace DungeonShooter
 {
     public interface IStageResourceProvider : ISceneResourceProvider
     {
-        UniTask<TileBase> GetGroundTile();
-        UniTask<Enemy> GetRandomEnemy();
-        UniTask<Player> GetPlayer();
+        UniTask<TileBase> GetGroundTileAsync();
+        UniTask<Enemy> GetRandomEnemyAsync();
+        UniTask<Player> GetPlayerAsync();
+        TileBase GetGroundTileSync();
+        Enemy GetRandomEnemySync();
+        Player GetPlayerSync();
     }
 }

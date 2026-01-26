@@ -25,7 +25,7 @@ namespace DungeonShooter
 
         private async UniTask<bool> SpawnEnemy()
         {
-            var enemy = await _resourceProvider.GetRandomEnemy();
+            var enemy = await _resourceProvider.GetRandomEnemyAsync();
             
             if (enemy == null)
             {

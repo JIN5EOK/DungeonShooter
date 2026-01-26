@@ -25,7 +25,7 @@ namespace DungeonShooter
 
         private async UniTask<bool> SpawnPlayer()
         {
-            var player = await _resourceProvider.GetPlayer();
+            var player = await _resourceProvider.GetPlayerAsync();
             
             if (player == null)
             {

@@ -117,7 +117,7 @@ namespace DungeonShooter
             decoTilemap.ClearAllTiles();
         }
         /// <summary>
-        /// 베이스 타일을 배치합니다.
+        /// 베이스 타일을 비동기적으로 배치합니다.
         /// </summary>
         /// <param name="stageRoot">스테이지 루트 Transform</param>
         /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
@@ -125,26 +125,33 @@ namespace DungeonShooter
         /// <param name="stageResourceProvider">리소스 제공자</param>
         public static async Task PlaceBaseTiles(Transform stageRoot, Vector2 centerPos, RoomData roomData, IStageResourceProvider stageResourceProvider)
         {
-            if (stageRoot == null || roomData == null || stageResourceProvider == null)
-            {
-                LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
-                return;
-            }
+            var groundTile = await stageResourceProvider.GetGroundTileAsync();
+            PlaceBaseTiles(stageRoot, centerPos, roomData, groundTile);
+        }
 
+        /// <summary>
+        /// 베이스 타일을 동기적으로 배치합니다.
+        /// </summary>
+        /// <param name="stageRoot">스테이지 루트 Transform</param>
+        /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
+        /// <param name="roomData">방 데이터</param>
+        /// <param name="stageResourceProvider">리소스 제공자</param>
+        public static void PlaceBaseTilesSync(Transform stageRoot, Vector2 centerPos, RoomData roomData, IStageResourceProvider stageResourceProvider)
+        {
+            var groundTile = stageResourceProvider.GetGroundTileSync();
+            PlaceBaseTiles(stageRoot, centerPos, roomData, groundTile);
+        }
+
+        /// <summary>
+        /// 베이스 타일 배치 로직
+        /// </summary>
+        public static void PlaceBaseTiles(Transform stageRoot, Vector2 centerPos, RoomData roomData, TileBase groundTile)
+        {
             var roomSizeX = roomData.RoomSizeX;
             var roomSizeY = roomData.RoomSizeY;
 
             var tilemapsParent = GetOrCreateChild(stageRoot, RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
             var groundTilemap = GetOrCreateTilemap(stageRoot, RoomConstants.TILEMAP_GROUND_NAME);
-
-            // Ground 타일 로드 (동기)
-            var groundTile = await stageResourceProvider.GetGroundTile();
-
-            if (groundTile == null)
-            {
-                LogHandler.LogError(nameof(RoomCreateHelper), "Ground 타일을 로드할 수 없습니다.");
-                return;
-            }
 
             var centerPosInt = new Vector3Int((int)centerPos.x, (int)centerPos.y, 0);
             var startX = -roomSizeX / 2;
@@ -162,13 +169,13 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 추가 타일을 배치합니다.
+        /// 추가 타일을 비동기적으로 배치합니다.
         /// </summary>
         /// <param name="stageRoot">스테이지 루트 Transform</param>
         /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
         /// <param name="roomData">방 데이터</param>
         /// <param name="stageResourceProvider">리소스 제공자</param>
-        public static async Task PlaceAdditionalTiles(Transform stageRoot, Vector2 centerPos, RoomData roomData, IStageResourceProvider stageResourceProvider)
+        public static async Task PlaceAdditionalTilesAsync(Transform stageRoot, Vector2 centerPos, RoomData roomData, IStageResourceProvider stageResourceProvider)
         {
             if (stageRoot == null || roomData == null || stageResourceProvider == null)
             {
@@ -192,24 +199,68 @@ namespace DungeonShooter
                 var tileBase = await stageResourceProvider.GetAsset<TileBase>(address);
                 if (tileBase == null) continue;
 
-                var sortingLayerName = RenderingLayers.GetLayerName(tileData.Layer);
-                var tilemapName = $"Tilemap_{sortingLayerName}";
-                var tilemap = GetOrCreateTilemap(stageRoot, tilemapName);
-                
-                var renderer = tilemap.GetComponent<TilemapRenderer>();
-                if (renderer != null)
-                {
-                    renderer.sortingLayerID = tileData.Layer;
-                }
-
-                var localPos = new Vector3Int(tileData.Position.x, tileData.Position.y, 0);
-                var worldTilePos = localPos + centerPosInt;
-                tilemap.SetTile(worldTilePos, tileBase);
+                PlaceAdditionalTileInternal(stageRoot, centerPosInt, tileData, tileBase);
             }
         }
 
         /// <summary>
-        /// 오브젝트를 배치합니다.
+        /// 추가 타일을 동기적으로 배치합니다.
+        /// </summary>
+        /// <param name="stageRoot">스테이지 루트 Transform</param>
+        /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
+        /// <param name="roomData">방 데이터</param>
+        /// <param name="stageResourceProvider">리소스 제공자</param>
+        public static void PlaceAdditionalTilesSync(Transform stageRoot, Vector2 centerPos, RoomData roomData, IStageResourceProvider stageResourceProvider)
+        {
+            if (stageRoot == null || roomData == null || stageResourceProvider == null)
+            {
+                LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
+                return;
+            }
+
+            if (roomData.Tiles.Count == 0)
+            {
+                return;
+            }
+
+            var centerPosInt = new Vector3Int((int)centerPos.x, (int)centerPos.y, 0);
+
+            // 타일 배치
+            foreach (var tileData in roomData.Tiles)
+            {
+                var address = roomData.GetAddress(tileData.Index);
+                if (string.IsNullOrEmpty(address)) continue;
+
+                var tileBase = stageResourceProvider.GetAssetSync<TileBase>(address);
+                if (tileBase == null) continue;
+
+                PlaceAdditionalTileInternal(stageRoot, centerPosInt, tileData, tileBase);
+            }
+        }
+
+        /// <summary>
+        /// 추가 타일 배치 로직 (내부 구현)
+        /// </summary>
+        private static void PlaceAdditionalTileInternal(Transform stageRoot, Vector3Int centerPosInt, TileLayerData tileData, TileBase tileBase)
+        {
+            var sortingLayerName = RenderingLayers.GetLayerName(tileData.Layer);
+            var tilemapName = $"Tilemap_{sortingLayerName}";
+            var tilemap = GetOrCreateTilemap(stageRoot, tilemapName);
+            
+            var renderer = tilemap.GetComponent<TilemapRenderer>();
+            if (renderer != null)
+            {
+                renderer.sortingLayerID = tileData.Layer;
+            }
+
+            var localPos = new Vector3Int(tileData.Position.x, tileData.Position.y, 0);
+            var worldTilePos = localPos + centerPosInt;
+            tilemap.SetTile(worldTilePos, tileBase);
+        }
+
+
+        /// <summary>
+        /// 오브젝트를 비동기적으로 배치합니다.
         /// </summary>
         /// <param name="stageRoot">스테이지 루트 Transform</param>
         /// <param name="roomData">방 데이터</param>
@@ -235,9 +286,7 @@ namespace DungeonShooter
                 var instance = await stageResourceProvider.GetInstance(address);
                 if (instance != null)
                 {
-                    instance.transform.SetParent(objectsParent);
-                    instance.transform.position = new Vector3(objectData.Position.x, objectData.Position.y, 0) + worldOffset;
-                    instance.transform.rotation = objectData.Rotation;
+                    PlaceObjectInternal(instance, objectsParent, objectData, worldOffset);
                     createdObjects.Add(instance);
                 }
             }
@@ -245,6 +294,50 @@ namespace DungeonShooter
             return createdObjects;
         }
 
+        /// <summary>
+        /// 오브젝트를 동기적으로 배치합니다.
+        /// </summary>
+        /// <param name="stageRoot">스테이지 루트 Transform</param>
+        /// <param name="roomData">방 데이터</param>
+        /// <param name="stageResourceProvider">리소스 제공자</param>
+        /// <param name="worldOffset">월드 오프셋 (기본값: Vector3.zero)</param>
+        /// <returns>생성된 오브젝트 리스트</returns>
+        public static List<GameObject> PlaceObjectsSync(Transform stageRoot, RoomData roomData, IStageResourceProvider stageResourceProvider, Vector3 worldOffset = default)
+        {
+            if (stageRoot == null || roomData == null || stageResourceProvider == null)
+            {
+                LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
+                return new List<GameObject>();
+            }
+
+            var objectsParent = GetOrCreateChild(stageRoot, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            var createdObjects = new List<GameObject>();
+
+            foreach (var objectData in roomData.Objects)
+            {
+                var address = roomData.GetAddress(objectData.Index);
+                if (string.IsNullOrEmpty(address)) continue;
+
+                var instance = stageResourceProvider.GetInstanceSync(address);
+                if (instance != null)
+                {
+                    PlaceObjectInternal(instance, objectsParent, objectData, worldOffset);
+                    createdObjects.Add(instance);
+                }
+            }
+
+            return createdObjects;
+        }
+
+        /// <summary>
+        /// 오브젝트 배치 로직 (내부 구현)
+        /// </summary>
+        private static void PlaceObjectInternal(GameObject instance, Transform objectsParent, ObjectData objectData, Vector3 worldOffset)
+        {
+            instance.transform.SetParent(objectsParent);
+            instance.transform.position = new Vector3(objectData.Position.x, objectData.Position.y, 0) + worldOffset;
+            instance.transform.rotation = objectData.Rotation;
+        }
     }
 }
 

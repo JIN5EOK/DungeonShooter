@@ -132,14 +132,9 @@ namespace DungeonShooter
             // 맵 배치
             RoomCreateHelper.ClearTiles(gameObject.transform);
 
-            var baseTilesTask = RoomCreateHelper.PlaceBaseTiles(gameObject.transform, centerPos, roomData, _resourceProvider);
-            baseTilesTask.Wait();
-
-            var additionalTilesTask = RoomCreateHelper.PlaceAdditionalTiles(gameObject.transform, centerPos, roomData, _resourceProvider);
-            additionalTilesTask.Wait();
-
-            var objectsTask = RoomCreateHelper.PlaceObjectsAsync(gameObject.transform, roomData, _resourceProvider);
-            objectsTask.Wait();
+            RoomCreateHelper.PlaceBaseTilesSync(gameObject.transform, centerPos, roomData, _resourceProvider);
+            RoomCreateHelper.PlaceAdditionalTilesSync(gameObject.transform, centerPos, roomData, _resourceProvider);
+            RoomCreateHelper.PlaceObjectsSync(gameObject.transform, roomData, _resourceProvider);
 
             EditorUtility.SetDirty(this);
             LogHandler.Log<RoomEditor>($"방 불러오기 완료: {_loadFile.name}");
@@ -171,8 +166,7 @@ namespace DungeonShooter
 
             // 베이스 타일 배치 (동기적으로 실행)
             var centerPos = Vector2.zero; // Room 레벨에서는 중심이 (0,0)
-            var task = RoomCreateHelper.PlaceBaseTiles(this.transform, centerPos, tempRoomData, _resourceProvider);
-            task.Wait();
+            RoomCreateHelper.PlaceBaseTilesSync(this.transform, centerPos, tempRoomData, _resourceProvider);
 
             EditorUtility.SetDirty(this);
             var tilemapsParent = this.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);

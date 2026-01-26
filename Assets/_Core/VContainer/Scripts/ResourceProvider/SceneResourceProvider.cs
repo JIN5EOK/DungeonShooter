@@ -30,7 +30,24 @@ namespace DungeonShooter
         {
             var handle = _addressablesScope.InstantiateAsync(address);
             await handle.Task;
+            return GetInstanceInternal(handle, address);
+        }
 
+        /// <summary>
+        /// 주소에 해당하는 인스턴스를 동기적으로 생성하고 의존성 주입
+        /// </summary>
+        public GameObject GetInstanceSync(string address)
+        {
+            var handle = _addressablesScope.InstantiateAsync(address);
+            handle.WaitForCompletion();
+            return GetInstanceInternal(handle, address);
+        }
+
+        /// <summary>
+        /// 인스턴스 생성 후 처리 (검증, 의존성 주입)
+        /// </summary>
+        private GameObject GetInstanceInternal(AsyncOperationHandle<GameObject> handle, string address)
+        {
             if (handle.Status != AsyncOperationStatus.Succeeded)
             {
                 Debug.LogWarning($"[{nameof(SceneResourceProvider)}] 인스턴스 생성 실패: {address}");
@@ -54,7 +71,24 @@ namespace DungeonShooter
         {
             var handle = _addressablesScope.LoadAssetAsync<T>(address);
             await handle.Task;
+            return GetAssetInternal(handle, address);
+        }
 
+        /// <summary>
+        /// 주소에 해당하는 에셋을 동기적으로 가져옵니다.
+        /// </summary>
+        public T GetAssetSync<T>(string address) where T : Object
+        {
+            var handle = _addressablesScope.LoadAssetAsync<T>(address);
+            handle.WaitForCompletion();
+            return GetAssetInternal(handle, address);
+        }
+
+        /// <summary>
+        /// 에셋 로드 후 처리 (검증, 의존성 주입)
+        /// </summary>
+        private T GetAssetInternal<T>(AsyncOperationHandle<T> handle, string address) where T : Object
+        {
             if (handle.Status != AsyncOperationStatus.Succeeded)
             {
                 Debug.LogWarning($"[{nameof(SceneResourceProvider)}] 에셋 로드 실패: {address}");

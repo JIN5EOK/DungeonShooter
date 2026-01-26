@@ -59,7 +59,7 @@ namespace DungeonShooter
 
                 // 방의 타일을 Stage 레벨 타일맵에 배치
                 await RoomCreateHelper.PlaceBaseTiles(stageObj.transform, centerPos, room.RoomData, resourceProvider);
-                await RoomCreateHelper.PlaceAdditionalTiles(stageObj.transform, centerPos, room.RoomData, resourceProvider);
+                await RoomCreateHelper.PlaceAdditionalTilesAsync(stageObj.transform, centerPos, room.RoomData, resourceProvider);
 
                 // 방의 오브젝트를 Stage 레벨 Objects에 배치
                 var objects = await RoomCreateHelper.PlaceObjectsAsync(stageObj.transform, room.RoomData, resourceProvider, worldPosition);
@@ -97,7 +97,7 @@ namespace DungeonShooter
                 return;
             }
 
-            var groundTile = await resourceProvider.GetGroundTile();
+            var groundTile = await resourceProvider.GetGroundTileAsync();
             if (groundTile == null)
             {
                 LogHandler.LogError(nameof(StageInstantiator), "Ground 타일을 로드할 수 없습니다.");
