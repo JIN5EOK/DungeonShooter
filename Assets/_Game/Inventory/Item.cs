@@ -115,27 +115,27 @@ namespace DungeonShooter
             try
             {
                 // UseSkill 생성 (Consume 전용)
-                if (entry.UseEffect > 0)
+                if (entry.UseSkillId > 0)
                 {
-                    UseSkill = await _skillFactory.CreateSkillAsync(entry.UseEffect);
+                    UseSkill = await _skillFactory.CreateSkillAsync(entry.UseSkillId);
                 }
 
                 // PassiveSkill 생성 (Passive 전용)
-                if (entry.PassiveEffect > 0)
+                if (entry.PassiveSkillId > 0)
                 {
-                    PassiveSkill = await _skillFactory.CreateSkillAsync(entry.PassiveEffect);
+                    PassiveSkill = await _skillFactory.CreateSkillAsync(entry.PassiveSkillId);
                 }
 
                 // EquipSkill 생성 (Weapon 전용)
-                if (entry.ItemType == ItemType.Weapon && entry.EquipEffect > 0)
+                if (entry.ItemType == ItemType.Weapon && entry.EquipSkillId > 0)
                 {
-                    EquipSkill = await _skillFactory.CreateSkillAsync(entry.EquipEffect);
+                    EquipSkill = await _skillFactory.CreateSkillAsync(entry.EquipSkillId);
                 }
 
                 // ActiveSkill 생성 (Weapon 전용)
-                if (entry.ItemType == ItemType.Weapon && entry.ActiveEffect > 0)
+                if (entry.ItemType == ItemType.Weapon && entry.ActiveSkillId > 0)
                 {
-                    ActiveSkill = await _skillFactory.CreateSkillAsync(entry.ActiveEffect);
+                    ActiveSkill = await _skillFactory.CreateSkillAsync(entry.ActiveSkillId);
                 }
             }
             catch (Exception ex)

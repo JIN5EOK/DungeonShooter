@@ -24,25 +24,25 @@ namespace DungeonShooter
         public string ItemDescription { get; set; }
         public ItemType ItemType { get; set; }
         public int MaxStackCount { get; set; }
-        public int UseEffect { get; set; }
+        public int UseSkillId { get; set; }
 
         /// <summary>
         /// 패시브 효과 (SkillTableEntry ID, Passive 전용)
         /// 아이템이 인벤토리에 들어왔을 때 적용
         /// </summary>
-        public int PassiveEffect { get; set; }
+        public int PassiveSkillId { get; set; }
 
         /// <summary>
         /// 장착 효과 (SkillTableEntry ID, Weapon 전용)
         /// 무기 아이템을 장착 중일 때 효과
         /// </summary>
-        public int EquipEffect { get; set; }
+        public int EquipSkillId { get; set; }
 
         /// <summary>
         /// 액티브 효과 (SkillTableEntry ID, Weapon 전용)
         /// 무기 아이템을 사용할 때 효과
         /// </summary>
-        public int ActiveEffect { get; set; }
+        public int ActiveSkillId { get; set; }
 
         /// <summary>
         /// 아이템 아이콘 주소 (Sprite Addressable 주소)
