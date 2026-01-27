@@ -12,11 +12,8 @@ public class MainMenuGameStarter : IStartable
         var loader = new SceneLoader();
         // TODO: 실제 플레이어 선택 및 스테이지 선택 로직으로 대체 필요
         var context = new StageContext("Player", 13000001); // playerPrefabKey, stageConfigTableId
-        var stageConfigTableEntry = tableRepository.GetTableEntry<StageConfigTableEntry>(context.StageConfigTableId);
-
         await loader
         .AddContext(context)
-        .AddContext(stageConfigTableEntry)
         .LoadScene("PrototypeScene");
     }
 

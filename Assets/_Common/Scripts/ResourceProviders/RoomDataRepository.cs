@@ -19,7 +19,8 @@ namespace DungeonShooter
     public class RoomDataRepository : IRoomDataRepository
     {
         private AddressablesScope _addressablesScope = new AddressablesScope();
-        private StageConfigTableEntry _stageConfigEntry;
+        private readonly ITableRepository _tableRepository;
+        private readonly StageContext _stageContext;
         private List<string> StartRoomDataAddresses { get; set; }
         private List<string> NormalRoomDataAddresses { get; set; }
         private List<string> BossRoomDataAddresses { get; set; }
@@ -27,9 +28,10 @@ namespace DungeonShooter
         private TaskCompletionSource<bool> _initializationTcs;
 
         [Inject]
-        public RoomDataRepository(StageConfigTableEntry stageConfigEntry)
+        public RoomDataRepository(ITableRepository tableRepository, StageContext stageContext)
         {
-            _stageConfigEntry = stageConfigEntry;
+            _tableRepository = tableRepository;
+            _stageContext = stageContext;
         }
 
         /// <summary>
@@ -39,27 +41,35 @@ namespace DungeonShooter
         {
             try
             {
-                if (!string.IsNullOrEmpty(_stageConfigEntry.StartRoomsLabel))
+                var stageConfigEntry = _tableRepository.GetTableEntry<StageConfigTableEntry>(_stageContext.StageConfigTableId);
+                if (stageConfigEntry == null)
                 {
-                    var handle = Addressables.LoadResourceLocationsAsync(_stageConfigEntry.StartRoomsLabel);
+                    Debug.LogError($"[{nameof(RoomDataRepository)}] StageConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.StageConfigTableId}");
+                    initializationTcs.SetResult(false);
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(stageConfigEntry.StartRoomsLabel))
+                {
+                    var handle = Addressables.LoadResourceLocationsAsync(stageConfigEntry.StartRoomsLabel);
                     await handle.Task;
                     StartRoomDataAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
 
                     Addressables.Release(handle);
                 }
 
-                if (!string.IsNullOrEmpty(_stageConfigEntry.NormalRoomsLabel))
+                if (!string.IsNullOrEmpty(stageConfigEntry.NormalRoomsLabel))
                 {
-                    var handle = Addressables.LoadResourceLocationsAsync(_stageConfigEntry.NormalRoomsLabel);
+                    var handle = Addressables.LoadResourceLocationsAsync(stageConfigEntry.NormalRoomsLabel);
                     await handle.Task;
                     NormalRoomDataAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
 
                     Addressables.Release(handle);
                 }
 
-                if (!string.IsNullOrEmpty(_stageConfigEntry.BossRoomsLabel))
+                if (!string.IsNullOrEmpty(stageConfigEntry.BossRoomsLabel))
                 {
-                    var handle = Addressables.LoadResourceLocationsAsync(_stageConfigEntry.BossRoomsLabel);
+                    var handle = Addressables.LoadResourceLocationsAsync(stageConfigEntry.BossRoomsLabel);
                     await handle.Task;
                     BossRoomDataAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
 

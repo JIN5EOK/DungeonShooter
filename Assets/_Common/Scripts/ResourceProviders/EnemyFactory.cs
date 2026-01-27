@@ -14,14 +14,16 @@ namespace DungeonShooter
     /// </summary>
     public class EnemyFactory : IEnemyFactory
     {
-        private readonly StageConfigTableEntry _stageConfigEntry;
+        private readonly ITableRepository _tableRepository;
+        private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private List<string> EnemyAddresses { get; set; }
 
         [Inject]
-        public EnemyFactory(StageConfigTableEntry stageConfigEntry, ISceneResourceProvider sceneResourceProvider)
+        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider)
         {
-            _stageConfigEntry = stageConfigEntry;
+            _tableRepository = tableRepository;
+            _stageContext = stageContext;
             _sceneResourceProvider = sceneResourceProvider;
             Initialize();
         }
@@ -31,9 +33,16 @@ namespace DungeonShooter
         /// </summary>
         private void Initialize()
         {
-            if (!string.IsNullOrEmpty(_stageConfigEntry.StageEnemiesLabel))
+            var stageConfigEntry = _tableRepository.GetTableEntry<StageConfigTableEntry>(_stageContext.StageConfigTableId);
+            if (stageConfigEntry == null)
             {
-                var handle = Addressables.LoadResourceLocationsAsync(_stageConfigEntry.StageEnemiesLabel);
+                Debug.LogWarning($"[{nameof(EnemyFactory)}] StageConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.StageConfigTableId}");
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(stageConfigEntry.StageEnemiesLabel))
+            {
+                var handle = Addressables.LoadResourceLocationsAsync(stageConfigEntry.StageEnemiesLabel);
                 handle.WaitForCompletion();
                 EnemyAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
 

@@ -14,16 +14,18 @@ namespace DungeonShooter
         private IPlayerFactory _playerFactory;
         private IEnemyFactory _enemyFactory;
         private ISceneResourceProvider _sceneResourceProvider;
-        private StageConfigTableEntry _stageConfigEntry;
+        private ITableRepository _tableRepository;
+        private StageContext _stageContext;
 
         [Inject]
-        public void Construct(IRoomDataRepository roomDataRepository, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, StageConfigTableEntry stageConfigEntry)
+        public void Construct(IRoomDataRepository roomDataRepository, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository, StageContext stageContext)
         {
             _roomDataRepository = roomDataRepository;
             _playerFactory = playerFactory;
             _enemyFactory = enemyFactory;
             _sceneResourceProvider = sceneResourceProvider;
-            _stageConfigEntry = stageConfigEntry;
+            _tableRepository = tableRepository;
+            _stageContext = stageContext;
         }
         
         public void Start()
@@ -37,7 +39,13 @@ namespace DungeonShooter
         private async void CreateStageAsync()
         {
             _stage = await StageGenerator.GenerateStage(_roomDataRepository);
-            await StageInstantiator.InstantiateStage(_stageConfigEntry, _playerFactory, _enemyFactory, _sceneResourceProvider, _stage);
+            var stageConfigEntry = _tableRepository.GetTableEntry<StageConfigTableEntry>(_stageContext.StageConfigTableId);
+            if (stageConfigEntry == null)
+            {
+                Debug.LogError($"[{nameof(StageManager)}] StageConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.StageConfigTableId}");
+                return;
+            }
+            await StageInstantiator.InstantiateStage(stageConfigEntry, _playerFactory, _enemyFactory, _sceneResourceProvider, _stage);
         }
     }
 }
