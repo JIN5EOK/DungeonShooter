@@ -5,7 +5,6 @@ namespace DungeonShooter
 {
     public class StageManager : MonoBehaviour
     {
-        private StageContext _context;
         private Stage _stage;
 
         public Stage Stage => _stage;
@@ -14,15 +13,16 @@ namespace DungeonShooter
         private IPlayerFactory _playerFactory;
         private IEnemyFactory _enemyFactory;
         private ISceneResourceProvider _sceneResourceProvider;
+        private StageConfigTableEntry _stageConfigEntry;
 
         [Inject]
-        public void Construct(StageContext context, IRoomDataRepository roomDataRepository, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
+        public void Construct(IRoomDataRepository roomDataRepository, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, StageConfigTableEntry stageConfigEntry)
         {
-            _context = context;
             _roomDataRepository = roomDataRepository;
             _playerFactory = playerFactory;
             _enemyFactory = enemyFactory;
             _sceneResourceProvider = sceneResourceProvider;
+            _stageConfigEntry = stageConfigEntry;
         }
         
         public void Start()
@@ -36,12 +36,7 @@ namespace DungeonShooter
         private async void CreateStageAsync()
         {
             _stage = await StageGenerator.GenerateStage(_roomDataRepository);
-            await StageInstantiator.InstantiateStage(_context, _playerFactory, _enemyFactory, _sceneResourceProvider, _stage);
-        }
-        
-        private void OnDestroy()
-        {
-            _context?.Dispose();
+            await StageInstantiator.InstantiateStage(_stageConfigEntry, _playerFactory, _enemyFactory, _sceneResourceProvider, _stage);
         }
     }
 }

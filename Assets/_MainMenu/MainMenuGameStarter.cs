@@ -7,9 +7,8 @@ public class MainMenuGameStarter : MonoBehaviour
     private async void Start()
     {
         var loader = new SceneLoader();
-        var context = new StageContext();
-        var isloadSucceedConfig = await context.LoadConfigAsync("StageConfig_001");
-        if(isloadSucceedConfig)
-            await loader.AddContext(context).LoadScene("PrototypeScene");
+        // TODO: 실제 플레이어 선택 및 스테이지 선택 로직으로 대체 필요
+        var context = new StageContext("Player_001", "1"); // playerPrefabKey, stageConfigTableId
+        await loader.AddContext(context).LoadScene("PrototypeScene");
     }
 }

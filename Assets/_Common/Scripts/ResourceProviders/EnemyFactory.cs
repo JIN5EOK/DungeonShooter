@@ -14,26 +14,26 @@ namespace DungeonShooter
     /// </summary>
     public class EnemyFactory : IEnemyFactory
     {
-        private readonly StageConfig _stageConfig;
+        private readonly StageConfigTableEntry _stageConfigEntry;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private List<string> EnemyAddresses { get; set; }
 
         [Inject]
-        public EnemyFactory(StageContext context, ISceneResourceProvider sceneResourceProvider)
+        public EnemyFactory(StageConfigTableEntry stageConfigEntry, ISceneResourceProvider sceneResourceProvider)
         {
-            _stageConfig = context.StageConfig;
+            _stageConfigEntry = stageConfigEntry;
             _sceneResourceProvider = sceneResourceProvider;
             Initialize();
         }
 
         /// <summary>
-        /// StageConfig의 Label 데이터를 기반으로 에셋의 어드레스 목록을 로드하여 저장합니다.
+        /// StageConfigTableEntry의 Label 데이터를 기반으로 에셋의 어드레스 목록을 로드하여 저장합니다.
         /// </summary>
         private void Initialize()
         {
-            if (!string.IsNullOrEmpty(_stageConfig.StageEnemyLabel.labelString))
+            if (!string.IsNullOrEmpty(_stageConfigEntry.StageEnemiesLabel))
             {
-                var handle = Addressables.LoadResourceLocationsAsync(_stageConfig.StageEnemyLabel.labelString);
+                var handle = Addressables.LoadResourceLocationsAsync(_stageConfigEntry.StageEnemiesLabel);
                 handle.WaitForCompletion();
                 EnemyAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
 

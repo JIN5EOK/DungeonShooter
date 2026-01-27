@@ -10,13 +10,13 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerFactory : IPlayerFactory
     {
-        private readonly StageConfig _stageConfig;
+        private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
 
         [Inject]
         public PlayerFactory(StageContext context, ISceneResourceProvider sceneResourceProvider)
         {
-            _stageConfig = context.StageConfig;
+            _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
         }
 
@@ -56,13 +56,13 @@ namespace DungeonShooter
         /// </summary>
         private string GetPlayerAddress()
         {
-            if (_stageConfig.PlayerPrefab == null || !_stageConfig.PlayerPrefab.RuntimeKeyIsValid())
+            if (string.IsNullOrEmpty(_stageContext.PlayerPrefabKey))
             {
-                Debug.LogWarning($"[{nameof(PlayerFactory)}] 플레이어 프리팹이 설정되지 않았습니다.");
+                Debug.LogWarning($"[{nameof(PlayerFactory)}] 플레이어 프리팹 키가 설정되지 않았습니다.");
                 return null;
             }
 
-            return _stageConfig.PlayerPrefab.RuntimeKey.ToString();
+            return _stageContext.PlayerPrefabKey;
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace DungeonShooter
         /// <summary>
         /// Stage를 실제 게임오브젝트로 변환합니다.
         /// </summary>
-        /// <param name="stageContext">스테이지 컨텍스트</param>
+        /// <param name="stageConfigEntry">스테이지 설정 테이블 엔트리</param>
         /// <param name="playerFactory">플레이어 팩토리</param>
         /// <param name="enemyFactory">적 팩토리</param>
         /// <param name="sceneResourceProvider">씬 리소스 제공자</param>
@@ -24,7 +24,7 @@ namespace DungeonShooter
         /// <param name="parent">부모 Transform (null이면 씬 루트)</param>
         /// <returns>생성된 게임오브젝트를 반환하는 Task</returns>
         public static async Task<GameObject> InstantiateStage(
-            StageContext stageContext,
+            StageConfigTableEntry stageConfigEntry,
             IPlayerFactory playerFactory,
             IEnemyFactory enemyFactory,
             ISceneResourceProvider sceneResourceProvider,
@@ -37,7 +37,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            if (stageContext == null || playerFactory == null || enemyFactory == null || sceneResourceProvider == null)
+            if (stageConfigEntry == null || playerFactory == null || enemyFactory == null || sceneResourceProvider == null)
             {
                 LogHandler.LogError(nameof(StageInstantiator), "리소스 제공자가 null입니다.");
                 return null;
@@ -52,7 +52,7 @@ namespace DungeonShooter
             // Stage 레벨 타일맵 구조 생성
             RoomCreateHelper.GetOrCreateRoomStructure(stageObj.transform);
 
-            var groundTile = await LoadGroundTileAsync(stageContext, sceneResourceProvider);
+            var groundTile = await LoadGroundTileAsync(stageConfigEntry, sceneResourceProvider);
             // 모든 방의 타일과 오브젝트를 Stage 레벨에 배치
             foreach (var room in stage.Rooms.Values)
             {
@@ -94,16 +94,15 @@ namespace DungeonShooter
         /// <summary>
         /// Ground 타일을 로드합니다.
         /// </summary>
-        private static async UniTask<TileBase> LoadGroundTileAsync(StageContext stageContext, ISceneResourceProvider sceneResourceProvider)
+        private static async UniTask<TileBase> LoadGroundTileAsync(StageConfigTableEntry stageConfigEntry, ISceneResourceProvider sceneResourceProvider)
         {
-            if (stageContext?.StageConfig?.GroundTile == null || !stageContext.StageConfig.GroundTile.RuntimeKeyIsValid())
+            if (stageConfigEntry == null || string.IsNullOrEmpty(stageConfigEntry.GroundTileKey))
             {
                 LogHandler.LogError(nameof(StageInstantiator), "Ground 타일이 설정되지 않았습니다.");
                 return null;
             }
 
-            var address = stageContext.StageConfig.GroundTile.RuntimeKey.ToString();
-            return await sceneResourceProvider.GetAssetAsync<TileBase>(address);
+            return await sceneResourceProvider.GetAssetAsync<TileBase>(stageConfigEntry.GroundTileKey);
         }
 
         /// <summary>

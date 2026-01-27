@@ -11,7 +11,6 @@ namespace DungeonShooter
         [SerializeField] private AssetReferenceT<TileBase> _groundTile;
         [SerializeField] public AssetLabelReference _stageEnemyLabel;
         [SerializeField] private AssetReferenceT<Player> _playerPrefab;
-        
         [SerializeField] public AssetLabelReference _startRoomDataLabel;
         [SerializeField] public AssetLabelReference _normalRoomDataLabel;
         [SerializeField] public AssetLabelReference _bossRoomDataLabel;
