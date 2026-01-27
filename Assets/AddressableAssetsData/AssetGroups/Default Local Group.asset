@@ -63,6 +63,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 85ba9cffafc5e47aab3685d1b8a877a5
+    m_Address: StageConfigTable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8a4d5face077b4eec84984c7e30f619a
     m_Address: Stage001_0003
     m_ReadOnly: 0

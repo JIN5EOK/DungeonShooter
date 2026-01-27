@@ -1,4 +1,3 @@
-using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -19,7 +18,7 @@ namespace DungeonShooter
             builder.Register<RoomDataRepository>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SkillFactory>(Lifetime.Scoped);
             builder.Register<ItemFactory>(Lifetime.Scoped);
-            builder.RegisterEntryPoint<SceneStartInjector>();
+            builder.RegisterEntryPoint<StageManager>(Lifetime.Scoped);
             base.Configure(builder);
         }
     }

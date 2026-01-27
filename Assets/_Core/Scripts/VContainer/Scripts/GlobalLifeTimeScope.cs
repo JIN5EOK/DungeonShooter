@@ -12,7 +12,6 @@ namespace DungeonShooter
         {
             builder.Register<InputManager>(Lifetime.Singleton);
             builder.Register<LocalTableRepository>(Lifetime.Singleton).AsImplementedInterfaces();
-            
             base.Configure(builder);
         }
         

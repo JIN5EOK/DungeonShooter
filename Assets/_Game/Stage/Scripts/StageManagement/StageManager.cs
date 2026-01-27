@@ -1,9 +1,10 @@
 using UnityEngine;
 using VContainer;
+using VContainer.Unity;
 
 namespace DungeonShooter
 {
-    public class StageManager : MonoBehaviour
+    public class StageManager : IStartable
     {
         private Stage _stage;
 

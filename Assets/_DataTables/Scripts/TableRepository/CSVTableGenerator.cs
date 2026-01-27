@@ -11,7 +11,7 @@ namespace DungeonShooter
     /// </summary>
     public static class CSVTableGenerator
     {
-        private const string DataTablePath = "Assets/_Data/Tables";
+        private const string DataTablePath = "Assets/_DataTables/Tables";
 
         /// <summary>
         /// SkillTable.csv 파일을 생성합니다.
@@ -29,6 +29,15 @@ namespace DungeonShooter
         public static void GenerateItemTableCSV()
         {
             GenerateCSVTemplate(typeof(ItemTableEntry), "ItemTable.csv");
+        }
+
+        /// <summary>
+        /// StageConfigTable.csv 파일을 생성합니다.
+        /// </summary>
+        [MenuItem("Tools/Generate Tables/Generate StageConfigTable.csv")]
+        public static void GenerateStageConfigTableCSV()
+        {
+            GenerateCSVTemplate(typeof(StageConfigTableEntry), "StageConfigTable.csv");
         }
 
         /// <summary>
@@ -61,7 +70,7 @@ namespace DungeonShooter
             {
                 writer.WriteLine(headerBuilder.ToString());
                 
-                // 예시 데이터 추가 (SkillTable인 경우)
+                // 예시 데이터 추가
                 if (tableEntryType == typeof(SkillTableEntry))
                 {
                     writer.WriteLine("1,파이어볼,적을 태우는 화염구,skill_fireball_icon,skill_example,range:5.0/speed:2.5,damage:30/count:3,30,0,0.5,5.0,1,10.0");
@@ -69,6 +78,10 @@ namespace DungeonShooter
                 else if (tableEntryType == typeof(ItemTableEntry))
                 {
                     writer.WriteLine("1,item_example,Example Item,Consume,10,1,0,0,0,item_icon");
+                }
+                else if (tableEntryType == typeof(StageConfigTableEntry))
+                {
+                    writer.WriteLine("1,ground_tile_default,enemies_stage1,start_rooms_stage1,normal_rooms_stage1,boss_rooms_stage1");
                 }
             }
 

@@ -1,14 +1,26 @@
 using DungeonShooter;
 using UnityEngine;
+using VContainer;
+using VContainer.Unity;
 
-public class MainMenuGameStarter : MonoBehaviour
+public class MainMenuGameStarter : IStartable
 {
     // TODO: 테스트용 코드로 개선 필요함
-    private async void Start()
+    [Inject]
+    private async void Construct(ITableRepository tableRepository)
     {
         var loader = new SceneLoader();
         // TODO: 실제 플레이어 선택 및 스테이지 선택 로직으로 대체 필요
-        var context = new StageContext("Player_001", "1"); // playerPrefabKey, stageConfigTableId
-        await loader.AddContext(context).LoadScene("PrototypeScene");
+        var context = new StageContext("Player", 13000001); // playerPrefabKey, stageConfigTableId
+        var stageConfigTableEntry = tableRepository.GetTableEntry<StageConfigTableEntry>(context.StageConfigTableId);
+
+        await loader
+        .AddContext(context)
+        .AddContext(stageConfigTableEntry)
+        .LoadScene("PrototypeScene");
+    }
+
+    public void Start()
+    {
     }
 }
