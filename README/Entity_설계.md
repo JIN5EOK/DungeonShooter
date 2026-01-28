@@ -75,18 +75,20 @@ classDiagram
 * 따라서 컴포넌트간 참조가 필요하다면 gameObject.GetComponent를 통해 참조
 * 특정 컴포넌트가 존재하지 않을 가능성이 존재하므로 다른 컴포넌트를 참조할때 예외처리 반드시 수행
 
----
-## 스텟 시스템 구조 구상
+## Entity 스탯 시스템 구조
 
-- `EntityStatsTableEntry` : 데이터 테이블로 작성하는 개체별 '기본 스탯'
-- `EntityStats` : Entity마다 개별로 존재하는 스탯 인스턴스
-
-1. EntityStatsTableEntry에서 필요한 스탯을 읽어온다
-2. EntityStats를 생성한다
-3. 게임오브젝트에 StatsComponent를 AddComponent 하고 EntityStats을 집어넣는다
-
+### Player, Enemy테이블과 Stats 테이블, 관계구조
 ```mermaid
 classDiagram
+    
+    class EntityStats{
+        +statsTableEntry : EntityStatsTableEntry
+        // 원본 스텟을 기반으로 레벨,장비등의 추가 계산을 통해 최종스텟 결정
+        +MaxHp : int
+        +Damage : int
+        +Defense : int
+        +MoveSpeed : float
+    }
     class EntityStatsTableEntry["EntityStatsTableEntry<br>스탯 테이블 데이터"]{
         +Id : int
         +MaxHp : int
@@ -114,6 +116,18 @@ classDiagram
         +StatsId // 스텟 TableEntryId
     }
 
+    EntityStats --> EntityStatsTableEntry  : 테이블 데이터에 기반하여 생성
     EntityStatsTableEntry <.. PlayerConfigTableEntry : Table ID로 간접 참조
     EntityStatsTableEntry <.. EnemyConfigTableEntry : Table ID로 간접 참조
 ```
+
+
+- 스탯 클래스 구분
+    - `EntityStatsTableEntry` : 데이터 테이블로 작성하는 개체별 '기본 스탯'
+    - `EntityStats` : Entity마다 개별로 존재하는 스탯 인스턴스
+
+- Entity에 스탯을 초기화하는 과정
+    1. `PlayerConfigTableEntry`, `EnemyConfigTableEntry`에서 스탯 ID를 가져온다
+    2. `ITableRepository`에서 ID로 조회해 `EntityStatsTableEntry`를 가져온다
+    3. 가져온 데이터 기반으로 EntityStats를 생성한다
+    4. 게임오브젝트에 `StatsComponent`를 AddComponent 하고 생성한 `EntityStats`을 집어넣는다
