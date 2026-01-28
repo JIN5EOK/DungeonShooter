@@ -16,7 +16,7 @@ namespace DungeonShooter
         public int MaxHp { get; set; }
 
         /// <summary>기본 공격력</summary>
-        public int Damage { get; set; }
+        public int Attack { get; set; }
 
         /// <summary>방어력</summary>
         public int Defense { get; set; }

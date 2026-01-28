@@ -74,6 +74,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - Stage001_NormalRoom
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9051e82d508094d1989b194fb7b2dd7e
+    m_Address: EntityStatsTable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 93f3e96e2de814f8080f7b6d455b1f50
     m_Address: Tile_Misc_001
     m_ReadOnly: 0
@@ -106,6 +111,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f5237e1a4b00d4fe0a0f4fa9d094686c
     m_Address: StageConfig_001
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fcdb8e067ff4a47068dd02615bcdb50d
+    m_Address: EnemyConfigTable
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

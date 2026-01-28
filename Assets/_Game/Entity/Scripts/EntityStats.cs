@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using UnityEngine.Serialization;
 
 namespace DungeonShooter
 {
@@ -16,8 +17,9 @@ namespace DungeonShooter
         [Tooltip("최대 체력")]
         [SerializeField] private int maxHealth = 100;
 
+        [FormerlySerializedAs("attackDamage")]
         [Tooltip("기본 공격력")]
-        [SerializeField] private int attackDamage = 10;
+        [SerializeField] private int attack = 10;
 
         [Tooltip("방어력 (받는 데미지 감소량)")]
         [SerializeField] private int defense = 0;
@@ -35,16 +37,37 @@ namespace DungeonShooter
             set => maxHealth = Mathf.Max(1, value);
         }
 
-        public int AttackDamage
+        public int Attack
         {
-            get => attackDamage;
-            set => attackDamage = Mathf.Max(0, value);
+            get => attack;
+            set => attack = Mathf.Max(0, value);
         }
 
         public int Defense
         {
             get => defense;
             set => defense = Mathf.Max(0, value);
+        }
+
+        /// <summary>
+        /// 테이블 엔트리에서 EntityStats 인스턴스를 생성합니다.
+        /// </summary>
+        public static EntityStats FromTableEntry(EntityStatsTableEntry entry)
+        {
+            if (entry == null)
+            {
+                return null;
+            }
+
+            var stats = new EntityStats
+            {
+                MoveSpeed = entry.MoveSpeed,
+                MaxHealth = entry.MaxHp,
+                Attack = entry.Attack,
+                Defense = entry.Defense
+            };
+
+            return stats;
         }
 
         public EntityStats() {}
@@ -55,7 +78,7 @@ namespace DungeonShooter
 
             moveSpeed = other.moveSpeed;
             maxHealth = other.maxHealth;
-            attackDamage = other.attackDamage;
+            attack = other.attack;
             defense = other.defense;
         }
 

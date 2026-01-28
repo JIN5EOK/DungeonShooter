@@ -8,13 +8,8 @@ namespace DungeonShooter
     /// </summary>
     public class EntityStatsComponent : MonoBehaviour, IEntityStats
     {
-        [Header("스테이터스 설정")]
+        [Header("스테이터스")]
         [SerializeField] private EntityStats stats = new EntityStats();
-
-        /// <summary>
-        /// 현재 스테이터스 (읽기 전용)
-        /// </summary>
-        public EntityStats Stats => stats;
 
         /// <summary>
         /// 스테이터스 초기화 (다른 EntityStats로 설정)
@@ -27,7 +22,6 @@ namespace DungeonShooter
             }
         }
 
-        // IEntityStats 구현 (stats에 위임)
         public float MoveSpeed
         {
             get => stats.MoveSpeed;
@@ -40,10 +34,10 @@ namespace DungeonShooter
             set => stats.MaxHealth = value;
         }
 
-        public int AttackDamage
+        public int Attack
         {
-            get => stats.AttackDamage;
-            set => stats.AttackDamage = value;
+            get => stats.Attack;
+            set => stats.Attack = value;
         }
 
         public int Defense

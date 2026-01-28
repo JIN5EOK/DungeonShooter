@@ -7,7 +7,7 @@ namespace DungeonShooter
     {
         float MoveSpeed { get; set; }
         int MaxHealth { get; set; }
-        int AttackDamage { get; set; }
+        int Attack { get; set; }
         int Defense { get; set; }
     }
 }

@@ -9,9 +9,6 @@ namespace DungeonShooter
 {
     public class Player : EntityBase
     {
-        [Header("스탯 컴포넌트")]
-        [SerializeField] private EntityStatsComponent statsComponent;
-
         private InputManager _inputManager;
         private HealthComponent _healthComponent;
         private bool _isDead;
@@ -25,21 +22,43 @@ namespace DungeonShooter
         private PlayerConfigTableEntry _playerConfigTableEntry;
         private ISceneResourceProvider _sceneResourceProvider;
         private ItemFactory _itemFactory;
+        private ITableRepository _tableRepository;
         [Inject]
         private void Construct(InputManager inputManager
             , Inventory inventory
             , ISceneResourceProvider sceneResourceProvider
-            , ItemFactory itemFactory)
+            , ItemFactory itemFactory
+            , ITableRepository tableRepository)
         {
             _inputManager = inputManager;
             _inventory = inventory;
             _sceneResourceProvider = sceneResourceProvider;
             _itemFactory = itemFactory;
+            _tableRepository = tableRepository;
         }
 
         public async UniTask Initialize(PlayerConfigTableEntry playerConfigTableEntry)
         {
+            if (playerConfigTableEntry == null)
+            {
+                LogHandler.LogWarning<Player>($"PlayerConfigTableEntry를 찾을 수 없습니다.");
+                return;
+            }
+
             _playerConfigTableEntry = playerConfigTableEntry;
+
+            
+            // 스탯 테이블 엔트리 로드 및 EntityBase 초기화
+            var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(_playerConfigTableEntry.StatsId);
+            if (statsEntry == null)
+            {
+                LogHandler.LogWarning<Player>($"EntityStatsTableEntry를 찾을 수 없습니다. ID: {_playerConfigTableEntry.StatsId}");
+                return;
+            }
+            
+            
+            base.Initialize(statsEntry);
+            
             _skillComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
             await _skillComponent.RegistSkill(_playerConfigTableEntry.Skill1Id);
             await _skillComponent.RegistSkill(_playerConfigTableEntry.Skill2Id);
@@ -53,6 +72,7 @@ namespace DungeonShooter
             _interactComponent = gameObject.AddOrGetComponent<InteractComponent>();
             _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();
             _dashComponent  =  gameObject.AddOrGetComponent<DashComponent>();
+            _healthComponent.FullHeal();
             _healthComponent.OnDeath += HandleDeath;
             
             SubscribeInputEvent();

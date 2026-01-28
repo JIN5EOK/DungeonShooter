@@ -27,7 +27,7 @@ namespace DungeonShooter
 
         target.MoveSpeed = source.MoveSpeed;
         target.MaxHealth = source.MaxHealth;
-        target.AttackDamage = source.AttackDamage;
+        target.Attack = source.Attack;
         target.Defense = source.Defense;
     }
     }

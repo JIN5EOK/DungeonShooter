@@ -16,7 +16,7 @@ namespace DungeonShooter
 
         public int MaxHealth
         {
-            get => statsComponent.Stats.MaxHealth;
+            get => statsComponent.MaxHealth;
         }
         public int CurrentHealth { get; private set; }
         public float HealthPercent => MaxHealth > 0 ? (float)CurrentHealth / MaxHealth : 0f;

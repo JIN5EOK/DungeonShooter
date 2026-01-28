@@ -1,2 +1,2 @@
-Id,Name,Description,GameObjectKey,StartWeaponId,Skill1Id,Skill2Id
-12000000,플레이어1,기본 플레이어 캐릭터,Player,15000001,14000101,14000101
+Id,Name,Description,GameObjectKey,StartWeaponId,Skill1Id,Skill2Id,StatsId
+12000000,플레이어1,기본 플레이어 캐릭터,Player,15000001,14000101,14000101,17000001

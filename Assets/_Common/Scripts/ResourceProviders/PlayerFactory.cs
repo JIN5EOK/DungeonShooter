@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Jin5eok;
 using UnityEngine;
 using VContainer;
 using Object = UnityEngine.Object;
@@ -15,7 +16,6 @@ namespace DungeonShooter
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
         private PlayerConfigTableEntry _playerConfigTableEntry;
-        private ItemFactory _itemFactory;
         [Inject]
         public PlayerFactory(StageContext context
             , ISceneResourceProvider sceneResourceProvider
@@ -93,7 +93,6 @@ namespace DungeonShooter
                 LogHandler.LogWarning<PlayerFactory>($"플레이어 인스턴스가 생성되지 않았습니다.");
                 return null;
             }
-
             var player = _sceneResourceProvider.AddOrGetComponentWithInejct<Player>(playerInstance);
             await player.Initialize(_playerConfigTableEntry);
             return player;
