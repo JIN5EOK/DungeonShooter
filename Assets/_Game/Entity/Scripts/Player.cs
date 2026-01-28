@@ -53,8 +53,8 @@ namespace DungeonShooter
             if (_inputManager == null) return;
 
             _inputManager.OnMoveInputChanged += HandleMoveInputChanged;
+            _inputManager.OnWeaponAttack += HandleWeaponAttackInput;
             _inputManager.OnSkill1Pressed += HandleSkill1Input;
-            _inputManager.OnSkill2Pressed += HandleSkill2Input;
             _inputManager.OnInteractPressed += HandleInteractInput;
         }
         
@@ -64,12 +64,12 @@ namespace DungeonShooter
             _movementComponent.Direction = input;
         }
 
-        private void HandleSkill1Input()
+        private void HandleWeaponAttackInput()
         {
             _inventory.EquippedWeapon.ActiveSkill.Execute(this).Forget();
         }
         
-        private void HandleSkill2Input()
+        private void HandleSkill1Input()
         {
             _skillComponent.UseSkill(14000101, this).Forget();
         }
@@ -140,8 +140,9 @@ namespace DungeonShooter
             if (_inputManager == null) return;
 
             _inputManager.OnMoveInputChanged -= HandleMoveInputChanged;
+            _inputManager.OnWeaponAttack -= HandleWeaponAttackInput;
             _inputManager.OnSkill1Pressed -= HandleSkill1Input;
-            _inputManager.OnSkill1Pressed -= HandleSkill2Input;
+            
             _inputManager.OnInteractPressed -= HandleInteractInput;
         }
 
