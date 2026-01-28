@@ -76,3 +76,44 @@ classDiagram
 * 특정 컴포넌트가 존재하지 않을 가능성이 존재하므로 다른 컴포넌트를 참조할때 예외처리 반드시 수행
 
 ---
+## 스텟 시스템 구조 구상
+
+- `EntityStatsTableEntry` : 데이터 테이블로 작성하는 개체별 '기본 스탯'
+- `EntityStats` : Entity마다 개별로 존재하는 스탯 인스턴스
+
+1. EntityStatsTableEntry에서 필요한 스탯을 읽어온다
+2. EntityStats를 생성한다
+3. 게임오브젝트에 StatsComponent를 AddComponent 하고 EntityStats을 집어넣는다
+
+```mermaid
+classDiagram
+    class EntityStatsTableEntry["EntityStatsTableEntry<br>스탯 테이블 데이터"]{
+        +Id : int
+        +MaxHp : int
+        +Damage : int
+        +Defense : int
+        +MoveSpeed : float
+    }
+
+    class PlayerConfigTableEntry["PlayerConfigTableEntry<br>플레이어 테이블 데이터"]{
+        +Id int
+        +Name string
+        +Description string
+        +GameObjectKey string // 게임오브젝트 주소
+        +StartWeaponId int // 시작 무기 TableEntry Id
+        +Skill1Id int // 1번 스킬 TableEntry Id
+        +Skill2Id int // 2번 스킬 TableEntry Id
+        +StatsId // 스텟 TableEntryId
+    }
+    
+    class EnemyConfigTableEntry["EnemyConfigTableEntry<br>적 테이블 데이터"]{
+        +Id int
+        +Name string
+        +GameObjectKey string
+        +AIType string // 행동 타입
+        +StatsId // 스텟 TableEntryId
+    }
+
+    EntityStatsTableEntry <.. PlayerConfigTableEntry : Table ID로 간접 참조
+    EntityStatsTableEntry <.. EnemyConfigTableEntry : Table ID로 간접 참조
+```
