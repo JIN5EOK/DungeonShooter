@@ -28,5 +28,8 @@ namespace DungeonShooter
         
         /// <summary> 2번 스킬 SkillTableEntry.Id </summary>
         public int Skill2Id { get; set; }
+        
+        /// <summary> 기본 스탯 EntityStatsTableEntry.Id </summary>
+        public int StatsId { get; set; }
     }
 }

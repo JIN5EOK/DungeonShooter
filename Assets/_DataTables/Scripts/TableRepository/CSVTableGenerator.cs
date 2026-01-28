@@ -41,6 +41,24 @@ namespace DungeonShooter
         }
 
         /// <summary>
+        /// EntityStatsTable.csv 파일을 생성합니다.
+        /// </summary>
+        [MenuItem("Tools/Generate Tables/Generate EntityStatsTable.csv")]
+        public static void GenerateEntityStatsTableCSV()
+        {
+            GenerateCSVTemplate(typeof(EntityStatsTableEntry), "EntityStatsTable.csv");
+        }
+
+        /// <summary>
+        /// EnemyConfigTable.csv 파일을 생성합니다.
+        /// </summary>
+        [MenuItem("Tools/Generate Tables/Generate EnemyConfigTable.csv")]
+        public static void GenerateEnemyConfigTableCSV()
+        {
+            GenerateCSVTemplate(typeof(EnemyConfigTableEntry), "EnemyConfigTable.csv");
+        }
+
+        /// <summary>
         /// PlayerConfigTable.csv 파일을 생성합니다.
         /// </summary>
         [MenuItem("Tools/Generate Tables/Generate PlayerConfigTable.csv")]
@@ -94,7 +112,15 @@ namespace DungeonShooter
                 }
                 else if (tableEntryType == typeof(PlayerConfigTableEntry))
                 {
-                    writer.WriteLine("1,플레이어1,기본 플레이어 캐릭터,Player,1,1,2");
+                    writer.WriteLine("1,플레이어1,기본 플레이어 캐릭터,Player,1,1,2,1");
+                }
+                else if (tableEntryType == typeof(EntityStatsTableEntry))
+                {
+                    writer.WriteLine("1,100,10,0,5.0");
+                }
+                else if (tableEntryType == typeof(EnemyConfigTableEntry))
+                {
+                    writer.WriteLine("1,Enemy_Example,EnemyPrefabKey,Melee,1");
                 }
             }
 

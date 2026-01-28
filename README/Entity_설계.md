@@ -105,15 +105,15 @@ classDiagram
         +StartWeaponId int // 시작 무기 TableEntry Id
         +Skill1Id int // 1번 스킬 TableEntry Id
         +Skill2Id int // 2번 스킬 TableEntry Id
-        +StatsId // 스텟 TableEntryId
+        +StatsId int // 스텟 EntityStatsTableEntry.Id
     }
     
     class EnemyConfigTableEntry["EnemyConfigTableEntry<br>적 테이블 데이터"]{
         +Id int
         +Name string
-        +GameObjectKey string
+        +GameObjectKey string // 적 프리팹 주소
         +AIType string // 행동 타입
-        +StatsId // 스텟 TableEntryId
+        +StatsId int // 스텟 EntityStatsTableEntry.Id
     }
 
     EntityStats --> EntityStatsTableEntry  : 테이블 데이터에 기반하여 생성

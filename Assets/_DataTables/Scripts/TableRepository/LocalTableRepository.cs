@@ -23,6 +23,8 @@ namespace DungeonShooter
             LoadAndCacheTable<ItemTableEntry>("ItemTable");
             LoadAndCacheTable<StageConfigTableEntry>("StageConfigTable");
             LoadAndCacheTable<PlayerConfigTableEntry>("PlayerConfigTable");
+            LoadAndCacheTable<EntityStatsTableEntry>("EntityStatsTable");
+            LoadAndCacheTable<EnemyConfigTableEntry>("EnemyConfigTable");
         }
 
         /// <summary>
