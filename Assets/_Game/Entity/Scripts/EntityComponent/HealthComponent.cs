@@ -32,13 +32,12 @@ namespace DungeonShooter
 
         private void Awake()
         {
-            statsComponent = ComponentExtension.AddOrGetComponent<EntityStatsComponent>(gameObject);
+            statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
             CurrentHealth = MaxHealth;
-
-            _spriteRenderer = ComponentExtension.AddOrGetComponent<SpriteRenderer>(gameObject);
+            _spriteRenderer = gameObject.AddOrGetComponent<SpriteRenderer>();
             _originalColor = _spriteRenderer.color;
-            _rigidbody = ComponentExtension.AddOrGetComponent<Rigidbody2D>(gameObject);
-            _collider = ComponentExtension.AddOrGetComponent<Collider2D>(gameObject);
+            _rigidbody = gameObject.AddOrGetComponent<Rigidbody2D>();
+            _collider = gameObject.AddOrGetComponent<Collider2D>();
         }
 
         /// <summary>

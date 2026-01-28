@@ -11,25 +11,26 @@ namespace DungeonShooter
         [Header("구르기 설정")]
         [SerializeField] private float _dashSpeed = 15f;
         [SerializeField] private float _dashDuration = 0.3f;
-        [SerializeField] private float _dashCooldown = 0.8f;
+        [SerializeField] private float _dashCooldown = 1.0f;
 
         public float DashSpeed => _dashSpeed;
         public float DashDuration => _dashDuration;
         public float DashCooldown => _dashCooldown;
         
         private Rigidbody2D _rigidbody;
-        
+        private MovementComponent _movementComponent;
         private bool _isDashing;
         private float _dashTimer;
         private float _cooldownRemaining;
         private Vector2 _moveInput;
-
+        
         public bool IsDashing => _isDashing;
         public bool IsReady => _cooldownRemaining <= 0f;
-
-        private void Awake()
+        
+        private void Start()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
+            _movementComponent = GetComponent<MovementComponent>();
         }
 
         private void Update()
@@ -40,14 +41,6 @@ namespace DungeonShooter
         private void FixedUpdate()
         {
             UpdateDash();
-        }
-
-        /// <summary>
-        /// 이동 입력과 마지막 바라본 방향을 설정합니다.
-        /// </summary>
-        public void SetInputs(Vector2 moveInput)
-        {
-            _moveInput = moveInput;
         }
 
         /// <summary>
@@ -63,14 +56,14 @@ namespace DungeonShooter
             _isDashing = true;
             _dashTimer = _dashDuration;
             _cooldownRemaining = _dashCooldown;
-            
+            _moveInput = _movementComponent.LookDirection;
             LogHandler.Log<DashComponent>("구르기!");
         }
 
         /// <summary>
         /// 구르기 상태를 업데이트합니다.
         /// </summary>
-        public void UpdateDash()
+        private void UpdateDash()
         {
             if (!_isDashing)
             {

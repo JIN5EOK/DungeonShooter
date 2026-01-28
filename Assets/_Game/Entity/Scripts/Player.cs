@@ -19,6 +19,7 @@ namespace DungeonShooter
         private MovementComponent _movementComponent;
         private SkillComponent _skillComponent;
         private InteractComponent _interactComponent;
+        private DashComponent _dashComponent;
         private Inventory _inventory;
         
         private PlayerConfigTableEntry _playerConfigTableEntry;
@@ -51,6 +52,7 @@ namespace DungeonShooter
             _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
             _interactComponent = gameObject.AddOrGetComponent<InteractComponent>();
             _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();
+            _dashComponent  =  gameObject.AddOrGetComponent<DashComponent>();
             _healthComponent.OnDeath += HandleDeath;
             
             SubscribeInputEvent();
@@ -68,6 +70,7 @@ namespace DungeonShooter
             _inputManager.OnWeaponAttack += HandleWeaponAttackInput;
             _inputManager.OnSkill1Pressed += HandleSkill1Input;
             _inputManager.OnInteractPressed += HandleInteractInput;
+            _inputManager.OnDashPressed += HandleDashInput;
         }
         
         // ==================== 입력 처리 ====================
@@ -76,6 +79,11 @@ namespace DungeonShooter
             _movementComponent.Direction = input;
         }
 
+        private void HandleDashInput()
+        {
+            _dashComponent?.StartDash();
+        }
+        
         private void HandleWeaponAttackInput()
         {
             _inventory.EquippedWeapon?.ActiveSkill.Execute(this).Forget();
@@ -154,7 +162,7 @@ namespace DungeonShooter
             _inputManager.OnMoveInputChanged -= HandleMoveInputChanged;
             _inputManager.OnWeaponAttack -= HandleWeaponAttackInput;
             _inputManager.OnSkill1Pressed -= HandleSkill1Input;
-            
+            _inputManager.OnDashPressed -= HandleDashInput;
             _inputManager.OnInteractPressed -= HandleInteractInput;
         }
 
