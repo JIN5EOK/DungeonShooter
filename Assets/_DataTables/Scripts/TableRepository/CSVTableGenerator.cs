@@ -41,6 +41,15 @@ namespace DungeonShooter
         }
 
         /// <summary>
+        /// PlayerConfigTable.csv 파일을 생성합니다.
+        /// </summary>
+        [MenuItem("Tools/Generate Tables/Generate PlayerConfigTable.csv")]
+        public static void GeneratePlayerConfigTableCSV()
+        {
+            GenerateCSVTemplate(typeof(PlayerConfigTableEntry), "PlayerConfigTable.csv");
+        }
+
+        /// <summary>
         /// CSV 템플릿 파일을 생성합니다.
         /// 헤더와 예시 데이터를 포함합니다.
         /// </summary>
@@ -82,6 +91,10 @@ namespace DungeonShooter
                 else if (tableEntryType == typeof(StageConfigTableEntry))
                 {
                     writer.WriteLine("1,ground_tile_default,enemies_stage1,start_rooms_stage1,normal_rooms_stage1,boss_rooms_stage1");
+                }
+                else if (tableEntryType == typeof(PlayerConfigTableEntry))
+                {
+                    writer.WriteLine("1,플레이어1,기본 플레이어 캐릭터,Player,1,1,2");
                 }
             }
 

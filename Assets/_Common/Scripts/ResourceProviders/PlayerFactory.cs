@@ -12,17 +12,18 @@ namespace DungeonShooter
     {
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
+        private readonly ITableRepository _tableRepository;
 
         [Inject]
-        public PlayerFactory(StageContext context, ISceneResourceProvider sceneResourceProvider)
+        public PlayerFactory(StageContext context, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository)
         {
             _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
+            _tableRepository = tableRepository;
         }
 
         /// <summary>
         /// 플레이어 캐릭터를 가져옵니다
-        /// TODO: 다양한 캐릭터 형태에 대응하도록 변경 필요
         /// </summary>
         public async UniTask<Player> GetPlayerAsync()
         {
@@ -56,13 +57,20 @@ namespace DungeonShooter
         /// </summary>
         private string GetPlayerAddress()
         {
-            if (string.IsNullOrEmpty(_stageContext.PlayerPrefabKey))
+            var playerConfig = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
+            if (playerConfig == null)
             {
-                Debug.LogWarning($"[{nameof(PlayerFactory)}] 플레이어 프리팹 키가 설정되지 않았습니다.");
+                Debug.LogWarning($"[{nameof(PlayerFactory)}] PlayerConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.PlayerConfigTableId}");
                 return null;
             }
 
-            return _stageContext.PlayerPrefabKey;
+            if (string.IsNullOrEmpty(playerConfig.GameObjectKey))
+            {
+                Debug.LogWarning($"[{nameof(PlayerFactory)}] 플레이어 게임오브젝트 키가 설정되지 않았습니다. ID: {_stageContext.PlayerConfigTableId}");
+                return null;
+            }
+
+            return playerConfig.GameObjectKey;
         }
 
         /// <summary>

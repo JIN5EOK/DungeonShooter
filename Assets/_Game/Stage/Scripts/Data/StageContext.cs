@@ -7,12 +7,12 @@ namespace DungeonShooter
     /// </summary>
     public class StageContext
     {
-        public readonly string PlayerPrefabKey;
+        public readonly int PlayerConfigTableId;
         public readonly int StageConfigTableId;
 
-        public StageContext(string playerPrefabKey, int stageConfigTableId)
+        public StageContext(int playerConfigTableId, int stageConfigTableId)
         {
-            PlayerPrefabKey = playerPrefabKey;
+            PlayerConfigTableId = playerConfigTableId;
             StageConfigTableId = stageConfigTableId;
         }
     }

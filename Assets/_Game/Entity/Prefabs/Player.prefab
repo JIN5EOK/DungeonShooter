@@ -97,6 +97,7 @@ GameObject:
   - component: {fileID: 4765213063567705226}
   - component: {fileID: 8085422767866510689}
   - component: {fileID: 7131252452929976203}
+  - component: {fileID: 4476529316084594537}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -235,18 +236,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   statsComponent: {fileID: 0}
-  skill1Cooldown: 2
-  skill2Cooldown: 3
-  skill3Cooldown: 5
-  skill1Damage: 20
-  skill2Damage: 15
-  skill3Damage: 35
-  jumpDuration: 0.5
-  jumpHeight: 2
-  showSkillRanges: 1
-  skill1Visualizer: {fileID: 0}
-  skill2Visualizer: {fileID: 0}
-  skill3Visualizer: {fileID: 0}
 --- !u!114 &8085422767866510689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,6 +269,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _triggerDetector2D: {fileID: 1939104385748527841}
+--- !u!50 &4476529316084594537
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3073406401155221875}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
 --- !u!1 &8573899989891988922
 GameObject:
   m_ObjectHideFlags: 0

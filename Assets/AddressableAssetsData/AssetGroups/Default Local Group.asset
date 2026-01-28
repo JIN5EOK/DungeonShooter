@@ -79,6 +79,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 985d7166b22864ff5b1fb72d1f3daf52
+    m_Address: PlayerConfigTable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9e907f54a0dbf414c91dbb241d0c338a
     m_Address: FireballLV1SkillData
     m_ReadOnly: 0
