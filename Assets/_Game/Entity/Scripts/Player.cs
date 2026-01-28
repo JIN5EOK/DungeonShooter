@@ -19,31 +19,43 @@ namespace DungeonShooter
         private MovementComponent _movementComponent;
         private SkillComponent _skillComponent;
         private InteractComponent _interactComponent;
-        private ISceneResourceProvider _resourceProvider;
         private Inventory _inventory;
+        
+        private PlayerConfigTableEntry _playerConfigTableEntry;
+        private ISceneResourceProvider _sceneResourceProvider;
+        private ItemFactory _itemFactory;
         [Inject]
-        private async UniTaskVoid Construct(ISceneResourceProvider resourceProvider, InputManager inputManager, Inventory inventory, ItemFactory itemFactory)
+        private void Construct(InputManager inputManager
+            , Inventory inventory
+            , ISceneResourceProvider sceneResourceProvider
+            , ItemFactory itemFactory)
         {
-            _resourceProvider = resourceProvider;
             _inputManager = inputManager;
             _inventory = inventory;
+            _sceneResourceProvider = sceneResourceProvider;
+            _itemFactory = itemFactory;
+        }
 
-            var item = await itemFactory.CreateItemAsync(15000001);
-            await _inventory.AddItem(item);
-            await _inventory.EquipItem(item);
-            _skillComponent = _resourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
-            await _skillComponent.RegistSkill(14000101);
+        public async UniTask Initialize(PlayerConfigTableEntry playerConfigTableEntry)
+        {
+            _playerConfigTableEntry = playerConfigTableEntry;
+            _skillComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
+            await _skillComponent.RegistSkill(_playerConfigTableEntry.Skill1Id);
+            await _skillComponent.RegistSkill(_playerConfigTableEntry.Skill2Id);
+
+            _inventory.SetOwner(this);
+            var weapon = await _itemFactory.CreateItemAsync(_playerConfigTableEntry.StartWeaponId);
+            await _inventory.AddItem(weapon);
+            await _inventory.EquipItem(weapon);
             
             _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
             _interactComponent = gameObject.AddOrGetComponent<InteractComponent>();
-            
-            // 체력 이벤트 구독
             _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();
             _healthComponent.OnDeath += HandleDeath;
             
             SubscribeInputEvent();
         }
-
+        
         // ==================== 입력 매니저 이벤트 구독/해제 ====================
         /// <summary>
         /// 입력 매니저 이벤트를 구독합니다.
@@ -66,12 +78,12 @@ namespace DungeonShooter
 
         private void HandleWeaponAttackInput()
         {
-            _inventory.EquippedWeapon.ActiveSkill.Execute(this).Forget();
+            _inventory.EquippedWeapon?.ActiveSkill.Execute(this).Forget();
         }
         
         private void HandleSkill1Input()
         {
-            _skillComponent.UseSkill(14000101, this).Forget();
+            _skillComponent?.UseSkill(_playerConfigTableEntry.Skill1Id, this).Forget();
         }
         private void HandleInteractInput()
         {

@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -28,15 +29,15 @@ namespace DungeonShooter
             _stageContext = stageContext;
         }
         
-        public void Start()
+        public async void Start()
         {
-            CreateStageAsync();
+            await CreateStageAsync();
         }
         
         /// <summary>
         /// 스테이지 구조와 인스턴스를 생성합니다
         /// </summary>
-        private async void CreateStageAsync()
+        private async UniTask CreateStageAsync()
         {
             _stage = await StageGenerator.GenerateStage(_roomDataRepository);
             var stageConfigEntry = _tableRepository.GetTableEntry<StageConfigTableEntry>(_stageContext.StageConfigTableId);

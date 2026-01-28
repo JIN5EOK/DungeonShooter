@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
@@ -13,13 +14,17 @@ namespace DungeonShooter
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
-
+        private PlayerConfigTableEntry _playerConfigTableEntry;
+        private ItemFactory _itemFactory;
         [Inject]
-        public PlayerFactory(StageContext context, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository)
+        public PlayerFactory(StageContext context
+            , ISceneResourceProvider sceneResourceProvider
+            , ITableRepository tableRepository)
         {
             _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
             _tableRepository = tableRepository;
+            _playerConfigTableEntry = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
         }
 
         /// <summary>
@@ -27,14 +32,17 @@ namespace DungeonShooter
         /// </summary>
         public async UniTask<Player> GetPlayerAsync()
         {
-            var playerAddress = GetPlayerAddress();
-            if (playerAddress == null)
+            try
             {
+                var playerAddress = GetPlayerAddress();
+                var playerInstance = await _sceneResourceProvider.GetInstanceAsync(playerAddress);
+                return await InitializePlayerInstance(playerInstance);
+            }
+            catch (Exception e)
+            {
+                LogHandler.LogError<PlayerFactory>(e, "플레이어를 불러오지 못했습니다.");
                 return null;
             }
-
-            var playerInstance = await _sceneResourceProvider.GetInstanceAsync(playerAddress);
-            return GetPlayerFromInstance(playerInstance, playerAddress);
         }
 
         /// <summary>
@@ -42,14 +50,17 @@ namespace DungeonShooter
         /// </summary>
         public Player GetPlayerSync()
         {
-            var playerAddress = GetPlayerAddress();
-            if (playerAddress == null)
+            try
             {
+                var playerAddress = GetPlayerAddress();
+                var playerInstance = _sceneResourceProvider.GetInstanceSync(playerAddress);
+                return InitializePlayerInstance(playerInstance).GetAwaiter().GetResult();
+            }
+            catch (Exception e)
+            {
+                LogHandler.LogError<PlayerFactory>(e, "플레이어를 불러오지 못했습니다.");
                 return null;
             }
-
-            var playerInstance = _sceneResourceProvider.GetInstanceSync(playerAddress);
-            return GetPlayerFromInstance(playerInstance, playerAddress);
         }
 
         /// <summary>
@@ -57,41 +68,34 @@ namespace DungeonShooter
         /// </summary>
         private string GetPlayerAddress()
         {
-            var playerConfig = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
-            if (playerConfig == null)
+            if (_playerConfigTableEntry == null)
             {
-                Debug.LogWarning($"[{nameof(PlayerFactory)}] PlayerConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.PlayerConfigTableId}");
+                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.PlayerConfigTableId}");
                 return null;
             }
 
-            if (string.IsNullOrEmpty(playerConfig.GameObjectKey))
+            if (string.IsNullOrEmpty(_playerConfigTableEntry.GameObjectKey))
             {
-                Debug.LogWarning($"[{nameof(PlayerFactory)}] 플레이어 게임오브젝트 키가 설정되지 않았습니다. ID: {_stageContext.PlayerConfigTableId}");
+                LogHandler.LogWarning<PlayerFactory>($"플레이어 게임오브젝트 키가 설정되지 않았습니다. ID: {_stageContext.PlayerConfigTableId}");
                 return null;
             }
 
-            return playerConfig.GameObjectKey;
+            return _playerConfigTableEntry.GameObjectKey;
         }
 
         /// <summary>
-        /// 인스턴스에서 Player 컴포넌트 추출 및 검증
+        /// Player 게임오브젝트 초기화
         /// </summary>
-        private Player GetPlayerFromInstance(GameObject playerInstance, string playerAddress)
+        private async UniTask<Player> InitializePlayerInstance(GameObject playerInstance)
         {
             if (playerInstance == null)
             {
-                Debug.LogWarning($"[{nameof(PlayerFactory)}] 플레이어 인스턴스 생성 실패: {playerAddress}");
+                LogHandler.LogWarning<PlayerFactory>($"플레이어 인스턴스가 생성되지 않았습니다.");
                 return null;
             }
 
-            var player = playerInstance.GetComponent<Player>();
-            if (player == null)
-            {
-                Debug.LogWarning($"[{nameof(PlayerFactory)}] 프리팹에 Player 컴포넌트가 없습니다: {playerAddress}");
-                Object.Destroy(playerInstance);
-                return null;
-            }
-
+            var player = _sceneResourceProvider.AddOrGetComponentWithInejct<Player>(playerInstance);
+            await player.Initialize(_playerConfigTableEntry);
             return player;
         }
     }

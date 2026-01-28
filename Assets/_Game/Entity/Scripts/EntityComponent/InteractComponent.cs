@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Jin5eok;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace DungeonShooter
@@ -13,12 +14,23 @@ namespace DungeonShooter
         [Header("감지할 트리거")]
         [SerializeField]
         private TriggerDetector2D _triggerDetector2D;
-        
         private HashSet<IInteractable> _nearbyInteractables = new HashSet<IInteractable>();
 
         private void Start()
         {
-            // 상호작용 객체만 찾도록
+            if (_triggerDetector2D == null)
+            {
+                var triggerGo = new GameObject(nameof(TriggerDetector2D));
+                var col = triggerGo.AddComponent<CircleCollider2D>();
+                col.isTrigger = true;
+                col.radius = 2f;
+                _triggerDetector2D = triggerGo.AddComponent<TriggerDetector2D>();
+                triggerGo.transform.SetParent(transform);
+                triggerGo.transform.localPosition = Vector3.zero;
+                triggerGo.transform.localRotation = Quaternion.identity;
+                triggerGo.transform.localScale = Vector3.one;
+            }
+            // 상호작용 객체만 찾도록 타입 설정
             _triggerDetector2D.TargetType = typeof(IInteractable);
             _triggerDetector2D.OnTargetEntered += RegisterInteractable;
             _triggerDetector2D.OnTargetExited += UnregisterInteractable;

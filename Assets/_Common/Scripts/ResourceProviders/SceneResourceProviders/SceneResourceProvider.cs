@@ -15,18 +15,20 @@ namespace DungeonShooter
     {
         protected readonly AddressablesScope _addressablesScope;
         protected readonly IObjectResolver _resolver;
-
+        
+        [Inject]
         public SceneResourceProvider(IObjectResolver resolver)
         {
             _addressablesScope = new AddressablesScope();
             _resolver = resolver;
         }
-
+        
         /// <summary>
         /// 주소에 해당하는 인스턴스를 생성하고 의존성 주입
         /// </summary>
         public async UniTask<GameObject> GetInstanceAsync(string address)
         {
+            await UniTask.SwitchToMainThread();
             var handle = _addressablesScope.InstantiateAsync(address);
             await handle.Task;
             return GetInstanceInternal(handle, address);
@@ -68,6 +70,7 @@ namespace DungeonShooter
         /// </summary>
         public async UniTask<T> GetAssetAsync<T>(string address) where T : Object
         {
+            await UniTask.SwitchToMainThread();
             var handle = _addressablesScope.LoadAssetAsync<T>(address);
             await handle.Task;
             return GetAssetInternal(handle, address);

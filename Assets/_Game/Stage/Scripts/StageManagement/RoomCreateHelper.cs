@@ -230,7 +230,7 @@ namespace DungeonShooter
             foreach (var objectData in roomData.Objects)
             {
                 var address = roomData.GetAddress(objectData.Index);
-
+                
                 GameObject instance = 
                     address == RoomConstants.RANDOM_ENEMY_SPAWN_ADDRESS && Application.isPlaying
                     ? (await enemyFactory.GetRandomEnemyAsync()).gameObject : 
