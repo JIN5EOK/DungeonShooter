@@ -46,28 +46,10 @@ namespace DungeonShooter
             set => stats.AttackDamage = value;
         }
 
-        public float AttackRange
-        {
-            get => stats.AttackRange;
-            set => stats.AttackRange = value;
-        }
-
-        public float AttackCooldown
-        {
-            get => stats.AttackCooldown;
-            set => stats.AttackCooldown = value;
-        }
-
         public int Defense
         {
             get => stats.Defense;
             set => stats.Defense = value;
-        }
-
-        public float KnockbackResistance
-        {
-            get => stats.KnockbackResistance;
-            set => stats.KnockbackResistance = value;
         }
     }
 }

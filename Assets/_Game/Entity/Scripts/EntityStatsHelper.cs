@@ -16,15 +16,7 @@ namespace DungeonShooter
         var finalDamage = baseDamage - stats.Defense;
         return Mathf.Max(1, finalDamage);
     }
-
-    /// <summary>
-    /// 넉백 저항 적용 최종 넉백 계산
-    /// </summary>
-    public static float CalculateFinalKnockback(IEntityStats stats, float baseKnockback)
-    {
-        if (stats == null) return baseKnockback;
-        return baseKnockback * (1f - stats.KnockbackResistance);
-    }
+    
 
     /// <summary>
     /// source의 값을 target에 복사합니다.
@@ -36,10 +28,7 @@ namespace DungeonShooter
         target.MoveSpeed = source.MoveSpeed;
         target.MaxHealth = source.MaxHealth;
         target.AttackDamage = source.AttackDamage;
-        target.AttackRange = source.AttackRange;
-        target.AttackCooldown = source.AttackCooldown;
         target.Defense = source.Defense;
-        target.KnockbackResistance = source.KnockbackResistance;
     }
     }
 }

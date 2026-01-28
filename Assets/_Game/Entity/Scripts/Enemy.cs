@@ -72,7 +72,7 @@ namespace DungeonShooter
             _playerTransform = FindFirstObjectByType<Player>().transform;
             
             _cooldownComponent = gameObject.AddOrGetComponent<CooldownComponent>();
-            _cooldownComponent.RegisterCooldown("attack", GetAttackCooldown());
+            //_cooldownComponent.RegisterCooldown("attack", GetAttackCooldown());
             _cooldownComponent.RegisterCooldown("hitStun", hitStunDuration);
             
             _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
@@ -235,7 +235,8 @@ namespace DungeonShooter
 
             // 공격 범위 내인지 확인
             var distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
-            var range = GetAttackRange();
+            var range = 0;
+            // var range = GetAttackRange();
             if (distanceToPlayer <= range && _cooldownComponent.IsReady("attack"))
             {
                 AttackPlayer();
@@ -274,8 +275,9 @@ namespace DungeonShooter
         private void AttackPlayer()
         {
             _cooldownComponent.StartCooldown("attack");
-
-            var damage = GetAttackDamage();
+            
+            // var damage = GetAttackDamage();
+            var damage = 0;
             LogHandler.Log<Enemy>($"적이 플레이어를 공격! 데미지: {damage}");
 
             // 플레이어에게 데미지 주기
@@ -288,10 +290,6 @@ namespace DungeonShooter
                 }
             }
         }
-        
-        public float GetAttackRange() => statsComponent != null ? statsComponent.AttackRange : 0f;
-        private int GetAttackDamage() => statsComponent != null ? statsComponent.AttackDamage : 0;
-        private float GetAttackCooldown() => statsComponent != null ? statsComponent.AttackCooldown : 0f;
 
         // ==================== 코인 드롭 ====================
 

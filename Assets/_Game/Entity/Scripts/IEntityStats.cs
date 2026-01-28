@@ -8,9 +8,6 @@ namespace DungeonShooter
         float MoveSpeed { get; set; }
         int MaxHealth { get; set; }
         int AttackDamage { get; set; }
-        float AttackRange { get; set; }
-        float AttackCooldown { get; set; }
         int Defense { get; set; }
-        float KnockbackResistance { get; set; }
     }
 }

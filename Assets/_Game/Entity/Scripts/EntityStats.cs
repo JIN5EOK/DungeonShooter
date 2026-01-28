@@ -9,93 +9,63 @@ namespace DungeonShooter
     [Serializable]
     public class EntityStats : IEntityStats
     {
-    [Header("기본 스테이터스")]
-    [Tooltip("이동 속도")]
-    [SerializeField] private float moveSpeed = 5f;
-    
-    [Tooltip("최대 체력")]
-    [SerializeField] private int maxHealth = 100;
+        [Header("기본 스테이터스")]
+        [Tooltip("이동 속도")]
+        [SerializeField] private float moveSpeed = 5f;
 
-    [Tooltip("기본 공격력")]
-    [SerializeField] private int attackDamage = 10;
-    
-    [Tooltip("공격 범위")]
-    [SerializeField] private float attackRange = 1.5f;
-    
-    [Tooltip("공격 쿨다운 (초)")]
-    [SerializeField] private float attackCooldown = 1.5f;
+        [Tooltip("최대 체력")]
+        [SerializeField] private int maxHealth = 100;
 
-    [Tooltip("방어력 (받는 데미지 감소량)")]
-    [SerializeField] private int defense = 0;
-    
-    [Tooltip("넉백 저항 (0~1, 1이면 넉백 무효)")]
-    [SerializeField, Range(0f, 1f)] private float knockbackResistance = 0f;
+        [Tooltip("기본 공격력")]
+        [SerializeField] private int attackDamage = 10;
 
-    // 프로퍼티
-    public float MoveSpeed
-    {
-        get => moveSpeed;
-        set => moveSpeed = Mathf.Max(0f, value);
-    }
+        [Tooltip("방어력 (받는 데미지 감소량)")]
+        [SerializeField] private int defense = 0;
 
-    public int MaxHealth
-    {
-        get => maxHealth;
-        set => maxHealth = Mathf.Max(1, value);
-    }
+        // 프로퍼티
+        public float MoveSpeed
+        {
+            get => moveSpeed;
+            set => moveSpeed = Mathf.Max(0f, value);
+        }
 
-    public int AttackDamage
-    {
-        get => attackDamage;
-        set => attackDamage = Mathf.Max(0, value);
-    }
+        public int MaxHealth
+        {
+            get => maxHealth;
+            set => maxHealth = Mathf.Max(1, value);
+        }
 
-    public float AttackRange
-    {
-        get => attackRange;
-        set => attackRange = Mathf.Max(0f, value);
-    }
+        public int AttackDamage
+        {
+            get => attackDamage;
+            set => attackDamage = Mathf.Max(0, value);
+        }
 
-    public float AttackCooldown
-    {
-        get => attackCooldown;
-        set => attackCooldown = Mathf.Max(0f, value);
-    }
+        public int Defense
+        {
+            get => defense;
+            set => defense = Mathf.Max(0, value);
+        }
 
-    public int Defense
-    {
-        get => defense;
-        set => defense = Mathf.Max(0, value);
-    }
+        public EntityStats() {}
 
-    public float KnockbackResistance
-    {
-        get => knockbackResistance;
-        set => knockbackResistance = Mathf.Clamp01(value);
-    }
+        private EntityStats(EntityStats other)
+        {
+            if (other == null) return;
 
-    public EntityStats() {}
+            moveSpeed = other.moveSpeed;
+            maxHealth = other.maxHealth;
+            attackDamage = other.attackDamage;
+            defense = other.defense;
+        }
 
-    private EntityStats(EntityStats other)
-    {
-        if (other == null) return;
-
-        moveSpeed = other.moveSpeed;
-        maxHealth = other.maxHealth;
-        attackDamage = other.attackDamage;
-        attackRange = other.attackRange;
-        attackCooldown = other.attackCooldown;
-        defense = other.defense;
-        knockbackResistance = other.knockbackResistance;
-    }
-
-    /// <summary>
-    /// 스테이터스 복사
-    /// </summary>
-    public EntityStats Clone()
-    {
-        return new EntityStats(this);
-    }
+        /// <summary>
+        /// 스테이터스 복사
+        /// </summary>
+        public EntityStats Clone()
+        {
+            return new EntityStats(this);
+        }
     }
 }
 

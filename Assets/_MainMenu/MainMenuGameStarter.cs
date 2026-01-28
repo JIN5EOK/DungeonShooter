@@ -14,7 +14,7 @@ public class MainMenuGameStarter : IStartable
         var context = new StageContext(12000000, 13000001); // playerConfigTableId, stageConfigTableId
         await loader
         .AddContext(context)
-        .LoadScene("PrototypeScene");
+        .LoadScene("StageScene");
     }
 
     public void Start()
