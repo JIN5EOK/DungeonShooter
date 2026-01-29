@@ -103,7 +103,16 @@ classDiagram
         +Stats : Dictionary~StatType, EntityStat~
         -StatsTableEntry : EntityStatsTableEntry
         // EntityStatsTableEntry의 수치는 AddModifier->Constant 타입으로 반영
-        +GetStat(StatType type) int
+        +ApplyStatBonus(object key, StatBonus statBonus) void// 스탯 보너스 적용
+        +RemoveStatBonus(object key) void// 스탯 보너스 제거
+        +GetStat(StatType type) int // 최종 스탯 수치
+        +GetStatOrigin(StatType type) int // 캐릭터 고유 스탯 수치
+    }
+    
+    class StatBonus["StatBonus<br>아이템등의 스탯 보너스 수치"]{
+        +HpAdd : int // 체력증가 수치
+        +HpMultiply : int // 체력증가 곱비율
+        ... // 그외 스탯 보너스 정보
     }
     
     class EntityStatsTableEntry["EntityStatsTableEntry<br>스탯 테이블 데이터"]{
@@ -133,6 +142,7 @@ classDiagram
         +StatsId int // 스텟 EntityStatsTableEntry.Id
     }
     
+    EntityStatsComponent ..> StatBonus : 아이템등의 스탯 보너스 수치
     StatModifierType "0..*"<--"1" EntityStat
     StatType "0..*"<--"1" EntityStatsComponent
     EntityStat "0..*"<--"1" EntityStatsComponent
@@ -151,13 +161,12 @@ classDiagram
     2. `ITableRepository`에서 ID로 조회해 `EntityStatsTableEntry`를 가져온다
     3. 게임오브젝트에 `StatsComponent`를 AddComponent 하고 가져온 `EntityStatsTableEntry`을 삽입, `StatType.Constant` 타입으로 StatModifier을 추가
 - Entity 스탯 반영 방법
-    - 스택 구조로 최종 스탯값을 결정한다
-    - 아이템, 스킬 등에 의해 각 `EtntiyStat`들에 StatModifer들이 추가된다 
-    - Constant, Add, Multiply
-      - Constant -> 캐릭터의 기본 스텟 값
-      - Add -> 수치 더하기
-      - Multiply -> 수치 곱하기
-        - 100% 단위를 기준으로 한다, 예: 50% -> 0.5배, 200% -> 2배
-      - 값 연산시엔 기본값 -> 더하기 -> 곱하기 순으로 연산한다
+    - 합산 구조로 최종 스탯값을 결정한다
+    - 기본 스탯 정보, 아이템, 스킬 등에 의해 각 `EntityStat`들에 StatModifer들이 추가된다
+    - 스탯 보너스 구조
+      - `Constant` -> `EntityStatsTableEntry`에 의해 적용되는 기본 수치 
+      - `Add`,`Multiply` -> 아이템등의 `StatBonus`에 의해 적용되는 더하기, 곱셈 보정
+          - 100% 단위를 기준으로 한다, 예: 50% -> 0.5배, 200% -> 2배
+      - `Constant` -> `Add` -> `Multiply` 순으로 스탯에 반영하여 최종 스탯을 계산해낸다
       - 최종 값들은 한번 연산한후 캐싱해두고 사용, Add,Remove등으로 값 변동이 일어나게 되면 다시 계산한다
         - 더티 플래그 패턴을 사용한다
