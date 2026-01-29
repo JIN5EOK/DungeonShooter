@@ -109,15 +109,15 @@ classDiagram
         +Stats : Dictionary~StatType, EntityStat~
         -StatsTableEntry : EntityStatsTableEntry
         // EntityStatsTableEntry의 수치는 AddModifier->Constant 타입으로 반영
-        +GetStat~T~() T where T : StatBase
+        +GetStat(StatType type) int
     }
     
     class EntityStatsTableEntry["EntityStatsTableEntry<br>스탯 테이블 데이터"]{
         +Id : int
         +MaxHp : int
-        +Damage : int
+        +Attack : int
         +Defense : int
-        +MoveSpeed : float
+        +MoveSpeed : int
     }
 
     class PlayerConfigTableEntry["PlayerConfigTableEntry<br>플레이어 테이블 데이터"]{
@@ -161,3 +161,4 @@ classDiagram
       - Add -> 수치 더하기
       - Multiply -> 수치 곱하기
       - 값 연산시엔 기본값 -> 더하기 -> 곱하기 순으로 연산한다
+      - 최종 값들은 한번 연산한후 캐싱해두고 사용, Add,Remove등 값의 변동이 일어나게 되면 다시 계산한다
