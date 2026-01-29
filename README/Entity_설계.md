@@ -34,8 +34,7 @@ classDiagram
         +CancelDash() void // 대시중이라면 취소
     }
     class EntityStatsComponent["EntityStatsComponent : Monobehaviour<br>캐릭터 스탯 기능 담당"]{
-        +Stats : EntityStats
-        // 그 외 스탯 관련 연산이 있으면 사용
+        // 스탯 데이터와 관련 연산
     }
 ```
 
@@ -81,7 +80,7 @@ classDiagram
 ```mermaid
 classDiagram
     
-    class EntityStats{
+    class EntityStatsComponent["EntityStatsComponent:Monobehaviour<br>스탯 컴포넌트"]{
         +statsTableEntry : EntityStatsTableEntry
         // 원본 스텟을 기반으로 레벨,장비등의 추가 계산을 통해 최종스텟 결정
         +MaxHp : int
@@ -116,7 +115,7 @@ classDiagram
         +StatsId int // 스텟 EntityStatsTableEntry.Id
     }
 
-    EntityStats --> EntityStatsTableEntry  : 테이블 데이터에 기반하여 생성
+    EntityStatsComponent --> EntityStatsTableEntry  : 테이블 데이터에 기반하여 생성
     EntityStatsTableEntry <.. PlayerConfigTableEntry : Table ID로 간접 참조
     EntityStatsTableEntry <.. EnemyConfigTableEntry : Table ID로 간접 참조
 ```
@@ -124,10 +123,9 @@ classDiagram
 
 - 스탯 클래스 구분
     - `EntityStatsTableEntry` : 데이터 테이블로 작성하는 개체별 '기본 스탯'
-    - `EntityStats` : Entity마다 개별로 존재하는 스탯 인스턴스
+    - `EntityStatsComponent` : Entity마다 개별로 존재하는 스탯 컴포넌트
 
 - Entity에 스탯을 초기화하는 과정
     1. `PlayerConfigTableEntry`, `EnemyConfigTableEntry`에서 스탯 ID를 가져온다
     2. `ITableRepository`에서 ID로 조회해 `EntityStatsTableEntry`를 가져온다
-    3. 가져온 데이터 기반으로 EntityStats를 생성한다
-    4. 게임오브젝트에 `StatsComponent`를 AddComponent 하고 생성한 `EntityStats`을 집어넣는다
+    3. 게임오브젝트에 `StatsComponent`를 AddComponent 하고 가져온 `EntityStatsTableEntry`을 집어넣는다

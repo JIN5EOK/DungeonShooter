@@ -17,15 +17,9 @@ namespace DungeonShooter
         protected virtual void Initialize(EntityStatsTableEntry statsTableEntry)
         {
             var statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
-            if (statsTableEntry == null)
+            if (statsTableEntry != null)
             {
-                return;
-            }
-
-            var stats = EntityStats.FromTableEntry(statsTableEntry);
-            if (stats != null)
-            {
-                statsComponent.Initialize(stats);
+                statsComponent.Initialize(statsTableEntry);
             }
         }
     }
