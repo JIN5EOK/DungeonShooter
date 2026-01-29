@@ -6,7 +6,7 @@ namespace DungeonShooter
     /// <summary>
     /// 투사체 인스턴스 프리팹
     /// </summary>
-    public class Projectile : MonoBehaviour
+    public class ProjectileSkillObject : SkillObjectBase
     {
         private EntityBase _owner;
         private List<EffectBase> _effects = new List<EffectBase>();
@@ -24,7 +24,7 @@ namespace DungeonShooter
         private float _elapsedTime = 0f;
         private SkillTableEntry _skillTableEntry;
         private Vector2 _direction;
-        public void Initialize(EntityBase owner, List<EffectBase> effects, SkillTableEntry skillTableEntry)
+        public override void Initialize(EntityBase owner, List<EffectBase> effects, SkillTableEntry skillTableEntry)
         {
             _owner = owner;
             _effects = effects;

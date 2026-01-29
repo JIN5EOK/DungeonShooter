@@ -29,15 +29,15 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 7692257427368706456
-      type: {class: SpawnProjectileEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      type: {class: SpawnSkillObjectEffect, ns: DungeonShooter, asm: Assembly-CSharp}
       data:
-        projectile:
+        _skillObject:
           m_AssetGUID: 1654f787912fc4307b0db38dc6acf3a7
           m_SubObjectName: 
           m_SubObjectType: 
           m_SubObjectGUID: 
           m_EditorAssetChanged: 0
-        effects:
+        _effects:
         - rid: 7692257427368706457
     - rid: 7692257427368706457
       type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}

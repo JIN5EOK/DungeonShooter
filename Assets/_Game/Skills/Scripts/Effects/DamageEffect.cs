@@ -10,12 +10,12 @@ namespace DungeonShooter
     [Serializable]
     public class DamageEffect : EffectBase
     {
-        public override async UniTask<bool> Execute(EntityBase target, SkillTableEntry entry)
+        public override UniTask<bool> Execute(EntityBase owner, SkillTableEntry entry)
         {
             if (entry == null)
             {
                 LogHandler.LogError<DamageEffect>("SkillTableEntry가 null입니다.");
-                return false;
+                return UniTask.FromResult(false);
             }
 
             // 직접 필드를 우선 사용, 0이면 딕셔너리에서 fallback
@@ -23,17 +23,17 @@ namespace DungeonShooter
             if (damage <= 0)
             {
                 LogHandler.LogWarning<DamageEffect>("데미지 값이 0 이하입니다.");
-                return false;
+                return UniTask.FromResult(false);
             }
 
-            if (target.TryGetComponent(out HealthComponent health))
+            if (owner.TryGetComponent(out HealthComponent health))
             {
                 health.TakeDamage(damage);
-                return true;
+                return UniTask.FromResult(true);
             }
-            
+
             LogHandler.LogError<DamageEffect>("데미지 주기 실패");
-            return false;
+            return UniTask.FromResult(false);
         }
     }
 }
