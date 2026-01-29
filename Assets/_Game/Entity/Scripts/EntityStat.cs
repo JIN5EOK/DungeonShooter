@@ -11,7 +11,7 @@ namespace DungeonShooter
     {
         private const int MultiplyUnit = 100;
 
-        private readonly Dictionary<string, List<StatModifier>> _modifiersByKey = new Dictionary<string, List<StatModifier>>();
+        private readonly Dictionary<object, List<StatModifier>> _modifiersByKey = new Dictionary<object, List<StatModifier>>();
         private int _cachedValue;
         private int _cachedOriginValue;
         private bool _dirty = true;
@@ -45,7 +45,7 @@ namespace DungeonShooter
         /// <summary>
         /// modifier 추가. Multiply는 100 단위(100=1.0, 200=2.0배, 50=0.5배).
         /// </summary>
-        public void AddModifier(string key, StatModifierType modiType, int value)
+        public void AddModifier(object key, StatModifierType modiType, int value)
         {
             if (!_modifiersByKey.TryGetValue(key, out var list))
             {
@@ -60,7 +60,7 @@ namespace DungeonShooter
         /// <summary>
         /// 해당 key로 등록된 modifier를 모두 제거한다.
         /// </summary>
-        public void RemoveModifier(string key)
+        public void RemoveModifier(object key)
         {
             _modifiersByKey.Remove(key);
             _dirty = true;

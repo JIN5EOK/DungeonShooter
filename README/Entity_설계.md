@@ -86,24 +86,19 @@ classDiagram
         MoveSpeed
     }
     class StatModifierType["StatModifierType<br>스탯 변경 데이터 타입"]{
-        Constant // 캐릭터 기본수치
+        Constant // StatTable의 기본수치
         Add // 더하기
         Multiply // 곱하기
     }
     
     class EntityStat["EntityStat<br>개별 스탯, 장비와 아이템에 의한 최종 스탯 계산"]{
         +GetValue() int // 최종 수치
-        +GetOriginValue() int // 원본 수치 
-        +AddModifier(string key, StatModifierType modiType, int value) void
-        // AddModifier의 key는 해쉬코드 등 스탯 변경 요청의 발원지를 구분할 수 있는 고유값을 사용
-        +RemoveModifier(string key) void
+        +GetOriginValue() int // 원본 수치 (Constant 값만)
+        +AddModifier(object key, StatModifierType modiType, int value) void
+        // Modifier key는 스탯 요청 발원지 오브젝트 사용
+        +RemoveModifier(object key) void
     }
 
-    StatModifierType <-- EntityStat
-    
-    StatType "0..*"<--"1" EntityStatsComponent
-    
-    EntityStat "0..*"<--"1" EntityStatsComponent
     class EntityStatsComponent["EntityStatsComponent:Monobehaviour<br>Entity의 스탯 컴포넌트"]{
         +Stats : Dictionary~StatType, EntityStat~
         -StatsTableEntry : EntityStatsTableEntry
@@ -137,7 +132,10 @@ classDiagram
         +AIType string // 행동 타입
         +StatsId int // 스텟 EntityStatsTableEntry.Id
     }
-
+    
+    StatModifierType "0..*"<--"1" EntityStat
+    StatType "0..*"<--"1" EntityStatsComponent
+    EntityStat "0..*"<--"1" EntityStatsComponent
     EntityStatsComponent --> EntityStatsTableEntry  : 테이블 데이터에 기반하여 기본 스탯 설정
     EntityStatsTableEntry <.. PlayerConfigTableEntry : Table ID로 간접 참조
     EntityStatsTableEntry <.. EnemyConfigTableEntry : Table ID로 간접 참조

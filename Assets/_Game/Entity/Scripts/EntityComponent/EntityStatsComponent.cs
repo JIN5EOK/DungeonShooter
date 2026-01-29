@@ -9,8 +9,6 @@ namespace DungeonShooter
     /// </summary>
     public class EntityStatsComponent : MonoBehaviour
     {
-        private const string BaseModifierKey = "EntityStatsTableEntry";
-
         private readonly Dictionary<StatType, EntityStat> _stats = new Dictionary<StatType, EntityStat>();
         private EntityStatsTableEntry _statsTableEntry;
 
@@ -24,10 +22,10 @@ namespace DungeonShooter
             _statsTableEntry = entry;
             _stats.Clear();
 
-            AddStat(StatType.Hp, Mathf.Max(1, entry.MaxHp));
-            AddStat(StatType.Attack, Mathf.Max(0, entry.Attack));
-            AddStat(StatType.Defense, Mathf.Max(0, entry.Defense));
-            AddStat(StatType.MoveSpeed, Mathf.Max(0, entry.MoveSpeed));
+            GetOrAddStat(StatType.Hp).AddModifier(_statsTableEntry, StatModifierType.Constant, entry.MaxHp);
+            GetOrAddStat(StatType.Attack).AddModifier(_statsTableEntry, StatModifierType.Constant, entry.Attack);
+            GetOrAddStat(StatType.Defense).AddModifier(_statsTableEntry, StatModifierType.Constant, entry.Defense);
+            GetOrAddStat(StatType.MoveSpeed).AddModifier(_statsTableEntry, StatModifierType.Constant, entry.MoveSpeed);
         }
 
         /// <summary>
@@ -74,16 +72,11 @@ namespace DungeonShooter
             {
                 return stat;
             }
-
-            AddStat(type, 0);
-            return _stats[type];
-        }
-
-        private void AddStat(StatType type, int baseValue)
-        {
+            
             var entityStat = new EntityStat();
-            entityStat.AddModifier(BaseModifierKey, StatModifierType.Constant, baseValue);
             _stats[type] = entityStat;
+            
+            return entityStat;
         }
     }
 }
