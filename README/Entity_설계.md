@@ -76,18 +76,42 @@ classDiagram
 
 ## Entity 스탯 시스템 구조
 
-### Player, Enemy테이블과 Stats 테이블, 관계구조
+### 스탯 시스템 구조도
 ```mermaid
 classDiagram
-    
-    class EntityStatsComponent["EntityStatsComponent:Monobehaviour<br>스탯 컴포넌트"]{
-        +statsTableEntry : EntityStatsTableEntry
-        // 원본 스텟을 기반으로 레벨,장비등의 추가 계산을 통해 최종스텟 결정
-        +MaxHp : int
-        +Damage : int
-        +Defense : int
-        +MoveSpeed : float
+    class StatType["StatType<br>스탯 타입 Enum"]{
+        Hp,
+        Attack,
+        Defense,
+        MoveSpeed
     }
+    class StatModifierType["StatModifierType<br>스탯 변경 데이터 타입"]{
+        Constant // 캐릭터 기본수치
+        Add // 더하기
+        Multiply // 곱하기
+    }
+    
+    class EntityStat["EntityStat<br>개별 스탯, 장비와 아이템에 의한 최종 스탯 계산"]{
+        +GetValue() int // 최종 수치
+        +GetOriginValue() int // 원본 수치 
+        +AddModifier(string key, StatModifierType modiType, int value) void
+        +AddModifier(string key, StatModifierType modiType, float value) void
+        // AddModifier의 key는 해쉬코드 등 스탯 변경 요청의 발원지를 구분할 수 있는 고유값을 사용
+        +RemoveModifier(string source) void
+    }
+
+    StatModifierType <-- EntityStat
+    
+    StatType "0..*"<--"1" EntityStatsComponent
+    
+    EntityStat "0..*"<--"1" EntityStatsComponent
+    class EntityStatsComponent["EntityStatsComponent:Monobehaviour<br>Entity의 스탯 컴포넌트"]{
+        +Stats : Dictionary~StatType, EntityStat~
+        -StatsTableEntry : EntityStatsTableEntry
+        // EntityStatsTableEntry의 수치는 AddModifier->Constant 타입으로 반영
+        +GetStat~T~() T where T : StatBase
+    }
+    
     class EntityStatsTableEntry["EntityStatsTableEntry<br>스탯 테이블 데이터"]{
         +Id : int
         +MaxHp : int
@@ -115,7 +139,7 @@ classDiagram
         +StatsId int // 스텟 EntityStatsTableEntry.Id
     }
 
-    EntityStatsComponent --> EntityStatsTableEntry  : 테이블 데이터에 기반하여 생성
+    EntityStatsComponent --> EntityStatsTableEntry  : 테이블 데이터에 기반하여 기본 스탯 설정
     EntityStatsTableEntry <.. PlayerConfigTableEntry : Table ID로 간접 참조
     EntityStatsTableEntry <.. EnemyConfigTableEntry : Table ID로 간접 참조
 ```
@@ -125,7 +149,15 @@ classDiagram
     - `EntityStatsTableEntry` : 데이터 테이블로 작성하는 개체별 '기본 스탯'
     - `EntityStatsComponent` : Entity마다 개별로 존재하는 스탯 컴포넌트
 
-- Entity에 스탯을 초기화하는 과정
+- Entity 스탯 초기화
     1. `PlayerConfigTableEntry`, `EnemyConfigTableEntry`에서 스탯 ID를 가져온다
     2. `ITableRepository`에서 ID로 조회해 `EntityStatsTableEntry`를 가져온다
-    3. 게임오브젝트에 `StatsComponent`를 AddComponent 하고 가져온 `EntityStatsTableEntry`을 집어넣는다
+    3. 게임오브젝트에 `StatsComponent`를 AddComponent 하고 가져온 `EntityStatsTableEntry`을 삽입, `StatType.Constant` 타입으로 StatModifier을 추가
+- Entity 스탯 반영 방법
+    - 스택 구조로 최종 스탯값을 결정한다
+    - 아이템, 스킬 등에 의해 각 `EtntiyStat`들에 StatModifer들이 추가된다 
+    - Constant, Add, Multiply
+      - Constant -> 캐릭터의 기본 스텟 값
+      - Add -> 수치 더하기
+      - Multiply -> 수치 곱하기
+      - 값 연산시엔 기본값 -> 더하기 -> 곱하기 순으로 연산한다
