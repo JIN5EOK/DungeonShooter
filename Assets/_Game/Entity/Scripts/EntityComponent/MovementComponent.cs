@@ -9,9 +9,7 @@ namespace DungeonShooter
     [RequireComponent(typeof(Rigidbody2D))]
     public class MovementComponent : MonoBehaviour
     {
-        [Header("이동 설정")]
-        [SerializeField] private float _moveSpeed = 5f;
-
+        private float _moveSpeed;
         private Vector2 _direction;
         public Vector2 Direction
         {
@@ -32,12 +30,18 @@ namespace DungeonShooter
             get;
             private set;
         }
-        public float MoveSpeed { get; set; }
+        public float MoveSpeed
+        {
+            get => _moveSpeed;
+            set => _moveSpeed = value;
+        }
         private Rigidbody2D _rigidbody;
-
+        private EntityStatsComponent _statsComponent;
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
+            _statsComponent = GetComponent<EntityStatsComponent>();
+            _moveSpeed = _statsComponent.GetStat(StatType.MoveSpeed);
         }
         
         /// <summary>

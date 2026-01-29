@@ -73,7 +73,7 @@ namespace DungeonShooter
             _cooldownComponent.RegisterCooldown("hitStun", hitStunDuration);
             
             _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
-            _movementComponent.MoveSpeed = statsComponent.MoveSpeed;
+            _movementComponent.MoveSpeed = (float)statsComponent.GetStat(StatType.MoveSpeed);
 
             // 순찰 초기화
             _patrolStartPos = transform.position;

@@ -22,7 +22,7 @@ namespace DungeonShooter
         public int Defense { get; set; }
 
         /// <summary>이동 속도</summary>
-        public float MoveSpeed { get; set; }
+        public int MoveSpeed { get; set; }
     }
 }
 
