@@ -95,9 +95,8 @@ classDiagram
         +GetValue() int // 최종 수치
         +GetOriginValue() int // 원본 수치 
         +AddModifier(string key, StatModifierType modiType, int value) void
-        +AddModifier(string key, StatModifierType modiType, float value) void
         // AddModifier의 key는 해쉬코드 등 스탯 변경 요청의 발원지를 구분할 수 있는 고유값을 사용
-        +RemoveModifier(string source) void
+        +RemoveModifier(string key) void
     }
 
     StatModifierType <-- EntityStat
@@ -160,5 +159,7 @@ classDiagram
       - Constant -> 캐릭터의 기본 스텟 값
       - Add -> 수치 더하기
       - Multiply -> 수치 곱하기
+        - 100% 단위를 기준으로 한다, 예: 50% -> 0.5배, 200% -> 2배
       - 값 연산시엔 기본값 -> 더하기 -> 곱하기 순으로 연산한다
-      - 최종 값들은 한번 연산한후 캐싱해두고 사용, Add,Remove등 값의 변동이 일어나게 되면 다시 계산한다
+      - 최종 값들은 한번 연산한후 캐싱해두고 사용, Add,Remove등으로 값 변동이 일어나게 되면 다시 계산한다
+        - 더티 플래그 패턴을 사용한다
