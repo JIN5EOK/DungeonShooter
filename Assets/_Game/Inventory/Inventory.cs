@@ -64,6 +64,12 @@ namespace DungeonShooter
                     {
                         item.ActivatePassiveSkill(_owner);
                     }
+
+                    // Passive: 인벤토리에 들어오면 스탯 보너스 적용
+                    if (item.ItemTableEntry.ItemType == ItemType.Passive)
+                    {
+                        ApplyItemStatBonus(item);
+                    }
                 }
             }
             else
@@ -81,6 +87,12 @@ namespace DungeonShooter
                 if (item.PassiveSkill != null)
                 {
                     item.ActivatePassiveSkill(_owner);
+                }
+
+                // Passive: 인벤토리에 들어오면 스탯 보너스 적용
+                if (item.ItemTableEntry.ItemType == ItemType.Passive)
+                {
+                    ApplyItemStatBonus(item);
                 }
             }
 
@@ -117,6 +129,7 @@ namespace DungeonShooter
             if (_equippedWeapon != null)
             {
                 _equippedWeapon.DeactivateEquipSkill(_owner);
+                RemoveItemStatBonus(_equippedWeapon);
                 OnWeaponUnequipped?.Invoke(_equippedWeapon);
             }
 
@@ -126,6 +139,9 @@ namespace DungeonShooter
             {
                 item.ActivateEquipSkill(_owner);
             }
+
+            // Weapon: 장착하면 스탯 보너스 적용
+            ApplyItemStatBonus(item);
 
             OnWeaponEquipped?.Invoke(item);
             return UniTask.CompletedTask;
@@ -146,7 +162,14 @@ namespace DungeonShooter
             if (item == _equippedWeapon)
             {
                 item.DeactivateEquipSkill(_owner);
+                RemoveItemStatBonus(item);
                 _equippedWeapon = null;
+            }
+
+            // Passive: 인벤토리에서 나가면 스탯 보너스 제거
+            if (item.ItemTableEntry.ItemType == ItemType.Passive)
+            {
+                RemoveItemStatBonus(item);
             }
 
             // 패시브 스킬 비활성화
@@ -166,6 +189,22 @@ namespace DungeonShooter
         {
             return _items.Find(i => i.ItemTableEntry.Id == itemEntryId && 
                                    i.StackCount < i.ItemTableEntry.MaxStackCount);
+        }
+
+        private void ApplyItemStatBonus(Item item)
+        {
+            if (_owner == null) return;
+            var comp = _owner.GetComponent<EntityStatsComponent>();
+            if (comp == null) return;
+            comp.ApplyStatBonus(item, StatBonus.From(item.ItemTableEntry));
+        }
+
+        private void RemoveItemStatBonus(Item item)
+        {
+            if (_owner == null) return;
+            var comp = _owner.GetComponent<EntityStatsComponent>();
+            if (comp == null) return;
+            comp.RemoveStatBonus(item);
         }
 
 

@@ -48,5 +48,29 @@ namespace DungeonShooter
         /// 아이템 아이콘 주소 (Sprite Addressable 주소)
         /// </summary>
         public string ItemIcon { get; set; }
+
+        /// <summary>체력 고정 증가량</summary>
+        public int HpAdd { get; set; }
+
+        /// <summary>체력 배율 (100=1.0, 120=20% 증가)</summary>
+        public int HpMultiply { get; set; }
+
+        /// <summary>공격력 고정 증가량</summary>
+        public int AttackAdd { get; set; }
+
+        /// <summary>공격력 배율 (100=1.0)</summary>
+        public int AttackMultiply { get; set; }
+
+        /// <summary>방어력 고정 증가량</summary>
+        public int DefenseAdd { get; set; }
+
+        /// <summary>방어력 배율 (100=1.0)</summary>
+        public int DefenseMultiply { get; set; }
+
+        /// <summary>이동속도 고정 증가량</summary>
+        public int MoveSpeedAdd { get; set; }
+
+        /// <summary>이동속도 배율 (100=1.0)</summary>
+        public int MoveSpeedMultiply { get; set; }
     }
 }

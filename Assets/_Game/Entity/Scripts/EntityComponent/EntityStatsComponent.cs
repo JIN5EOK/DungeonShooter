@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -45,21 +46,26 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 스탯에 modifier를 추가합니다. key는 발원지 구분용(장비, 버프 등). 해당 StatType이 없으면 생성 후 추가합니다.
+        /// StatBonus를 source 키로 적용합니다.
         /// </summary>
-        public void AddModifier(StatType type, string key, StatModifierType modiType, int value)
+        public void ApplyStatBonus(object key, StatBonus bonus)
         {
-            GetOrAddStat(type).AddModifier(key, modiType, value);
+            if (key == null) return;
+
+            ApplyStatBonusInternal(key, StatType.Hp, bonus.HpAdd, bonus.HpMultiply);
+            ApplyStatBonusInternal(key, StatType.Attack, bonus.AttackAdd, bonus.AttackMultiply);
+            ApplyStatBonusInternal(key, StatType.Defense, bonus.DefenseAdd, bonus.DefenseMultiply);
+            ApplyStatBonusInternal(key, StatType.MoveSpeed, bonus.MoveSpeedAdd, bonus.MoveSpeedMultiply);
         }
 
         /// <summary>
-        /// 해당 key로 등록된 modifier를 해당 스탯에서 모두 제거합니다. 해당 StatType이 없으면 아무 동작도 하지 않습니다.
+        /// 해당 source로 등록된 modifier를 모든 스탯에서 제거합니다.
         /// </summary>
-        public void RemoveModifier(StatType type, string source)
+        public void RemoveStatBonus(object key)
         {
-            if (_stats.TryGetValue(type, out var stat))
+            foreach (var stat in _stats.Values)
             {
-                stat.RemoveModifier(source);
+                stat.RemoveModifier(key);
             }
         }
 
@@ -77,6 +83,20 @@ namespace DungeonShooter
             _stats[type] = entityStat;
             
             return entityStat;
+        }
+
+        private void ApplyStatBonusInternal(object source, StatType type, int add, int multiply)
+        {
+            var stat = GetOrAddStat(type);
+            if (add != 0)
+            {
+                stat.AddModifier(source, StatModifierType.Add, add);
+            }
+
+            if (multiply != 100 && multiply != 0)
+            {
+                stat.AddModifier(source, StatModifierType.Multiply, multiply);
+            }
         }
     }
 }
