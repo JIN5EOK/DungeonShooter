@@ -66,7 +66,7 @@ namespace DungeonShooter
             }
             catch (Exception ex)
             {
-                LogHandler.LogError<SkillFactory>(ex, $"Skill 생성 실패: {skillEntryId}");
+                LogHandler.LogException<SkillFactory>(ex, $"Skill 생성 실패: {skillEntryId}");
                 return null;
             }
         }

@@ -243,7 +243,7 @@ namespace DungeonShooter
             }
             catch (Exception e)
             {
-                LogHandler.LogError(nameof(RoomDataSerializer), e, "역직렬화 실패");
+                LogHandler.LogException(nameof(RoomDataSerializer), e, "역직렬화 실패");
                 return null;
             }
         }
@@ -282,7 +282,7 @@ namespace DungeonShooter
             }
             catch (Exception e)
             {
-                LogHandler.LogError(nameof(RoomDataSerializer), e, "저장 실패");
+                LogHandler.LogException(nameof(RoomDataSerializer), e, "저장 실패");
             }
         }
 

@@ -140,7 +140,7 @@ namespace DungeonShooter
             }
             catch (Exception ex)
             {
-                LogHandler.LogError<Item>(ex, $"아이템 스킬 초기화 실패: {entry.Id}");
+                LogHandler.LogException<Item>(ex, $"아이템 스킬 초기화 실패: {entry.Id}");
             }
         }
 

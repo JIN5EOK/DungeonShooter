@@ -96,7 +96,7 @@ namespace DungeonShooter
             }
             catch (Exception e)
             {
-                LogHandler.LogError<SkillComponent>(e, "스킬 등록 중 오류 발생");
+                LogHandler.LogException<SkillComponent>(e, "스킬 등록 중 오류 발생");
                 return false;
             }
         }

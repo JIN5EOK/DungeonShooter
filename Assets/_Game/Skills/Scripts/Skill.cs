@@ -86,7 +86,7 @@ namespace DungeonShooter
                     }
                     catch (Exception e)
                     {
-                        LogHandler.LogError<Skill>(e, "이펙트 실행 중 오류 발생");
+                        LogHandler.LogException<Skill>(e, "이펙트 실행 중 오류 발생");
                         allSuccess = false;
                     }
                 }
@@ -116,7 +116,7 @@ namespace DungeonShooter
                     }
                     catch (Exception e)
                     {
-                        LogHandler.LogError<Skill>(e, "패시브 이펙트 활성화 중 오류 발생");
+                        LogHandler.LogException<Skill>(e, "패시브 이펙트 활성화 중 오류 발생");
                     }
                 }
             }
@@ -143,7 +143,7 @@ namespace DungeonShooter
                     }
                     catch (Exception e)
                     {
-                        LogHandler.LogError<Skill>(e, "패시브 이펙트 비활성화 중 오류 발생");
+                        LogHandler.LogException<Skill>(e, "패시브 이펙트 비활성화 중 오류 발생");
                     }
                 }
             }

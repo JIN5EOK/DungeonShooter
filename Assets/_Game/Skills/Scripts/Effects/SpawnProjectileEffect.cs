@@ -47,7 +47,7 @@ namespace DungeonShooter
         }
         catch (Exception e)
         {
-            LogHandler.LogError<SpawnProjectileEffect>(e, "투사체 생성 실패");
+            LogHandler.LogException<SpawnProjectileEffect>(e, "투사체 생성 실패");
         }
 
         return false;

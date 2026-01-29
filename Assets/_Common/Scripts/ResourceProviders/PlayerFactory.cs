@@ -47,7 +47,7 @@ namespace DungeonShooter
             }
             catch (Exception e)
             {
-                LogHandler.LogError<PlayerFactory>(e, "플레이어를 불러오지 못했습니다.");
+                LogHandler.LogException<PlayerFactory>(e, "플레이어를 불러오지 못했습니다.");
                 return null;
             }
         }
@@ -65,7 +65,7 @@ namespace DungeonShooter
             }
             catch (Exception e)
             {
-                LogHandler.LogError<PlayerFactory>(e, "플레이어를 불러오지 못했습니다.");
+                LogHandler.LogException<PlayerFactory>(e, "플레이어를 불러오지 못했습니다.");
                 return null;
             }
         }

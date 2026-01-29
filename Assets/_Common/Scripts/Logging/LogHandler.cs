@@ -101,12 +101,12 @@ namespace DungeonShooter
         /// <typeparam name="T">클래스 타입</typeparam>
         /// <param name="exception">발생한 예외</param>
         /// <param name="context">예외 발생 컨텍스트</param>
-        public static void LogError<T>(Exception exception, string context = "")
+        public static void LogException<T>(Exception exception, string context = "")
         {
             if (!IsUseLog) 
                 return;
             
-            LogError(typeof(T).Name, exception, context);
+            LogException(typeof(T).Name, exception, context);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace DungeonShooter
         /// <param name="header">로그 헤더 (클래스 이름 사용 권장)</param>
         /// <param name="exception">발생한 예외</param>
         /// <param name="context">예외 발생 컨텍스트</param>
-        public static void LogError(string header, Exception exception, string context = "")
+        public static void LogException(string header, Exception exception, string context = "")
         {
             if (!IsUseLog) 
                 return;
