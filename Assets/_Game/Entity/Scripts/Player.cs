@@ -21,13 +21,13 @@ namespace DungeonShooter
         
         private PlayerConfigTableEntry _playerConfigTableEntry;
         private ISceneResourceProvider _sceneResourceProvider;
-        private ItemFactory _itemFactory;
+        private IItemFactory _itemFactory;
         private ITableRepository _tableRepository;
         [Inject]
         private void Construct(InputManager inputManager
             , Inventory inventory
             , ISceneResourceProvider sceneResourceProvider
-            , ItemFactory itemFactory
+            , IItemFactory itemFactory
             , ITableRepository tableRepository)
         {
             _inputManager = inputManager;

@@ -3,16 +3,20 @@ using VContainer;
 
 namespace DungeonShooter
 {
+    public interface IItemFactory
+    {
+        public UniTask<Item> CreateItemAsync(int itemId);
+    }
     /// <summary>
     /// Item 인스턴스를 생성하는 팩토리
     /// </summary>
-    public class ItemFactory
+    public class ItemFactory : IItemFactory
     {
         private readonly ITableRepository _tableRepository;
-        private readonly SkillFactory _skillFactory;
+        private readonly ISkillFactory _skillFactory;
 
         [Inject]
-        public ItemFactory(ITableRepository tableRepository, SkillFactory skillFactory)
+        public ItemFactory(ITableRepository tableRepository, ISkillFactory skillFactory)
         {
             _tableRepository = tableRepository;
             _skillFactory = skillFactory;

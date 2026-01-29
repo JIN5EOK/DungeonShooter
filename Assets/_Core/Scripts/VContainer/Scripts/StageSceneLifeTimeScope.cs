@@ -16,8 +16,8 @@ namespace DungeonShooter
             builder.Register<PlayerFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<EnemyFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<RoomDataRepository>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<SkillFactory>(Lifetime.Scoped);
-            builder.Register<ItemFactory>(Lifetime.Scoped);
+            builder.Register<SkillFactory>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<ItemFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.RegisterEntryPoint<StageManager>(Lifetime.Scoped);
             base.Configure(builder);
         }

@@ -20,7 +20,7 @@ namespace DungeonShooter
         /// </summary>
         public int StackCount { get; set; }
 
-        private readonly SkillFactory _skillFactory;
+        private readonly ISkillFactory _skillFactory;
 
         /// <summary>
         /// 소비 아이템 사용 스킬 (Consume 전용)
@@ -48,7 +48,7 @@ namespace DungeonShooter
         /// <param name="itemTableEntry">아이템 테이블 엔트리</param>
         /// <param name="skillFactory">스킬 팩토리</param>
         [Inject]
-        public Item(ItemTableEntry itemTableEntry, SkillFactory skillFactory)
+        public Item(ItemTableEntry itemTableEntry, ISkillFactory skillFactory)
         {
             if (itemTableEntry == null)
             {

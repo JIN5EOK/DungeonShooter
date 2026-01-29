@@ -12,11 +12,11 @@ namespace DungeonShooter
     public class SkillComponent : MonoBehaviour
     {
         private Dictionary<int, Skill> _skills = new Dictionary<int, Skill>();
-        private SkillFactory _skillFactory;
+        private ISkillFactory _skillFactory;
         private EntityBase _owner;
 
         [Inject]
-        private void Construct(SkillFactory skillFactory)
+        private void Construct(ISkillFactory skillFactory)
         {
             _skillFactory = skillFactory;
         }

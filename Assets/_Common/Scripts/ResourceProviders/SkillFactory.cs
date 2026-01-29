@@ -1,12 +1,18 @@
+using System;
 using Cysharp.Threading.Tasks;
 using VContainer;
 
 namespace DungeonShooter
 {
+    public interface ISkillFactory
+    {
+        public UniTask<Skill> CreateSkillAsync(int skillEntryId);
+    }
+    
     /// <summary>
     /// Skill 인스턴스를 생성하는 팩토리
     /// </summary>
-    public class SkillFactory
+    public class SkillFactory : ISkillFactory
     {
         private readonly ISceneResourceProvider _resourceProvider;
         private readonly ITableRepository _tableRepository;
@@ -58,7 +64,7 @@ namespace DungeonShooter
                 // Skill 인스턴스 생성
                 return new Skill(skillTableEntry, skillData);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 LogHandler.LogError<SkillFactory>(ex, $"Skill 생성 실패: {skillEntryId}");
                 return null;

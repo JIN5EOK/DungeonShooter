@@ -17,9 +17,6 @@ namespace DungeonShooter
 
     public class Enemy : EntityBase
     {
-        [Header("스탯 컴포넌트")]
-        [SerializeField] private EntityStatsComponent statsComponent;
-
         [Header("AI 설정")]
         [SerializeField] private float detectionRange = 10f;
         [SerializeField] private float patrolRange = 5f;
