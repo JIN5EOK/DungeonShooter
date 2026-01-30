@@ -13,7 +13,7 @@ namespace DungeonShooter
         SkillTableEntry SkillTableEntry { get; }
         bool IsCooldown { get; }
         float Cooldown { get; }
-        
+        float MaxCooldown { get; }
         event Action OnExecute;
         Action<float> OnCooldownChanged { get; set; }
         Action OnCooldownEnded { get; set; }

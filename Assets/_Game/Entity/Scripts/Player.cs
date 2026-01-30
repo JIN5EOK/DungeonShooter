@@ -18,12 +18,16 @@ namespace DungeonShooter
         private InteractComponent _interactComponent;
         private DashComponent _dashComponent;
         private Inventory _inventory;
-        
+
         private PlayerConfigTableEntry _playerConfigTableEntry;
         private ISceneResourceProvider _sceneResourceProvider;
         private IItemFactory _itemFactory;
         private ITableRepository _tableRepository;
         private StageUIManager _stageUIManager;
+        private HealthBarUI _healthBarUI;
+        private SkillCooldownHudUI _skillCooldownHudUI;
+        private SkillCooldownSlot _skill1CooldownUI;
+        private SkillCooldownSlot _skill2CooldownUI;
         [Inject]
         private void Construct(InputManager inputManager
             , Inventory inventory
@@ -50,7 +54,7 @@ namespace DungeonShooter
 
             _playerConfigTableEntry = playerConfigTableEntry;
 
-            
+
             // 스탯 테이블 엔트리 로드 및 EntityBase 초기화
             var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(_playerConfigTableEntry.StatsId);
             if (statsEntry == null)
@@ -58,33 +62,43 @@ namespace DungeonShooter
                 LogHandler.LogWarning<Player>($"EntityStatsTableEntry를 찾을 수 없습니다. ID: {_playerConfigTableEntry.StatsId}");
                 return;
             }
-            
-            
-            base.Initialize(statsEntry);
-            
-            _skillComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
-            await _skillComponent.RegistSkill(_playerConfigTableEntry.Skill1Id);
-            await _skillComponent.RegistSkill(_playerConfigTableEntry.Skill2Id);
 
+
+            base.Initialize(statsEntry);
+
+            _skillComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
+            var skill1 = await _skillComponent.GetOrRegistSkill(_playerConfigTableEntry.Skill1Id);
+            var skill2 = await _skillComponent.GetOrRegistSkill(_playerConfigTableEntry.Skill2Id);
+
+            _skillCooldownHudUI = await _stageUIManager.GetSkillCooldownHudUI();
+            _skill1CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
+            _skill2CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
+
+            _skill1CooldownUI.SetMaxCooldown(skill1.MaxCooldown);
+            _skill2CooldownUI.SetMaxCooldown(skill2.MaxCooldown);
+            skill1.OnCooldownChanged += _skill1CooldownUI.SetCooldown;
+            skill2.OnCooldownChanged += _skill2CooldownUI.SetCooldown;
+            
             _inventory.SetOwner(this);
             var weapon = await _itemFactory.CreateItemAsync(_playerConfigTableEntry.StartWeaponId);
             await _inventory.AddItem(weapon);
             await _inventory.EquipItem(weapon);
-            
+
             _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
             _interactComponent = gameObject.AddOrGetComponent<InteractComponent>();
             _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();
-            _dashComponent  =  gameObject.AddOrGetComponent<DashComponent>();
+            _dashComponent = gameObject.AddOrGetComponent<DashComponent>();
             _healthComponent.FullHeal();
             _healthComponent.OnDeath += HandleDeath;
+
+            _healthBarUI = await _stageUIManager.GetHealthBarUI();
+            _healthBarUI.SetHealth(_healthComponent.CurrentHealth, _healthComponent.MaxHealth);
+            _healthComponent.OnHealthChanged += _healthBarUI.SetHealth;
             
-            var healthBarUI = await _stageUIManager.GetHealthBarUI();
-            healthBarUI.SetHealth(_healthComponent.CurrentHealth, _healthComponent.MaxHealth);
-            _healthComponent.OnHealthChanged += healthBarUI.SetHealth;
 
             SubscribeInputEvent();
         }
-        
+
         // ==================== 입력 매니저 이벤트 구독/해제 ====================
         /// <summary>
         /// 입력 매니저 이벤트를 구독합니다.
@@ -99,7 +113,7 @@ namespace DungeonShooter
             _inputManager.OnInteractPressed += HandleInteractInput;
             _inputManager.OnDashPressed += HandleDashInput;
         }
-        
+
         // ==================== 입력 처리 ====================
         private void HandleMoveInputChanged(Vector2 input)
         {
@@ -110,12 +124,12 @@ namespace DungeonShooter
         {
             _dashComponent?.StartDash();
         }
-        
+
         private void HandleWeaponAttackInput()
         {
             _inventory.EquippedWeapon?.ActiveSkill.Execute(this).Forget();
         }
-        
+
         private void HandleSkill1Input()
         {
             _skillComponent?.UseSkill(_playerConfigTableEntry.Skill1Id, this).Forget();
@@ -124,7 +138,7 @@ namespace DungeonShooter
         {
             _interactComponent?.TryInteract();
         }
-        
+
         /// <summary>
         /// 사망 처리
         /// </summary>
@@ -138,7 +152,7 @@ namespace DungeonShooter
 
             // 모든 입력 및 로직 비활성화
             enabled = false;
-            
+
             StartCoroutine(GameOverSequence());
         }
 
@@ -173,9 +187,10 @@ namespace DungeonShooter
                 SceneManager.GetActiveScene().name
             );
         }
-        
+
         private void OnDestroy()
         {
+            _healthComponent.OnHealthChanged -= _healthBarUI.SetHealth;
             UnsubscribeInputEvent();
         }
 
@@ -192,6 +207,5 @@ namespace DungeonShooter
             _inputManager.OnDashPressed -= HandleDashInput;
             _inputManager.OnInteractPressed -= HandleInteractInput;
         }
-
     }
 }

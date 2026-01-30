@@ -6,9 +6,9 @@ using TMPro;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 스킬 쿨다운을 표시하는 HUD. CooldownManager를 참조하지 않고, 외부에서 SetCooldown로 갱신한다.
+    /// 개별 스킬의 쿨다운을 표시하는 UI. SkillCooldownHudUI의 하위 부품
     /// </summary>
-    public class SkillCooldownUI : HudUI
+    public class SkillCooldownSlot : MonoBehaviour
     {
         [Header("UI 요소")]
         [SerializeField] private Image _skillIcon;
@@ -36,12 +36,16 @@ namespace DungeonShooter
         /// <summary>
         /// 쿨다운 수치를 설정한다.
         /// </summary>
-        public void SetCooldown(float remainingTime, float totalCooldown)
+        public void SetCooldown(float remainingTime)
         {
             _remainingTime = Mathf.Max(0f, remainingTime);
-            _totalCooldown = Mathf.Max(0f, totalCooldown);
         }
 
+        public void SetMaxCooldown(float totalCooldown)
+        {
+            _totalCooldown = Mathf.Max(0f, totalCooldown);
+        }
+        
         private void UpdateCooldownVisuals()
         {
             var isReady = _totalCooldown <= 0f || _remainingTime <= 0f;

@@ -59,18 +59,17 @@ namespace DungeonShooter
         /// </summary>
         /// <param name="skillEntryId">스킬의 Entry ID</param>
         /// <returns>등록 성공 여부</returns>
-        public async UniTask<bool> RegistSkill(int skillEntryId)
+        public async UniTask<Skill> GetOrRegistSkill(int skillEntryId)
         {
-            if (_skills.ContainsKey(skillEntryId))
+            if (_skills.TryGetValue(skillEntryId, out var registSkill))
             {
-                LogHandler.LogWarning<SkillComponent>($"이미 등록된 스킬입니다: {skillEntryId}");
-                return false;
+                return registSkill;
             }
 
             if (_skillFactory == null)
             {
                 LogHandler.LogError<SkillComponent>("SkillFactory가 null입니다.");
-                return false;
+                return null;
             }
 
             try
@@ -80,7 +79,7 @@ namespace DungeonShooter
                 if (skill == null)
                 {
                     LogHandler.LogError<SkillComponent>($"Skill 생성 실패: {skillEntryId}");
-                    return false;
+                    return null;
                 }
 
                 _skills[skillEntryId] = skill;
@@ -92,12 +91,12 @@ namespace DungeonShooter
                 }
 
                 LogHandler.Log<SkillComponent>($"스킬 등록 완료: {skillEntryId} ({skill.SkillTableEntry.SkillName})");
-                return true;
+                return skill;
             }
             catch (Exception e)
             {
                 LogHandler.LogException<SkillComponent>(e, "스킬 등록 중 오류 발생");
-                return false;
+                return null;
             }
         }
 

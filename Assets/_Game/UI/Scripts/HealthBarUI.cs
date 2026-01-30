@@ -16,13 +16,6 @@ namespace DungeonShooter
         private int _currentHealth;
         private int _maxHealth;
         private float _targetFillAmount;
-        private float _currentFillAmount;
-        private float _fillAnimationSpeed = 5f;
-        
-        private void Update()
-        {
-            UpdateFill();
-        }
 
         /// <summary>
         /// 체력 수치를 설정한다.
@@ -35,15 +28,13 @@ namespace DungeonShooter
             UpdateVisuals();
         }
 
-        private void UpdateFill()
-        {
-            _healthFillImage.fillAmount = _targetFillAmount;
-        }
-
         private void UpdateVisuals()
         {
             if (_healthText != null)
                 _healthText.text = $"{_currentHealth} / {_maxHealth}";
+
+            if (_healthFillImage != null)
+                _healthFillImage.fillAmount = _targetFillAmount;
         }
     }
 }

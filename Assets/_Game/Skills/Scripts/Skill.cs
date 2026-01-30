@@ -18,7 +18,7 @@ namespace DungeonShooter
         public SkillTableEntry SkillTableEntry => _skillTableEntry;
         public bool IsCooldown { get; private set; }
         public float Cooldown { get; private set; }
-        
+        public float MaxCooldown => _skillTableEntry.Cooldown;
         public event Action OnExecute;
         public Action<float> OnCooldownChanged { get; set; }
         public Action OnCooldownEnded { get; set; }

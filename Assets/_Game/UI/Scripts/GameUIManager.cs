@@ -8,7 +8,7 @@ namespace DungeonShooter
     {
         private UIManager _uiManager;
         private readonly UICache<HealthBarUI> _healthBarCache = new();
-        private readonly UICache<SkillCooldownUI> _skillCooldownCache = new();
+        private readonly UICache<SkillCooldownHudUI> _skillCooldownHudCache = new();
 
         [Inject]
         public void Construct(UIManager uiManager)
@@ -19,8 +19,8 @@ namespace DungeonShooter
         public async UniTask<HealthBarUI> GetHealthBarUI() =>
             await _healthBarCache.GetOrCreateAsync(_uiManager, "UI_HpHud");
 
-        public async UniTask<SkillCooldownUI> GetSkillCooldownUI() =>
-            await _skillCooldownCache.GetOrCreateAsync(_uiManager, "UI_SkillCooldown");
+        public async UniTask<SkillCooldownHudUI> GetSkillCooldownHudUI() =>
+            await _skillCooldownHudCache.GetOrCreateAsync(_uiManager, "UI_SkillCooldownHud");
 
         private class UICache<T> : IDisposable where T : UIBase
         {
@@ -54,7 +54,7 @@ namespace DungeonShooter
         public void Dispose()
         {
             _healthBarCache.Dispose();
-            _skillCooldownCache.Dispose();
+            _skillCooldownHudCache.Dispose();
         }
     }
 }

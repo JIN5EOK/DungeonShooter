@@ -21,7 +21,7 @@ namespace DungeonShooter
         protected override void Awake()
         {
             base.Awake();
-            Debug.Log(Container.Resolve<UIManager>().name);
+            Container.Resolve<UIManager>();
             DontDestroyOnLoad(gameObject);
         }
     }
