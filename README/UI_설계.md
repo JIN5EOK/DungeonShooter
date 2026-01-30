@@ -10,7 +10,7 @@ classDiagram
         PopupUI
     }
     
-    class UIManager["UIManager<br>UI들의 관리 담당"]{
+    class UIManager["UIManager<br>UI생성 및 게임오브젝트 계층구조 담당"]{
         -uiMap Dictionary~UIType, UIBase~
         +CreateUI(string key) UIBase
         +RemoveUI(UIBase uiBase) UIBase
@@ -33,6 +33,13 @@ classDiagram
     class HudUI["HudUI<br>스크린 영역에 표시되는 정보표시 UI"]{
 
     }
+    
+    class StageUIManager["StageUIManager<br>스테이지 UI Manager(보조 UIManager)<br>UI관련 구체적 함수 제공 및 생명주기 책임 포함"]{
+        +GetInventory : InventoryUI
+        ... 스테이지 UI 관련 구체 함수들
+    }
+    UIManager <-- StageUIManager : UIManager를 통해 UI를 얻어옴
+    StageUIManager <-- 사용자 : 보조 UIManager들을 통해 UI 이용
     UIManager --> UIType : UI 타입 구분
     UIManager "1"-->"0..*" UIBase
     UIBase <|-- PopupUI
@@ -40,7 +47,11 @@ classDiagram
     PopupUI <|-- 상세UI구현
     HudUI<|-- 상세UI구현
 ```
-* `UIManager`
-  * `UIType`
+* `UIManager` -> UI생성 및 게임오브젝트 계층구조 담당
+  * UI 오브젝트 생성 
+  * `UIType`별 캔버스 및 계층구조 생성
     * `UIType`별로 캔버스를 생성한다 
     * 캔버스의 정렬 순서는 UIType에 정의된 순서를 따른다 (HudUI < PopupUI)
+* `StageUIManager`를 비롯한 서브 UIManager들 
+  * 실질적인 UI 관리 책임 담당, `UIManager`를 통해 UI를 얻어오되 생명주기 책임 및 특정 UI관련 구체적인 기능 제공
+  * UI 사용자들은 UIManager보다는 서브 UIManager를 통해 통신
