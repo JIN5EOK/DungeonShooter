@@ -18,47 +18,29 @@ classDiagram
   * 객체 중앙관리
 
 ## EntityComponent - Entity의 기능 담당 파트들
-
-### Entity 컴포넌트 예시
+* Entity의 Root 게임오브젝트에 부착하여 사용한다
+### 현재 작성된 Entity 컴포넌트 종류
 
 ```mermaid
 classDiagram
-    class MovementComponent["MovementComponent : Monobehaviour<br>캐릭터 이동 기능 담당"]{
-        +MoveSpeed : float
-        +MoveDirection : Vector2
-        +Move() void
-    }
-    class DashComponent["MovementComponent : Monobehaviour<br>캐릭터 대시 기능 담당"]{
-        +IsDashing : bool
-        +Dash() bool // 대시 성공여부 반환
-        +CancelDash() void // 대시중이라면 취소
-    }
-    class EntityStatsComponent["EntityStatsComponent : Monobehaviour<br>캐릭터 스탯 기능 담당"]{
-        // 스탯 데이터와 관련 연산
+    class MovementComponent["MovementComponent<br>캐릭터 이동 기능 담당"]{ }
+    class DashComponent["DashComponent<br>캐릭터 대시 기능 담당"]{ }
+    class EntityStatsComponent["EntityStatsComponent<br>캐릭터 스탯 기능 담당"]{
     }
 ```
 
 ```mermaid
 classDiagram
-    class HealthComponent["HealthComponent : Monobehaviour<br>캐릭터 체력 기능 담당"]{
-        +TakeDamage() void
-        +Heal() void
-        +Die() void
-    }
-    class InteractComponent["InteractComponent : Monobehaviour<br>플레이어와 상호작용 가능 물체 상호작용 담당"]{
-        +TryInteract() void 
-        // () 후보에 있는 IInteractable 객체와 상호작용
-        -RegisterInteractable() void
-        -UnRegisterInteractable() void
-        // () 범위내 객체를 후보로 등록/해제하거나 외부등록
-    }
+    class HealthComponent["HealthComponent<br>캐릭터 체력 기능 담당"]{ }
+    class InteractComponent["InteractComponent<br>플레이어의 상호작용 기능 담당"]{ }
 ```
+
+### 작성 예정 컴포넌트
 
 ```mermaid
 classDiagram
-    class BehaviourTreeComponent["BehaviourTreeComponent : Monobehaviour<br>적 AI등 행동트리 담당"]{
-        +SetBehaviourTree(BehaviourTreeNode bTNode) 
-    }
+    class BehaviourTreeComponent["BehaviourTreeComponent<br>적 AI등 행동트리 담당"]{ }
+    class VisualComponent["VisualComponent<br>애니메이션, 스프라이트 등 비주얼 담당"]
 ```
 
 ### 컴포넌트간 참조는 자유롭게
