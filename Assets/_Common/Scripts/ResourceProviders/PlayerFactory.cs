@@ -10,6 +10,7 @@ namespace DungeonShooter
     /// </summary>
     public interface IPlayerFactory
     {
+        public event Action<Player> OnPlayerCreated;
         UniTask<Player> GetPlayerAsync();
         Player GetPlayerSync();
     }
@@ -19,6 +20,7 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerFactory : IPlayerFactory
     {
+        public event Action<Player> OnPlayerCreated;
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
@@ -102,6 +104,7 @@ namespace DungeonShooter
             }
             var player = _sceneResourceProvider.AddOrGetComponentWithInejct<Player>(playerInstance);
             await player.Initialize(_playerConfigTableEntry);
+            OnPlayerCreated?.Invoke(player);
             return player;
         }
     }

@@ -21,7 +21,7 @@ namespace DungeonShooter
         
         private void Update()
         {
-            UpdateFillAnimation();
+            UpdateFill();
         }
 
         /// <summary>
@@ -35,10 +35,9 @@ namespace DungeonShooter
             UpdateVisuals();
         }
 
-        private void UpdateFillAnimation()
+        private void UpdateFill()
         {
-            _currentFillAmount = Mathf.Lerp(_currentFillAmount, _targetFillAmount, Time.deltaTime * _fillAnimationSpeed);
-            _healthFillImage.fillAmount = _currentFillAmount;
+            _healthFillImage.fillAmount = _targetFillAmount;
         }
 
         private void UpdateVisuals()
