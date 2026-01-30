@@ -23,18 +23,21 @@ namespace DungeonShooter
         private ISceneResourceProvider _sceneResourceProvider;
         private IItemFactory _itemFactory;
         private ITableRepository _tableRepository;
+        private StageUIManager _stageUIManager;
         [Inject]
         private void Construct(InputManager inputManager
             , Inventory inventory
             , ISceneResourceProvider sceneResourceProvider
             , IItemFactory itemFactory
-            , ITableRepository tableRepository)
+            , ITableRepository tableRepository
+            , StageUIManager stageUIManager)
         {
             _inputManager = inputManager;
             _inventory = inventory;
             _sceneResourceProvider = sceneResourceProvider;
             _itemFactory = itemFactory;
             _tableRepository = tableRepository;
+            _stageUIManager = stageUIManager;
         }
 
         public async UniTask Initialize(PlayerConfigTableEntry playerConfigTableEntry)
@@ -75,6 +78,10 @@ namespace DungeonShooter
             _healthComponent.FullHeal();
             _healthComponent.OnDeath += HandleDeath;
             
+            var healthBarUI = await _stageUIManager.GetHealthBarUI();
+            healthBarUI.SetHealth(_healthComponent.CurrentHealth, _healthComponent.MaxHealth);
+            _healthComponent.OnHealthChanged += healthBarUI.SetHealth;
+
             SubscribeInputEvent();
         }
         

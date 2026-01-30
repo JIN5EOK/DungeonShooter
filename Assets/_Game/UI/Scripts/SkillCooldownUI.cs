@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -5,203 +6,131 @@ using TMPro;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 스킬 쿨다운을 표시하는 UI 컴포넌트
+    /// 스킬 쿨다운을 표시하는 HUD. CooldownManager를 참조하지 않고, 외부에서 SetCooldown로 갱신한다.
     /// </summary>
-    public class SkillCooldownUI : MonoBehaviour
+    public class SkillCooldownUI : HudUI
     {
         [Header("UI 요소")]
-        [SerializeField] private Image skillIcon;
-        [SerializeField] private Image cooldownOverlay;
-        [SerializeField] private TextMeshProUGUI cooldownText;
+        [SerializeField] private Image _skillIcon;
+        [SerializeField] private Image _cooldownOverlay;
+        [SerializeField] private TextMeshProUGUI _cooldownText;
 
         [Header("시각적 설정")]
-        [SerializeField] private Color readyColor = Color.white;
-        [SerializeField] private Color cooldownColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
-        [SerializeField] private Color overlayColor = new Color(0f, 0f, 0f, 0.6f);
+        [SerializeField] private Color _readyColor = Color.white;
+        [SerializeField] private Color _cooldownColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+        [SerializeField] private Color _overlayColor = new Color(0f, 0f, 0f, 0.6f);
 
         [Header("애니메이션")]
-        [SerializeField] private bool enableReadyPulse = true;
-        [SerializeField] private float pulseSpeed = 3f;
-        [SerializeField] private float pulseIntensity = 0.2f;
+        [SerializeField] private bool _enableReadyPulse = true;
+        [SerializeField] private float _pulseSpeed = 3f;
+        [SerializeField] private float _pulseIntensity = 0.2f;
 
-        private string _skillCooldownKey;
-        private string _skillDisplayName;
-        private bool _isReady = true;
-
-        /// <summary>
-        /// 스킬 UI 초기화
-        /// </summary>
-        public void Initialize(string cooldownKey, string displayName)
-        {
-            _skillCooldownKey = cooldownKey;
-            _skillDisplayName = displayName;
-
-            // 초기 상태는 준비 완료
-            SetReadyState();
-        }
-
-        /// <summary>
-        /// 쿨다운 상태 업데이트
-        /// </summary>
-        // public void UpdateCooldown(CooldownComponent cooldownComponent)
-        // {
-        //     if (cooldownComponent == null || string.IsNullOrEmpty(_skillCooldownKey))
-        //     {
-        //         LogHandler.LogWarning<SkillCooldownUI>($"UpdateCooldown 실패: cooldownComponent={cooldownComponent != null}, key='{_skillCooldownKey}'");
-        //         return;
-        //     }
-
-        //     var skillReady = cooldownComponent.IsReady(_skillCooldownKey);
-        //     var remainingTime = cooldownComponent.GetRemainingCooldown(_skillCooldownKey);
-        //     var totalCooldown = cooldownComponent.GetTotalCooldown(_skillCooldownKey);
-
-        //     // 디버그 로그 (쿨다운 중일 때만)
-        //     if (!skillReady)
-        //     {
-        //         LogHandler.Log<SkillCooldownUI>($"{_skillCooldownKey}: {remainingTime:F1}s / {totalCooldown:F1}s");
-        //     }
-
-        //     if (skillReady)
-        //     {
-        //         if (!_isReady) SetReadyState();
-        //     }
-        //     else
-        //     {
-        //         if (_isReady) SetCooldownState();
-        //         UpdateCooldownProgress(remainingTime, totalCooldown);
-        //     }
-        // }
+        private float _remainingTime;
+        private float _totalCooldown;
 
         private void Update()
         {
-            // 준비 상태에서 펄스 효과
-            if (_isReady && enableReadyPulse && skillIcon != null)
-            {
-                var pulse = 1f + pulseIntensity * Mathf.Sin(Time.time * pulseSpeed);
-                skillIcon.color = readyColor * pulse;
-            }
+            UpdateCooldownVisuals();
         }
 
         /// <summary>
-        /// 준비 완료 상태로 설정
+        /// 쿨다운 수치를 설정한다.
         /// </summary>
-        private void SetReadyState()
+        public void SetCooldown(float remainingTime, float totalCooldown)
         {
-            _isReady = true;
-
-            if (skillIcon != null)
-            {
-                skillIcon.color = readyColor;
-            }
-
-            if (cooldownOverlay != null)
-            {
-                cooldownOverlay.fillAmount = 0f;
-                cooldownOverlay.color = overlayColor;
-            }
-
-            if (cooldownText != null)
-            {
-                cooldownText.text = "준비완료";
-                cooldownText.color = Color.green;
-            }
+            _remainingTime = Mathf.Max(0f, remainingTime);
+            _totalCooldown = Mathf.Max(0f, totalCooldown);
         }
 
-        /// <summary>
-        /// 쿨다운 상태로 설정
-        /// </summary>
-        private void SetCooldownState()
+        private void UpdateCooldownVisuals()
         {
-            _isReady = false;
+            var isReady = _totalCooldown <= 0f || _remainingTime <= 0f;
 
-            if (skillIcon != null)
+            if (isReady)
             {
-                skillIcon.color = cooldownColor;
-            }
-
-            if (cooldownText != null)
-            {
-                cooldownText.color = Color.white;
-            }
-        }
-
-        /// <summary>
-        /// 쿨다운 진행도 업데이트
-        /// </summary>
-        private void UpdateCooldownProgress(float remainingTime, float totalCooldown)
-        {
-            if (totalCooldown <= 0) return;
-
-            // 오버레이 fillAmount 업데이트 (시계 방향으로 줄어듦)
-            if (cooldownOverlay != null)
-            {
-                var progress = remainingTime / totalCooldown;
-                cooldownOverlay.fillAmount = progress;
-            }
-
-            // 남은 시간 텍스트 업데이트
-            if (cooldownText != null)
-            {
-                if (remainingTime > 1f)
+                if (_skillIcon != null)
                 {
-                    cooldownText.text = Mathf.Ceil(remainingTime).ToString("F0");
+                    if (_enableReadyPulse)
+                    {
+                        var pulse = 1f + _pulseIntensity * Mathf.Sin(Time.time * _pulseSpeed);
+                        _skillIcon.color = _readyColor * pulse;
+                    }
+                    else
+                    {
+                        _skillIcon.color = _readyColor;
+                    }
                 }
-                else
+
+                if (_cooldownOverlay != null)
+                    _cooldownOverlay.fillAmount = 0f;
+
+                if (_cooldownText != null)
                 {
-                    cooldownText.text = remainingTime.ToString("F1");
+                    _cooldownText.text = "준비완료";
+                    _cooldownText.color = Color.green;
+                }
+            }
+            else
+            {
+                if (_skillIcon != null)
+                    _skillIcon.color = _cooldownColor;
+
+                if (_cooldownOverlay != null && _totalCooldown > 0f)
+                    _cooldownOverlay.fillAmount = _remainingTime / _totalCooldown;
+
+                if (_cooldownText != null)
+                {
+                    _cooldownText.color = Color.white;
+                    if (_remainingTime > 1f)
+                        _cooldownText.text = Mathf.Ceil(_remainingTime).ToString("F0");
+                    else
+                        _cooldownText.text = _remainingTime.ToString("F1");
                 }
             }
         }
 
         /// <summary>
-        /// 스킬 아이콘 설정
+        /// 스킬 아이콘을 설정한다.
         /// </summary>
         public void SetSkillIcon(Sprite iconSprite)
         {
-            if (skillIcon != null && iconSprite != null)
-            {
-                skillIcon.sprite = iconSprite;
-            }
+            if (_skillIcon != null && iconSprite != null)
+                _skillIcon.sprite = iconSprite;
         }
 
         /// <summary>
-        /// 스킬 사용 트리거 (시각적 피드백용)
+        /// 스킬 사용 시각 피드백을 재생한다.
         /// </summary>
         public void OnSkillUsed()
         {
-            // 스킬 사용 시 간단한 시각 효과
             StartCoroutine(SkillUsedEffect());
         }
 
-        private System.Collections.IEnumerator SkillUsedEffect()
+        private IEnumerator SkillUsedEffect()
         {
-            if (skillIcon == null) yield break;
+            if (_skillIcon == null) yield break;
 
-            // 잠깐 크게 만들었다가 원래 크기로
-            var originalScale = skillIcon.transform.localScale;
+            var originalScale = _skillIcon.transform.localScale;
             var bigScale = originalScale * 1.2f;
-
             var duration = 0.1f;
             var elapsed = 0f;
 
-            // 커지기
             while (elapsed < duration)
             {
-                skillIcon.transform.localScale = Vector3.Lerp(originalScale, bigScale, elapsed / duration);
+                _skillIcon.transform.localScale = Vector3.Lerp(originalScale, bigScale, elapsed / duration);
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
             elapsed = 0f;
-            // 원래 크기로
             while (elapsed < duration)
             {
-                skillIcon.transform.localScale = Vector3.Lerp(bigScale, originalScale, elapsed / duration);
+                _skillIcon.transform.localScale = Vector3.Lerp(bigScale, originalScale, elapsed / duration);
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
-            skillIcon.transform.localScale = originalScale;
+            _skillIcon.transform.localScale = originalScale;
         }
     }
 }
