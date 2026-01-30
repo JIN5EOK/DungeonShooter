@@ -5,7 +5,7 @@ using VContainer.Unity;
 
 namespace DungeonShooter
 {
-    public class StageManager : IStartable
+    public class StageManager
     {
         private Stage _stage;
 
@@ -29,15 +29,10 @@ namespace DungeonShooter
             _stageContext = stageContext;
         }
         
-        public async void Start()
-        {
-            await CreateStageAsync();
-        }
-        
         /// <summary>
         /// 스테이지 구조와 인스턴스를 생성합니다
         /// </summary>
-        private async UniTask CreateStageAsync()
+        public async UniTask CreateStageAsync()
         {
             _stage = await StageGenerator.GenerateStage(_roomDataRepository);
             var stageConfigEntry = _tableRepository.GetTableEntry<StageConfigTableEntry>(_stageContext.StageConfigTableId);

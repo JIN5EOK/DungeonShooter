@@ -1,3 +1,4 @@
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -8,8 +9,10 @@ namespace DungeonShooter
     /// </summary>
     public class GlobalLifeTimeScope : LifetimeScope
     {
+        UIManager uiManager;
         protected override void Configure(IContainerBuilder builder)
         {
+            builder.RegisterComponentOnNewGameObject<UIManager>(Lifetime.Singleton).DontDestroyOnLoad();
             builder.Register<InputManager>(Lifetime.Singleton);
             builder.Register<LocalTableRepository>(Lifetime.Singleton).AsImplementedInterfaces();
             base.Configure(builder);
@@ -18,6 +21,7 @@ namespace DungeonShooter
         protected override void Awake()
         {
             base.Awake();
+            Debug.Log(Container.Resolve<UIManager>().name);
             DontDestroyOnLoad(gameObject);
         }
     }

@@ -1,10 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 using Jin5eok;
-using UnityEngine.AddressableAssets;
+using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.UI;
+using VContainer;
+using VContainer.Unity;
+using Object = UnityEngine.Object;
 
 namespace DungeonShooter
 {
@@ -15,18 +19,12 @@ namespace DungeonShooter
     {
         private readonly List<UIBase> _uiList = new();
         private Dictionary<UIType, Transform> _canvasByType;
-
         private AddressablesScope _scope;
 
-        private void Awake()
+        public void Start()
         {
             _canvasByType = CreateCanvasesByType();
             _scope = new AddressablesScope();
-        }
-
-        private void OnDestroy()
-        {
-            _scope?.Dispose();
         }
 
         /// <summary>
@@ -36,7 +34,7 @@ namespace DungeonShooter
         {
             var result = new Dictionary<UIType, Transform>();
 
-            foreach (UIType type in System.Enum.GetValues(typeof(UIType)))
+            foreach (UIType type in Enum.GetValues(typeof(UIType)))
             {
                 var go = new GameObject($"Canvas_{type}");
                 go.transform.SetParent(transform, false);
@@ -44,9 +42,11 @@ namespace DungeonShooter
                 var canvas = go.AddComponent<Canvas>();
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
                 canvas.sortingOrder = (int)type;
-                go.AddComponent<CanvasScaler>();
+                var scaler = go.AddComponent<CanvasScaler>();
+                scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                scaler.referenceResolution = new Vector2(Constants.ScreenSizeX, Constants.ScreenSizeY);
                 go.AddComponent<GraphicRaycaster>();
-
+                
                 result[type] = go.transform;
             }
 
@@ -58,7 +58,7 @@ namespace DungeonShooter
         /// </summary>
         /// <param name="addressableKey">어드레서블 키</param>
         /// <returns>생성된 UI. 실패 시 null</returns>
-        public async Task<UIBase> CreateUIAsync(string addressableKey)
+        public async UniTask<T> CreateUIAsync<T>(string addressableKey) where T : UIBase
         {
             var handle = _scope.InstantiateAsync(addressableKey);
             await handle.Task;
@@ -70,19 +70,19 @@ namespace DungeonShooter
             }
 
             var instance = handle.Result;
-            var uiBase = instance.GetComponent<UIBase>();
-            if (uiBase == null)
+            var ui = instance.GetComponent<T>();
+            if (ui == null)
             {
                 LogHandler.LogError<UIManager>($"프리팹에 UIBase가 없음: {addressableKey}");
                 Object.Destroy(instance);
                 return null;
             }
-
-            var parent = _canvasByType[uiBase.Type];
+            
+            var parent = _canvasByType[ui.Type];
             instance.transform.SetParent(parent, false);
 
-            _uiList.Add(uiBase);
-            return uiBase;
+            _uiList.Add(ui);
+            return ui;
         }
 
         /// <summary>
@@ -117,6 +117,11 @@ namespace DungeonShooter
             if (uiBase == null)
                 return;
             uiBase.transform.SetSiblingIndex(Mathf.Clamp(order, 0, uiBase.transform.parent.childCount - 1));
+        }
+
+        ~UIManager()
+        {
+            _scope?.Dispose();   
         }
     }
 }

@@ -43,6 +43,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - Stage001_NormalRoom
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 52f253cd74caa4bfb9f36e3a6736ede4
+    m_Address: UI_HpHud
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5b971ca8ccc0349049228890c3c418bc
     m_Address: Tile_Tree_001
     m_ReadOnly: 0

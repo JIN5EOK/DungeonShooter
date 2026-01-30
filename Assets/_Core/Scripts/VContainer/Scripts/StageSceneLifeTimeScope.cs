@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using VContainer;
 using VContainer.Unity;
 
@@ -18,8 +19,15 @@ namespace DungeonShooter
             builder.Register<RoomDataRepository>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SkillFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<ItemFactory>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.RegisterEntryPoint<StageManager>(Lifetime.Scoped);
+            builder.Register<StageManager>(Lifetime.Scoped);
+            builder.RegisterComponentOnNewGameObject<GameManager>(Lifetime.Scoped);
             base.Configure(builder);
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            Container.Resolve<GameManager>();
         }
     }
 }
