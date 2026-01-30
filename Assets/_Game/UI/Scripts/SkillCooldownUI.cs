@@ -43,34 +43,34 @@ namespace DungeonShooter
         /// <summary>
         /// 쿨다운 상태 업데이트
         /// </summary>
-        public void UpdateCooldown(CooldownComponent cooldownComponent)
-        {
-            if (cooldownComponent == null || string.IsNullOrEmpty(_skillCooldownKey))
-            {
-                LogHandler.LogWarning<SkillCooldownUI>($"UpdateCooldown 실패: cooldownComponent={cooldownComponent != null}, key='{_skillCooldownKey}'");
-                return;
-            }
+        // public void UpdateCooldown(CooldownComponent cooldownComponent)
+        // {
+        //     if (cooldownComponent == null || string.IsNullOrEmpty(_skillCooldownKey))
+        //     {
+        //         LogHandler.LogWarning<SkillCooldownUI>($"UpdateCooldown 실패: cooldownComponent={cooldownComponent != null}, key='{_skillCooldownKey}'");
+        //         return;
+        //     }
 
-            var skillReady = cooldownComponent.IsReady(_skillCooldownKey);
-            var remainingTime = cooldownComponent.GetRemainingCooldown(_skillCooldownKey);
-            var totalCooldown = cooldownComponent.GetTotalCooldown(_skillCooldownKey);
+        //     var skillReady = cooldownComponent.IsReady(_skillCooldownKey);
+        //     var remainingTime = cooldownComponent.GetRemainingCooldown(_skillCooldownKey);
+        //     var totalCooldown = cooldownComponent.GetTotalCooldown(_skillCooldownKey);
 
-            // 디버그 로그 (쿨다운 중일 때만)
-            if (!skillReady)
-            {
-                LogHandler.Log<SkillCooldownUI>($"{_skillCooldownKey}: {remainingTime:F1}s / {totalCooldown:F1}s");
-            }
+        //     // 디버그 로그 (쿨다운 중일 때만)
+        //     if (!skillReady)
+        //     {
+        //         LogHandler.Log<SkillCooldownUI>($"{_skillCooldownKey}: {remainingTime:F1}s / {totalCooldown:F1}s");
+        //     }
 
-            if (skillReady)
-            {
-                if (!_isReady) SetReadyState();
-            }
-            else
-            {
-                if (_isReady) SetCooldownState();
-                UpdateCooldownProgress(remainingTime, totalCooldown);
-            }
-        }
+        //     if (skillReady)
+        //     {
+        //         if (!_isReady) SetReadyState();
+        //     }
+        //     else
+        //     {
+        //         if (_isReady) SetCooldownState();
+        //         UpdateCooldownProgress(remainingTime, totalCooldown);
+        //     }
+        // }
 
         private void Update()
         {

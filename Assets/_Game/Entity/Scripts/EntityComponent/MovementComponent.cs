@@ -30,6 +30,7 @@ namespace DungeonShooter
             get;
             private set;
         }
+        
         public float MoveSpeed
         {
             get => _moveSpeed;
@@ -37,25 +38,26 @@ namespace DungeonShooter
         }
         private Rigidbody2D _rigidbody;
         private EntityStatsComponent _statsComponent;
+        
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
             _statsComponent = GetComponent<EntityStatsComponent>();
             _moveSpeed = _statsComponent.GetStat(StatType.MoveSpeed);
         }
+
+        private void Update()
+        {
+            Move();
+        }
         
         /// <summary>
         /// 캐릭터를 이동시킵니다.
         /// </summary>
-        public void Move()
+        private void Move()
         {
             var velocity = Direction.normalized * _moveSpeed;
             _rigidbody.linearVelocity = velocity;
-        }
-
-        public void Update()
-        {
-            Move();
         }
     }
 }

@@ -23,16 +23,38 @@ classDiagram
 
 ```mermaid
 classDiagram
-    class MovementComponent["MovementComponent<br>캐릭터 이동 기능 담당"]{ }
-    class DashComponent["DashComponent<br>캐릭터 대시 기능 담당"]{ }
+    class MovementComponent["MovementComponent<br>캐릭터 이동 기능 담당"]{
+        +MoveSpeed : float
+        +Direction : Vector2
+    }
+        
+    class DashComponent["DashComponent<br>캐릭터 대시 기능 담당"]{
+        +StartDash() void
+    }
     class EntityStatsComponent["EntityStatsComponent<br>캐릭터 스탯 기능 담당"]{
+        +GetValue(StatType statType) int
+        +AddModifier(...) void 
+        +RemoveModifier(...) void
+        // Modifier => 아이템 등에 의한 스탯 변화 추가
     }
 ```
 
 ```mermaid
 classDiagram
-    class HealthComponent["HealthComponent<br>캐릭터 체력 기능 담당"]{ }
-    class InteractComponent["InteractComponent<br>플레이어의 상호작용 기능 담당"]{ }
+    class SkillComponent["SkillComponent<br>캐릭터 고유 스킬 담당"]{
+        +UseSkill(int skillId, EntityBase target) UniTask~bool~
+        +RegistSkill(int skillId) UniTask~bool~
+        +UnregistSkill(int skillId) UniTask~bool~
+    }
+    class HealthComponent["HealthComponent<br>캐릭터 체력 기능 담당"]{ 
+        +Hp : int
+        +TakeDamage() void
+        +Heal() void
+        +Kill() void
+    }
+    class InteractComponent["InteractComponent<br>플레이어의 상호작용 기능 담당"]{ 
+        +TryInteract() void
+    }
 ```
 
 ### 작성 예정 컴포넌트
@@ -40,7 +62,7 @@ classDiagram
 ```mermaid
 classDiagram
     class BehaviourTreeComponent["BehaviourTreeComponent<br>적 AI등 행동트리 담당"]{ }
-    class VisualComponent["VisualComponent<br>애니메이션, 스프라이트 등 비주얼 담당"]
+    class EntityVisualComponent["EntityVisualComponent<br>애니메이션, 스프라이트 등 비주얼 담당"]
 ```
 
 ### 컴포넌트간 참조는 자유롭게

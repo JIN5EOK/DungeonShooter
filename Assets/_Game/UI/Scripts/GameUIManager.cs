@@ -18,60 +18,60 @@ namespace DungeonShooter
         [SerializeField] private Player player;
 
         private HealthComponent _playerHealth;
-        private CooldownComponent _playerCooldowns;
+        //private CooldownComponent _playerCooldowns;
 
         private async void Start()
         {
             // 한 프레임 후에 초기화 (PlayerProto.Start() 이후 보장)
             await Awaitable.NextFrameAsync();
-            await InitializeUIAsync();
+            // await InitializeUIAsync();
         }
 
-        private void Update()
-        {
-            UpdateUI();
-        }
+        // private void Update()
+        // {
+        //     UpdateUI();
+        // }
 
-        /// <summary>
-        /// UI 비동기 초기화
-        /// </summary>
-        private async Awaitable InitializeUIAsync()
-        {
-            // 플레이어가 지정되지 않았으면 찾기
-            if (player == null)
-            {
-                player = FindFirstObjectByType<Player>();
-            }
+        // /// <summary>
+        // /// UI 비동기 초기화
+        // /// </summary>
+        // private async Awaitable InitializeUIAsync()
+        // {
+        //     // 플레이어가 지정되지 않았으면 찾기
+        //     if (player == null)
+        //     {
+        //         player = FindFirstObjectByType<Player>();
+        //     }
 
-            if (player == null)
-            {
-                LogHandler.LogError<GameUIManager>("플레이어를 찾을 수 없습니다!");
-                return;
-            }
+        //     if (player == null)
+        //     {
+        //         LogHandler.LogError<GameUIManager>("플레이어를 찾을 수 없습니다!");
+        //         return;
+        //     }
 
-            // 플레이어 컴포넌트 참조
-            _playerHealth = player.GetComponent<HealthComponent>();
-            _playerCooldowns = player.GetComponent<CooldownComponent>();
+        //     // 플레이어 컴포넌트 참조
+        //     _playerHealth = player.GetComponent<HealthComponent>();
+        //     _playerCooldowns = player.GetComponent<CooldownComponent>();
 
-            // CooldownComponent가 아직 초기화 안 됐으면 재시도
-            if (_playerCooldowns == null)
-            {
-                LogHandler.LogWarning<GameUIManager>("CooldownComponent가 아직 초기화되지 않음. 재시도 중...");
-                await RetryInitializationAsync();
-                return;
-            }
+        //     // CooldownComponent가 아직 초기화 안 됐으면 재시도
+        //     if (_playerCooldowns == null)
+        //     {
+        //         LogHandler.LogWarning<GameUIManager>("CooldownComponent가 아직 초기화되지 않음. 재시도 중...");
+        //         await RetryInitializationAsync();
+        //         return;
+        //     }
 
-            LogHandler.Log<GameUIManager>("초기화 완료");
+        //     LogHandler.Log<GameUIManager>("초기화 완료");
 
-            // 체력 UI 초기화
-            if (healthBarUI != null && _playerHealth != null)
-            {
-                healthBarUI.Initialize(_playerHealth);
-            }
+        //     // 체력 UI 초기화
+        //     if (healthBarUI != null && _playerHealth != null)
+        //     {
+        //         healthBarUI.Initialize(_playerHealth);
+        //     }
 
-            // 스킬 UI 초기화
-            InitializeSkillUIs();
-        }
+        //     // 스킬 UI 초기화
+        //     InitializeSkillUIs();
+        // }
 
         /// <summary>
         /// CooldownComponent 초기화 재시도 (Awaitable 사용)
@@ -87,8 +87,8 @@ namespace DungeonShooter
 
                 if (player != null)
                 {
-                    _playerCooldowns = player.GetComponent<CooldownComponent>();
-                    if (_playerCooldowns != null)
+                    //_playerCooldowns = player.GetComponent<CooldownComponent>();
+                    if (true)//_playerCooldowns != null)
                     {
                         LogHandler.Log<GameUIManager>($"CooldownComponent 초기화 완료! (재시도: {retryCount + 1}회)");
                         InitializeSkillUIs();
@@ -125,25 +125,25 @@ namespace DungeonShooter
         /// <summary>
         /// UI 업데이트
         /// </summary>
-        private void UpdateUI()
-        {
-            // 체력 UI 업데이트
-            if (healthBarUI != null && _playerHealth != null)
-            {
-                healthBarUI.UpdateUI();
-            }
+        // private void UpdateUI()
+        // {
+        //     // 체력 UI 업데이트
+        //     if (healthBarUI != null && _playerHealth != null)
+        //     {
+        //         healthBarUI.UpdateUI();
+        //     }
 
-            // 스킬 UI 업데이트
-            if (skillUIs != null && _playerCooldowns != null)
-            {
-                for (int i = 0; i < skillUIs.Length; i++)
-                {
-                    if (skillUIs[i] != null)
-                    {
-                        skillUIs[i].UpdateCooldown(_playerCooldowns);
-                    }
-                }
-            }
-        }
+        //     // 스킬 UI 업데이트
+        //     if (skillUIs != null && _playerCooldowns != null)
+        //     {
+        //         for (int i = 0; i < skillUIs.Length; i++)
+        //         {
+        //             if (skillUIs[i] != null)
+        //             {
+        //                 skillUIs[i].UpdateCooldown(_playerCooldowns);
+        //             }
+        //         }
+        //     }
+        // }
     }
 }

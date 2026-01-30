@@ -40,7 +40,7 @@ namespace DungeonShooter
         [SerializeField] private float coinDropRadius = 1f;
 
         private Transform _playerTransform;
-        private CooldownComponent _cooldownComponent;
+        //private CooldownComponent _cooldownComponent;
         private HealthComponent _healthComponent;
         private MovementComponent _movementComponent;
 
@@ -68,9 +68,9 @@ namespace DungeonShooter
             statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
             _playerTransform = FindFirstObjectByType<Player>().transform;
             
-            _cooldownComponent = gameObject.AddOrGetComponent<CooldownComponent>();
+            //_cooldownComponent = gameObject.AddOrGetComponent<CooldownComponent>();
             //_cooldownComponent.RegisterCooldown("attack", GetAttackCooldown());
-            _cooldownComponent.RegisterCooldown("hitStun", hitStunDuration);
+            //_cooldownComponent.RegisterCooldown("hitStun", hitStunDuration);
             
             _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
             _movementComponent.MoveSpeed = (float)statsComponent.GetStat(StatType.MoveSpeed);
@@ -114,7 +114,7 @@ namespace DungeonShooter
         private void UpdateAI()
         {
             // 스턴 상태 확인
-            if (_isStunned && _cooldownComponent.IsReady("hitStun"))
+            if (_isStunned)// _cooldownComponent.IsReady("hitStun"))
             {
                 _isStunned = false;
                 _currentState = EnemyState.Idle;
@@ -139,10 +139,10 @@ namespace DungeonShooter
                     break;
                 case EnemyState.Hit:
                     // 피격 후 잠시 대기
-                    if (_cooldownComponent.IsReady("hitStun"))
-                    {
-                        _currentState = playerDetected ? EnemyState.Chase : EnemyState.Idle;
-                    }
+                    // if (_cooldownComponent.IsReady("hitStun"))
+                    // {
+                    //     _currentState = playerDetected ? EnemyState.Chase : EnemyState.Idle;
+                    // }
                     break;
             }
         }
@@ -169,7 +169,7 @@ namespace DungeonShooter
             {
                 case EnemyState.Idle:
                     _movementComponent.Direction = Vector2.zero;
-                    _movementComponent.Move();
+                    //_movementComponent.Move();
                     break;
                 case EnemyState.Patrol:
                     MoveTowardsTarget(_patrolTargetPos);
@@ -183,7 +183,7 @@ namespace DungeonShooter
                     break;
                 default:
                     _movementComponent.Direction = Vector2.zero;
-                    _movementComponent.Move();
+                    //_movementComponent.Move();
                     break;
             }
         }
@@ -234,7 +234,7 @@ namespace DungeonShooter
             var distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
             var range = 0;
             // var range = GetAttackRange();
-            if (distanceToPlayer <= range && _cooldownComponent.IsReady("attack"))
+            if (distanceToPlayer <= range)// && _cooldownComponent.IsReady("attack"))
             {
                 AttackPlayer();
             }
@@ -245,14 +245,14 @@ namespace DungeonShooter
         {
             var directionToPlayer = (_playerTransform.position - transform.position).normalized;
             _movementComponent.Direction = directionToPlayer;
-            _movementComponent.Move();
+            // _movementComponent.Move();
         }
 
         private void MoveTowardsTarget(Vector2 target)
         {
             var direction = (target - (Vector2)transform.position).normalized; ;
             _movementComponent.Direction = direction;
-            _movementComponent.Move();
+            // _movementComponent.Move();
         }
 
         // ==================== 유틸리티 ====================
@@ -271,7 +271,7 @@ namespace DungeonShooter
         // ==================== 공격 ====================
         private void AttackPlayer()
         {
-            _cooldownComponent.StartCooldown("attack");
+            //_cooldownComponent.StartCooldown("attack");
             
             // var damage = GetAttackDamage();
             var damage = 0;
@@ -335,7 +335,7 @@ namespace DungeonShooter
             // 상태 변경
             _currentState = EnemyState.Hit;
             _isStunned = true;
-            _cooldownComponent.StartCooldown("hitStun");
+            //_cooldownComponent.StartCooldown("hitStun");
 
             // 넉백 적용
             if (_playerTransform != null)
