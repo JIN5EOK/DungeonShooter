@@ -1,32 +1,46 @@
-## 구상
-* 염두에 두기
-    * 레이어드 아키텍쳐 설계 필요
-    * 일부 기능들은 다른 프로젝트에서도 사용할 수 있을 정도로 충분히 추상화 하기
+# 개요
+> UI 관리를 위한 UIManager, UI를 상속받는 UIBase들에 대한 설계입니다
 
-* UIManager
-    * UI 정렬순서, 계층 관리 
-    * UI생성
-    * UI삭제
+### UI 구조도
+```mermaid
+classDiagram
+    class UIType{
+        <<Enum>>
+        HudUI
+        PopupUI
+    }
+    
+    class UIManager["UIManager<br>UI들의 관리 담당"]{
+        -uiMap Dictionary~UIType, UIBase~
+        +CreateUI(string key) UIBase
+        +RemoveUI(UIBase uiBase) UIBase
+        +GetOrder(UIBase uiBase) int // 정렬순서 조회
+        +SetOrder(UIBase uiBase, int order) void // 정렬순서 조절
+    }
+    
+    class UIBase["UIBase<br>UI들의 부모 클래스"]{
+        <<abstract>>
+        +OnShow event Action
+        +OnHide event Action
+        +OnDestroy event Action
+        +Show() void
+        +Hide() void
+        +Destroy() void
+    }
+    class PopupUI["PopupUI<br>일반적인 UI, 버튼등 상호작용 가능"]{
+        
+    }
+    class HudUI["HudUI<br>스크린 영역에 표시되는 정보표시 UI"]{
 
-* UIBase - UI들이 상속
-    * UI 보이기
-    * UI 숨김
-    * UI 제거
-    * 이벤트 - 파괴,보이기,숨김시
-
-* UI 종류
-    * HudUI
-        * 스크린 영역에 표시, 플레이어가 상호작용할 수 없음
-        * 예시
-            * 체력바
-            * 'X키를 눌러 아이템 획득' 안내 메시지
-    * MenuUI
-        * 화면에 고정됨, 클릭이나 버튼으로 상호작용할 수 있는 UI
-        * 예시
-            * 인벤토리 UI
-            * 일시정지 UI
-    * WorldSpaceUI
-        * 스크린 영역이 아닌 캐릭터와 같은 월드공간에 표시되는 UI
-        * 예시
-            * 데미지 숫자 표시
----
+    }
+    UIManager --> UIType : UI 타입 구분
+    UIManager "1"-->"0..*" UIBase
+    UIBase <|-- PopupUI
+    UIBase <|-- HudUI
+    PopupUI <|-- 상세UI구현
+    HudUI<|-- 상세UI구현
+```
+* `UIManager`
+  * `UIType`
+    * `UIType`별로 캔버스를 생성한다 
+    * 캔버스의 정렬 순서는 UIType에 정의된 순서를 따른다 (HudUI < PopupUI)
