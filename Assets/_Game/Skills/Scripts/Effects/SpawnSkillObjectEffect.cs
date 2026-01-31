@@ -20,18 +20,23 @@ namespace DungeonShooter
 
         [Header("스킬 오브젝트 적중시 효과")]
         [SerializeReference]
-        private List<EffectBase> _effects = new List<EffectBase>();
+        private List<EffectBase> _effects;
 
         private string SkillObjectAddress => _skillObject.AssetGUID.ToString();
-        private ISceneResourceProvider _resourceProvider;
 
-        [Inject]
-        public void Construct(ISceneResourceProvider resourceProvider)
+        public override void Initialize(ISceneResourceProvider resourceProvider)
         {
-            _resourceProvider = resourceProvider;
-            _resourceProvider.GetAssetAsync<GameObject>(SkillObjectAddress);
-        }
+            base.Initialize(resourceProvider);
 
+            if(_effects == null)
+                return;
+
+            foreach (var effect in _effects)
+            {
+                effect.Initialize(resourceProvider);
+            }
+        }
+        
         public override async UniTask<bool> Execute(EntityBase owner, SkillTableEntry entry)
         {
             try

@@ -8,9 +8,6 @@ namespace DungeonShooter
     /// </summary>
     public class ProjectileSkillObject : SkillObjectBase
     {
-        private EntityBase _owner;
-        private List<EffectBase> _effects = new List<EffectBase>();
-        
         [Header("투사체 설정")]
         [SerializeField] private float _speed;
         [SerializeField] private float _lifeTime;
@@ -22,19 +19,19 @@ namespace DungeonShooter
 
         private bool _stopTrigger = false;
         private float _elapsedTime = 0f;
-        private SkillTableEntry _skillTableEntry;
-        private Vector2 _direction;
+        
+        private Vector2 _direction = Vector2.right;
         public override void Initialize(EntityBase owner, List<EffectBase> effects, SkillTableEntry skillTableEntry)
         {
-            _owner = owner;
-            _effects = effects;
-            _skillTableEntry = skillTableEntry;
+            base.Initialize(owner, effects, skillTableEntry);
+            
             // TODO: 이동 전략에 대한 커스텀 기능 필요
-            if (_owner.TryGetComponent(out MovementComponent movement))
+            if (this.owner.TryGetComponent(out MovementComponent movement))
             {
                 _direction = movement.LookDirection;
             }
-            transform.position = _owner.transform.position;
+            
+            transform.position = owner.transform.position;
         }
 
         private void Update()
@@ -72,7 +69,7 @@ namespace DungeonShooter
             if(otherEntity == null)
                 return;
             
-            var ownerLayer = _owner.gameObject.layer;
+            var ownerLayer = owner.gameObject.layer;
             var otherLayer = other.gameObject.layer;
 
             // 아군에게 적용 체크
@@ -83,9 +80,23 @@ namespace DungeonShooter
             if (ownerLayer != otherLayer && !_applyToOpponent)
                 return;
 
-            foreach (var effect in _effects)
+            if (effects != null)
             {
-                effect.Execute(otherEntity, _skillTableEntry);
+                foreach (var effect in effects)
+                {
+                    if (other.gameObject != owner.gameObject)
+                    {
+                        if (effect is SpawnSkillObjectEffect)
+                            effect.Execute(owner, skillTableEntry);
+                        else
+                            effect.Execute(otherEntity, skillTableEntry);
+                        
+                    }
+                    else
+                    {
+                        effect.Execute(otherEntity, skillTableEntry);
+                    }
+                }
             }
             
             if (_destroyOnTrigger == true)

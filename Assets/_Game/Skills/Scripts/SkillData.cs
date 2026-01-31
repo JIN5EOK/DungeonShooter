@@ -28,16 +28,16 @@ namespace DungeonShooter
 
         // 이펙트에 의존성 주입
         [Inject]
-        private void Construct(IObjectResolver resolver)
+        private void Construct(ISceneResourceProvider provider)
         {
-            foreach(var effect in _activeEffects)
+            foreach (var effect in _activeEffects)
             {
-                resolver.Inject(effect);
+                effect.Initialize(provider);
             }
             
             foreach(var effect in _passiveEffects)
             {
-                resolver.Inject(effect);
+                effect.Initialize(provider);
             }
         }
     }
