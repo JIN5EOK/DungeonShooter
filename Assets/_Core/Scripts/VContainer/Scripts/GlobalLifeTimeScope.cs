@@ -9,7 +9,6 @@ namespace DungeonShooter
     /// </summary>
     public class GlobalLifeTimeScope : LifetimeScope
     {
-        UIManager uiManager;
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterComponentOnNewGameObject<UIManager>(Lifetime.Singleton).DontDestroyOnLoad();

@@ -10,24 +10,26 @@ namespace DungeonShooter
     public class Player : EntityBase
     {
         private InputManager _inputManager;
-        private HealthComponent _healthComponent;
-        private bool _isDead;
-
-        private MovementComponent _movementComponent;
-        private SkillComponent _skillComponent;
-        private InteractComponent _interactComponent;
-        private DashComponent _dashComponent;
         private Inventory _inventory;
-
         private PlayerConfigTableEntry _playerConfigTableEntry;
         private ISceneResourceProvider _sceneResourceProvider;
         private IItemFactory _itemFactory;
         private ITableRepository _tableRepository;
         private StageUIManager _stageUIManager;
+        
+        private HealthComponent _healthComponent;
+        private MovementComponent _movementComponent;
+        private SkillComponent _skillComponent;
+        private InteractComponent _interactComponent;
+        private DashComponent _dashComponent;
+        
         private HealthBarHudUI _healthBarUI;
         private SkillCooldownHudUI _skillCooldownHudUI;
         private SkillCooldownSlot _skill1CooldownUI;
         private SkillCooldownSlot _skill2CooldownUI;
+        
+        private bool _isDead;
+        
         [Inject]
         private void Construct(InputManager inputManager
             , Inventory inventory
@@ -51,7 +53,6 @@ namespace DungeonShooter
                 LogHandler.LogWarning<Player>($"PlayerConfigTableEntry를 찾을 수 없습니다.");
                 return;
             }
-
             _playerConfigTableEntry = playerConfigTableEntry;
 
 
@@ -200,6 +201,8 @@ namespace DungeonShooter
         private void OnDestroy()
         {
             _healthComponent.OnHealthChanged -= _healthBarUI.SetHealth;
+            _skillCooldownHudUI.RemoveSkillCooldownSlot(_skill1CooldownUI);
+            _skillCooldownHudUI.RemoveSkillCooldownSlot(_skill2CooldownUI);
             UnsubscribeInputEvent();
         }
 

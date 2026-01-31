@@ -3,16 +3,6 @@ using System;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 아이템 타입
-    /// </summary>
-    public enum ItemType
-    {
-        Weapon,
-        Passive,
-        Consume
-    }
-
-    /// <summary>
     /// 아이템 수치 테이블 엔트리
     /// CSV 등 테이블을 통해 편집되는 아이템의 수치 정보
     /// </summary>
