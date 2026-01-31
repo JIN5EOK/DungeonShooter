@@ -18,7 +18,6 @@ namespace DungeonShooter
         [Header("시각적 설정")]
         [SerializeField] private Color _readyColor = Color.white;
         [SerializeField] private Color _cooldownColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
-        [SerializeField] private Color _overlayColor = new Color(0f, 0f, 0f, 0.6f);
 
         [Header("애니메이션")]
         [SerializeField] private bool _enableReadyPulse = true;
@@ -52,44 +51,27 @@ namespace DungeonShooter
 
             if (isReady)
             {
-                if (_skillIcon != null)
+                if (_enableReadyPulse)
                 {
-                    if (_enableReadyPulse)
-                    {
-                        var pulse = 1f + _pulseIntensity * Mathf.Sin(Time.time * _pulseSpeed);
-                        _skillIcon.color = _readyColor * pulse;
-                    }
-                    else
-                    {
-                        _skillIcon.color = _readyColor;
-                    }
+                    var pulse = 1f + _pulseIntensity * Mathf.Sin(Time.time * _pulseSpeed);
+                    _skillIcon.color = _readyColor * pulse;
                 }
-
-                if (_cooldownOverlay != null)
-                    _cooldownOverlay.fillAmount = 0f;
-
-                if (_cooldownText != null)
+                else
                 {
-                    _cooldownText.text = "준비완료";
-                    _cooldownText.color = Color.green;
+                    _skillIcon.color = _readyColor;
                 }
+                _cooldownOverlay.fillAmount = 0f;                    
+                _cooldownText.text = "";
             }
             else
             {
-                if (_skillIcon != null)
-                    _skillIcon.color = _cooldownColor;
-
-                if (_cooldownOverlay != null && _totalCooldown > 0f)
+                if (_totalCooldown > 0f)
                     _cooldownOverlay.fillAmount = _remainingTime / _totalCooldown;
 
-                if (_cooldownText != null)
-                {
-                    _cooldownText.color = Color.white;
-                    if (_remainingTime > 1f)
-                        _cooldownText.text = Mathf.Ceil(_remainingTime).ToString("F0");
-                    else
-                        _cooldownText.text = _remainingTime.ToString("F1");
-                }
+                if (_remainingTime > 1f)
+                    _cooldownText.text = Mathf.Ceil(_remainingTime).ToString("F0");
+                else
+                    _cooldownText.text = _remainingTime.ToString("F1");
             }
         }
 

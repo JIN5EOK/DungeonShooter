@@ -119,7 +119,7 @@ namespace DungeonShooter
             uiBase.transform.SetSiblingIndex(Mathf.Clamp(order, 0, uiBase.transform.parent.childCount - 1));
         }
 
-        ~UIManager()
+        private void OnDestroy()
         {
             _scope?.Dispose();   
         }

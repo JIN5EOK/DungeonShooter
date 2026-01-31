@@ -1,6 +1,6 @@
 Id,SkillName,SkillDescription,SkillIconKey,SkillDataKey,FloatAmounts,IntAmounts,Damage,Heal,Delay,Cooldown,TargetCount,KnockbackForce,SkillRootID
-14000100,파이어볼,화염구를 발사합니다,FireballIcon,,,,,,,,,,14000100
-14000101,파이어볼 LV1,데미지 150%의 화염구를 발사합니다,FireballIcon,FireballSkillData,,,150,0,0.5,5,99,10.0,14000100
-14000102,파이어볼 LV2,데미지 200%의 화염구를 발사합니다,FireballIcon,FireballSkillData,,,200,0,0.5,5,99,10.0,14000100
-14000103,파이어볼 LV3,데미지 250%의 화염구를 발사합니다,FireballIcon,FireballSkillData,,,250,0,0.5,5,99,10.0,14000100
-14000200,검 공격,검으로 공격해 데미지 100%를 입힙니다.,SwordIcon,SwordAttackSkillData,,,100,,0.5,0.5,99,10.0,14000200
+14000100,파이어볼,화염구를 발사합니다,FireballSkillIcon,,,,,,,,,,14000100
+14000101,파이어볼 LV1,데미지 150%의 화염구를 발사합니다,FireballSkillIcon,FireballSkillData,,,150,0,0.5,5,99,10.0,14000100
+14000102,파이어볼 LV2,데미지 200%의 화염구를 발사합니다,FireballSkillIcon,FireballSkillData,,,200,0,0.5,5,99,10.0,14000100
+14000103,파이어볼 LV3,데미지 250%의 화염구를 발사합니다,FireballSkillIcon,FireballSkillData,,,250,0,0.5,5,99,10.0,14000100
+14000200,검 공격,검으로 공격해 데미지 100%를 입힙니다.,FireballSkillIcon,SwordAttackSkillData,,,100,,0.5,0.5,99,10.0,14000200

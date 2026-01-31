@@ -76,6 +76,8 @@ namespace DungeonShooter
 
             _skill1CooldownUI.SetMaxCooldown(skill1.MaxCooldown);
             _skill2CooldownUI.SetMaxCooldown(skill2.MaxCooldown);
+            _skill1CooldownUI.SetSkillIcon(await _sceneResourceProvider.GetAssetAsync<Sprite>(skill1.SkillTableEntry.SkillIconKey));
+            _skill2CooldownUI.SetSkillIcon(await _sceneResourceProvider.GetAssetAsync<Sprite>(skill2.SkillTableEntry.SkillIconKey));
             skill1.OnCooldownChanged += _skill1CooldownUI.SetCooldown;
             skill2.OnCooldownChanged += _skill2CooldownUI.SetCooldown;
             
@@ -110,6 +112,7 @@ namespace DungeonShooter
             _inputManager.OnMoveInputChanged += HandleMoveInputChanged;
             _inputManager.OnWeaponAttack += HandleWeaponAttackInput;
             _inputManager.OnSkill1Pressed += HandleSkill1Input;
+            _inputManager.OnSkill2Pressed += HandleSkill2Input;
             _inputManager.OnInteractPressed += HandleInteractInput;
             _inputManager.OnDashPressed += HandleDashInput;
         }
@@ -134,6 +137,12 @@ namespace DungeonShooter
         {
             _skillComponent?.UseSkill(_playerConfigTableEntry.Skill1Id, this).Forget();
         }
+        
+        private void HandleSkill2Input()
+        {
+            _skillComponent?.UseSkill(_playerConfigTableEntry.Skill2Id, this).Forget();
+        }
+        
         private void HandleInteractInput()
         {
             _interactComponent?.TryInteract();
@@ -204,6 +213,7 @@ namespace DungeonShooter
             _inputManager.OnMoveInputChanged -= HandleMoveInputChanged;
             _inputManager.OnWeaponAttack -= HandleWeaponAttackInput;
             _inputManager.OnSkill1Pressed -= HandleSkill1Input;
+            _inputManager.OnSkill2Pressed -= HandleSkill2Input;
             _inputManager.OnDashPressed -= HandleDashInput;
             _inputManager.OnInteractPressed -= HandleInteractInput;
         }

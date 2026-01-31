@@ -84,6 +84,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 92a436165918d476992fe8363157c822
+    m_Address: FireballSkillIcon
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 93f3e96e2de814f8080f7b6d455b1f50
     m_Address: Tile_Misc_001
     m_ReadOnly: 0

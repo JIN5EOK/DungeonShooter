@@ -66,8 +66,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 46c1fc8777a554b529e60567d535f874, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -124,10 +124,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 6827702116135799765}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ff35adc67ed4c11bbca3338657e259f, type: 3}
+  m_Script: {fileID: 11500000, guid: d328c78a8869a456391d88a7fbb44fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _healthFillImage: {fileID: 8839687004206255245}
+  _healthFillImage: {fileID: 4243959653753323526}
   _healthText: {fileID: 7611550177601230393}
 --- !u!222 &4763658563795884312
 CanvasRenderer:
@@ -308,7 +308,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 30}
+  m_SizeDelta: {x: 200, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1909112330439264973
 CanvasRenderer:
@@ -331,14 +331,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -403659247, guid: 5b355ac4bf5394547b37ee6bcc55b804, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e8f86c88c0d754c8eb3e7fd909d8d7d8, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
