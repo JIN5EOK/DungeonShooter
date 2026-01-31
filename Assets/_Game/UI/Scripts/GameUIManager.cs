@@ -7,7 +7,7 @@ namespace DungeonShooter
     public class StageUIManager : IDisposable
     {
         private UIManager _uiManager;
-        private readonly UICache<HealthBarUI> _healthBarCache = new();
+        private readonly UICache<HealthBarHudUI> _healthBarCache = new();
         private readonly UICache<SkillCooldownHudUI> _skillCooldownHudCache = new();
 
         [Inject]
@@ -16,7 +16,7 @@ namespace DungeonShooter
             _uiManager = uiManager;
         }
 
-        public async UniTask<HealthBarUI> GetHealthBarUI() =>
+        public async UniTask<HealthBarHudUI> GetHealthBarUI() =>
             await _healthBarCache.GetOrCreateAsync(_uiManager, "UI_HpHud");
 
         public async UniTask<SkillCooldownHudUI> GetSkillCooldownHudUI() =>

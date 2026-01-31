@@ -24,7 +24,7 @@ namespace DungeonShooter
         private IItemFactory _itemFactory;
         private ITableRepository _tableRepository;
         private StageUIManager _stageUIManager;
-        private HealthBarUI _healthBarUI;
+        private HealthBarHudUI _healthBarUI;
         private SkillCooldownHudUI _skillCooldownHudUI;
         private SkillCooldownSlot _skill1CooldownUI;
         private SkillCooldownSlot _skill2CooldownUI;
