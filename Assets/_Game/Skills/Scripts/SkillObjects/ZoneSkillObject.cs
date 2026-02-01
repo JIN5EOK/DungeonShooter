@@ -7,7 +7,6 @@ namespace DungeonShooter
     /// <summary>
     /// 장판 스킬 오브젝트. 트리거 안에 있는 대상에게 주기적으로 이펙트를 적용합니다.
     /// </summary>
-    [RequireComponent(typeof(Collider2D))]
     public class ZoneSkillObject : SkillObjectBase
     {
         private float _duration = 5f;

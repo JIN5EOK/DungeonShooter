@@ -33,6 +33,7 @@ MonoBehaviour:
         speed: 10
         lifeTime: 2
         targetCount: 1
+        _rotateToCastDirection: 1
         _effects:
         - rid: 7692257720340054266
         - rid: 7692257720340054273

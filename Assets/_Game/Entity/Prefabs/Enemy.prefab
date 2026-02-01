@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 5998d8e5a080241409d1ec89d5591acd, type: 3}
+  m_Sprite: {fileID: 6602966838755796383, guid: faa3c9af1094f4d0eadf42de2e613dc7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -177,7 +177,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 325ac37a0e9164e528fb7f9ea9c965d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  statsComponent: {fileID: 0}
   detectionRange: 10
   patrolRange: 5
   idleTime: 2
@@ -185,8 +184,6 @@ MonoBehaviour:
   knockbackForce: 3
   deathDelay: 1
   disableOnDeath: 1
-  showAttackRange: 1
-  attackRangeVisualizer: {fileID: 0}
   coinDropChance: 1
   coinDropRange: {x: 1, y: 3}
   coinDropRadius: 1
@@ -202,14 +199,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab4f6b44ee01b42e1a52042bf93f4149, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stats:
-    moveSpeed: 5
-    maxHealth: 100
-    attackDamage: 10
-    attackRange: 1.5
-    attackCooldown: 1.5
-    defense: 0
-    knockbackResistance: 0
 --- !u!114 &4560199198152073960
 MonoBehaviour:
   m_ObjectHideFlags: 0

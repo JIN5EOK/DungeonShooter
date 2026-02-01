@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using DungeonShooter;
 using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using VContainer;
 
 namespace DungeonShooter
 {
@@ -15,11 +13,11 @@ namespace DungeonShooter
     [Serializable]
     public class SpawnProjectileEffect : EffectBase
     {
-        [Header("스킬 오브젝트 생성 위치")]
+        [Header("스킬 시전 위치")]
         [SerializeField]
         private SkillOwner _spawnPosition;
         
-        [Header("스킬 오브젝트 프리팹")]
+        [Header("오브젝트 프리팹")]
         [SerializeField]
         private AssetReferenceGameObject _skillObject;
 
@@ -35,6 +33,10 @@ namespace DungeonShooter
         [Range(1, 99)]
         [SerializeField] 
         private int targetCount = 1;
+
+        [Header("투사체가 시전 방향을 바라보도록 회전 여부")]
+        [SerializeField]
+        private bool _rotateToCastDirection;
 
         [Header("스킬 오브젝트 적중시 효과")]
         [SerializeReference]
@@ -62,7 +64,7 @@ namespace DungeonShooter
                 var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress);
 
                 var skillObj = obj.AddOrGetComponent<ProjectileSkillObject>();
-                skillObj.Initialize(_effects, entry, context, _spawnPosition, targetCount, speed, lifeTime);
+                skillObj.Initialize(_effects, entry, context, _spawnPosition, targetCount, speed, lifeTime, _rotateToCastDirection);
 
                 return false;
             }

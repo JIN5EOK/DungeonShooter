@@ -13,13 +13,54 @@ MonoBehaviour:
   m_Name: SwordAttackSkillData
   m_EditorClassIdentifier: 
   _activeEffects:
-  - rid: 7692257720340054264
+  - rid: 2338584298139156483
   _passiveEffects: []
   references:
     version: 2
     RefIds:
-    - rid: 7692257720340054264
-      type: {class: HealEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+    - rid: 2338584298139156483
+      type: {class: SpawnProjectileEffect, ns: DungeonShooter, asm: Assembly-CSharp}
       data:
-        effectCaster: 0
-        _healPercent: 1
+        executeTarget: 0
+        _spawnPosition: 0
+        _skillObject:
+          m_AssetGUID: 7c4bdfba27ed84a5781dd720a8ccfd2a
+          m_SubObjectName: 
+          m_SubObjectType: 
+          m_SubObjectGUID: 
+          m_EditorAssetChanged: 0
+        speed: 0
+        lifeTime: 0.5
+        targetCount: 99
+        _rotateToCastDirection: 1
+        _effects:
+        - rid: 2338584298139156484
+        - rid: 2338584298139156485
+        - rid: 2338584298139156714
+    - rid: 2338584298139156484
+      type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      data:
+        executeTarget: 1
+        damagePercent: 1
+    - rid: 2338584298139156485
+      type: {class: PlaySoundEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      data:
+        executeTarget: 0
+        _audioClipRef:
+          m_AssetGUID: 00263528ab539443f9c2392a9459c0cd
+          m_SubObjectName: 
+          m_SubObjectType: 
+          m_SubObjectGUID: 
+          m_EditorAssetChanged: 0
+    - rid: 2338584298139156714
+      type: {class: SpawnParticleEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      data:
+        executeTarget: 0
+        _particlePrefab:
+          m_AssetGUID: 5c6bc939f060248f492bc6aa7fb7cb6b
+          m_SubObjectName: 
+          m_SubObjectType: 
+          m_SubObjectGUID: 
+          m_EditorAssetChanged: 0
+        _spawnPosition: 1
+        _destroyAfterSeconds: 0

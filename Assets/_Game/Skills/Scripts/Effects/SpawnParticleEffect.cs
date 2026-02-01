@@ -1,8 +1,8 @@
 using System;
 using Cysharp.Threading.Tasks;
-using DungeonShooter;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using Object = UnityEngine.Object;
 
 namespace DungeonShooter
 {
@@ -16,7 +16,7 @@ namespace DungeonShooter
         [SerializeField]
         private AssetReferenceGameObject _particlePrefab;
 
-        [Header("생성 위치")]
+        [Header("스킬 시전 위치")]
         [SerializeField]
         private SkillOwner _spawnPosition;
 
@@ -53,7 +53,7 @@ namespace DungeonShooter
 
                 if (_destroyAfterSeconds > 0f)
                 {
-                    UnityEngine.Object.Destroy(obj, _destroyAfterSeconds);
+                    Object.Destroy(obj, _destroyAfterSeconds);
                 }
 
                 return true;

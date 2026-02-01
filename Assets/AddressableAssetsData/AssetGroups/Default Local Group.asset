@@ -68,6 +68,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5c6bc939f060248f492bc6aa7fb7cb6b
+    m_Address: SwordImpactYellow_Particle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5e0e56f83045f46b58153059772875e1
     m_Address: ItemTable
     m_ReadOnly: 0
@@ -80,6 +85,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 68cbc2d8171cd407f81f321629c6e28a
     m_Address: PlayerSpawn
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7c4bdfba27ed84a5781dd720a8ccfd2a
+    m_Address: SwordSlashYellow_Particle
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

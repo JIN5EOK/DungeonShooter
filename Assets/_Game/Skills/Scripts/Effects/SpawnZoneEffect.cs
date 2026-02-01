@@ -14,11 +14,11 @@ namespace DungeonShooter
     [Serializable]
     public class SpawnZoneEffect : EffectBase
     {
-        [Header("스킬 오브젝트 생성 위치")]
+        [Header("스킬 시전 위치")]
         [SerializeField]
         private SkillOwner _spawnPosition;
         
-        [Header("스킬 오브젝트 프리팹 (Collider2D isTrigger 필요)")]
+        [Header("오브젝트 프리펩")]
         [SerializeField]
         private AssetReferenceGameObject _skillObject;
 
