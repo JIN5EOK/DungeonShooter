@@ -9,10 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8058911077602655392}
-  - component: {fileID: 5932905829648565609}
   - component: {fileID: 5116505164295440530}
   m_Layer: 0
-  m_Name: Fireball_Projectile
+  m_Name: Fireball_Particle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34,25 +33,6 @@ Transform:
   - {fileID: 3253467287939270907}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5932905829648565609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1694397312920760376}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cba1b75ab8110438984cca9ee9e588c5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _speed: 15
-  _lifeTime: 2
-  _triggerStartTime: 0
-  _triggerEndTime: 2
-  _destroyOnTrigger: 1
-  _applyToOpponent: 1
-  _applyToFriend: 0
 --- !u!61 &5116505164295440530
 BoxCollider2D:
   m_ObjectHideFlags: 0

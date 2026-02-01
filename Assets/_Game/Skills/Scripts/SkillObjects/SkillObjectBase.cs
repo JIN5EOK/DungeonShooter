@@ -20,14 +20,14 @@ namespace DungeonShooter
         /// <param name="skillTableEntry">스킬 수치 테이블 엔트리</param>
         /// <param name="context">시전 컨텍스트 (초기 위치 산출용)</param>
         /// <param name="spawnPosition">스폰 위치 (Caster = 시전자 위치, Target = 대상 위치)</param>
-        public virtual void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
+        protected void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
             SkillExecutionContext context, SkillOwner spawnPosition)
         {
             this.context = context;
             this.effects = effects;
             this.skillTableEntry = skillTableEntry;
 
-            var position = spawnPosition == SkillOwner.LastHitTarget ? context.HitTarget.transform.position : context.Caster.transform.position;
+            var position = spawnPosition == SkillOwner.LastHitTarget ? context.LastHitTarget.transform.position : context.Caster.transform.position;
             transform.position = position;
         }
 
@@ -36,11 +36,6 @@ namespace DungeonShooter
         /// </summary>
         protected async UniTask RunEffectsAsync(SkillExecutionContext context)
         {
-            if (effects == null || skillTableEntry == null)
-            {
-                return;
-            }
-
             foreach (var effect in effects)
             {
                 if (effect != null)

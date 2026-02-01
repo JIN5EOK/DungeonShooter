@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DungeonShooter;
+using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using VContainer;
@@ -12,7 +13,7 @@ namespace DungeonShooter
     /// 스킬 오브젝트(투사체, 장판 등)를 소환하는 이펙트
     /// </summary>
     [Serializable]
-    public class SpawnSkillObjectEffect : EffectBase
+    public class SpawnProjectileEffect : EffectBase
     {
         [Header("스킬 오브젝트 생성 위치")]
         [SerializeField]
@@ -21,7 +22,20 @@ namespace DungeonShooter
         [Header("스킬 오브젝트 프리팹")]
         [SerializeField]
         private AssetReferenceGameObject _skillObject;
+
+        [Header("투사체 비행속도")] 
+        [SerializeField] 
+        private float speed;
         
+        [Header("투사체 소멸시간")] 
+        [SerializeField] 
+        private float lifeTime;
+        
+        [Header("적용 타겟 수")] 
+        [Range(1, 99)]
+        [SerializeField] 
+        private int targetCount = 1;
+
         [Header("스킬 오브젝트 적중시 효과")]
         [SerializeReference]
         private List<EffectBase> _effects;
@@ -46,19 +60,15 @@ namespace DungeonShooter
             try
             { 
                 var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress);
-                
-                if (obj.TryGetComponent(out SkillObjectBase skillObj))
-                {
-                    skillObj.Initialize(_effects, entry, context, _spawnPosition);
-                    return true;
-                }
 
-                LogHandler.LogError<SpawnSkillObjectEffect>("스킬 오브젝트에 SkillObjectBase가 없습니다.");
+                var skillObj = obj.AddOrGetComponent<ProjectileSkillObject>();
+                skillObj.Initialize(_effects, entry, context, _spawnPosition, targetCount, speed, lifeTime);
+
                 return false;
             }
             catch (Exception e)
             {
-                LogHandler.LogException<SpawnSkillObjectEffect>(e, "스킬 오브젝트 생성 실패");
+                LogHandler.LogException<SpawnProjectileEffect>(e, "스킬 오브젝트 생성 실패");
             }
 
             return false;

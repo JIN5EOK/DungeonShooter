@@ -13,37 +13,29 @@ MonoBehaviour:
   m_Name: FireballSkillData
   m_EditorClassIdentifier: 
   _activeEffects:
-  - rid: 7692257427368706456
+  - rid: 7692257720340054265
   _passiveEffects: []
   references:
     version: 2
     RefIds:
-    - rid: 7692257427368706456
-      type: {class: SpawnSkillObjectEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+    - rid: 7692257720340054265
+      type: {class: SpawnProjectileEffect, ns: DungeonShooter, asm: Assembly-CSharp}
       data:
+        effectCaster: 0
+        _spawnPosition: 0
         _skillObject:
           m_AssetGUID: 1654f787912fc4307b0db38dc6acf3a7
           m_SubObjectName: 
           m_SubObjectType: 
           m_SubObjectGUID: 
           m_EditorAssetChanged: 0
+        speed: 10
+        lifeTime: 2
+        targetCount: 1
         _effects:
-        - rid: 7692257427368706457
-        - rid: 7692257720340054246
-    - rid: 7692257427368706457
+        - rid: 7692257720340054266
+    - rid: 7692257720340054266
       type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}
-      data: 
-    - rid: 7692257720340054246
-      type: {class: SpawnSkillObjectEffect, ns: DungeonShooter, asm: Assembly-CSharp}
       data:
-        _skillObject:
-          m_AssetGUID: 1654f787912fc4307b0db38dc6acf3a7
-          m_SubObjectName: 
-          m_SubObjectType: 
-          m_SubObjectGUID: 
-          m_EditorAssetChanged: 0
-        _effects:
-        - rid: 7692257720340054248
-    - rid: 7692257720340054248
-      type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}
-      data: 
+        effectCaster: 1
+        damagePercent: 1

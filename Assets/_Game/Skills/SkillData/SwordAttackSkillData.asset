@@ -12,33 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 283c72616b63046e8aa598bcb4aa5e6d, type: 3}
   m_Name: SwordAttackSkillData
   m_EditorClassIdentifier: 
-  _skillName: "\uD30C\uC774\uC5B4\uBCFC"
-  _skillDescription: "\uC804\uBC29\uC5D0 \uD30C\uC774\uC5B4\uBCFC\uC744 \uBC1C\uC0AC\uD55C\uB2E4,
-    \uC2A4\uD0AC \uB808\uBCA8\uC774 \uC99D\uAC00\uD558\uBA74 \uBC1C\uC0AC \uD69F\uC218\uAC00
-    \uC99D\uAC00\uD55C\uB2E4"
-  _skillIcon:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
   _activeEffects:
-  - rid: 7692257427368706456
+  - rid: 7692257720340054264
   _passiveEffects: []
   references:
     version: 2
     RefIds:
-    - rid: 7692257427368706456
-      type: {class: SpawnSkillObjectEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+    - rid: 7692257720340054264
+      type: {class: HealEffect, ns: DungeonShooter, asm: Assembly-CSharp}
       data:
-        _skillObject:
-          m_AssetGUID: 1654f787912fc4307b0db38dc6acf3a7
-          m_SubObjectName: 
-          m_SubObjectType: 
-          m_SubObjectGUID: 
-          m_EditorAssetChanged: 0
-        _effects:
-        - rid: 7692257427368706457
-    - rid: 7692257427368706457
-      type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}
-      data: 
+        effectCaster: 0
+        _healPercent: 1

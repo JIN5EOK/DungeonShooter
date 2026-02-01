@@ -29,7 +29,7 @@ namespace DungeonShooter
                 return UniTask.FromResult(false);
             }
 
-            if (context.HitTarget.TryGetComponent(out HealthComponent health))
+            if (context.LastHitTarget.TryGetComponent(out HealthComponent health))
             {
                 health.Heal(heal);
                 return UniTask.FromResult(true);
