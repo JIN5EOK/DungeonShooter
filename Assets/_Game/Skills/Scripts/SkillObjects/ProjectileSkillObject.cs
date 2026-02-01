@@ -83,7 +83,7 @@ namespace DungeonShooter
             if (effects != null)
             {
                 var newContext = context
-                    .WithOther(otherEntity);
+                    .WithHitTarget(otherEntity);
                 RunEffectsAsync(newContext).Forget();
             }
 

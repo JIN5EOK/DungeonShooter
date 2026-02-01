@@ -27,7 +27,7 @@ namespace DungeonShooter
             this.effects = effects;
             this.skillTableEntry = skillTableEntry;
 
-            var position = spawnPosition == SkillOwner.Other ? context.Other.transform.position : context.Caster.transform.position;
+            var position = spawnPosition == SkillOwner.LastHitTarget ? context.HitTarget.transform.position : context.Caster.transform.position;
             transform.position = position;
         }
 

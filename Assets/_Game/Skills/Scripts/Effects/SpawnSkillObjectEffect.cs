@@ -44,8 +44,9 @@ namespace DungeonShooter
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
             try
-            {
+            { 
                 var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress);
+                
                 if (obj.TryGetComponent(out SkillObjectBase skillObj))
                 {
                     skillObj.Initialize(_effects, entry, context, _spawnPosition);

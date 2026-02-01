@@ -33,11 +33,11 @@ namespace DungeonShooter
         HudUI,
         PopupUI
     }
-
+    
     public enum SkillOwner
     {
         Caster = 0,
-        Other = 1
+        LastHitTarget = 1
     }
 }
 

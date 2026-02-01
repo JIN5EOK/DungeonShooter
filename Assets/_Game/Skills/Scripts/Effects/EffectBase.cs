@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DungeonShooter
 {
@@ -10,15 +11,17 @@ namespace DungeonShooter
     [Serializable]
     public abstract class EffectBase
     {
-        [SerializeField]
-        [Header("이펙트 적용 대상")]
-        protected SkillOwner applyTarget;
+        [FormerlySerializedAs("executeTarget")]
+        [SerializeField] 
+        [Header("이펙트 시전자")]
+        protected SkillOwner effectCaster;
+        
         protected ISceneResourceProvider _resourceProvider;
         public virtual void Initialize(ISceneResourceProvider resourceProvider)
         {
             _resourceProvider = resourceProvider;
         }
-        
+
         /// <summary>
         /// 이펙트를 실행합니다. (액티브 스킬 사용 시 호출)
         /// </summary>
@@ -26,7 +29,6 @@ namespace DungeonShooter
         /// <param name="entry">스킬 수치 테이블 엔트리</param>
         /// <returns>실행 성공 여부</returns>
         public abstract UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry);
-        
         /// <summary>
         /// 효과를 활성화합니다. (패시브 스킬 등록 시 호출)
         /// </summary>

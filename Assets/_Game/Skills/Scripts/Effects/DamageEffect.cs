@@ -27,9 +27,8 @@ namespace DungeonShooter
                 LogHandler.LogWarning<DamageEffect>("데미지 값이 0 이하입니다.");
                 return UniTask.FromResult(false);
             }
-
-            var target = context.Other;
-            if (target != null && target.TryGetComponent(out HealthComponent health))
+            
+            if (context.HitTarget.TryGetComponent(out HealthComponent health))
             {
                 health.TakeDamage(damage);
                 return UniTask.FromResult(true);
