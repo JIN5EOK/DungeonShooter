@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: e727023362f784fb398d507d154abd24
   m_SerializeEntries:
+  - m_GUID: 00263528ab539443f9c2392a9459c0cd
+    m_Address: Explosion8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0b01011d905fb4cbea08a65af348edc9
     m_Address: Stage001_0001
     m_ReadOnly: 0
@@ -50,6 +55,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 52f253cd74caa4bfb9f36e3a6736ede4
     m_Address: UI_HpHud
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 550f8ea83664141b3ae95895d662ca51
+    m_Address: FireballExplosion_Particle
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -131,6 +141,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f5237e1a4b00d4fe0a0f4fa9d094686c
     m_Address: StageConfig_001
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f5c978ab5f436be48882cd620ac3dcc3
+    m_Address: Assets/_ExternalAssets/Pixel Arsenal/Sound/Explosion8.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

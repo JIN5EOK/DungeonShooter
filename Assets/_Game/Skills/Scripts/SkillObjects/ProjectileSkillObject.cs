@@ -52,6 +52,11 @@ namespace DungeonShooter
 
         private void OnTriggerStay2D(Collider2D other)
         {
+            if (_appliedTargetCount >= _targetCount)
+            {
+                return;
+            }
+            
             var otherEntity = other.GetComponent<EntityBase>();
             
             if(otherEntity == null)

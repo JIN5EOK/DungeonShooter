@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _activeEffects:
   - rid: 7692257720340054265
+  - rid: 7692257720340054271
   _passiveEffects: []
   references:
     version: 2
@@ -34,29 +35,42 @@ MonoBehaviour:
         targetCount: 1
         _effects:
         - rid: 7692257720340054266
-        - rid: 7692257720340054267
+        - rid: 7692257720340054273
+        - rid: 7692257720340054276
     - rid: 7692257720340054266
       type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}
       data:
         executeTarget: 0
         damagePercent: 1
-    - rid: 7692257720340054267
-      type: {class: SpawnZoneEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+    - rid: 7692257720340054271
+      type: {class: PlaySoundEffect, ns: DungeonShooter, asm: Assembly-CSharp}
       data:
         executeTarget: 0
-        _spawnPosition: 1
-        _skillObject:
-          m_AssetGUID: 4f231cb0a4c4847e79ff681dc772719f
+        _audioClipRef:
+          m_AssetGUID: f5c978ab5f436be48882cd620ac3dcc3
           m_SubObjectName: 
           m_SubObjectType: 
           m_SubObjectGUID: 
           m_EditorAssetChanged: 0
-        _duration: 3
-        _applyInterval: 1
-        _effects:
-        - rid: 7692257720340054268
-    - rid: 7692257720340054268
-      type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+    - rid: 7692257720340054273
+      type: {class: PlaySoundEffect, ns: DungeonShooter, asm: Assembly-CSharp}
       data:
-        executeTarget: 1
-        damagePercent: 0.1
+        executeTarget: 0
+        _audioClipRef:
+          m_AssetGUID: f5c978ab5f436be48882cd620ac3dcc3
+          m_SubObjectName: 
+          m_SubObjectType: 
+          m_SubObjectGUID: 
+          m_EditorAssetChanged: 0
+    - rid: 7692257720340054276
+      type: {class: SpawnParticleEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      data:
+        executeTarget: 0
+        _particlePrefab:
+          m_AssetGUID: 550f8ea83664141b3ae95895d662ca51
+          m_SubObjectName: 
+          m_SubObjectType: 
+          m_SubObjectGUID: 
+          m_EditorAssetChanged: 0
+        _spawnPosition: 1
+        _destroyAfterSeconds: 0

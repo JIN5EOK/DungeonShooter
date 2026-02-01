@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 19983718}
   - component: {fileID: 8201872}
   m_Layer: 0
-  m_Name: FireballExplosionRed
+  m_Name: FireballExplosion_Particle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

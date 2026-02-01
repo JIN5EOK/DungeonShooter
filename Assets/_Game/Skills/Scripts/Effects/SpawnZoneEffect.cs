@@ -17,7 +17,7 @@ namespace DungeonShooter
         [Header("스킬 오브젝트 생성 위치")]
         [SerializeField]
         private SkillOwner _spawnPosition;
-
+        
         [Header("스킬 오브젝트 프리팹 (Collider2D isTrigger 필요)")]
         [SerializeField]
         private AssetReferenceGameObject _skillObject;
