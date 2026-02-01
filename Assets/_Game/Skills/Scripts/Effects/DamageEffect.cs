@@ -10,6 +10,8 @@ namespace DungeonShooter
     [Serializable]
     public class DamageEffect : EffectBase
     {
+        [Header("테이블의 지정된 Damage에 적용할 배율\n0 = 데미지 적용 안됨, 1.0f = 1배율")]
+        public float damagePercent = 1.0f;
         public override UniTask<bool> Execute(EntityBase owner, SkillTableEntry entry)
         {
             if (entry == null)

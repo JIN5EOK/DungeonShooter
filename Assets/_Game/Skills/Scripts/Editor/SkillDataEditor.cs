@@ -103,7 +103,7 @@ namespace DungeonShooter
                         // List<EffectBase>라면 재귀로 자식의 이펙트 리스트 그리기, 아니라면 필드만 그리기
                         if (IsEffectBaseList(iterator))
                         {
-                            EditorGUILayout.LabelField(iterator.displayName, EditorStyles.boldLabel);
+                            EditorGUILayout.LabelField("적용 이펙트", EditorStyles.boldLabel);
                             DrawEffectList(iterator, depth + 1);
                         }
                         else

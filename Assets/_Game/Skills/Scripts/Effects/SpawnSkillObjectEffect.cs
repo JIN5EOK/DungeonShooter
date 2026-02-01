@@ -18,10 +18,14 @@ namespace DungeonShooter
         [SerializeField]
         private AssetReferenceGameObject _skillObject;
 
+        [Header("스킬 오브젝트 생성 위치")]
+        [SerializeField]
+        private SkillOwner _spawnPosition;
+        
         [Header("스킬 오브젝트 적중시 효과")]
         [SerializeReference]
         private List<EffectBase> _effects;
-
+        
         private string SkillObjectAddress => _skillObject.AssetGUID.ToString();
 
         public override void Initialize(ISceneResourceProvider resourceProvider)
