@@ -11,16 +11,11 @@ namespace DungeonShooter
     [Serializable]
     public abstract class EffectBase
     {
-        [FormerlySerializedAs("executeTarget")]
         [SerializeField] 
         [Header("이펙트 시전자")]
-        protected SkillOwner effectCaster;
-        
-        protected ISceneResourceProvider _resourceProvider;
-        public virtual void Initialize(ISceneResourceProvider resourceProvider)
-        {
-            _resourceProvider = resourceProvider;
-        }
+        protected SkillOwner executeTarget;
+
+        public virtual void Initialize(ISceneResourceProvider resourceProvider) { }
 
         /// <summary>
         /// 이펙트를 실행합니다. (액티브 스킬 사용 시 호출)

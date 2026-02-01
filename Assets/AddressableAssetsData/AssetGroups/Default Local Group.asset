@@ -43,6 +43,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - Stage001_NormalRoom
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f231cb0a4c4847e79ff681dc772719f
+    m_Address: Firezone_Particle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 52f253cd74caa4bfb9f36e3a6736ede4
     m_Address: UI_HpHud
     m_ReadOnly: 0

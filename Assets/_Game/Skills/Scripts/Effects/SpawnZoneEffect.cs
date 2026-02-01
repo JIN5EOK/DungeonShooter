@@ -5,44 +5,40 @@ using DungeonShooter;
 using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using VContainer;
 
 namespace DungeonShooter
 {
     /// <summary>
-    /// 스킬 오브젝트(투사체, 장판 등)를 소환하는 이펙트
+    /// 장판 스킬 오브젝트를 소환하는 이펙트. 장판 안에 있는 대상에게 주기적으로 이펙트를 적용합니다.
     /// </summary>
     [Serializable]
-    public class SpawnProjectileEffect : EffectBase
+    public class SpawnZoneEffect : EffectBase
     {
         [Header("스킬 오브젝트 생성 위치")]
         [SerializeField]
         private SkillOwner _spawnPosition;
-        
-        [Header("스킬 오브젝트 프리팹")]
+
+        [Header("스킬 오브젝트 프리팹 (Collider2D isTrigger 필요)")]
         [SerializeField]
         private AssetReferenceGameObject _skillObject;
 
-        [Header("투사체 비행속도")] 
-        [SerializeField] 
-        private float speed;
-        
-        [Header("투사체 소멸시간")] 
-        [SerializeField] 
-        private float lifeTime;
-        
-        [Header("적용 타겟 수")] 
-        [Range(1, 99)]
-        [SerializeField] 
-        private int targetCount = 1;
+        [Header("장판 지속시간 (초)")]
+        [SerializeField]
+        [Min(0.01f)]
+        private float _duration = 5f;
 
-        [Header("스킬 오브젝트 적중시 효과")]
+        [Header("이펙트 적용 주기 (초)")]
+        [SerializeField]
+        [Min(0.01f)]
+        private float _applyInterval = 1f;
+
+        [Header("장판 안에 있을 때 적용할 이펙트")]
         [SerializeReference]
         private List<EffectBase> _effects;
-        
+
         private string SkillObjectAddress => _skillObject.AssetGUID.ToString();
 
-        protected ISceneResourceProvider _resourceProvider;
+        private ISceneResourceProvider _resourceProvider;
         public override void Initialize(ISceneResourceProvider resourceProvider)
         {
             if (_effects == null)
@@ -54,21 +50,21 @@ namespace DungeonShooter
                 effect.Initialize(resourceProvider);
             }
         }
-        
+
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
             try
-            { 
+            {
                 var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress);
 
-                var skillObj = obj.AddOrGetComponent<ProjectileSkillObject>();
-                skillObj.Initialize(_effects, entry, context, _spawnPosition, targetCount, speed, lifeTime);
+                var skillObj = obj.AddOrGetComponent<ZoneSkillObject>();
+                skillObj.Initialize(_effects, entry, context, _spawnPosition, _duration, _applyInterval);
 
-                return false;
+                return true;
             }
             catch (Exception e)
             {
-                LogHandler.LogException<SpawnProjectileEffect>(e, "스킬 오브젝트 생성 실패");
+                LogHandler.LogException<SpawnZoneEffect>(e, "장판 스킬 오브젝트 생성 실패");
             }
 
             return false;
