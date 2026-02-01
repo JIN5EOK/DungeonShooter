@@ -147,9 +147,9 @@ namespace DungeonShooter
         /// <summary>
         /// 소비 아이템 사용 스킬을 실행합니다.
         /// </summary>
-        /// <param name="target">스킬을 적용할 Entity</param>
+        /// <param name="caster">스킬 시전자</param>
         /// <returns>실행 성공 여부</returns>
-        public async UniTask<bool> ExecuteUseSkill(EntityBase target)
+        public async UniTask<bool> ExecuteUseSkill(EntityBase caster)
         {
             if (UseSkill == null)
             {
@@ -157,15 +157,15 @@ namespace DungeonShooter
                 return false;
             }
 
-            return await UseSkill.Execute(target);
+            return await UseSkill.Execute(caster);
         }
 
         /// <summary>
         /// 무기 액티브 스킬을 실행합니다.
         /// </summary>
-        /// <param name="target">스킬을 적용할 Entity</param>
+        /// <param name="caster">스킬 시전자</param>
         /// <returns>실행 성공 여부</returns>
-        public async UniTask<bool> ExecuteActiveSkill(EntityBase target)
+        public async UniTask<bool> ExecuteActiveSkill(EntityBase caster)
         {
             if (ActiveSkill == null)
             {
@@ -173,7 +173,7 @@ namespace DungeonShooter
                 return false;
             }
 
-            return await ActiveSkill.Execute(target);
+            return await ActiveSkill.Execute(caster);
         }
 
         /// <summary>

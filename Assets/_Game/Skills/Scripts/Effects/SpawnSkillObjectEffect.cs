@@ -14,13 +14,13 @@ namespace DungeonShooter
     [Serializable]
     public class SpawnSkillObjectEffect : EffectBase
     {
-        [Header("스킬 오브젝트 프리팹")]
-        [SerializeField]
-        private AssetReferenceGameObject _skillObject;
-
         [Header("스킬 오브젝트 생성 위치")]
         [SerializeField]
         private SkillOwner _spawnPosition;
+        
+        [Header("스킬 오브젝트 프리팹")]
+        [SerializeField]
+        private AssetReferenceGameObject _skillObject;
         
         [Header("스킬 오브젝트 적중시 효과")]
         [SerializeReference]
@@ -41,14 +41,14 @@ namespace DungeonShooter
             }
         }
         
-        public override async UniTask<bool> Execute(EntityBase owner, SkillTableEntry entry)
+        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
             try
             {
                 var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress);
                 if (obj.TryGetComponent(out SkillObjectBase skillObj))
                 {
-                    skillObj.Initialize(owner, _effects, entry);
+                    skillObj.Initialize(_effects, entry, context, _spawnPosition);
                     return true;
                 }
 

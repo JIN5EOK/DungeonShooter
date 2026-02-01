@@ -9,7 +9,11 @@ namespace DungeonShooter
     [System.Serializable]
     public class HealEffect : EffectBase
     {
-        public override UniTask<bool> Execute(EntityBase owner, SkillTableEntry entry)
+        [Header("테이블의 Heal에 적용할 배율 (0 = 미적용, 1.0f = 1배율)")]
+        [SerializeField]
+        private float _healPercent = 1.0f;
+
+        public override UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
             if (entry == null)
             {
@@ -17,15 +21,16 @@ namespace DungeonShooter
                 return UniTask.FromResult(false);
             }
 
-            // 직접 필드를 우선 사용, 0이면 딕셔너리에서 fallback
-            var heal = entry.Heal;
+            var rawHeal = entry.Heal;
+            var heal = Mathf.RoundToInt(rawHeal * _healPercent);
             if (heal <= 0)
             {
                 LogHandler.LogWarning<HealEffect>("회복량이 0 이하입니다.");
                 return UniTask.FromResult(false);
             }
 
-            if (owner.TryGetComponent(out HealthComponent health))
+            var target = context.Other;
+            if (target != null && target.TryGetComponent(out HealthComponent health))
             {
                 health.Heal(heal);
                 return UniTask.FromResult(true);

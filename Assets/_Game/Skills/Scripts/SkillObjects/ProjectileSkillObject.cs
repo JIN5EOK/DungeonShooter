@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace DungeonShooter
@@ -21,17 +22,16 @@ namespace DungeonShooter
         private float _elapsedTime = 0f;
         
         private Vector2 _direction = Vector2.right;
-        public override void Initialize(EntityBase owner, List<EffectBase> effects, SkillTableEntry skillTableEntry)
+        public override void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
+            SkillExecutionContext context, SkillOwner spawnPosition)
         {
-            base.Initialize(owner, effects, skillTableEntry);
-            
+            base.Initialize(effects, skillTableEntry, context, spawnPosition);
+
             // TODO: 이동 전략에 대한 커스텀 기능 필요
-            if (this.owner.TryGetComponent(out MovementComponent movement))
+            if (context.Caster.TryGetComponent(out MovementComponent movement))
             {
                 _direction = movement.LookDirection;
             }
-            
-            transform.position = owner.transform.position;
         }
 
         private void Update()
@@ -69,36 +69,24 @@ namespace DungeonShooter
             if(otherEntity == null)
                 return;
             
-            var ownerLayer = owner.gameObject.layer;
+            var casterLayer = context.Caster.gameObject.layer;
             var otherLayer = other.gameObject.layer;
 
             // 아군에게 적용 체크
-            if (ownerLayer == otherLayer && !_applyToFriend)
+            if (casterLayer == otherLayer && !_applyToFriend)
                 return;
 
             // 상대편에게 적용 체크
-            if (ownerLayer != otherLayer && !_applyToOpponent)
+            if (casterLayer != otherLayer && !_applyToOpponent)
                 return;
 
             if (effects != null)
             {
-                foreach (var effect in effects)
-                {
-                    if (other.gameObject != owner.gameObject)
-                    {
-                        if (effect is SpawnSkillObjectEffect)
-                            effect.Execute(owner, skillTableEntry);
-                        else
-                            effect.Execute(otherEntity, skillTableEntry);
-                        
-                    }
-                    else
-                    {
-                        effect.Execute(otherEntity, skillTableEntry);
-                    }
-                }
+                var newContext = context
+                    .WithOther(otherEntity);
+                RunEffectsAsync(newContext).Forget();
             }
-            
+
             if (_destroyOnTrigger == true)
             {
                 Destroy(gameObject);

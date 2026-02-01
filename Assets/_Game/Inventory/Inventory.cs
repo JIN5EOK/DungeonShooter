@@ -214,7 +214,7 @@ namespace DungeonShooter
         /// <param name="item">사용할 아이템</param>
         /// <param name="target">스킬을 적용할 Entity</param>
         /// <returns>사용 성공 여부</returns>
-        public async UniTask<bool> UseItem(Item item, EntityBase target = null)
+        public async UniTask<bool> UseItem(Item item)
         {
             if (item == null)
             {
@@ -234,15 +234,8 @@ namespace DungeonShooter
                 return false;
             }
 
-            var actualTarget = target ?? _owner;
-            if (actualTarget == null)
-            {
-                LogHandler.LogWarning<Inventory>("스킬을 적용할 대상이 없습니다.");
-                return false;
-            }
-
-            // 스킬 실행
-            var success = await item.ExecuteUseSkill(actualTarget);
+            // 스킬 실행 (시전자 = 인벤토리 소유자)
+            var success = await item.ExecuteUseSkill(_owner);
 
             // 사용 성공 시 아이템 제거
             if (success)

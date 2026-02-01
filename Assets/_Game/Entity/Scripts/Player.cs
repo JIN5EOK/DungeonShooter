@@ -131,17 +131,17 @@ namespace DungeonShooter
 
         private void HandleWeaponAttackInput()
         {
-            _inventory.EquippedWeapon?.ActiveSkill.Execute(this).Forget();
+            _inventory.EquippedWeapon?.ExecuteActiveSkill(this).Forget();
         }
 
         private void HandleSkill1Input()
         {
-            _skillComponent?.UseSkill(_playerConfigTableEntry.Skill1Id, this).Forget();
+            _skillComponent?.UseSkill(_playerConfigTableEntry.Skill1Id).Forget();
         }
         
         private void HandleSkill2Input()
         {
-            _skillComponent?.UseSkill(_playerConfigTableEntry.Skill2Id, this).Forget();
+            _skillComponent?.UseSkill(_playerConfigTableEntry.Skill2Id).Forget();
         }
         
         private void HandleInteractInput()

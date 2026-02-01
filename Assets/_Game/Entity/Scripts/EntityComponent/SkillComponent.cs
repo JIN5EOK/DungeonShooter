@@ -36,22 +36,15 @@ namespace DungeonShooter
         /// <param name="skillEntryId">사용할 스킬의 Entry ID</param>
         /// <param name="target">스킬에 적중된 Entity (선택적)</param>
         /// <returns>사용 성공 여부</returns>
-        public async UniTask<bool> UseSkill(int skillEntryId, EntityBase target = null)
+        public async UniTask<bool> UseSkill(int skillEntryId)
         {
             if (!_skills.TryGetValue(skillEntryId, out var skill))
             {
                 LogHandler.LogWarning<SkillComponent>($"스킬을 찾을 수 없습니다: {skillEntryId}");
                 return false;
             }
-
-            if (_owner == null)
-            {
-                LogHandler.LogError<SkillComponent>("Target이 null입니다.");
-                return false;
-            }
-
-            var actualTarget = target ?? _owner;
-            return await skill.Execute(actualTarget);
+            
+            return await skill.Execute(_owner);
         }
 
         /// <summary>
@@ -64,12 +57,6 @@ namespace DungeonShooter
             if (_skills.TryGetValue(skillEntryId, out var registSkill))
             {
                 return registSkill;
-            }
-
-            if (_skillFactory == null)
-            {
-                LogHandler.LogError<SkillComponent>("SkillFactory가 null입니다.");
-                return null;
             }
 
             try

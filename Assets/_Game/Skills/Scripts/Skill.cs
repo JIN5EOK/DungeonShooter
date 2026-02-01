@@ -46,39 +46,41 @@ namespace DungeonShooter
         /// <summary>
         /// 스킬을 실행합니다.
         /// </summary>
-        /// <param name="target">스킬을 적용할 Entity</param>
+        /// <param name="caster">스킬 시전자</param>
         /// <returns>실행 성공 여부</returns>
-        public async UniTask<bool> Execute(EntityBase target)
+        public async UniTask<bool> Execute(EntityBase caster)
         {
             if (IsCooldown)
             {
                 LogHandler.Log<Skill>($"스킬 쿨다운 중: {SkillTableEntry.Id}({_skillTableEntry.SkillName})");
                 return false;
             }
-                    
-            // 스킬 효과 실행 (비동기로 완료까지 대기)
-            bool success = await ExecuteEffectsAsync(target);
+
+            var context = SkillExecutionContext.Create()
+                .WithCaster(caster);
+
+            bool success = await ExecuteEffectsAsync(context);
             LogHandler.Log<Skill>($"스킬 실행 : {SkillTableEntry.Id}({_skillTableEntry.SkillName})");
             OnExecute?.Invoke();
             StartCooldown();
 
             return success;
         }
-        
+
         /// <summary>
         /// 스킬 효과를 비동기로 실행합니다.
         /// </summary>
-        private async UniTask<bool> ExecuteEffectsAsync(EntityBase target)
+        private async UniTask<bool> ExecuteEffectsAsync(SkillExecutionContext context)
         {
             bool allSuccess = true;
-            
+
             foreach (var effect in _skillData.ActiveEffects)
             {
                 if (effect != null)
                 {
                     try
                     {
-                        bool result = await effect.Execute(target, _skillTableEntry);
+                        bool result = await effect.Execute(context, _skillTableEntry);
                         if (!result)
                         {
                             allSuccess = false;
@@ -91,7 +93,7 @@ namespace DungeonShooter
                     }
                 }
             }
-            
+
             return allSuccess;
         }
         

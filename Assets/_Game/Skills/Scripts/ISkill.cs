@@ -20,8 +20,11 @@ namespace DungeonShooter
         
         /// <summary>
         /// 스킬을 실행합니다. (액티브 스킬 사용 시 호출)
+        /// </summary>
+        /// <param name="caster">스킬 시전자</param>
+        /// <param name="target">스킬 적용 대상 (null이면 caster와 동일)</param>
         /// <returns>실행 성공 여부</returns>
-        UniTask<bool> Execute(EntityBase target);
+        UniTask<bool> Execute(EntityBase caster);
         
         /// <summary>
         /// 패시브 효과를 활성화합니다.
