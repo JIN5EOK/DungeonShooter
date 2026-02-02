@@ -22,6 +22,7 @@ namespace DungeonShooter
         private SkillComponent _skillComponent;
         private InteractComponent _interactComponent;
         private DashComponent _dashComponent;
+        private CameraTrackComponent _cameraTrackComponent;
         
         private HealthBarHudUI _healthBarUI;
         private SkillCooldownHudUI _skillCooldownHudUI;
@@ -91,6 +92,8 @@ namespace DungeonShooter
             _interactComponent = gameObject.AddOrGetComponent<InteractComponent>();
             _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();
             _dashComponent = gameObject.AddOrGetComponent<DashComponent>();
+            _cameraTrackComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<CameraTrackComponent>(gameObject);
+            await _cameraTrackComponent.AttachCameraAsync();
             _healthComponent.FullHeal();
             _healthComponent.OnDeath += HandleDeath;
 

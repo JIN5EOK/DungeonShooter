@@ -39,5 +39,11 @@ namespace DungeonShooter
         Caster = 0,
         LastHitTarget = 1
     }
+
+    /// <summary> 추적 카메라 종류 </summary>
+    public enum CameraTrackType
+    {
+        PlayerChaseCamera
+    }
 }
 
