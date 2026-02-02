@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace DungeonShooter
 {
     /// <summary>
@@ -13,5 +15,12 @@ namespace DungeonShooter
         /// <param name="id">엔트리 ID</param>
         /// <returns>테이블 엔트리, 없으면 null</returns>
         T GetTableEntry<T>(int id) where T : class, ITableEntry;
+
+        /// <summary>
+        /// 지정한 타입의 테이블 엔트리 전체 목록을 가져옵니다.
+        /// </summary>
+        /// <typeparam name="T">테이블 엔트리 타입</typeparam>
+        /// <returns>해당 타입의 엔트리 목록 (없으면 빈 목록)</returns>
+        IReadOnlyList<T> GetAllTableEntries<T>() where T : class, ITableEntry;
     }
 }

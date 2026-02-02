@@ -108,7 +108,7 @@ namespace DungeonShooter
                 }
                 else if (tableEntryType == typeof(StageConfigTableEntry))
                 {
-                    writer.WriteLine("1,ground_tile_default,enemies_stage1,start_rooms_stage1,normal_rooms_stage1,boss_rooms_stage1");
+                    writer.WriteLine("1,스테이지 1,ground_tile_default,enemies_stage1,start_rooms_stage1,normal_rooms_stage1,boss_rooms_stage1");
                 }
                 else if (tableEntryType == typeof(PlayerConfigTableEntry))
                 {

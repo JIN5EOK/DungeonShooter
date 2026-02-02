@@ -109,6 +109,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 917cb0225d5d74cc39b774de44c36d2b
+    m_Address: CharacterSelectUI
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 92a436165918d476992fe8363157c822
     m_Address: FireballSkillIcon
     m_ReadOnly: 0

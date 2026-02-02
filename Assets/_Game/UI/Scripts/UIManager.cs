@@ -20,7 +20,7 @@ namespace DungeonShooter
         private readonly List<UIBase> _uiList = new();
         private Dictionary<UIType, Transform> _canvasByType;
         private AddressablesScope _scope;
-
+        
         public void Start()
         {
             _canvasByType = CreateCanvasesByType();

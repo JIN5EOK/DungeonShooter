@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.AddressableAssets;
 
 namespace DungeonShooter
@@ -45,6 +46,14 @@ namespace DungeonShooter
 
             LogHandler.LogWarning<LocalTableRepository>($"ID {id}를 가진 {nameof(T)} 엔트리를 찾을 수 없습니다.");
             return null;
+        }
+
+        /// <summary>
+        /// 지정한 타입의 테이블 엔트리 전체 목록을 가져옵니다.
+        /// </summary>
+        public IReadOnlyList<T> GetAllTableEntries<T>() where T : class, ITableEntry
+        {
+            return _cache.Values.OfType<T>().ToList();
         }
 
         /// <summary>

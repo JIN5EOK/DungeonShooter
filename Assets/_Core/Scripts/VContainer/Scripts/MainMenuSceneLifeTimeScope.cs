@@ -11,7 +11,7 @@ namespace DungeonShooter
     {
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterEntryPoint<MainMenuGameStarter>(Lifetime.Scoped);
+            builder.Register<SceneResourceProvider>(Lifetime.Scoped).AsImplementedInterfaces();
             base.Configure(builder);
         }
     }
