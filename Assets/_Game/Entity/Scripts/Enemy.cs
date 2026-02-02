@@ -18,6 +18,7 @@ namespace DungeonShooter
     public class Enemy : EntityBase
     {
         [Header("AI 설정")]
+        [SerializeField] private AiBTBase _aiBT;
         [SerializeField] private float detectionRange = 10f;
         [SerializeField] private float patrolRange = 5f;
         [SerializeField] private float idleTime = 2f;
@@ -58,38 +59,30 @@ namespace DungeonShooter
 
         private ISceneResourceProvider _resourceProvider;
 
+        private void Start()
+        {
+            Initialize(null); // 임시코드
+            if (_aiBT != null)
+            {
+                gameObject.AddOrGetComponent<AIComponent>().SetBT(_aiBT);
+            }
+            _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
+            _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();
+            _healthComponent.OnDeath += HandleDeath;
+            _healthComponent.OnDamaged += HandleDamaged;
+        }
+
         [Inject]
         private void Construct(ISceneResourceProvider resourceProvider)
         {
             _resourceProvider = resourceProvider;
 
-            return;
-            _rb = gameObject.AddOrGetComponent<Rigidbody2D>();
-            statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
-            _playerTransform = FindFirstObjectByType<Player>().transform;
             
-            //_cooldownComponent = gameObject.AddOrGetComponent<CooldownComponent>();
-            //_cooldownComponent.RegisterCooldown("attack", GetAttackCooldown());
-            //_cooldownComponent.RegisterCooldown("hitStun", hitStunDuration);
+
+  
             
-            _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
-            _movementComponent.MoveSpeed = (float)statsComponent.GetStat(StatType.MoveSpeed);
 
-            // 순찰 초기화
-            _patrolStartPos = transform.position;
-            SetNewPatrolTarget();
 
-            // HealthComponent 찾기 및 이벤트 구독
-            _healthComponent = GetComponent<HealthComponent>();
-            if (_healthComponent != null)
-            {
-                _healthComponent.OnDeath += HandleDeath;
-                _healthComponent.OnDamaged += HandleDamaged;
-            }
-            else
-            {
-                LogHandler.LogWarning<Enemy>($"{gameObject.name}: HealthComponent가 없습니다. 적이 죽지 않습니다!");
-            }
         }
         
         private void OnDestroy()
@@ -102,192 +95,7 @@ namespace DungeonShooter
             }
         }
 
-        private void Update()
-        {
-            return;
-            // 죽었으면 AI 중지
-            if (_currentState == EnemyState.Dead) return;
-
-            UpdateAI();
-        }
-
-        private void UpdateAI()
-        {
-            // 스턴 상태 확인
-            if (_isStunned)// _cooldownComponent.IsReady("hitStun"))
-            {
-                _isStunned = false;
-                _currentState = EnemyState.Idle;
-            }
-
-            // 스턴 중이면 AI 중지
-            if (_isStunned) return;
-
-            // 플레이어 감지
-            var playerDetected = IsPlayerInRange(detectionRange);
-
-            switch (_currentState)
-            {
-                case EnemyState.Idle:
-                    HandleIdleState(playerDetected);
-                    break;
-                case EnemyState.Patrol:
-                    HandlePatrolState(playerDetected);
-                    break;
-                case EnemyState.Chase:
-                    HandleChaseState(playerDetected);
-                    break;
-                case EnemyState.Hit:
-                    // 피격 후 잠시 대기
-                    // if (_cooldownComponent.IsReady("hitStun"))
-                    // {
-                    //     _currentState = playerDetected ? EnemyState.Chase : EnemyState.Idle;
-                    // }
-                    break;
-            }
-        }
-
-        private void FixedUpdate()
-        {
-            return;
-            // 죽었으면 움직임 중지
-            if (_currentState == EnemyState.Dead)
-            {
-                _rb.linearVelocity = Vector2.zero;
-                return;
-            }
-
-            // 넉백 처리
-            if (_isStunned)
-            {
-                _rb.linearVelocity = Vector2.Lerp(_rb.linearVelocity, Vector2.zero, Time.fixedDeltaTime * 5f);
-                return;
-            }
-
-            // 상태별 움직임
-            switch (_currentState)
-            {
-                case EnemyState.Idle:
-                    _movementComponent.Direction = Vector2.zero;
-                    //_movementComponent.Move();
-                    break;
-                case EnemyState.Patrol:
-                    MoveTowardsTarget(_patrolTargetPos);
-                    break;
-                case EnemyState.Chase:
-                    if (_playerTransform != null)
-                        MoveTowardsPlayer();
-                    break;
-                case EnemyState.Hit:
-                    // 피격 시 약간의 넉백
-                    break;
-                default:
-                    _movementComponent.Direction = Vector2.zero;
-                    //_movementComponent.Move();
-                    break;
-            }
-        }
-
-        // ==================== 상태별 AI 처리 ====================
-        private void HandleIdleState(bool playerDetected)
-        {
-            if (playerDetected)
-            {
-                _currentState = EnemyState.Chase;
-                return;
-            }
-
-            _idleTimer += Time.deltaTime;
-            if (_idleTimer >= idleTime)
-            {
-                _idleTimer = 0f;
-                _currentState = EnemyState.Patrol;
-                SetNewPatrolTarget();
-            }
-        }
-
-        private void HandlePatrolState(bool playerDetected)
-        {
-            if (playerDetected)
-            {
-                _currentState = EnemyState.Chase;
-                return;
-            }
-
-            // 목표 지점에 도달했는지 확인
-            if (Vector2.Distance(transform.position, _patrolTargetPos) < 0.5f)
-            {
-                _currentState = EnemyState.Idle;
-                _idleTimer = 0f;
-            }
-        }
-
-        private void HandleChaseState(bool playerDetected)
-        {
-            if (!playerDetected)
-            {
-                _currentState = EnemyState.Idle;
-                return;
-            }
-
-            // 공격 범위 내인지 확인
-            var distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
-            var range = 0;
-            // var range = GetAttackRange();
-            if (distanceToPlayer <= range)// && _cooldownComponent.IsReady("attack"))
-            {
-                AttackPlayer();
-            }
-        }
-
-        // ==================== 움직임 ====================
-        private void MoveTowardsPlayer()
-        {
-            var directionToPlayer = (_playerTransform.position - transform.position).normalized;
-            _movementComponent.Direction = directionToPlayer;
-            // _movementComponent.Move();
-        }
-
-        private void MoveTowardsTarget(Vector2 target)
-        {
-            var direction = (target - (Vector2)transform.position).normalized; ;
-            _movementComponent.Direction = direction;
-            // _movementComponent.Move();
-        }
-
-        // ==================== 유틸리티 ====================
-        private bool IsPlayerInRange(float range)
-        {
-            if (_playerTransform == null) return false;
-            return Vector2.Distance(transform.position, _playerTransform.position) <= range;
-        }
-
-        private void SetNewPatrolTarget()
-        {
-            var randomDirection = Random.insideUnitCircle.normalized;
-            _patrolTargetPos = _patrolStartPos + randomDirection * patrolRange;
-        }
-
-        // ==================== 공격 ====================
-        private void AttackPlayer()
-        {
-            //_cooldownComponent.StartCooldown("attack");
-            
-            // var damage = GetAttackDamage();
-            var damage = 0;
-            LogHandler.Log<Enemy>($"적이 플레이어를 공격! 데미지: {damage}");
-
-            // 플레이어에게 데미지 주기
-            if (_playerTransform != null)
-            {
-                var playerHealth = _playerTransform.GetComponent<HealthComponent>();
-                if (playerHealth != null)
-                {
-                    playerHealth.TakeDamage(damage);
-                }
-            }
-        }
-
+        
         // ==================== 코인 드롭 ====================
 
         /// <summary>

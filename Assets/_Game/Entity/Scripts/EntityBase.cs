@@ -21,6 +21,10 @@ namespace DungeonShooter
             {
                 statsComponent.Initialize(statsTableEntry);
             }
+            else
+            {
+                statsComponent.Initialize(new EntityStatsTableEntry() {Attack = 10, Defense = 10, MaxHp = 100, MoveSpeed = 5});
+            }
         }
     }
 }

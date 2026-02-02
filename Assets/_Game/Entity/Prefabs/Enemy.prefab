@@ -13,8 +13,6 @@ GameObject:
   - component: {fileID: 6682134852837990247}
   - component: {fileID: -4710752342727833568}
   - component: {fileID: 7001560364046731188}
-  - component: {fileID: 399146359455650338}
-  - component: {fileID: 4560199198152073960}
   m_Layer: 7
   m_Name: Enemy
   m_TagString: Enemy
@@ -177,6 +175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 325ac37a0e9164e528fb7f9ea9c965d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _aiBT: {fileID: 11400000, guid: 8cded1c31749c4d0daa49926b19c7dcc, type: 2}
   detectionRange: 10
   patrolRange: 5
   idleTime: 2
@@ -187,27 +186,3 @@ MonoBehaviour:
   coinDropChance: 1
   coinDropRange: {x: 1, y: 3}
   coinDropRadius: 1
---- !u!114 &399146359455650338
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8223576401328736019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab4f6b44ee01b42e1a52042bf93f4149, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4560199198152073960
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8223576401328736019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ceae8b9499194fe7bead2cf9e9ce5db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
