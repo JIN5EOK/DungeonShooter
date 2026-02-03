@@ -12,9 +12,8 @@ GameObject:
   - component: {fileID: 5214938083091541001}
   - component: {fileID: 6682134852837990247}
   - component: {fileID: -4710752342727833568}
-  - component: {fileID: 7001560364046731188}
-  m_Layer: 7
-  m_Name: Enemy
+  m_Layer: 0
+  m_Name: Goblin
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -163,26 +162,3 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &7001560364046731188
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8223576401328736019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 325ac37a0e9164e528fb7f9ea9c965d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _aiBT: {fileID: 11400000, guid: 8cded1c31749c4d0daa49926b19c7dcc, type: 2}
-  detectionRange: 10
-  patrolRange: 5
-  idleTime: 2
-  hitStunDuration: 0.5
-  knockbackForce: 3
-  deathDelay: 1
-  disableOnDeath: 1
-  coinDropChance: 1
-  coinDropRange: {x: 1, y: 3}
-  coinDropRadius: 1

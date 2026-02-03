@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Jin5eok;
 using UnityEngine;
 using VContainer;
 using Object = UnityEngine.Object;
@@ -122,13 +123,8 @@ namespace DungeonShooter
                 return null;
             }
 
-            var enemy = enemyInstance.GetComponent<Enemy>();
-            if (enemy == null)
-            {
-                Debug.LogWarning($"[{nameof(EnemyFactory)}] 프리팹에 Enemy 컴포넌트가 없습니다: {configTableEntry.GameObjectKey}");
-                Object.Destroy(enemyInstance);
-                return null;
-            }
+            enemyInstance.layer = PhysicalLayers.Enemy.LayerIndex;
+            var enemy = _sceneResourceProvider.AddOrGetComponentWithInejct<Enemy>(enemyInstance);
             enemy.Initialize(configTableEntry);
             return enemy;
         }

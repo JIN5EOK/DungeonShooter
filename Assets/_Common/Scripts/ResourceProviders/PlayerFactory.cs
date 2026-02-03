@@ -102,6 +102,7 @@ namespace DungeonShooter
                 LogHandler.LogWarning<PlayerFactory>($"플레이어 인스턴스가 생성되지 않았습니다.");
                 return null;
             }
+            playerInstance.layer = PhysicalLayers.Player.LayerIndex;
             var player = _sceneResourceProvider.AddOrGetComponentWithInejct<Player>(playerInstance);
             await player.Initialize(_playerConfigTableEntry);
             OnPlayerCreated?.Invoke(player);

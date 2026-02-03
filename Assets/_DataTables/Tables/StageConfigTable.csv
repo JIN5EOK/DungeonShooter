@@ -1,2 +1,3 @@
 Memo,Id,Name,GroundTileKey,EnemyKeys,StartRoomsLabel,NormalRoomsLabel,BossRoomsLabel
-,13000001,스테이지 1,Tile_Ground_001,18000000,Stage001_StartRoom,Stage001_NormalRoom,Stage001_NormalRoom
+고블린의 숲,13000001,고블린의 숲,Tile_Ground_001,18000000,Stage001_StartRoom,Stage001_NormalRoom,Stage001_NormalRoom
+인간의 숲,13000002,인간의 숲,Tile_Ground_001,18000001,Stage001_StartRoom,Stage001_NormalRoom,Stage001_NormalRoom
