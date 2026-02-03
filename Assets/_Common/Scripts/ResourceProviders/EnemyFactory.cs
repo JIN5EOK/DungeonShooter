@@ -58,14 +58,14 @@ namespace DungeonShooter
         /// </summary>
         public async UniTask<Enemy> GetRandomEnemyAsync()
         {
-            var enemyAddress = GetRandomEnemyAddress();
-            if (enemyAddress == null)
+            var enemyConfig = GetRandomEnemyTableConfig();
+            if (enemyConfig == null)
             {
                 return null;
             }
 
-            var enemyInstance = await _sceneResourceProvider.GetInstanceAsync(enemyAddress);
-            return GetEnemyFromInstance(enemyInstance, enemyAddress);
+            var enemyInstance = await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey);
+            return GetEnemyFromInstance(enemyInstance, enemyConfig);
         }
 
         /// <summary>
@@ -73,20 +73,20 @@ namespace DungeonShooter
         /// </summary>
         public Enemy GetRandomEnemySync()
         {
-            var enemyAddress = GetRandomEnemyAddress();
-            if (enemyAddress == null)
+            var enemyConfig = GetRandomEnemyTableConfig();
+            if (enemyConfig == null)
             {
                 return null;
             }
 
-            var enemyInstance = _sceneResourceProvider.GetInstanceSync(enemyAddress);
-            return GetEnemyFromInstance(enemyInstance, enemyAddress);
+            var enemyInstance = _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey);
+            return GetEnemyFromInstance(enemyInstance, enemyConfig);
         }
 
         /// <summary>
         /// EnemyKeys에서 랜덤 ID를 선택하고, 해당 EnemyConfigTableEntry의 GameObjectKey(어드레스)를 반환합니다.
         /// </summary>
-        private string GetRandomEnemyAddress()
+        private EnemyConfigTableEntry GetRandomEnemyTableConfig()
         {
             if (_enemyIds == null || _enemyIds.Count == 0)
             {
@@ -108,28 +108,28 @@ namespace DungeonShooter
                 return null;
             }
 
-            return enemyEntry.GameObjectKey;
+            return enemyEntry;
         }
 
         /// <summary>
         /// 인스턴스에서 Enemy 컴포넌트 추출 및 검증
         /// </summary>
-        private Enemy GetEnemyFromInstance(GameObject enemyInstance, string enemyAddress)
+        private Enemy GetEnemyFromInstance(GameObject enemyInstance, EnemyConfigTableEntry configTableEntry)
         {
             if (enemyInstance == null)
             {
-                Debug.LogWarning($"[{nameof(EnemyFactory)}] 적 인스턴스 생성 실패: {enemyAddress}");
+                Debug.LogWarning($"[{nameof(EnemyFactory)}] 적 인스턴스 생성 실패: {configTableEntry.GameObjectKey}");
                 return null;
             }
 
             var enemy = enemyInstance.GetComponent<Enemy>();
             if (enemy == null)
             {
-                Debug.LogWarning($"[{nameof(EnemyFactory)}] 프리팹에 Enemy 컴포넌트가 없습니다: {enemyAddress}");
+                Debug.LogWarning($"[{nameof(EnemyFactory)}] 프리팹에 Enemy 컴포넌트가 없습니다: {configTableEntry.GameObjectKey}");
                 Object.Destroy(enemyInstance);
                 return null;
             }
-
+            enemy.Initialize(configTableEntry);
             return enemy;
         }
     }

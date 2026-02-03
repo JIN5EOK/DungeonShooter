@@ -5,34 +5,12 @@ using VContainer;
 
 namespace DungeonShooter
 {
-    public enum EnemyState
-    {
-    Idle,
-    Patrol,
-    Chase,
-    Hit,
-    Stunned,
-    Dead
-}
 
     public class Enemy : EntityBase
     {
-        [Header("AI 설정")]
-        [SerializeField] private AiBTBase _aiBT;
-        [SerializeField] private float detectionRange = 10f;
-        [SerializeField] private float patrolRange = 5f;
-        [SerializeField] private float idleTime = 2f;
-
-        [Header("피격 설정")]
-        [SerializeField] private float hitStunDuration = 0.5f;
-        [SerializeField] private float knockbackForce = 3f;
-
-        [Header("사망 설정")]
-        [SerializeField] private float deathDelay = 1f;
-        [SerializeField] private bool disableOnDeath = true;
-
-        [Header("코인 드롭 설정")]
+        private AiBTBase _aiBT;
         
+        [Header("코인 드롭 설정")]
         [Tooltip("코인 드롭 확률 (0~1)")]
         [SerializeField, Range(0f, 1f)] private float coinDropChance = 1f;
         [Tooltip("드롭할 코인 개수 범위")]
@@ -41,13 +19,10 @@ namespace DungeonShooter
         [SerializeField] private float coinDropRadius = 1f;
 
         private Transform _playerTransform;
-        //private CooldownComponent _cooldownComponent;
         private HealthComponent _healthComponent;
         private MovementComponent _movementComponent;
 
         private Rigidbody2D _rb;
-        // AI 상태
-        private EnemyState _currentState = EnemyState.Idle;
         private Vector2 _patrolStartPos;
         private Vector2 _patrolTargetPos;
         private bool _isPatrolling;
@@ -58,31 +33,26 @@ namespace DungeonShooter
         private Vector2 _knockbackDirection;
 
         private ISceneResourceProvider _resourceProvider;
-
-        private void Start()
+        private ITableRepository _tableRepository;
+        private EnemyConfigTableEntry _enemyConfigTableEntry;
+        [Inject]
+        private void Construct(ISceneResourceProvider resourceProvider, ITableRepository tableRepository)
         {
-            Initialize(null); // 임시코드
-            if (_aiBT != null)
-            {
-                gameObject.AddOrGetComponent<AIComponent>().SetBT(_aiBT);
-            }
+            _resourceProvider = resourceProvider;
+            _tableRepository = tableRepository;
+        }
+        
+        public void Initialize(EnemyConfigTableEntry enemyConfigTableEntry)
+        {
+            _enemyConfigTableEntry = enemyConfigTableEntry;
+            Initialize(_tableRepository.GetTableEntry<EntityStatsTableEntry>(enemyConfigTableEntry.StatsId));
+            
             _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
             _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();
             _healthComponent.OnDeath += HandleDeath;
             _healthComponent.OnDamaged += HandleDamaged;
-        }
-
-        [Inject]
-        private void Construct(ISceneResourceProvider resourceProvider)
-        {
-            _resourceProvider = resourceProvider;
-
             
-
-  
-            
-
-
+            gameObject.AddOrGetComponent<AIComponent>().SetBT(_resourceProvider.GetAssetSync<AiBTBase>(enemyConfigTableEntry.AIType));
         }
         
         private void OnDestroy()
@@ -139,23 +109,12 @@ namespace DungeonShooter
         private void HandleDamaged(int damage, int remainingHealth)
         {
             LogHandler.Log<Enemy>($"{gameObject.name}: 피격! 데미지: {damage}, 남은 HP: {remainingHealth}");
-
-            // 상태 변경
-            _currentState = EnemyState.Hit;
             _isStunned = true;
-            //_cooldownComponent.StartCooldown("hitStun");
-
-            // 넉백 적용
-            if (_playerTransform != null)
-            {
-                _knockbackDirection = ((Vector2)transform.position - (Vector2)_playerTransform.position).normalized;
-                _rb.linearVelocity = _knockbackDirection * knockbackForce;
-            }
         }
 
         private void HandleDeath()
         {
-            HandleDeathAsync().Forget();
+            return;
         }
         
         /// <summary>
@@ -163,20 +122,8 @@ namespace DungeonShooter
         /// </summary>
         private async UniTask HandleDeathAsync()
         {
-            if (_currentState == EnemyState.Dead) return; // 중복 호출 방지
-
-            _currentState = EnemyState.Dead;
-
-            LogHandler.Log<Enemy>($"{gameObject.name}: 사망!");
-
             // AI 및 물리 즉시 중지
             _rb.linearVelocity = Vector2.zero;
-
-            // 즉시 비활성화 옵션
-            if (disableOnDeath)
-            {
-                enabled = false; // MonoBehaviour만 비활성화
-            }
 
             // 코인 드롭
             await DropCoins();
@@ -187,7 +134,7 @@ namespace DungeonShooter
             // - 파티클 이펙트
 
             // 일정 시간 후 파괴
-            Destroy(gameObject, deathDelay);
+            Destroy(gameObject, 1f);
         }
     }
 }

@@ -104,6 +104,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - Stage001_NormalRoom
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8cded1c31749c4d0daa49926b19c7dcc
+    m_Address: NormalEnemyAI
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9051e82d508094d1989b194fb7b2dd7e
     m_Address: EntityStatsTable
     m_ReadOnly: 0
