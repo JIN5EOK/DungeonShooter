@@ -147,53 +147,55 @@ namespace DungeonShooter
         /// <summary>
         /// 추가 타일을 비동기적으로 배치합니다.
         /// </summary>
-        /// <param name="stageRoot">스테이지 루트 Transform</param>
-        /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
-        /// <param name="roomData">방 데이터</param>
-        /// <param name="sceneResourceProvider">씬 리소스 제공자</param>
         public static async Task PlaceAdditionalTilesAsync(Transform stageRoot, Vector2 centerPos, RoomData roomData, ISceneResourceProvider sceneResourceProvider)
         {
-            if (stageRoot == null || roomData == null || sceneResourceProvider == null)
-            {
-                LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
+            if (!ValidatePlaceAdditionalTiles(stageRoot, roomData, sceneResourceProvider))
                 return;
-            }
-
-            // 타일 배치
-            var tileBases = new List<TileBase>();
-            foreach (var tileData in roomData.Tiles)
-            {
-                var address = roomData.GetAddress(tileData.Index);
-                tileBases.Add(await sceneResourceProvider.GetAssetAsync<TileBase>(address));
-            }
-            
+            var tileBases = await LoadTileBasesAsync(roomData, sceneResourceProvider);
             PlaceAdditionalTilesInternal(stageRoot, centerPos, roomData.Tiles, tileBases);
         }
 
         /// <summary>
         /// 추가 타일을 동기적으로 배치합니다.
         /// </summary>
-        /// <param name="stageRoot">스테이지 루트 Transform</param>
-        /// <param name="centerPos">방의 중심 위치 (월드 좌표)</param>
-        /// <param name="roomData">방 데이터</param>
-        /// <param name="sceneResourceProvider">씬 리소스 제공자</param>
         public static void PlaceAdditionalTilesSync(Transform stageRoot, Vector2 centerPos, RoomData roomData, ISceneResourceProvider sceneResourceProvider)
+        {
+            if (!ValidatePlaceAdditionalTiles(stageRoot, roomData, sceneResourceProvider))
+                return;
+            var tileBases = LoadTileBasesSync(roomData, sceneResourceProvider);
+            PlaceAdditionalTilesInternal(stageRoot, centerPos, roomData.Tiles, tileBases);
+        }
+
+        private static bool ValidatePlaceAdditionalTiles(Transform stageRoot, RoomData roomData, ISceneResourceProvider sceneResourceProvider)
         {
             if (stageRoot == null || roomData == null || sceneResourceProvider == null)
             {
                 LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
-                return;
+                return false;
             }
+            return true;
+        }
 
-            // 타일 배치
-            var tileBases = new List<TileBase>();
+        private static async Task<List<TileBase>> LoadTileBasesAsync(RoomData roomData, ISceneResourceProvider sceneResourceProvider)
+        {
+            var list = new List<TileBase>();
             foreach (var tileData in roomData.Tiles)
             {
                 var address = roomData.GetAddress(tileData.Index);
-                tileBases.Add(sceneResourceProvider.GetAssetSync<TileBase>(address));
+                list.Add(await sceneResourceProvider.GetAssetAsync<TileBase>(address));
             }
-            
-            PlaceAdditionalTilesInternal(stageRoot, centerPos, roomData.Tiles, tileBases);
+            return list;
+        }
+
+        private static List<TileBase> LoadTileBasesSync(RoomData roomData, ISceneResourceProvider sceneResourceProvider)
+        {
+            var list = new List<TileBase>();
+            foreach (var tileData in roomData.Tiles)
+            {
+                var address = roomData.GetAddress(tileData.Index);
+                list.Add(sceneResourceProvider.GetAssetSync<TileBase>(address));
+            }
+            return list;
         }
         
         /// <summary>
@@ -218,27 +220,9 @@ namespace DungeonShooter
         /// 오브젝트를 비동기적으로 배치합니다.
         /// ObjectData.TableId가 0이 아니면 테이블 ID 기반(팩토리/테이블)으로, 0이면 legacy 어드레스 기반으로 생성합니다.
         /// </summary>
-        /// <param name="stageRoot">스테이지 루트 Transform</param>
-        /// <param name="roomData">방 데이터</param>
-        /// <param name="playerFactory">플레이어 팩토리 (에디터에서는 null)</param>
-        /// <param name="enemyFactory">적 팩토리 (에디터에서는 null)</param>
-        /// <param name="sceneResourceProvider">씬 리소스 제공자</param>
-        /// <param name="tableRepository">테이블 리포지토리 (테이블 ID 기반 배치 시 필수, 에디터에서 LocalTableRepository 전달)</param>
-        /// <param name="worldOffset">월드 오프셋 (기본값: Vector3.zero)</param>
-        /// <returns>생성된 오브젝트 리스트를 반환하는 Task</returns>
         public static async Task<List<GameObject>> PlaceObjectsAsync(Transform stageRoot, RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository, Vector3 worldOffset = default)
         {
-            var instances = new List<GameObject>();
-            foreach (var objectData in roomData.Objects)
-            {
-                var instance = await ResolveAndCreateInstanceAsync(objectData, roomData, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
-                if (instance != null && objectData.TableId != 0)
-                {
-                    var marker = instance.AddOrGetComponent<RoomObjectMarker>();
-                    marker.TableId = objectData.TableId;
-                }
-                instances.Add(instance);
-            }
+            var instances = await ResolveAndCreateInstancesAsync(roomData, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
             PlaceObjectsInternal(stageRoot, worldOffset, roomData.Objects, instances);
             return instances;
         }
@@ -247,20 +231,19 @@ namespace DungeonShooter
         /// 오브젝트를 동기적으로 배치합니다.
         /// ObjectData.TableId가 0이 아니면 테이블 ID 기반(팩토리/테이블)으로, 0이면 legacy 어드레스 기반으로 생성합니다.
         /// </summary>
-        /// <param name="stageRoot">스테이지 루트 Transform</param>
-        /// <param name="roomData">방 데이터</param>
-        /// <param name="playerFactory">플레이어 팩토리 (에디터에서는 null)</param>
-        /// <param name="enemyFactory">적 팩토리 (에디터에서는 null)</param>
-        /// <param name="sceneResourceProvider">씬 리소스 제공자</param>
-        /// <param name="tableRepository">테이블 리포지토리 (테이블 ID 기반 배치 시 필수, 에디터에서 LocalTableRepository 전달)</param>
-        /// <param name="worldOffset">월드 오프셋 (기본값: Vector3.zero)</param>
-        /// <returns>생성된 오브젝트 리스트</returns>
         public static List<GameObject> PlaceObjectsSync(Transform stageRoot, RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository, Vector3 worldOffset = default)
+        {
+            var instances = ResolveAndCreateInstancesSync(roomData, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
+            PlaceObjectsInternal(stageRoot, worldOffset, roomData.Objects, instances);
+            return instances;
+        }
+
+        private static async Task<List<GameObject>> ResolveAndCreateInstancesAsync(RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository)
         {
             var instances = new List<GameObject>();
             foreach (var objectData in roomData.Objects)
             {
-                var instance = ResolveAndCreateInstanceSync(objectData, roomData, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
+                var instance = objectData.TableId == 0 ? null : await ResolveByTableIdAsync(objectData.TableId, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
                 if (instance != null && objectData.TableId != 0)
                 {
                     var marker = instance.AddOrGetComponent<RoomObjectMarker>();
@@ -268,182 +251,129 @@ namespace DungeonShooter
                 }
                 instances.Add(instance);
             }
-            PlaceObjectsInternal(stageRoot, worldOffset, roomData.Objects, instances);
             return instances;
         }
 
-        private static async Task<GameObject> ResolveAndCreateInstanceAsync(ObjectData objectData, RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository)
+        private static List<GameObject> ResolveAndCreateInstancesSync(RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository)
         {
-            if (objectData.TableId == 0)
+            var instances = new List<GameObject>();
+            foreach (var objectData in roomData.Objects)
             {
-                return null;
+                var instance = objectData.TableId == 0 ? null : ResolveByTableIdSync(objectData.TableId, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
+                if (instance != null && objectData.TableId != 0)
+                {
+                    var marker = instance.AddOrGetComponent<RoomObjectMarker>();
+                    marker.TableId = objectData.TableId;
+                }
+                instances.Add(instance);
             }
-            return await ResolveByTableIdAsync(objectData.TableId, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
-        }
-
-        private static GameObject ResolveAndCreateInstanceSync(ObjectData objectData, RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository)
-        {
-            if (objectData.TableId == 0)
-            {
-                return null;
-            }
-            return ResolveByTableIdSync(objectData.TableId, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
+            return instances;
         }
 
         private static async Task<GameObject> ResolveByTableIdAsync(int tableId, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository)
         {
-            if (tableRepository == null)
-            {
-                return null;
-            }
-
-            var miscObjEntry = tableRepository.GetTableEntry<MiscObjectTableEntry>(tableId);
-            if (miscObjEntry != null)
-            {
-                return await ResolveMiscObjectEntryAsync(miscObjEntry, playerFactory, enemyFactory, sceneResourceProvider);
-            }
-
+            if (tableRepository == null) return null;
+            
             var entry = tableRepository.GetTableEntry(tableId);
-            if (entry == null)
-            {
-                return null;
-            }
+            if (entry == null) return null;
+            
+            if (entry is MiscObjectTableEntry miscObjEntry)
+                return await ResolveMiscObjectEntryAsync(miscObjEntry, playerFactory, enemyFactory, sceneResourceProvider);
             if (entry is EnemyConfigTableEntry enemyConfig)
-            {
-                if (Application.isPlaying && enemyFactory != null)
-                {
-                    var enemy = await enemyFactory.GetEnemyByConfigIdAsync(tableId);
-                    return enemy != null ? enemy.gameObject : null;
-                }
-                if (!string.IsNullOrEmpty(enemyConfig.GameObjectKey))
-                {
-                    return await sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey);
-                }
-            }
-            else if (entry is PlayerConfigTableEntry playerConfig)
-            {
-                if (Application.isPlaying && playerFactory != null)
-                {
-                    var player = await playerFactory.GetPlayerByConfigIdAsync(tableId);
-                    return player != null ? player.gameObject : null;
-                }
-                if (!string.IsNullOrEmpty(playerConfig.GameObjectKey))
-                {
-                    return await sceneResourceProvider.GetInstanceAsync(playerConfig.GameObjectKey);
-                }
-            }
+                return await ResolveEnemyEntryAsync(tableId, enemyConfig, enemyFactory, sceneResourceProvider);
+            if (entry is PlayerConfigTableEntry playerConfig)
+                return await ResolvePlayerEntryAsync(tableId, playerConfig, playerFactory, sceneResourceProvider);
             return null;
-        }
-
-        private static async Task<GameObject> ResolveMiscObjectEntryAsync(MiscObjectTableEntry miscObjEntry, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
-        {
-            // 에디터/비플레이 모드에서는 마커 프리팹을 배치해 시각화합니다.
-            if (!Application.isPlaying)
-            {
-                if (!string.IsNullOrEmpty(miscObjEntry.GameObjectKey))
-                {
-                    return await sceneResourceProvider.GetInstanceAsync(miscObjEntry.GameObjectKey);
-                }
-                return new GameObject($"[MiscObject] {miscObjEntry.Name} (ID:{miscObjEntry.Id})");
-            }
-
-            switch (miscObjEntry.ObjectType)
-            {
-                case MiscObjectType.PlayerSpawnPoint:
-                    if (Application.isPlaying && playerFactory != null)
-                    {
-                        var player = await playerFactory.GetPlayerAsync();
-                        return player != null ? player.gameObject : null;
-                    }
-                    return null;
-                case MiscObjectType.RandomEnemySpawn:
-                    if (Application.isPlaying && enemyFactory != null)
-                    {
-                        var enemy = await enemyFactory.GetRandomEnemyAsync();
-                        return enemy != null ? enemy.gameObject : null;
-                    }
-                    return null;
-                default:
-                    return null;
-            }
         }
 
         private static GameObject ResolveByTableIdSync(int tableId, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository)
         {
-            if (tableRepository == null)
-            {
-                return null;
-            }
-
-            var miscObjEntry = tableRepository.GetTableEntry<MiscObjectTableEntry>(tableId);
-            if (miscObjEntry != null)
-            {
-                return ResolveMiscObjectEntrySync(miscObjEntry, playerFactory, enemyFactory, sceneResourceProvider);
-            }
-
+            if (tableRepository == null) return null;
+            
             var entry = tableRepository.GetTableEntry(tableId);
-            if (entry == null)
-            {
-                return null;
-            }
+            if (entry == null) return null;
+            if (entry is MiscObjectTableEntry miscObjEntry)
+                return ResolveMiscObjectEntrySync(miscObjEntry, playerFactory, enemyFactory, sceneResourceProvider);
             if (entry is EnemyConfigTableEntry enemyConfig)
+                return ResolveEnemyEntrySync(tableId, enemyConfig, enemyFactory, sceneResourceProvider);
+            if (entry is PlayerConfigTableEntry playerConfig)
+                return ResolvePlayerEntrySync(tableId, playerConfig, playerFactory, sceneResourceProvider);
+            return null;
+        }
+
+        private static async Task<GameObject> ResolveEnemyEntryAsync(int tableId, EnemyConfigTableEntry enemyConfig, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
+        {
+            if (Application.isPlaying && enemyFactory != null)
             {
-                if (Application.isPlaying && enemyFactory != null)
-                {
-                    var enemy = enemyFactory.GetEnemyByConfigIdSync(tableId);
-                    return enemy != null ? enemy.gameObject : null;
-                }
-                if (!string.IsNullOrEmpty(enemyConfig.GameObjectKey))
-                {
-                    return sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey);
-                }
+                var enemy = await enemyFactory.GetEnemyByConfigIdAsync(tableId);
+                return enemy != null ? enemy.gameObject : null;
             }
-            else if (entry is PlayerConfigTableEntry playerConfig)
+            return await sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey);
+        }
+
+        private static GameObject ResolveEnemyEntrySync(int tableId, EnemyConfigTableEntry enemyConfig, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
+        {
+            if (Application.isPlaying && enemyFactory != null)
             {
-                if (Application.isPlaying && playerFactory != null)
-                {
-                    var player = playerFactory.GetPlayerByConfigIdSync(tableId);
-                    return player != null ? player.gameObject : null;
-                }
-                if (!string.IsNullOrEmpty(playerConfig.GameObjectKey))
-                {
-                    return sceneResourceProvider.GetInstanceSync(playerConfig.GameObjectKey);
-                }
+                var enemy = enemyFactory.GetEnemyByConfigIdSync(tableId);
+                return enemy != null ? enemy.gameObject : null;
             }
+            return sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey);
+        }
+
+        private static async Task<GameObject> ResolvePlayerEntryAsync(int tableId, PlayerConfigTableEntry playerConfig, IPlayerFactory playerFactory, ISceneResourceProvider sceneResourceProvider)
+        {
+            if (Application.isPlaying && playerFactory != null)
+            {
+                var player = await playerFactory.GetPlayerByConfigIdAsync(tableId);
+                return player != null ? player.gameObject : null;
+            }
+            return await sceneResourceProvider.GetInstanceAsync(playerConfig.GameObjectKey);
+        }
+
+        private static GameObject ResolvePlayerEntrySync(int tableId, PlayerConfigTableEntry playerConfig, IPlayerFactory playerFactory, ISceneResourceProvider sceneResourceProvider)
+        {
+            if (Application.isPlaying && playerFactory != null)
+            {
+                var player = playerFactory.GetPlayerByConfigIdSync(tableId);
+                return player != null ? player.gameObject : null;
+            }
+            return sceneResourceProvider.GetInstanceSync(playerConfig.GameObjectKey);
+        }
+
+        private static async Task<GameObject> ResolveMiscObjectEntryAsync(MiscObjectTableEntry miscObjEntry, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
+        {
+            if (!Application.isPlaying)
+            {
+                return await sceneResourceProvider.GetInstanceAsync(miscObjEntry.GameObjectKey);
+            }
+            switch (miscObjEntry.ObjectType)
+            {
+                case MiscObjectType.PlayerSpawnPoint :
+                    return (await playerFactory.GetPlayerAsync()).gameObject;
+                case MiscObjectType.RandomEnemySpawn :
+                    return (await enemyFactory.GetRandomEnemyAsync()).gameObject;
+            }
+
             return null;
         }
 
         private static GameObject ResolveMiscObjectEntrySync(MiscObjectTableEntry miscObjEntry, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
         {
-            // 에디터/비플레이 모드에서는 마커 프리팹을 배치해 시각화합니다.
             if (!Application.isPlaying)
             {
-                if (!string.IsNullOrEmpty(miscObjEntry.GameObjectKey))
-                {
-                    return sceneResourceProvider.GetInstanceSync(miscObjEntry.GameObjectKey);
-                }
-                return new GameObject($"[MiscObject] {miscObjEntry.Name} (ID:{miscObjEntry.Id})");
+                return sceneResourceProvider.GetInstanceSync(miscObjEntry.GameObjectKey);
             }
-
+            
             switch (miscObjEntry.ObjectType)
             {
-                case MiscObjectType.PlayerSpawnPoint:
-                    if (Application.isPlaying && playerFactory != null)
-                    {
-                        var player = playerFactory.GetPlayerSync();
-                        return player != null ? player.gameObject : null;
-                    }
-                    return null;
-                case MiscObjectType.RandomEnemySpawn:
-                    if (Application.isPlaying && enemyFactory != null)
-                    {
-                        var enemy = enemyFactory.GetRandomEnemySync();
-                        return enemy != null ? enemy.gameObject : null;
-                    }
-                    return null;
-                default:
-                    return null;
+                case MiscObjectType.PlayerSpawnPoint :
+                    return playerFactory.GetPlayerSync().gameObject;
+                case MiscObjectType.RandomEnemySpawn :
+                    return enemyFactory.GetRandomEnemySync().gameObject;
             }
+
+            return null;
         }
 
         private static void PlaceObjectsInternal(Transform stageRoot, Vector3 worldOffset, List<ObjectData> objectDatas, List<GameObject> createdObjects)

@@ -84,7 +84,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 68cbc2d8171cd407f81f321629c6e28a
-    m_Address: PlayerSpawn
+    m_Address: PlayerSpawnPoint
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
