@@ -9,8 +9,7 @@ namespace DungeonShooter
     [Serializable]
     public class ObjectData
     {
-        [SerializeField] private int tableId; // 테이블 엔트리 ID. 0이면 legacy(Index/어드레스) 사용
-        [SerializeField] private int index; // legacy: RoomData.AssetAddresses 인덱스
+        [SerializeField] private int tableId; // 테이블 엔트리 ID
         [SerializeField] private Vector2 position; // 방 생성시 배치될 위치
         [SerializeField] private Quaternion rotation; // 방 생성시 배치될 회전값
 
@@ -18,12 +17,6 @@ namespace DungeonShooter
         {
             get => tableId;
             set => tableId = value;
-        }
-
-        public int Index
-        {
-            get => index;
-            set => index = value;
         }
 
         public Vector2 Position

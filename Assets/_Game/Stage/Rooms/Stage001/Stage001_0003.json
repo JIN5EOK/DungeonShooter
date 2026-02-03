@@ -1,1 +1,129 @@
-{"roomSizeX":24,"roomSizeY":24,"assetAddresses":["Tile_Tree_001","Tile_Misc_002","Tile_Tree_002","Tile_Misc_001"],"tilesRLE":[{"index":0,"layer":-1051402079,"startPosition":{"x":-6,"y":-8},"length":8},{"index":1,"layer":-1051402079,"startPosition":{"x":-8,"y":-7},"length":2},{"index":1,"layer":-1051402079,"startPosition":{"x":0,"y":-7},"length":3},{"index":2,"layer":-1051402079,"startPosition":{"x":-6,"y":-7},"length":6},{"index":1,"layer":-1051402079,"startPosition":{"x":-8,"y":-6},"length":4},{"index":1,"layer":-1051402079,"startPosition":{"x":0,"y":-6},"length":3},{"index":3,"layer":-1051402079,"startPosition":{"x":-4,"y":-6},"length":2},{"index":1,"layer":-1051402079,"startPosition":{"x":-9,"y":-5},"length":5},{"index":1,"layer":-1051402079,"startPosition":{"x":0,"y":-5},"length":3},{"index":1,"layer":-1051402079,"startPosition":{"x":7,"y":-5},"length":2},{"index":3,"layer":-1051402079,"startPosition":{"x":-4,"y":-5},"length":2},{"index":0,"layer":-1051402079,"startPosition":{"x":3,"y":-4},"length":4},{"index":1,"layer":-1051402079,"startPosition":{"x":-8,"y":-4},"length":4},{"index":1,"layer":-1051402079,"startPosition":{"x":2,"y":-4},"length":1},{"index":1,"layer":-1051402079,"startPosition":{"x":7,"y":-4},"length":2},{"index":3,"layer":-1051402079,"startPosition":{"x":-4,"y":-4},"length":2},{"index":1,"layer":-1051402079,"startPosition":{"x":2,"y":-3},"length":2},{"index":1,"layer":-1051402079,"startPosition":{"x":7,"y":-3},"length":3},{"index":2,"layer":-1051402079,"startPosition":{"x":4,"y":-3},"length":3},{"index":3,"layer":-1051402079,"startPosition":{"x":-9,"y":-3},"length":10},{"index":1,"layer":-1051402079,"startPosition":{"x":-4,"y":-2},"length":1},{"index":1,"layer":-1051402079,"startPosition":{"x":2,"y":-2},"length":2},{"index":1,"layer":-1051402079,"startPosition":{"x":7,"y":-2},"length":3},{"index":3,"layer":-1051402079,"startPosition":{"x":-9,"y":-2},"length":5},{"index":3,"layer":-1051402079,"startPosition":{"x":-3,"y":-2},"length":4},{"index":1,"layer":-1051402079,"startPosition":{"x":-4,"y":-1},"length":2},{"index":1,"layer":-1051402079,"startPosition":{"x":7,"y":-1},"length":3},{"index":3,"layer":-1051402079,"startPosition":{"x":-11,"y":-1},"length":7},{"index":3,"layer":-1051402079,"startPosition":{"x":-2,"y":-1},"length":3},{"index":3,"layer":-1051402079,"startPosition":{"x":5,"y":-1},"length":2},{"index":1,"layer":-1051402079,"startPosition":{"x":-4,"y":0},"length":2},{"index":3,"layer":-1051402079,"startPosition":{"x":-9,"y":0},"length":5},{"index":3,"layer":-1051402079,"startPosition":{"x":-2,"y":0},"length":4},{"index":3,"layer":-1051402079,"startPosition":{"x":5,"y":0},"length":3},{"index":1,"layer":-1051402079,"startPosition":{"x":-4,"y":1},"length":2},{"index":3,"layer":-1051402079,"startPosition":{"x":-7,"y":1},"length":2},{"index":3,"layer":-1051402079,"startPosition":{"x":-2,"y":1},"length":1},{"index":3,"layer":-1051402079,"startPosition":{"x":0,"y":1},"length":3},{"index":3,"layer":-1051402079,"startPosition":{"x":5,"y":1},"length":3},{"index":1,"layer":-1051402079,"startPosition":{"x":-4,"y":2},"length":2},{"index":3,"layer":-1051402079,"startPosition":{"x":-7,"y":2},"length":2},{"index":3,"layer":-1051402079,"startPosition":{"x":0,"y":2},"length":5},{"index":1,"layer":-1051402079,"startPosition":{"x":-4,"y":3},"length":1},{"index":3,"layer":-1051402079,"startPosition":{"x":0,"y":3},"length":5},{"index":1,"layer":-1051402079,"startPosition":{"x":-2,"y":4},"length":5},{"index":1,"layer":-1051402079,"startPosition":{"x":4,"y":4},"length":4},{"index":3,"layer":-1051402079,"startPosition":{"x":3,"y":4},"length":1},{"index":0,"layer":-1051402079,"startPosition":{"x":-10,"y":5},"length":7},{"index":1,"layer":-1051402079,"startPosition":{"x":-1,"y":5},"length":4},{"index":1,"layer":-1051402079,"startPosition":{"x":-1,"y":6},"length":1},{"index":2,"layer":-1051402079,"startPosition":{"x":-10,"y":6},"length":7}],"objects":[{"tableId":10000002,"index":0,"position":{"x":6.858593940734863,"y":4.80324649810791},"rotation":{"x":0.0,"y":0.0,"z":0.0,"w":1.0}},{"tableId":10000002,"index":0,"position":{"x":4.709711074829102,"y":6.952129364013672},"rotation":{"x":0.0,"y":0.0,"z":0.0,"w":1.0}},{"tableId":10000002,"index":0,"position":{"x":-5.318408012390137,"y":1.1501456499099732},"rotation":{"x":0.0,"y":0.0,"z":0.0,"w":1.0}},{"tableId":10000002,"index":0,"position":{"x":-4.530484199523926,"y":-2.7894725799560549},"rotation":{"x":0.0,"y":0.0,"z":0.0,"w":1.0}},{"tableId":10000002,"index":0,"position":{"x":-2.6681196689605715,"y":2.0096988677978517},"rotation":{"x":0.0,"y":0.0,"z":0.0,"w":1.0}},{"tableId":10000002,"index":0,"position":{"x":-2.0234549045562746,"y":5.018134593963623},"rotation":{"x":0.0,"y":0.0,"z":0.0,"w":1.0}},{"tableId":10000002,"index":0,"position":{"x":-0.017830848693847657,"y":-3.7206549644470217},"rotation":{"x":0.0,"y":0.0,"z":0.0,"w":1.0}}]}
+{
+    "roomSizeX": 23,
+    "roomSizeY": 12,
+    "assetAddresses": [
+        "Tile_Tree_001",
+        "Tile_Tree_002"
+    ],
+    "layerNames": [
+        "Deco"
+    ],
+    "tilesRLE": [
+        {
+            "index": 0,
+            "layer": 0,
+            "startPosition": {
+                "x": 4,
+                "y": -2
+            },
+            "length": 4
+        },
+        {
+            "index": 1,
+            "layer": 0,
+            "startPosition": {
+                "x": 4,
+                "y": -1
+            },
+            "length": 4
+        },
+        {
+            "index": 0,
+            "layer": 0,
+            "startPosition": {
+                "x": -9,
+                "y": 2
+            },
+            "length": 7
+        },
+        {
+            "index": 1,
+            "layer": 0,
+            "startPosition": {
+                "x": -9,
+                "y": 3
+            },
+            "length": 7
+        }
+    ],
+    "objects": [
+        {
+            "tableId": 10000002,
+            "position": {
+                "x": 1.5281696319580079,
+                "y": 2.0942728519439699
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            }
+        },
+        {
+            "tableId": 10000002,
+            "position": {
+                "x": 2.9126133918762209,
+                "y": -0.8723921775817871
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            }
+        },
+        {
+            "tableId": 10000002,
+            "position": {
+                "x": 9.142609596252442,
+                "y": 2.193161725997925
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            }
+        },
+        {
+            "tableId": 10000002,
+            "position": {
+                "x": -4.602938175201416,
+                "y": -0.18017029762268067
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            }
+        },
+        {
+            "tableId": 10000002,
+            "position": {
+                "x": -2.625161647796631,
+                "y": 1.4020510911941529
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            }
+        },
+        {
+            "tableId": 10000002,
+            "position": {
+                "x": 0.4403924345970154,
+                "y": 3.6764943599700929
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            }
+        }
+    ]
+}

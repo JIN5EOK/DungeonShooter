@@ -1,1 +1,22 @@
-{"roomSizeX":18,"roomSizeY":18,"assetAddresses":[],"tilesRLE":[],"objects":[{"tableId":10000001,"index":0,"position":{"x":-0.44760727882385256,"y":1.1501456499099732},"rotation":{"x":0.0,"y":0.0,"z":0.0,"w":1.0}}]}
+{
+    "roomSizeX": 12,
+    "roomSizeY": 12,
+    "assetAddresses": [],
+    "layerNames": [],
+    "tilesRLE": [],
+    "objects": [
+        {
+            "tableId": 10000001,
+            "position": {
+                "x": -0.33299726247787478,
+                "y": 1.150026559829712
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            }
+        }
+    ]
+}

@@ -13,7 +13,8 @@ namespace DungeonShooter
         [SerializeField] private int roomSizeX;
         [SerializeField] private int roomSizeY;
         [SerializeField] private List<string> assetAddresses = new List<string>();
-        [SerializeField] private List<TileLayerDataRLE> tilesRLE = new List<TileLayerDataRLE>(); // RLE 압축된 타일
+        [SerializeField] private List<string> layerNames = new List<string>(); // 레이어 이름 컬렉션 (어드레스와 동일하게 인덱스 참조)
+        [SerializeField] private List<TileLayerDataRLE> tilesRLE = new List<TileLayerDataRLE>(); // RLE 압축된 타일 (Layer는 layerNames 인덱스)
         [SerializeField] private List<ObjectData> objects = new List<ObjectData>();
 
         public int RoomSizeX
@@ -32,6 +33,12 @@ namespace DungeonShooter
         {
             get => assetAddresses;
             set => assetAddresses = value;
+        }
+
+        public List<string> LayerNames
+        {
+            get => layerNames;
+            set => layerNames = value;
         }
 
         public List<TileLayerDataRLE> TilesRLE
@@ -57,15 +64,16 @@ namespace DungeonShooter
             roomData.AssetAddresses = new List<string>(assetAddresses);
             roomData.Objects = new List<ObjectData>(objects);
 
-            // RLE 압축 해제
+            // RLE 압축 해제 (레이어 인덱스 -> SortingLayer ID 변환)
             foreach (TileLayerDataRLE rleData in tilesRLE)
             {
+                var layerId = GetSortingLayerIdFromIndex(rleData.Layer);
                 for (int i = 0; i < rleData.Length; i++)
                 {
                     var tileData = new TileLayerData
                     {
                         Index = rleData.Index,
-                        Layer = rleData.Layer,
+                        Layer = layerId,
                         Position = new Vector2Int(rleData.StartPosition.x + i, rleData.StartPosition.y)
                     };
 
@@ -92,23 +100,57 @@ namespace DungeonShooter
             serialized.AssetAddresses = new List<string>(roomData.AssetAddresses);
             serialized.Objects = new List<ObjectData>(roomData.Objects);
 
-            // RLE 압축
-            CompressTiles(roomData.Tiles, serialized.TilesRLE);
+            // RLE 압축 (레이어는 문자열 컬렉션 인덱스로 저장)
+            CompressTiles(roomData.Tiles, serialized);
 
             return serialized;
         }
 
         /// <summary>
-        /// 타일 데이터를 RLE로 압축합니다.
+        /// 레이어 이름 컬렉션에 추가하고 인덱스를 반환합니다. 이미 존재하면 기존 인덱스를 반환합니다.
         /// </summary>
-        private static void CompressTiles(List<TileLayerData> tiles, List<TileLayerDataRLE> tilesRLE)
+        private int GetOrAddLayerIndex(string layerName)
+        {
+            if (string.IsNullOrEmpty(layerName))
+            {
+                return -1;
+            }
+
+            var index = layerNames.IndexOf(layerName);
+            if (index == -1)
+            {
+                layerNames.Add(layerName);
+                index = layerNames.Count - 1;
+            }
+
+            return index;
+        }
+
+        /// <summary>
+        /// layerNames 인덱스를 SortingLayer ID로 변환합니다.
+        /// </summary>
+        private int GetSortingLayerIdFromIndex(int layerIndex)
+        {
+            if (layerIndex < 0 || layerIndex >= layerNames.Count)
+            {
+                return 0;
+            }
+
+            var layerName = layerNames[layerIndex];
+            return new RenderingLayer(layerName).LayerID;
+        }
+
+        /// <summary>
+        /// 타일 데이터를 RLE로 압축합니다. 레이어는 layerNames 컬렉션 인덱스로 저장합니다.
+        /// </summary>
+        private static void CompressTiles(List<TileLayerData> tiles, SerializedRoomData serialized)
         {
             if (tiles == null || tiles.Count == 0)
             {
                 return;
             }
 
-            tilesRLE.Clear();
+            serialized.TilesRLE.Clear();
 
             // 타일들을 레이어, Y 좌표, index, X 좌표 순으로 정렬
             var sortedTiles = new List<TileLayerData>(tiles);
@@ -126,10 +168,12 @@ namespace DungeonShooter
                 return a.Position.x.CompareTo(b.Position.x);
             });
 
-            // RLE 압축
+            // RLE 압축 (레이어는 SortingLayer ID -> 레이어 이름 -> 컬렉션 인덱스로 변환)
             for (int i = 0; i < sortedTiles.Count; i++)
             {
                 var current = sortedTiles[i];
+                var layerName = RenderingLayers.GetLayerName(current.Layer);
+                var layerIndex = serialized.GetOrAddLayerIndex(layerName);
                 var startPos = current.Position;
                 var length = 1;
 
@@ -137,7 +181,9 @@ namespace DungeonShooter
                 while (i + length < sortedTiles.Count)
                 {
                     var next = sortedTiles[i + length];
-                    if (next.Layer != current.Layer ||
+                    var nextLayerName = RenderingLayers.GetLayerName(next.Layer);
+                    var nextLayerIndex = serialized.GetOrAddLayerIndex(nextLayerName);
+                    if (nextLayerIndex != layerIndex ||
                         next.Index != current.Index ||
                         next.Position.y != current.Position.y ||
                         next.Position.x != startPos.x + length)
@@ -147,16 +193,16 @@ namespace DungeonShooter
                     length++;
                 }
 
-                // RLE 엔트리 생성
+                // RLE 엔트리 생성 (Layer는 layerNames 인덱스)
                 var rleData = new TileLayerDataRLE
                 {
                     Index = current.Index,
-                    Layer = current.Layer,
+                    Layer = layerIndex,
                     StartPosition = startPos,
                     Length = length
                 };
 
-                tilesRLE.Add(rleData);
+                serialized.TilesRLE.Add(rleData);
                 i += length - 1; // 다음 그룹으로 이동
             }
         }

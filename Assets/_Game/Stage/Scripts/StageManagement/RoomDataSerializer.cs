@@ -162,7 +162,6 @@ namespace DungeonShooter
                 roomData.Objects.Add(new ObjectData
                 {
                     TableId = marker.TableId,
-                    Index = 0,
                     Position = position2,
                     Rotation = rotation
                 });
@@ -222,8 +221,7 @@ namespace DungeonShooter
                     return;
                 }
 
-                // JSON으로 직렬화 (pretty print 제거로 용량 절약)
-                var json = JsonUtility.ToJson(serialized, false);
+                var json = JsonUtility.ToJson(serialized, true);
                 var directory = Path.GetDirectoryName(path);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 {
