@@ -14,23 +14,22 @@ namespace DungeonShooter
         [Tooltip("적 감지 거리")]
         private float _detectionRange = 10f;
 
-        /// <summary>
-        /// 적 감지 거리
-        /// </summary>
-        public float DetectionRange => _detectionRange;
-
-        /// <inheritdoc />
-        public override float GetDetectionRange() => _detectionRange;
-
-        /// <inheritdoc />
         public override IBehaviourTreeNode<AiBTContext> GetTree()
         {
             var chaseSequence = new SequencerNode<AiBTContext>()
                 .AddChild(new ConditionPlayerInRangeNode(_detectionRange))
                 .AddChild(new ActionChaseNode());
 
-            var root = new SelectorNode<AiBTContext>()
+            var mainSelector = new SelectorNode<AiBTContext>()
                 .AddChild(chaseSequence)
+                .AddChild(new ActionIdleNode());
+
+            var withFindPlayer = new SequencerNode<AiBTContext>()
+                .AddChild(new ActionFindPlayerNode())
+                .AddChild(mainSelector);
+
+            var root = new SelectorNode<AiBTContext>()
+                .AddChild(withFindPlayer)
                 .AddChild(new ActionIdleNode());
 
             return root;

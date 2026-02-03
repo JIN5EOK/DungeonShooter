@@ -14,10 +14,5 @@ namespace DungeonShooter
         /// </summary>
         /// <returns>행동트리 루트 노드</returns>
         public abstract IBehaviourTreeNode<AiBTContext> GetTree();
-
-        /// <summary>
-        /// 컨텍스트에 넣을 감지 거리입니다. 서브클래스에서 오버라이드합니다.
-        /// </summary>
-        public virtual float GetDetectionRange() => 0f;
     }
 }

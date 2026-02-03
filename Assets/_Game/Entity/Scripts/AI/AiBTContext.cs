@@ -16,10 +16,5 @@ namespace DungeonShooter
         /// 현재 타겟 엔티티(예: 플레이어)
         /// </summary>
         public EntityBase Target { get; set; }
-
-        /// <summary>
-        /// 적 감지 거리
-        /// </summary>
-        public float DetectionRange { get; set; }
     }
 }
