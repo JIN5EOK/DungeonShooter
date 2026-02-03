@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace DungeonShooter
@@ -8,6 +9,20 @@ namespace DungeonShooter
     /// </summary>
     public interface ITableRepository
     {
+        /// <summary>
+        /// ID로 테이블 엔트리를 가져옵니다. 타입을 지정하지 않고 엔트리만 조회할 때 사용합니다.
+        /// </summary>
+        /// <param name="id">엔트리 ID</param>
+        /// <returns>테이블 엔트리, 없으면 null</returns>
+        ITableEntry GetTableEntry(int id);
+
+        /// <summary>
+        /// ID에 해당하는 테이블 엔트리의 런타임 타입을 반환합니다.
+        /// </summary>
+        /// <param name="id">엔트리 ID</param>
+        /// <returns>엔트리 타입, 없으면 null</returns>
+        Type GetTableEntryTypeByID(int id);
+
         /// <summary>
         /// 테이블 엔트리를 가져옵니다.
         /// </summary>

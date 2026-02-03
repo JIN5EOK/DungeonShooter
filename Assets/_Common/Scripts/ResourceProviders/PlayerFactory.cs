@@ -13,6 +13,8 @@ namespace DungeonShooter
         public event Action<Player> OnPlayerCreated;
         UniTask<Player> GetPlayerAsync();
         Player GetPlayerSync();
+        UniTask<Player> GetPlayerByConfigIdAsync(int configId);
+        Player GetPlayerByConfigIdSync(int configId);
     }
     
     /// <summary>
@@ -70,6 +72,56 @@ namespace DungeonShooter
                 LogHandler.LogException<PlayerFactory>(e, "플레이어를 불러오지 못했습니다.");
                 return null;
             }
+        }
+
+        /// <summary>
+        /// 지정한 PlayerConfigTableEntry ID로 플레이어를 비동기 생성합니다.
+        /// </summary>
+        public async UniTask<Player> GetPlayerByConfigIdAsync(int configId)
+        {
+            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(configId);
+            if (config == null)
+            {
+                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigTableEntry를 찾을 수 없습니다. ID: {configId}");
+                return null;
+            }
+
+            var playerInstance = await _sceneResourceProvider.GetInstanceAsync(config.GameObjectKey);
+            return await InitializePlayerInstanceWithConfig(playerInstance, config);
+        }
+
+        /// <summary>
+        /// 지정한 PlayerConfigTableEntry ID로 플레이어를 동기 생성합니다.
+        /// </summary>
+        public Player GetPlayerByConfigIdSync(int configId)
+        {
+            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(configId);
+            if (config == null)
+            {
+                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigTableEntry를 찾을 수 없습니다. ID: {configId}");
+                return null;
+            }
+
+            var playerInstance = _sceneResourceProvider.GetInstanceSync(config.GameObjectKey);
+            return InitializePlayerInstanceWithConfig(playerInstance, config).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// 지정한 설정으로 플레이어 인스턴스를 초기화합니다.
+        /// </summary>
+        private async UniTask<Player> InitializePlayerInstanceWithConfig(GameObject playerInstance, PlayerConfigTableEntry config)
+        {
+            if (playerInstance == null)
+            {
+                LogHandler.LogWarning<PlayerFactory>("플레이어 인스턴스가 생성되지 않았습니다.");
+                return null;
+            }
+
+            playerInstance.layer = PhysicalLayers.Player.LayerIndex;
+            var player = _sceneResourceProvider.AddOrGetComponentWithInejct<Player>(playerInstance);
+            await player.Initialize(config);
+            OnPlayerCreated?.Invoke(player);
+            return player;
         }
 
         /// <summary>

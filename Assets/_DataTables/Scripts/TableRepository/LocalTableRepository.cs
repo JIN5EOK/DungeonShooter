@@ -26,6 +26,23 @@ namespace DungeonShooter
             LoadAndCacheTable<PlayerConfigTableEntry>("PlayerConfigTable");
             LoadAndCacheTable<EntityStatsTableEntry>("EntityStatsTable");
             LoadAndCacheTable<EnemyConfigTableEntry>("EnemyConfigTable");
+            LoadAndCacheTable<MiscObjectTableEntry>("MiscObjectTable");
+        }
+
+        /// <summary>
+        /// ID로 테이블 엔트리를 가져옵니다. 타입을 지정하지 않고 엔트리만 조회할 때 사용합니다.
+        /// </summary>
+        public ITableEntry GetTableEntry(int id)
+        {
+            return _cache.TryGetValue(id, out var entry) ? entry : null;
+        }
+
+        /// <summary>
+        /// ID에 해당하는 테이블 엔트리의 런타임 타입을 반환합니다.
+        /// </summary>
+        public Type GetTableEntryTypeByID(int id)
+        {
+            return _cache.TryGetValue(id, out var entry) ? entry.GetType() : null;
         }
 
         /// <summary>
@@ -43,7 +60,7 @@ namespace DungeonShooter
                 LogHandler.LogWarning<LocalTableRepository>($"ID {id}의 엔트리가 {nameof(T)} 타입이 아닙니다. (실제 타입: {entry.GetType().Name})");
                 return null;
             }
-
+    
             LogHandler.LogWarning<LocalTableRepository>($"ID {id}를 가진 {nameof(T)} 엔트리를 찾을 수 없습니다.");
             return null;
         }

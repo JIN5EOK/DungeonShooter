@@ -142,77 +142,30 @@ namespace DungeonShooter
 
         /// <summary>
         /// 오브젝트들을 직렬화합니다.
+        /// RoomObjectMarker(테이블 ID)가 있는 오브젝트만 저장합니다.
         /// </summary>
         private static void SerializeObjects(Transform objectsParent, RoomData roomData)
         {
-            // Objects 하위의 모든 자식 오브젝트 순회
             for (int i = 0; i < objectsParent.childCount; i++)
             {
                 var child = objectsParent.GetChild(i);
                 var obj = child.gameObject;
-
-                // 프리팹 인스턴스인지 확인
-                var prefabType = PrefabUtility.GetPrefabAssetType(obj);
-                if (prefabType == PrefabAssetType.NotAPrefab)
+                if (!obj.TryGetComponent(out RoomObjectMarker marker) || marker.TableId == 0)
                 {
-                    // 프리팹이 아니면 프리팹 루트를 찾기
-                    var prefabRoot = PrefabUtility.GetCorrespondingObjectFromSource(obj);
-                    if (prefabRoot == null)
-                    {
-                        LogHandler.LogWarning(nameof(RoomDataSerializer),$"오브젝트 '{obj.name}'는 프리팹이 아닙니다. 어드레서블로 등록된 프리팹을 사용해야 합니다.");
-                        continue;
-                    }
-
-                    // 프리팹의 어드레서블 주소 얻기
-                    var address = GetAddressableAddress(prefabRoot);
-                    if (string.IsNullOrEmpty(address))
-                    {
-                        LogHandler.LogWarning(nameof(RoomDataSerializer),$"프리팹 '{prefabRoot.name}'의 어드레서블 주소를 찾을 수 없습니다.");
-                        continue;
-                    }
-
-                    // 주소 테이블에 추가하고 인덱스 얻기
-                    var addressIndex = roomData.GetOrAddAddress(address);
-
-                    // ObjectData 생성
-                    var position = child.position;
-                    var objectData = new ObjectData
-                    {
-                        Index = addressIndex,
-                        Position = new Vector2(position.x, position.y),
-                        Rotation = child.rotation
-                    };
-
-                    roomData.Objects.Add(objectData);
+                    LogHandler.LogWarning(nameof(RoomDataSerializer), $"오브젝트 '{obj.name}'는 RoomObjectMarker(테이블 ID)가 없어 저장되지 않습니다. 인스펙터에서 배치할 ID를 선택 후 Ctrl+클릭으로 배치하세요.");
+                    continue;
                 }
-                else
+
+                var position = child.position;
+                var rotation = child.rotation;
+                var position2 = new Vector2(position.x, position.y);
+                roomData.Objects.Add(new ObjectData
                 {
-                    // 프리팹 인스턴스인 경우
-                    var prefabAsset = PrefabUtility.GetCorrespondingObjectFromSource(obj);
-                    if (prefabAsset == null)
-                    {
-                        continue;
-                    }
-
-                    var address = GetAddressableAddress(prefabAsset);
-                    if (string.IsNullOrEmpty(address))
-                    {
-                        LogHandler.LogWarning(nameof(RoomDataSerializer),$"프리팹 '{prefabAsset.name}'의 어드레서블 주소를 찾을 수 없습니다.");
-                        continue;
-                    }
-
-                    var addressIndex = roomData.GetOrAddAddress(address);
-
-                    var position = child.position;
-                    var objectData = new ObjectData
-                    {
-                        Index = addressIndex,
-                        Position = new Vector2(position.x, position.y),
-                        Rotation = child.rotation
-                    };
-
-                    roomData.Objects.Add(objectData);
-                }
+                    TableId = marker.TableId,
+                    Index = 0,
+                    Position = position2,
+                    Rotation = rotation
+                });
             }
         }
 

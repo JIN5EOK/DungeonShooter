@@ -154,6 +154,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eb0f1b106225440efbda60fbb2c505c2
+    m_Address: MiscObjectTable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: efc9dffc693594de0aa8f41aedda2d92
     m_Address: UI_SkillCooldownHud
     m_ReadOnly: 0

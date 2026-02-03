@@ -38,11 +38,27 @@ namespace DungeonShooter
         [Tooltip("불러올 방 데이터 파일 (TextAsset)")]
         private TextAsset _loadFile;
 
+        [SerializeField]
+        [Tooltip("배치할 오브젝트 테이블 ID (인스펙터에서 선택 후 씬 뷰 클릭으로 배치)")]
+        private int _selectedPlaceableTableId;
+
         public string SavePath => _savePath;
+        public int SelectedPlaceableTableId { get => _selectedPlaceableTableId; set => _selectedPlaceableTableId = value; }
         public TextAsset LoadFile => _loadFile;
         public string FileName => _fileName;
         public int RoomSizeX => _roomSizeX;
         public int RoomSizeY => _roomSizeY;
+
+        private ITableRepository _tableRepository;
+
+        public ITableRepository GetOrCreateTableRepository()
+        {
+            if (_tableRepository == null)
+            {
+                _tableRepository = new LocalTableRepository();
+            }
+            return _tableRepository;
+        }
 
         public void SetSavePath(string path) => _savePath = path;
         public void SetLoadFile(TextAsset file) => _loadFile = file;
@@ -147,7 +163,7 @@ namespace DungeonShooter
 
             RoomCreateHelper.PlaceBaseTiles(gameObject.transform, centerPos, roomData, groundTile);
             RoomCreateHelper.PlaceAdditionalTilesSync(gameObject.transform, centerPos, roomData, _resourceProvider);
-            RoomCreateHelper.PlaceObjectsSync(gameObject.transform, roomData, null, null, _resourceProvider);
+            RoomCreateHelper.PlaceObjectsSync(gameObject.transform, roomData, null, null, _resourceProvider, GetOrCreateTableRepository());
 
             EditorUtility.SetDirty(this);
             LogHandler.Log<RoomEditor>($"방 불러오기 완료: {_loadFile.name}");
@@ -233,6 +249,72 @@ namespace DungeonShooter
 
             var address = _groundTile.RuntimeKey.ToString();
             return _resourceProvider.GetAssetSync<TileBase>(address);
+        }
+
+        /// <summary>
+        /// 선택한 테이블 ID로 오브젝트를 지정 위치에 배치합니다. (에디터 전용)
+        /// </summary>
+        /// <param name="tableId">MiscObjectTableEntry, EnemyConfigTableEntry 또는 PlayerConfigTableEntry ID</param>
+        /// <param name="worldPosition">월드 위치 (Z는 0으로 사용)</param>
+        /// <returns>생성된 인스턴스, 실패 시 null</returns>
+        public GameObject PlaceObjectAt(int tableId, Vector3 worldPosition)
+        {
+            if (tableId == 0)
+            {
+                return null;
+            }
+            if (_resourceProvider == null)
+            {
+                LogHandler.LogError<RoomEditor>("ResourceProvider가 설정되지 않았습니다.");
+                return null;
+            }
+
+            var tableRepo = GetOrCreateTableRepository();
+            var entry = tableRepo.GetTableEntry(tableId);
+            if (entry == null)
+            {
+                LogHandler.LogWarning<RoomEditor>($"테이블 엔트리를 찾을 수 없습니다. ID: {tableId}");
+                return null;
+            }
+
+            string address = null;
+            if (entry is MiscObjectTableEntry miscObjEntry)
+            {
+                address = miscObjEntry.GameObjectKey;
+            }
+            else if (entry is EnemyConfigTableEntry enemyConfig)
+            {
+                address = enemyConfig.GameObjectKey;
+            }
+            else if (entry is PlayerConfigTableEntry playerConfig)
+            {
+                address = playerConfig.GameObjectKey;
+            }
+
+            GameObject instance;
+            if (!string.IsNullOrEmpty(address))
+            {
+                instance = _resourceProvider.GetInstanceSync(address);
+                if (instance == null)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                instance = new GameObject($"[MiscObject] ID:{tableId}");
+            }
+
+            var marker = instance.AddOrGetComponent<RoomObjectMarker>();
+            marker.TableId = tableId;
+
+            var objectsParent = RoomCreateHelper.GetOrCreateChild(transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            instance.transform.SetParent(objectsParent);
+            instance.transform.position = new Vector3(worldPosition.x, worldPosition.y, 0);
+            instance.transform.rotation = Quaternion.identity;
+
+            EditorUtility.SetDirty(this);
+            return instance;
         }
 
         /// <summary>

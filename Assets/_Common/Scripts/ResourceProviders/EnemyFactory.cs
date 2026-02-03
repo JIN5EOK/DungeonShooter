@@ -15,6 +15,8 @@ namespace DungeonShooter
     {
         UniTask<Enemy> GetRandomEnemyAsync();
         Enemy GetRandomEnemySync();
+        UniTask<Enemy> GetEnemyByConfigIdAsync(int configId);
+        Enemy GetEnemyByConfigIdSync(int configId);
     }
     
     /// <summary>
@@ -77,6 +79,38 @@ namespace DungeonShooter
             var enemyConfig = GetRandomEnemyTableConfig();
             if (enemyConfig == null)
             {
+                return null;
+            }
+
+            var enemyInstance = _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey);
+            return GetEnemyFromInstance(enemyInstance, enemyConfig);
+        }
+
+        /// <summary>
+        /// 지정한 EnemyConfigTableEntry ID로 적을 비동기 생성합니다.
+        /// </summary>
+        public async UniTask<Enemy> GetEnemyByConfigIdAsync(int configId)
+        {
+            var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(configId);
+            if (enemyConfig == null)
+            {
+                LogHandler.LogWarning<EnemyFactory>($"EnemyConfigTableEntry를 찾을 수 없습니다. ID: {configId}");
+                return null;
+            }
+
+            var enemyInstance = await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey);
+            return GetEnemyFromInstance(enemyInstance, enemyConfig);
+        }
+
+        /// <summary>
+        /// 지정한 EnemyConfigTableEntry ID로 적을 동기 생성합니다.
+        /// </summary>
+        public Enemy GetEnemyByConfigIdSync(int configId)
+        {
+            var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(configId);
+            if (enemyConfig == null)
+            {
+                LogHandler.LogWarning<EnemyFactory>($"EnemyConfigTableEntry를 찾을 수 없습니다. ID: {configId}");
                 return null;
             }
 

@@ -20,6 +20,7 @@ namespace DungeonShooter
         /// <param name="playerFactory">플레이어 팩토리</param>
         /// <param name="enemyFactory">적 팩토리</param>
         /// <param name="sceneResourceProvider">씬 리소스 제공자</param>
+        /// <param name="tableRepository">테이블 리포지토리 (방 오브젝트 테이블 ID 해석용)</param>
         /// <param name="stage">변환할 Stage</param>
         /// <param name="parent">부모 Transform (null이면 씬 루트)</param>
         /// <returns>생성된 게임오브젝트를 반환하는 Task</returns>
@@ -28,6 +29,7 @@ namespace DungeonShooter
             IPlayerFactory playerFactory,
             IEnemyFactory enemyFactory,
             ISceneResourceProvider sceneResourceProvider,
+            ITableRepository tableRepository,
             Stage stage,
             Transform parent = null)
         {
@@ -37,7 +39,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            if (stageConfigEntry == null || playerFactory == null || enemyFactory == null || sceneResourceProvider == null)
+            if (stageConfigEntry == null || playerFactory == null || enemyFactory == null || sceneResourceProvider == null || tableRepository == null)
             {
                 LogHandler.LogError(nameof(StageInstantiator), "리소스 제공자가 null입니다.");
                 return null;
@@ -70,7 +72,7 @@ namespace DungeonShooter
                 await RoomCreateHelper.PlaceAdditionalTilesAsync(stageObj.transform, centerPos, room.RoomData, sceneResourceProvider);
 
                 // 방의 오브젝트를 Stage 레벨 Objects에 배치
-                var objects = await RoomCreateHelper.PlaceObjectsAsync(stageObj.transform, room.RoomData, playerFactory, enemyFactory, sceneResourceProvider, worldPosition);
+                var objects = await RoomCreateHelper.PlaceObjectsAsync(stageObj.transform, room.RoomData, playerFactory, enemyFactory, sceneResourceProvider, tableRepository, worldPosition);
                 // 생성후 초기화 필요한 객체면 대기
 
                 foreach (var go in objects)

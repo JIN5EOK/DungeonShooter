@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -12,6 +13,11 @@ namespace DungeonShooter
         private SerializedProperty _roomSizeXProperty;
         private SerializedProperty _roomSizeYProperty;
         private SerializedProperty _loadFileProperty;
+        private SerializedProperty _selectedPlaceableTableIdProperty;
+
+        private List<int> _placeableIds = new List<int>();
+        private List<string> _placeableNames = new List<string>();
+        private bool _placeableListDirty = true;
 
         private void OnEnable()
         {
@@ -20,6 +26,70 @@ namespace DungeonShooter
             _roomSizeXProperty = serializedObject.FindProperty("_roomSizeX");
             _roomSizeYProperty = serializedObject.FindProperty("_roomSizeY");
             _loadFileProperty = serializedObject.FindProperty("_loadFile");
+            _selectedPlaceableTableIdProperty = serializedObject.FindProperty("_selectedPlaceableTableId");
+            _placeableListDirty = true;
+
+            SceneView.duringSceneGui += OnSceneGUI;
+        }
+
+        private void OnDisable()
+        {
+            SceneView.duringSceneGui -= OnSceneGUI;
+        }
+
+        private void RefreshPlaceableList(RoomEditor roomEditor)
+        {
+            if (!_placeableListDirty)
+            {
+                return;
+            }
+            _placeableIds.Clear();
+            _placeableNames.Clear();
+            var repo = roomEditor.GetOrCreateTableRepository();
+            foreach (var entry in repo.GetAllTableEntries<MiscObjectTableEntry>())
+            {
+                _placeableIds.Add(entry.Id);
+                _placeableNames.Add($"[기타] {entry.Name} (ID:{entry.Id})");
+            }
+            foreach (var entry in repo.GetAllTableEntries<EnemyConfigTableEntry>())
+            {
+                _placeableIds.Add(entry.Id);
+                _placeableNames.Add($"[Enemy] {entry.Name} (ID:{entry.Id})");
+            }
+            if (_placeableIds.Count == 0)
+            {
+                _placeableIds.Add(0);
+                _placeableNames.Add("(배치 가능한 엔트리 없음)");
+            }
+            _placeableListDirty = false;
+        }
+
+        private void OnSceneGUI(SceneView sceneView)
+        {
+            if (target == null || !(target is RoomEditor roomEditor))
+            {
+                return;
+            }
+            if (Application.isPlaying)
+            {
+                return;
+            }
+            var e = Event.current;
+            if (e.type == EventType.MouseDown && e.button == 0 && (e.control || e.command))
+            {
+                var ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+                var plane = new Plane(Vector3.forward, Vector3.zero);
+                if (plane.Raycast(ray, out var enter))
+                {
+                    var worldPos = ray.GetPoint(enter);
+                    var tableId = roomEditor.SelectedPlaceableTableId;
+                    if (tableId != 0)
+                    {
+                        roomEditor.PlaceObjectAt(tableId, worldPos);
+                        e.Use();
+                    }
+                }
+            }
         }
 
         public override void OnInspectorGUI()
@@ -27,6 +97,7 @@ namespace DungeonShooter
             var roomEditor = (RoomEditor)target;
             
             serializedObject.Update();
+            RefreshPlaceableList(roomEditor);
 
             // 방 크기 설정 섹션
             EditorGUILayout.Space();
@@ -44,6 +115,21 @@ namespace DungeonShooter
             {
                 roomEditor.UpdateRoomSizeTiles();
             }
+
+            // 테이블 ID 기반 오브젝트 배치 섹션
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("오브젝트 배치 (테이블 ID)", EditorStyles.boldLabel);
+            var currentId = _selectedPlaceableTableIdProperty.intValue;
+            var currentIndex = _placeableIds.IndexOf(currentId);
+            if (currentIndex < 0)
+            {
+                currentIndex = 0;
+            }
+            serializedObject.Update();
+            var newIndex = EditorGUILayout.Popup("배치할 오브젝트", currentIndex, _placeableNames.ToArray());
+            _selectedPlaceableTableIdProperty.intValue = _placeableIds[newIndex];
+            serializedObject.ApplyModifiedProperties();
+            EditorGUILayout.HelpBox("배치할 오브젝트를 선택한 뒤, 씬 뷰에서 Ctrl+클릭(맥: Cmd+클릭)으로 해당 위치에 배치합니다.", MessageType.Info);
 
             // 저장 섹션
             EditorGUILayout.Space();

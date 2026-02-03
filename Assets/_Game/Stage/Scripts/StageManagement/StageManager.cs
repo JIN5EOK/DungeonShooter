@@ -41,7 +41,7 @@ namespace DungeonShooter
                 Debug.LogError($"[{nameof(StageManager)}] StageConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.StageConfigTableId}");
                 return;
             }
-            await StageInstantiator.InstantiateStage(stageConfigEntry, _playerFactory, _enemyFactory, _sceneResourceProvider, _stage);
+            await StageInstantiator.InstantiateStage(stageConfigEntry, _playerFactory, _enemyFactory, _sceneResourceProvider, _tableRepository, _stage);
         }
     }
 }

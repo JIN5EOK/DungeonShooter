@@ -1,1 +1,2 @@
-* PlayerCharacterConfig, StageConfig 테이블 기반으로 변경하기
+### 할일 : 에디터 개선
+- https://github.com/JIN5EOK/DungeonShooter/issues/4
