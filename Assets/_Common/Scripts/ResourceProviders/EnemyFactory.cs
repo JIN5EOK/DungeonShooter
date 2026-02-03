@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using VContainer;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
@@ -26,7 +24,7 @@ namespace DungeonShooter
         private readonly ITableRepository _tableRepository;
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
-        private List<string> EnemyAddresses { get; set; }
+        private List<int> _enemyIds;
 
         [Inject]
         public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider)
@@ -38,7 +36,7 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// StageConfigTableEntry의 Label 데이터를 기반으로 에셋의 어드레스 목록을 로드하여 저장합니다.
+        /// StageConfigTableEntry의 EnemyKeys(EnemyConfigTableEntry Id 목록)를 로드하여 저장합니다.
         /// </summary>
         private void Initialize()
         {
@@ -49,13 +47,9 @@ namespace DungeonShooter
                 return;
             }
 
-            if (!string.IsNullOrEmpty(stageConfigEntry.StageEnemiesLabel))
+            if (stageConfigEntry.EnemyKeys != null && stageConfigEntry.EnemyKeys.Count > 0)
             {
-                var handle = Addressables.LoadResourceLocationsAsync(stageConfigEntry.StageEnemiesLabel);
-                handle.WaitForCompletion();
-                EnemyAddresses = handle.Result.Select(location => location.PrimaryKey).ToList();
-
-                Addressables.Release(handle);
+                _enemyIds = new List<int>(stageConfigEntry.EnemyKeys);
             }
         }
 
@@ -90,17 +84,31 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 랜덤 적 어드레스 선택
+        /// EnemyKeys에서 랜덤 ID를 선택하고, 해당 EnemyConfigTableEntry의 GameObjectKey(어드레스)를 반환합니다.
         /// </summary>
         private string GetRandomEnemyAddress()
         {
-            if (EnemyAddresses == null || EnemyAddresses.Count == 0)
+            if (_enemyIds == null || _enemyIds.Count == 0)
             {
-                Debug.LogWarning($"[{nameof(EnemyFactory)}] 적 어드레스 목록이 비어있습니다.");
+                Debug.LogWarning($"[{nameof(EnemyFactory)}] 적 ID 목록이 비어있습니다.");
                 return null;
             }
 
-            return EnemyAddresses[Random.Range(0, EnemyAddresses.Count)];
+            var enemyId = _enemyIds[Random.Range(0, _enemyIds.Count)];
+            var enemyEntry = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(enemyId);
+            if (enemyEntry == null)
+            {
+                Debug.LogWarning($"[{nameof(EnemyFactory)}] EnemyConfigTableEntry를 찾을 수 없습니다. ID: {enemyId}");
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(enemyEntry.GameObjectKey))
+            {
+                Debug.LogWarning($"[{nameof(EnemyFactory)}] EnemyConfigTableEntry에 GameObjectKey가 없습니다. ID: {enemyId}");
+                return null;
+            }
+
+            return enemyEntry.GameObjectKey;
         }
 
         /// <summary>

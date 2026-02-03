@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace DungeonShooter
 {
@@ -17,8 +18,8 @@ namespace DungeonShooter
         /// <summary> 기본 지형 타일 주소 (Addressable 주소) </summary>
         public string GroundTileKey { get; set; }
         
-        /// <summary> 스테이지에 등장할 수 있는 적들의 라벨 </summary>
-        public string StageEnemiesLabel { get; set; }
+        /// <summary> 스테이지에 등장할 수 있는 적 EnemyConfigTableEntry Id 목록 (예: 18000000/18000001) </summary>
+        public List<int> EnemyKeys { get; set; }
         
         /// <summary> 시작 방 데이터 라벨</summary>
         public string StartRoomsLabel { get; set; }

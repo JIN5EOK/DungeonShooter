@@ -137,6 +137,14 @@ namespace DungeonShooter
                 return;
             }
 
+            // List<int> 처리 (예: StageConfigTableEntry.EnemyKeys - "18000000/18000001")
+            if (propertyType == typeof(List<int>))
+            {
+                var intList = ParseIntList(value);
+                property.SetValue(entry, intList);
+                return;
+            }
+
             // enum 타입 처리
             if (propertyType.IsEnum)
             {
@@ -192,6 +200,36 @@ namespace DungeonShooter
             {
                 var typeName = typeof(T).Name;
                 LogHandler.LogError(nameof(CSVTableParser), $"{typeName} 커스텀 파싱 실패: {data}, 에러: {ex.Message}");
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// '/' 구분 문자열을 List&lt;int&gt;로 파싱합니다.
+        /// 예: "18000000/18000001/18000002"
+        /// </summary>
+        private static List<int> ParseIntList(string data)
+        {
+            var result = new List<int>();
+            if (string.IsNullOrEmpty(data))
+                return result;
+
+            try
+            {
+                var parts = data.Split('/');
+                foreach (var part in parts)
+                {
+                    var trimmed = part.Trim();
+                    if (string.IsNullOrEmpty(trimmed))
+                        continue;
+                    if (int.TryParse(trimmed, out var id))
+                        result.Add(id);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHandler.LogError(nameof(CSVTableParser), $"EnemyKeys 파싱 실패: {data}, 에러: {ex.Message}");
             }
 
             return result;

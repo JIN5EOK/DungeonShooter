@@ -36,7 +36,7 @@ namespace DungeonShooter
                 LogHandler.LogError<SkillFactory>("TableRepository가 null입니다.");
                 return null;
             }
-
+    
             if (_resourceProvider == null)
             {
                 LogHandler.LogError<SkillFactory>("ResourceProvider가 null입니다.");
