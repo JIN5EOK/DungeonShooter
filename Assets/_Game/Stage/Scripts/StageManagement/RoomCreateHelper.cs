@@ -277,8 +277,8 @@ namespace DungeonShooter
             var entry = tableRepository.GetTableEntry(tableId);
             if (entry == null) return null;
             
-            if (entry is MiscObjectTableEntry miscObjEntry)
-                return await ResolveMiscObjectEntryAsync(miscObjEntry, playerFactory, enemyFactory, sceneResourceProvider);
+            if (entry is RoomEventTriggerTableEntry eventTriggerEntry)
+                return await ResolveRoomEventTriggerEntryAsync(eventTriggerEntry, playerFactory, enemyFactory, sceneResourceProvider);
             if (entry is EnemyConfigTableEntry enemyConfig)
                 return await ResolveEnemyEntryAsync(tableId, enemyConfig, enemyFactory, sceneResourceProvider);
             if (entry is PlayerConfigTableEntry playerConfig)
@@ -292,8 +292,8 @@ namespace DungeonShooter
             
             var entry = tableRepository.GetTableEntry(tableId);
             if (entry == null) return null;
-            if (entry is MiscObjectTableEntry miscObjEntry)
-                return ResolveMiscObjectEntrySync(miscObjEntry, playerFactory, enemyFactory, sceneResourceProvider);
+            if (entry is RoomEventTriggerTableEntry eventTriggerEntry)
+                return ResolveRoomEventTriggerEntrySync(eventTriggerEntry, playerFactory, enemyFactory, sceneResourceProvider);
             if (entry is EnemyConfigTableEntry enemyConfig)
                 return ResolveEnemyEntrySync(tableId, enemyConfig, enemyFactory, sceneResourceProvider);
             if (entry is PlayerConfigTableEntry playerConfig)
@@ -341,38 +341,35 @@ namespace DungeonShooter
             return sceneResourceProvider.GetInstanceSync(playerConfig.GameObjectKey);
         }
 
-        private static async Task<GameObject> ResolveMiscObjectEntryAsync(MiscObjectTableEntry miscObjEntry, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
+        private static async Task<GameObject> ResolveRoomEventTriggerEntryAsync(RoomEventTriggerTableEntry eventTriggerEntry, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
         {
             if (!Application.isPlaying)
             {
-                return await sceneResourceProvider.GetInstanceAsync(miscObjEntry.GameObjectKey);
+                return await sceneResourceProvider.GetInstanceAsync(eventTriggerEntry.GameObjectKey);
             }
-            switch (miscObjEntry.ObjectType)
+            switch (eventTriggerEntry.TriggerType)
             {
-                case MiscObjectType.PlayerSpawnPoint :
+                case RoomEventTriggerType.PlayerSpawnPoint:
                     return (await playerFactory.GetPlayerAsync()).gameObject;
-                case MiscObjectType.RandomEnemySpawn :
+                case RoomEventTriggerType.RandomEnemySpawn:
                     return (await enemyFactory.GetRandomEnemyAsync()).gameObject;
             }
-
             return null;
         }
 
-        private static GameObject ResolveMiscObjectEntrySync(MiscObjectTableEntry miscObjEntry, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
+        private static GameObject ResolveRoomEventTriggerEntrySync(RoomEventTriggerTableEntry eventTriggerEntry, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
         {
             if (!Application.isPlaying)
             {
-                return sceneResourceProvider.GetInstanceSync(miscObjEntry.GameObjectKey);
+                return sceneResourceProvider.GetInstanceSync(eventTriggerEntry.GameObjectKey);
             }
-            
-            switch (miscObjEntry.ObjectType)
+            switch (eventTriggerEntry.TriggerType)
             {
-                case MiscObjectType.PlayerSpawnPoint :
+                case RoomEventTriggerType.PlayerSpawnPoint:
                     return playerFactory.GetPlayerSync().gameObject;
-                case MiscObjectType.RandomEnemySpawn :
+                case RoomEventTriggerType.RandomEnemySpawn:
                     return enemyFactory.GetRandomEnemySync().gameObject;
             }
-
             return null;
         }
 

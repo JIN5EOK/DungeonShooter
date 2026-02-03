@@ -1,10 +1,10 @@
 namespace DungeonShooter
 {
     /// <summary>
-    /// 기타 오브젝트(방 특수 오브젝트) 타입.
-    /// MiscObjectTableEntry.ObjectType에 사용됩니다.
+    /// 방 이벤트 트리거(특정 위치에 배치되는 이벤트 트리거) 타입.
+    /// RoomEventTriggerTableEntry.ObjectType에 사용됩니다.
     /// </summary>
-    public enum MiscObjectType
+    public enum RoomEventTriggerType
     {
         /// <summary>플레이어 스폰 포인트 (종류는 런타임에 지정)</summary>
         PlayerSpawnPoint = 0,

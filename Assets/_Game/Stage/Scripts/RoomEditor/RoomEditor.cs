@@ -254,7 +254,7 @@ namespace DungeonShooter
         /// <summary>
         /// 선택한 테이블 ID로 오브젝트를 지정 위치에 배치합니다. (에디터 전용)
         /// </summary>
-        /// <param name="tableId">MiscObjectTableEntry, EnemyConfigTableEntry 또는 PlayerConfigTableEntry ID</param>
+        /// <param name="tableId">RoomEventTriggerTableEntry, EnemyConfigTableEntry 또는 PlayerConfigTableEntry ID</param>
         /// <param name="worldPosition">월드 위치 (Z는 0으로 사용)</param>
         /// <returns>생성된 인스턴스, 실패 시 null</returns>
         public GameObject PlaceObjectAt(int tableId, Vector3 worldPosition)
@@ -278,9 +278,9 @@ namespace DungeonShooter
             }
 
             string address = null;
-            if (entry is MiscObjectTableEntry miscObjEntry)
+            if (entry is RoomEventTriggerTableEntry eventTriggerEntry)
             {
-                address = miscObjEntry.GameObjectKey;
+                address = eventTriggerEntry.GameObjectKey;
             }
             else if (entry is EnemyConfigTableEntry enemyConfig)
             {
@@ -302,7 +302,7 @@ namespace DungeonShooter
             }
             else
             {
-                instance = new GameObject($"[MiscObject] ID:{tableId}");
+                instance = new GameObject($"[EventTrigger] ID:{tableId}");
             }
 
             var marker = instance.AddOrGetComponent<RoomObjectMarker>();

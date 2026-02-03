@@ -1,4 +1,0 @@
-Memo,Id,Name,ObjectType,GameObjectKey
-플레이어 스폰 포인트 (종류는 런타임 지정),10000001,PlayerSpawn,PlayerSpawnPoint,PlayerSpawnPoint
-적 랜덤 스폰 포인트,10000002,RandomEnemySpawn,RandomEnemySpawn,RandomEnemySpawn
-,,,,

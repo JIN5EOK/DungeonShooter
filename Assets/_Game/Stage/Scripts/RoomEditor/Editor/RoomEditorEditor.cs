@@ -46,10 +46,10 @@ namespace DungeonShooter
             _placeableIds.Clear();
             _placeableNames.Clear();
             var repo = roomEditor.GetOrCreateTableRepository();
-            foreach (var entry in repo.GetAllTableEntries<MiscObjectTableEntry>())
+            foreach (var entry in repo.GetAllTableEntries<RoomEventTriggerTableEntry>())
             {
                 _placeableIds.Add(entry.Id);
-                _placeableNames.Add($"[기타] {entry.Name} (ID:{entry.Id})");
+                _placeableNames.Add($"[이벤트트리거] {entry.Name} (ID:{entry.Id})");
             }
             foreach (var entry in repo.GetAllTableEntries<EnemyConfigTableEntry>())
             {

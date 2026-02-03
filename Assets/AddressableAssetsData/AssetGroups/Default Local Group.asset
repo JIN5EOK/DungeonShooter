@@ -155,7 +155,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: eb0f1b106225440efbda60fbb2c505c2
-    m_Address: MiscObjectTable
+    m_Address: RoomEventTriggerTable
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
