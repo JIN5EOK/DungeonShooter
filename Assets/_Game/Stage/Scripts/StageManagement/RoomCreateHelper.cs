@@ -345,9 +345,15 @@ namespace DungeonShooter
         {
             if (!Application.isPlaying)
             {
-                return await sceneResourceProvider.GetInstanceAsync(eventTriggerEntry.GameObjectKey);
+                var go = new GameObject($"[EventTrigger] {eventTriggerEntry.Name} (ID:{eventTriggerEntry.Id})");
+                var marker = go.AddComponent<RoomObjectMarker>();
+                marker.TableId = eventTriggerEntry.Id;
+                return go;
             }
-            switch (eventTriggerEntry.TriggerType)
+            if (!System.Enum.IsDefined(typeof(RoomEventTriggerType), eventTriggerEntry.Id))
+                return null;
+            var triggerType = (RoomEventTriggerType)eventTriggerEntry.Id;
+            switch (triggerType)
             {
                 case RoomEventTriggerType.PlayerSpawnPoint:
                     return (await playerFactory.GetPlayerAsync()).gameObject;
@@ -361,9 +367,15 @@ namespace DungeonShooter
         {
             if (!Application.isPlaying)
             {
-                return sceneResourceProvider.GetInstanceSync(eventTriggerEntry.GameObjectKey);
+                var go = new GameObject($"[EventTrigger] {eventTriggerEntry.Name} (ID:{eventTriggerEntry.Id})");
+                var marker = go.AddComponent<RoomObjectMarker>();
+                marker.TableId = eventTriggerEntry.Id;
+                return go;
             }
-            switch (eventTriggerEntry.TriggerType)
+            if (!System.Enum.IsDefined(typeof(RoomEventTriggerType), eventTriggerEntry.Id))
+                return null;
+            var triggerType = (RoomEventTriggerType)eventTriggerEntry.Id;
+            switch (triggerType)
             {
                 case RoomEventTriggerType.PlayerSpawnPoint:
                     return playerFactory.GetPlayerSync().gameObject;

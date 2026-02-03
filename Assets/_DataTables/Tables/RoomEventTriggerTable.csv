@@ -1,3 +1,3 @@
-Memo,Id,Name,TriggerType,GameObjectKey
-플레이어 스폰 포인트 (어떤 플레이어 캐릭터를 쓸지는 런타임에 지정),10000001,PlayerSpawn,PlayerSpawnPoint,PlayerSpawnPoint
-지정 위치에 적 랜덤 스폰,10000002,RandomEnemySpawn,RandomEnemySpawn,RandomEnemySpawn
+Memo,Id,Name
+플레이어 스폰 포인트 (어떤 플레이어 캐릭터를 쓸지는 런타임에 지정),10000001,PlayerSpawnPoint
+지정 위치에 적 랜덤 스폰,10000002,RandomEnemySpawnPoint

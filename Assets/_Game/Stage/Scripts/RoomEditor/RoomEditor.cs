@@ -277,32 +277,26 @@ namespace DungeonShooter
                 return null;
             }
 
-            string address = null;
+            GameObject instance;
             if (entry is RoomEventTriggerTableEntry eventTriggerEntry)
             {
-                address = eventTriggerEntry.GameObjectKey;
+                instance = new GameObject($"[EventTrigger] {eventTriggerEntry.Name} (ID:{tableId})");
             }
-            else if (entry is EnemyConfigTableEntry enemyConfig)
+            else
             {
-                address = enemyConfig.GameObjectKey;
-            }
-            else if (entry is PlayerConfigTableEntry playerConfig)
-            {
-                address = playerConfig.GameObjectKey;
-            }
-
-            GameObject instance;
-            if (!string.IsNullOrEmpty(address))
-            {
+                var address = entry is EnemyConfigTableEntry eConfig ? eConfig.GameObjectKey
+                    : entry is PlayerConfigTableEntry pConfig ? pConfig.GameObjectKey
+                    : null;
+                
+                if (string.IsNullOrEmpty(address))
+                {
+                    return null;
+                }
                 instance = _resourceProvider.GetInstanceSync(address);
                 if (instance == null)
                 {
                     return null;
                 }
-            }
-            else
-            {
-                instance = new GameObject($"[EventTrigger] ID:{tableId}");
             }
 
             var marker = instance.AddOrGetComponent<RoomObjectMarker>();
