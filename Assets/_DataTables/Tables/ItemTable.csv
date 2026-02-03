@@ -1,2 +1,2 @@
-Id,ItemName,ItemDescription,ItemType,MaxStackCount,UseSkillId,PassiveSkillId,EquipSkillId,ActiveSkillId,ItemIcon,HpAdd,HpMultiply,AttackAdd,AttackMultiply,DefenseAdd,DefenseMultiply,MoveSpeedAdd,MoveSpeedMultiply
-15000001,롱소드,평범한 철제 장검입니다.,Weapon,1,,,,14000200,item_icon,0,100,10,100,0,100,0,100
+Memo,Id,ItemName,ItemDescription,ItemType,MaxStackCount,UseSkillId,PassiveSkillId,EquipSkillId,ActiveSkillId,ItemIcon,HpAdd,HpMultiply,AttackAdd,AttackMultiply,DefenseAdd,DefenseMultiply,MoveSpeedAdd,MoveSpeedMultiply
+,15000001,롱소드,평범한 철제 장검입니다.,Weapon,1,,,,14000200,item_icon,0,100,10,100,0,100,0,100

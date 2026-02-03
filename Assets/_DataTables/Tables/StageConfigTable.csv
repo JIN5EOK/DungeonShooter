@@ -1,2 +1,2 @@
-Id,Name,GroundTileKey,StageEnemiesLabel,StartRoomsLabel,NormalRoomsLabel,BossRoomsLabel
-13000001,스테이지 1,Tile_Ground_001,Stage001_Enemy,Stage001_StartRoom,Stage001_NormalRoom,Stage001_NormalRoom
+Memo,Id,Name,GroundTileKey,StageEnemiesLabel,StartRoomsLabel,NormalRoomsLabel,BossRoomsLabel
+,13000001,스테이지 1,Tile_Ground_001,Stage001_Enemy,Stage001_StartRoom,Stage001_NormalRoom,Stage001_NormalRoom

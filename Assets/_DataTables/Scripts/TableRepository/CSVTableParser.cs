@@ -12,6 +12,11 @@ namespace DungeonShooter
     public static class CSVTableParser
     {
         /// <summary>
+        /// 파싱에서 제외되는 메모 열의 헤더 이름. 첫 번째 열이 이 이름이면 실제 파싱 대상에서 제외됩니다.
+        /// </summary>
+        private const string MemoColumnName = "Memo";
+
+        /// <summary>
         /// CSV TextAsset을 파싱하여 테이블 엔트리 리스트로 변환합니다.
         /// </summary>
         /// <typeparam name="T">테이블 엔트리 타입</typeparam>
@@ -35,6 +40,12 @@ namespace DungeonShooter
             var headerLine = lines[0];
             var headers = headerLine.Split(',').Select(h => h.Trim()).ToArray();
 
+            var parseHeaders = headers;
+            if (headers.Length > 0 && string.Equals(headers[0], MemoColumnName, StringComparison.Ordinal))
+            {
+                parseHeaders = headers.Skip(1).ToArray();
+            }
+
             var entries = new List<T>();
 
             for (int i = 1; i < lines.Length; i++)
@@ -49,9 +60,15 @@ namespace DungeonShooter
                     continue;
                 }
 
+                var parseValues = values;
+                if (parseHeaders.Length < headers.Length)
+                {
+                    parseValues = values.Skip(1).ToArray();
+                }
+
                 try
                 {
-                    var entry = ParseLine<T>(headers, values);
+                    var entry = ParseLine<T>(parseHeaders, parseValues);
                     if (entry != null)
                         entries.Add(entry);
                 }
