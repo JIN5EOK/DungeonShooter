@@ -5,6 +5,7 @@ using Jin5eok;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.U2D;
 using Object = UnityEngine.Object;
 
 namespace DungeonShooter
@@ -38,6 +39,26 @@ namespace DungeonShooter
             }
 
             return handle.Result;
+        }
+
+        /// <summary>
+        /// 주소에 해당하는 에셋을 동기적으로 가져옵니다. T가 Sprite이고 atlasAddress가 비어있지 않으면 해당 아틀라스에서 스프라이트를 반환합니다.
+        /// </summary>
+        public T GetAssetSync<T>(string address, string atlasAddress) where T : Object
+        {
+            if (typeof(T) == typeof(Sprite) && !string.IsNullOrEmpty(atlasAddress))
+            {
+                var atlasHandle = _addressablesScope.LoadAssetAsync<SpriteAtlas>(atlasAddress);
+                atlasHandle.WaitForCompletion();
+                if (atlasHandle.Status == AsyncOperationStatus.Succeeded && atlasHandle.Result != null)
+                {
+                    var sprite = atlasHandle.Result.GetSprite(address);
+                    if (sprite != null)
+                        return (T)(Object)sprite;
+                }
+            }
+
+            return GetAssetSync<T>(address);
         }
 
         /// <summary>
@@ -75,6 +96,7 @@ namespace DungeonShooter
         
         public UniTask<GameObject> GetInstanceAsync(string address) => throw new NotImplementedException();
         public UniTask<T> GetAssetAsync<T>(string address) where T : Object => throw new NotImplementedException();
+        public UniTask<T> GetAssetAsync<T>(string address, string atlasAddress) where T : Object => throw new NotImplementedException();
         public T AddOrGetComponentWithInejct<T>(GameObject go) where T : Component => throw new NotImplementedException();
         public T AddComponentWithInejct<T>(GameObject go) where T : Component => throw new NotImplementedException();
     }

@@ -68,7 +68,7 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 주소에 해당하는 에셋을 가져옵니다.
+        /// 주소에 해당하는 에셋을 가져옵니다. T가 Sprite일 경우 주소를 스프라이트 단일 에셋 주소로 직접 로드합니다.
         /// </summary>
         public async UniTask<T> GetAssetAsync<T>(string address) where T : Object
         {
@@ -79,6 +79,20 @@ namespace DungeonShooter
         }
 
         /// <summary>
+        /// 주소에 해당하는 에셋을 가져옵니다. T가 Sprite이고 atlasAddress가 비어있지 않으면 해당 아틀라스에서 스프라이트를 반환하고, 아니면 주소로 직접 로드합니다.
+        /// </summary>
+        public async UniTask<T> GetAssetAsync<T>(string address, string atlasAddress) where T : Object
+        {
+            if (typeof(T) == typeof(Sprite) && !string.IsNullOrEmpty(atlasAddress))
+            {
+                var sprite = await GetSpriteFromAtlasAsync(address, atlasAddress);
+                return sprite != null ? (T)(Object)sprite : null;
+            }
+
+            return await GetAssetAsync<T>(address);
+        }
+
+        /// <summary>
         /// 주소에 해당하는 에셋을 동기적으로 가져옵니다.
         /// </summary>
         public T GetAssetSync<T>(string address) where T : Object
@@ -86,6 +100,20 @@ namespace DungeonShooter
             var handle = _addressablesScope.LoadAssetAsync<T>(address);
             handle.WaitForCompletion();
             return GetAssetInternal(handle, address);
+        }
+
+        /// <summary>
+        /// 주소에 해당하는 에셋을 동기적으로 가져옵니다. T가 Sprite이고 atlasAddress가 비어있지 않으면 해당 아틀라스에서 스프라이트를 반환하고, 아니면 주소로 직접 로드합니다.
+        /// </summary>
+        public T GetAssetSync<T>(string address, string atlasAddress) where T : Object
+        {
+            if (typeof(T) == typeof(Sprite) && !string.IsNullOrEmpty(atlasAddress))
+            {
+                var sprite = GetSpriteFromAtlasSync(address, atlasAddress);
+                return sprite != null ? (T)(Object)sprite : null;
+            }
+
+            return GetAssetSync<T>(address);
         }
 
         /// <summary>
@@ -135,6 +163,42 @@ namespace DungeonShooter
             _addressablesScope?.Dispose();
         }
         
+        /// <summary> 지정한 아틀라스 주소로 아틀라스를 로드한 뒤 해당 스프라이트 이름의 스프라이트를 반환합니다. </summary>
+        private async UniTask<Sprite> GetSpriteFromAtlasAsync(string spriteName, string atlasAddress)
+        {
+            await UniTask.SwitchToMainThread();
+            var handle = _addressablesScope.LoadAssetAsync<SpriteAtlas>(atlasAddress);
+            await handle.Task;
+            return GetSpriteFromAtlasInternal(handle, spriteName, atlasAddress);
+        }
+
+        /// <summary> 지정한 아틀라스 주소로 아틀라스를 로드한 뒤 해당 스프라이트 이름의 스프라이트를 동기 반환합니다. </summary>
+        private Sprite GetSpriteFromAtlasSync(string spriteName, string atlasAddress)
+        {
+            var handle = _addressablesScope.LoadAssetAsync<SpriteAtlas>(atlasAddress);
+            handle.WaitForCompletion();
+            return GetSpriteFromAtlasInternal(handle, spriteName, atlasAddress);
+        }
+
+        private Sprite GetSpriteFromAtlasInternal(AsyncOperationHandle<SpriteAtlas> handle, string spriteName, string atlasAddress)
+        {
+            if (handle.Status != AsyncOperationStatus.Succeeded || handle.Result == null)
+            {
+                Debug.LogWarning($"[{nameof(SceneResourceProvider)}] 스프라이트 아틀라스 로드 실패: {atlasAddress}");
+                return null;
+            }
+
+            var sprite = handle.Result.GetSprite(spriteName);
+            if (sprite == null)
+            {
+                Debug.LogWarning($"[{nameof(SceneResourceProvider)}] 아틀라스 내 스프라이트를 찾을 수 없음: {spriteName}");
+                return null;
+            }
+
+            _resolver?.Inject(sprite);
+            return sprite;
+        }
+
         /// <summary> 스프라이트 아틀라스 요청 이벤트 /// </summary>
         private void OnAtlasRequested(string tag, System.Action<SpriteAtlas> action)
         {

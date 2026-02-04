@@ -78,8 +78,8 @@ namespace DungeonShooter
 
             _skill1CooldownUI.SetMaxCooldown(skill1.MaxCooldown);
             _skill2CooldownUI.SetMaxCooldown(skill2.MaxCooldown);
-            _skill1CooldownUI.SetSkillIcon(await _sceneResourceProvider.GetAssetAsync<Sprite>(skill1.SkillTableEntry.SkillIconKey));
-            _skill2CooldownUI.SetSkillIcon(await _sceneResourceProvider.GetAssetAsync<Sprite>(skill2.SkillTableEntry.SkillIconKey));
+            _skill1CooldownUI.SetSkillIcon(skill1.Icon);
+            _skill2CooldownUI.SetSkillIcon(skill2.Icon);
             skill1.OnCooldownChanged += _skill1CooldownUI.SetCooldown;
             skill2.OnCooldownChanged += _skill2CooldownUI.SetCooldown;
             

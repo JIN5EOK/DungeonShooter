@@ -12,10 +12,12 @@ namespace DungeonShooter
     {
         private readonly SkillData _skillData;
         private readonly SkillTableEntry _skillTableEntry;
+        private readonly Sprite _icon;
         private CancellationTokenSource _cooldownCancellationTokenSource;
-        
+
         public SkillData SkillData => _skillData;
         public SkillTableEntry SkillTableEntry => _skillTableEntry;
+        public Sprite Icon => _icon;
         public bool IsCooldown { get; private set; }
         public float Cooldown { get; private set; }
         public float MaxCooldown => _skillTableEntry.Cooldown;
@@ -23,7 +25,7 @@ namespace DungeonShooter
         public Action<float> OnCooldownChanged { get; set; }
         public Action OnCooldownEnded { get; set; }
         
-        public Skill(SkillTableEntry skillTableEntry, SkillData skillData)
+        public Skill(SkillTableEntry skillTableEntry, SkillData skillData, Sprite icon)
         {
             if (skillTableEntry == null)
             {
@@ -36,9 +38,10 @@ namespace DungeonShooter
                 LogHandler.LogError<Skill>("SkillData가 null입니다.");
                 return;
             }
-            
+
             _skillTableEntry = skillTableEntry;
             _skillData = skillData;
+            _icon = icon;
             Cooldown = 0f;
             IsCooldown = false;
         }

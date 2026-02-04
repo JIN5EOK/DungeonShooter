@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 using VContainer;
 
 namespace DungeonShooter
@@ -61,8 +62,11 @@ namespace DungeonShooter
                     return null;
                 }
 
+                // 스킬 아이콘 로드
+                Sprite icon = await _resourceProvider.GetAssetAsync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
+
                 // Skill 인스턴스 생성
-                return new Skill(skillTableEntry, skillData);
+                return new Skill(skillTableEntry, skillData, icon);
             }
             catch (Exception ex)
             {
