@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.U2D;
 using VContainer;
 using VContainer.Unity;
 using Object = UnityEngine.Object;
@@ -15,14 +16,15 @@ namespace DungeonShooter
     {
         protected readonly AddressablesScope _addressablesScope;
         protected readonly IObjectResolver _resolver;
-        
+
         [Inject]
         public SceneResourceProvider(IObjectResolver resolver)
         {
             _addressablesScope = new AddressablesScope();
             _resolver = resolver;
+            SpriteAtlasManager.atlasRequested += OnAtlasRequested;
         }
-        
+
         /// <summary>
         /// 주소에 해당하는 인스턴스를 생성하고 의존성 주입
         /// </summary>
@@ -129,7 +131,22 @@ namespace DungeonShooter
 
         public void Dispose()
         {
+            SpriteAtlasManager.atlasRequested -= OnAtlasRequested;
             _addressablesScope?.Dispose();
+        }
+        
+        /// <summary> 스프라이트 아틀라스 요청 이벤트 /// </summary>
+        private void OnAtlasRequested(string tag, System.Action<SpriteAtlas> action)
+        {
+            LogHandler.Log<SceneResourceProvider>($"아틀라스 요청됨: {tag}");
+
+            _addressablesScope.LoadAssetAsync<SpriteAtlas>(tag).Completed += (handle) =>
+            {
+                if (handle.Status == AsyncOperationStatus.Succeeded)
+                {
+                    action(handle.Result);
+                }
+            };
         }
     }
 }
