@@ -11,7 +11,6 @@ namespace DungeonShooter
         private readonly int _id;
         private readonly RoomData _roomData;
         private Vector2Int _position;
-        private bool _isCleared;
         private Dictionary<Direction, int> _connections; // 방들간 연결 표현, Direction은 문이 위치하는 방향
 
         public int Id => _id;
@@ -22,12 +21,6 @@ namespace DungeonShooter
             set => _position = value;
         }
 
-        public bool IsCleared
-        {
-            get => _isCleared;
-            set => _isCleared = value;
-        }
-
         public Dictionary<Direction, int> Connections => _connections;
 
         public Room(int id, RoomData roomData, Vector2Int position)
@@ -35,7 +28,6 @@ namespace DungeonShooter
             _id = id;
             _roomData = roomData;
             _position = position;
-            _isCleared = false;
             _connections = new Dictionary<Direction, int>();
         }
 

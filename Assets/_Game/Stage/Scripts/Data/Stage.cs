@@ -92,8 +92,6 @@ namespace DungeonShooter
 
             // 새 Room 객체 생성 (기존 연결 정보 유지)
             var newRoom = new Room(roomId, newRoomData, oldRoom.Position);
-            newRoom.IsCleared = oldRoom.IsCleared;
-
             // 기존 연결 정보 복사
             foreach (var connection in oldRoom.Connections)
             {
