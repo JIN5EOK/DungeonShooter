@@ -78,6 +78,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5d47fcc59664c43ba8e7b74ba7ed2273
+    m_Address: DamageText
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5e0e56f83045f46b58153059772875e1
     m_Address: ItemTable
     m_ReadOnly: 0

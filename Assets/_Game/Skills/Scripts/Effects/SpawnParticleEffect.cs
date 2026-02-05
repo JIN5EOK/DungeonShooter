@@ -16,14 +16,9 @@ namespace DungeonShooter
         [SerializeField]
         private AssetReferenceGameObject _particlePrefab;
 
-        [Header("스킬 시전 위치")]
+        [Header("이펙트 소환 위치")]
         [SerializeField]
         private SkillOwner _spawnPosition;
-
-        [Header("재생 후 자동 파괴 시간 (초, 0이면 자동 파괴 안 함)")]
-        [SerializeField]
-        [Min(0f)]
-        private float _destroyAfterSeconds;
 
         private string ParticlePrefabAddress => _particlePrefab.AssetGUID.ToString();
 
@@ -49,11 +44,6 @@ namespace DungeonShooter
                 if (particleSystem != null)
                 {
                     particleSystem.Play();
-                }
-
-                if (_destroyAfterSeconds > 0f)
-                {
-                    Object.Destroy(obj, _destroyAfterSeconds);
                 }
 
                 return true;
