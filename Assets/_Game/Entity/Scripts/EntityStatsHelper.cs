@@ -8,7 +8,7 @@ namespace DungeonShooter
         {
             float percentFloat = (float)percentInt / 100;
             var percentDamage = (int)(casterAttack * percentFloat);
-            var finalDamage = (int)(Mathf.Max(0, percentDamage - targetDefense) * Random.Range(0.8f, 1.0f));
+            var finalDamage = (int)(Mathf.Max(0, percentDamage - targetDefense) * Random.Range(damageRandomRatioFrom, 1.0f));
             return finalDamage;
         }
     }

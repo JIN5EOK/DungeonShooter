@@ -39,35 +39,44 @@ namespace DungeonShooter
                 return false;
             }
 
-            if (!context.LastHitTarget.TryGetComponent(out HealthComponent health))
+            var targetEntity = executeTarget == SkillOwner.Caster ? context.Caster : context.LastHitTarget;
+
+            if (targetEntity == null)
             {
-                LogHandler.LogError<DamageEffect>("데미지 주기 실패");
+                LogHandler.LogWarning<DamageEffect>("데미지 적용 대상이 없습니다.");
                 return false;
             }
-
-            var finalDamage =
-                EntityStatsHelper.CalculatePercentDamage(context.Caster.StatsComponent.GetStat(StatType.Attack)
-                    , context.LastHitTarget.StatsComponent.GetStat(StatType.Defense)
-                    , skillDamagePercent);
-
-            health.TakeDamage(finalDamage);
-
-            if (_resourceProvider != null)
+            
+            if (targetEntity.TryGetComponent(out HealthComponent health))
             {
-                var damageTextGo = await _resourceProvider.GetInstanceAsync(DamageTextAddress);
-                if (damageTextGo != null)
+                var finalDamage =
+                    EntityStatsHelper.CalculatePercentDamage(context.Caster.StatsComponent.GetStat(StatType.Attack)
+                        , context.LastHitTarget.StatsComponent.GetStat(StatType.Defense)
+                        , skillDamagePercent);
+
+                health.TakeDamage(finalDamage);
+                
+                if (_resourceProvider != null)
                 {
-                    var hitPosition = context.LastHitTarget.transform.position;
-                    damageTextGo.transform.position = hitPosition + (Vector3)(UnityEngine.Random.insideUnitCircle * 0.5f) + Vector3.up;
-                    var tmpText = damageTextGo.GetComponentInChildren<TMP_Text>(true);
-                    if (tmpText != null)
+                    // 추후 로직 최적화 필요
+                    var damageTextGo = await _resourceProvider.GetInstanceAsync(DamageTextAddress);
+                    if (damageTextGo != null)
                     {
-                        tmpText.text = finalDamage.ToString();
+                        var hitPosition = context.LastHitTarget.transform.position;
+                        damageTextGo.transform.position = hitPosition + (Vector3)(UnityEngine.Random.insideUnitCircle * 0.5f) + Vector3.up;
+                        var tmpText = damageTextGo.GetComponentInChildren<TMP_Text>(true);
+                        if (tmpText != null)
+                        {
+                            tmpText.text = finalDamage.ToString();
+                        }
                     }
                 }
-            }
 
-            return true;
+                return true;
+            }
+            
+            LogHandler.LogError<DamageEffect>("데미지 주기 실패");
+            return false;
         }
     }
 }

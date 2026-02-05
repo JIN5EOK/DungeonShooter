@@ -41,7 +41,7 @@ MonoBehaviour:
     - rid: 7692257720340054266
       type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}
       data:
-        executeTarget: 0
+        executeTarget: 1
         damagePercent: 1
     - rid: 7692257720340054271
       type: {class: PlaySoundEffect, ns: DungeonShooter, asm: Assembly-CSharp}
