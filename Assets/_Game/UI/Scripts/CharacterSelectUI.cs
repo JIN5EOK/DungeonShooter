@@ -59,7 +59,7 @@ namespace DungeonShooter
         public event Action OnGameStartRequested;
 
         [Inject]
-        public void Initialize(ITableRepository tableRepository, ISceneResourceProvider resourceProvider)
+        public void Construct(ITableRepository tableRepository, ISceneResourceProvider resourceProvider)
         {
             _tableRepository = tableRepository;
             _resourceProvider = resourceProvider;

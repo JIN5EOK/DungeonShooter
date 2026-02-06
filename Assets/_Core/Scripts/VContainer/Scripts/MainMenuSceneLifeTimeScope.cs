@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -11,8 +12,7 @@ namespace DungeonShooter
     {
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.Register<SceneResourceProvider>(Lifetime.Scoped).AsImplementedInterfaces();
-            base.Configure(builder);
+            new CommonSceneInstaller().Install(builder);
         }
     }
 }

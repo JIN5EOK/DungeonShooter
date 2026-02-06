@@ -10,21 +10,16 @@ public class MainMenuSceneInitializer : MonoBehaviour
     
     private UIManager _uiManager;
     private GameStartUI _gameStartUI;
-    private ITableRepository _tableRepository;
-    private ISceneResourceProvider _sceneResourceProvider;
 
     [Inject]
-    public void Construct(UIManager uiManager, ITableRepository repository, ISceneResourceProvider resourceProvider)
+    public void Construct(UIManager uiManager)
     {
         _uiManager = uiManager;
-        _tableRepository = repository;
-        _sceneResourceProvider = resourceProvider;
     }
 
     public async UniTaskVoid Start()
     {
         _gameStartUI = await _uiManager.CreateUIAsync<GameStartUI>(GameStartUIAddress);
-        _gameStartUI.Initialize(_tableRepository, _sceneResourceProvider);
         _gameStartUI.OnGameStartRequested += HandleGameStartRequested;
     }
 

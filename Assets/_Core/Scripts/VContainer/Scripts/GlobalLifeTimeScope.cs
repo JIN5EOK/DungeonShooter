@@ -11,16 +11,14 @@ namespace DungeonShooter
     {
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterComponentOnNewGameObject<UIManager>(Lifetime.Singleton).DontDestroyOnLoad();
+            base.Configure(builder);
             builder.Register<InputManager>(Lifetime.Singleton);
             builder.Register<LocalTableRepository>(Lifetime.Singleton).AsImplementedInterfaces();
-            base.Configure(builder);
         }
-        
+
         protected override void Awake()
         {
             base.Awake();
-            Container.Resolve<UIManager>();
             DontDestroyOnLoad(gameObject);
         }
     }

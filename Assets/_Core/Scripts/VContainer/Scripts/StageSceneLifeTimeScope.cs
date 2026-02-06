@@ -11,9 +11,9 @@ namespace DungeonShooter
     {
         protected override void Configure(IContainerBuilder builder)
         {
+            new CommonSceneInstaller().Install(builder);
             builder.Register<CoinInventory>(Lifetime.Scoped);
             builder.Register<Inventory>(Lifetime.Scoped);
-            builder.Register<SceneResourceProvider>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<PlayerFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<EnemyFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<RoomDataRepository>(Lifetime.Scoped).AsImplementedInterfaces();
@@ -28,6 +28,7 @@ namespace DungeonShooter
         protected override void Awake()
         {
             base.Awake();
+            Container.Resolve<UIManager>();
             Container.Resolve<GameManager>();
         }
     }

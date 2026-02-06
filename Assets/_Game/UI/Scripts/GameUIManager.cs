@@ -11,51 +11,41 @@ namespace DungeonShooter
         private readonly UICache<HealthBarHudUI> _healthBarCache = new();
         private readonly UICache<SkillCooldownHudUI> _skillCooldownHudCache = new();
         private readonly UICache<InventoryUI> _inventoryUICache = new();
-        IObjectResolver _objectResolver;
+        
         [Inject]
-        public void Construct(UIManager uiManager, IObjectResolver resolver)
+        public void Construct(UIManager uiManager)
         {
             _uiManager = uiManager;
-            _objectResolver = resolver;
         }
 
         public async UniTask<HealthBarHudUI> GetHealthBarUI() =>
-            await _healthBarCache.GetOrCreateAsync(_uiManager,_objectResolver,"UI_HpHud");
+            await _healthBarCache.GetOrCreateAsync(_uiManager,"UI_HpHud");
 
         public async UniTask<SkillCooldownHudUI> GetSkillCooldownHudUI() =>
-            await _skillCooldownHudCache.GetOrCreateAsync(_uiManager,_objectResolver, "UI_SkillCooldownHud");
+            await _skillCooldownHudCache.GetOrCreateAsync(_uiManager, "UI_SkillCooldownHud");
 
         public async UniTask<InventoryUI> GetInventoryUI() =>
-            await _inventoryUICache.GetOrCreateAsync(_uiManager, _objectResolver,"UI_Inventory");
+            await _inventoryUICache.GetOrCreateAsync(_uiManager, "UI_Inventory");
 
         private class UICache<T> : IDisposable where T : UIBase
         {
             private T _cached;
             private UniTask<T>? _task;
-            private UIManager _uiManager;
-            private IObjectResolver _resolver;
-            public async UniTask<T> GetOrCreateAsync(UIManager uiManager, IObjectResolver resolver, string addressableKey)
+            public async UniTask<T> GetOrCreateAsync(UIManager uiManager, string key)
             {
                 if (_cached != null)
                     return _cached;
                 if (_task.HasValue)
                     return await _task.Value;
 
-                _uiManager = uiManager;
-                _resolver = resolver;
-                _task = uiManager.CreateUIAsync<T>(addressableKey);
+                _task = uiManager.CreateUIAsync<T>(key);
                 _cached = await _task.Value;
-                resolver.InjectGameObject(_cached.gameObject);
                 _task = null;
                 return _cached;
             }
 
             public void Dispose()
             {
-                if (_cached != null)
-                {
-                    _uiManager?.RemoveUI(_cached);
-                }
                 // 일단은 생성된 UI만 파괴하도록 함, 나중에 취소토큰 등으로 캐시를 취소할 수 있도록 구현해야 할수도 있음
             }
         }

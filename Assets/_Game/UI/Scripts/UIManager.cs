@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using Jin5eok;
 using UnityEngine;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 using VContainer;
-using VContainer.Unity;
-using Object = UnityEngine.Object;
 
 namespace DungeonShooter
 {
@@ -19,12 +14,17 @@ namespace DungeonShooter
     {
         private readonly List<UIBase> _uiList = new();
         private Dictionary<UIType, Transform> _canvasByType;
-        private AddressablesScope _scope;
+        private ISceneResourceProvider _sceneResourceProvider;
         
-        public void Start()
+        [Inject]
+        public void Construct(ISceneResourceProvider sceneResourceProvider)
+        {
+            _sceneResourceProvider = sceneResourceProvider;
+        }
+        
+        public void Awake()
         {
             _canvasByType = CreateCanvasesByType();
-            _scope = new AddressablesScope();
         }
 
         /// <summary>
@@ -60,21 +60,12 @@ namespace DungeonShooter
         /// <returns>생성된 UI. 실패 시 null</returns>
         public async UniTask<T> CreateUIAsync<T>(string addressableKey) where T : UIBase
         {
-            var handle = _scope.InstantiateAsync(addressableKey);
-            await handle.Task;
-
-            if (handle.Status != AsyncOperationStatus.Succeeded)
-            {
-                LogHandler.LogError<UIManager>($"UI 생성 실패: {addressableKey}");
-                return null;
-            }
-
-            var instance = handle.Result;
+            var instance = await _sceneResourceProvider.GetInstanceAsync(addressableKey);
             var ui = instance.GetComponent<T>();
             if (ui == null)
             {
                 LogHandler.LogError<UIManager>($"프리팹에 UIBase가 없음: {addressableKey}");
-                Object.Destroy(instance);
+                Destroy(instance);
                 return null;
             }
             
@@ -117,11 +108,6 @@ namespace DungeonShooter
             if (uiBase == null)
                 return;
             uiBase.transform.SetSiblingIndex(Mathf.Clamp(order, 0, uiBase.transform.parent.childCount - 1));
-        }
-
-        private void OnDestroy()
-        {
-            _scope?.Dispose();   
         }
     }
 }
