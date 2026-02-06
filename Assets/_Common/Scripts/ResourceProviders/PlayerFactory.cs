@@ -11,10 +11,10 @@ namespace DungeonShooter
     public interface IPlayerFactory
     {
         public event Action<Player> OnPlayerCreated;
-        UniTask<Player> GetPlayerAsync();
-        Player GetPlayerSync();
-        UniTask<Player> GetPlayerByConfigIdAsync(int configId);
-        Player GetPlayerByConfigIdSync(int configId);
+        UniTask<Player> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        Player GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        UniTask<Player> GetPlayerByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        Player GetPlayerByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
     
     /// <summary>
@@ -41,12 +41,12 @@ namespace DungeonShooter
         /// <summary>
         /// 플레이어 캐릭터를 가져옵니다
         /// </summary>
-        public async UniTask<Player> GetPlayerAsync()
+        public async UniTask<Player> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             try
             {
                 var playerAddress = GetPlayerAddress();
-                var playerInstance = await _sceneResourceProvider.GetInstanceAsync(playerAddress);
+                var playerInstance = await _sceneResourceProvider.GetInstanceAsync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
                 return await InitializePlayerInstance(playerInstance);
             }
             catch (Exception e)
@@ -59,12 +59,12 @@ namespace DungeonShooter
         /// <summary>
         /// 플레이어 캐릭터를 동기적으로 가져옵니다.
         /// </summary>
-        public Player GetPlayerSync()
+        public Player GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             try
             {
                 var playerAddress = GetPlayerAddress();
-                var playerInstance = _sceneResourceProvider.GetInstanceSync(playerAddress);
+                var playerInstance = _sceneResourceProvider.GetInstanceSync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
                 return InitializePlayerInstance(playerInstance).GetAwaiter().GetResult();
             }
             catch (Exception e)
@@ -77,7 +77,7 @@ namespace DungeonShooter
         /// <summary>
         /// 지정한 PlayerConfigTableEntry ID로 플레이어를 비동기 생성합니다.
         /// </summary>
-        public async UniTask<Player> GetPlayerByConfigIdAsync(int configId)
+        public async UniTask<Player> GetPlayerByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(configId);
             if (config == null)
@@ -86,14 +86,14 @@ namespace DungeonShooter
                 return null;
             }
 
-            var playerInstance = await _sceneResourceProvider.GetInstanceAsync(config.GameObjectKey);
+            var playerInstance = await _sceneResourceProvider.GetInstanceAsync(config.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
             return await InitializePlayerInstanceWithConfig(playerInstance, config);
         }
 
         /// <summary>
         /// 지정한 PlayerConfigTableEntry ID로 플레이어를 동기 생성합니다.
         /// </summary>
-        public Player GetPlayerByConfigIdSync(int configId)
+        public Player GetPlayerByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(configId);
             if (config == null)
@@ -102,7 +102,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            var playerInstance = _sceneResourceProvider.GetInstanceSync(config.GameObjectKey);
+            var playerInstance = _sceneResourceProvider.GetInstanceSync(config.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
             return InitializePlayerInstanceWithConfig(playerInstance, config).GetAwaiter().GetResult();
         }
 
