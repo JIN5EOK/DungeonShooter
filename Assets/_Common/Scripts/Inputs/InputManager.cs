@@ -20,6 +20,7 @@ namespace DungeonShooter
         private readonly ButtonInputHandlerKeyCode _skill2InputHandler;
         private readonly ButtonInputHandlerKeyCode _skill3InputHandler;
         private readonly ButtonInputHandlerKeyCode _interactInputHandler;
+        private readonly ButtonInputHandlerKeyCode _escapeInputHandler;
 
         // 이벤트
         public event Action<Vector2> OnMoveInputChanged;
@@ -28,6 +29,7 @@ namespace DungeonShooter
         public event Action OnSkill1Pressed;
         public event Action OnSkill2Pressed;
         public event Action OnInteractPressed;
+        public event Action OnEscapePressed;
 
         // 현재 입력 값
         public Vector2 MoveInput => _moveInputHandler.Value;
@@ -36,6 +38,7 @@ namespace DungeonShooter
         public bool IsSkill1Pressed => _skill2InputHandler.Value;
         public bool IsSkill2Pressed => _skill3InputHandler.Value;
         public bool IsInteractPressed => _interactInputHandler.Value;
+        public bool IsEscapePressed => _escapeInputHandler.Value;
 
         public InputManager()
         {
@@ -62,6 +65,9 @@ namespace DungeonShooter
             // 상호작용 (E)
             _interactInputHandler = new ButtonInputHandlerKeyCode(KeyCode.E);
             _interactInputHandler.InputValueChanged += isPressed => { if (isPressed) OnInteractPressed?.Invoke(); };
+            
+            _escapeInputHandler = new ButtonInputHandlerKeyCode(KeyCode.Escape);
+            _escapeInputHandler.InputValueChanged += isPressed => { if(isPressed) OnEscapePressed?.Invoke();};
         }
 
         public void Dispose()
@@ -72,6 +78,7 @@ namespace DungeonShooter
             _skill2InputHandler?.Dispose();
             _skill3InputHandler?.Dispose();
             _interactInputHandler?.Dispose();
+            _escapeInputHandler?.Dispose();
         }
     }
 }

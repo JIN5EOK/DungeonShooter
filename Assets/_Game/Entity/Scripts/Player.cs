@@ -88,7 +88,7 @@ namespace DungeonShooter
             var weapon = await _itemFactory.CreateItemAsync(_playerConfigTableEntry.StartWeaponId);
             await _inventory.AddItem(weapon);
             await _inventory.EquipItem(weapon);
-            var weapon2 = await _itemFactory.CreateItemAsync(_playerConfigTableEntry.StartWeaponId);
+            var weapon2 = await _itemFactory.CreateItemAsync(15000002);
             await _inventory.AddItem(weapon2);
             _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
             _interactComponent = gameObject.AddOrGetComponent<InteractComponent>();
@@ -106,15 +106,6 @@ namespace DungeonShooter
             SubscribeInputEvent();
         }
 
-        private async UniTask Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                var a = await _uIManager.CreateUIAsync<InventoryUI>(UIAddresses.UI_Inventory, true);
-                a.Show();
-            }
-        }
-
         // ==================== 입력 매니저 이벤트 구독/해제 ====================
         /// <summary>
         /// 입력 매니저 이벤트를 구독합니다.
@@ -129,6 +120,7 @@ namespace DungeonShooter
             _inputManager.OnSkill2Pressed += HandleSkill2Input;
             _inputManager.OnInteractPressed += HandleInteractInput;
             _inputManager.OnDashPressed += HandleDashInput;
+            _inputManager.OnEscapePressed += HandleEscapeInput;
         }
 
         // ==================== 입력 처리 ====================
@@ -162,6 +154,19 @@ namespace DungeonShooter
             _interactComponent?.TryInteract();
         }
 
+        private async void HandleEscapeInput()
+        {
+            var inventoryUI = await _uIManager.CreateUIAsync<InventoryUI>(UIAddresses.UI_Inventory, true);
+            if (inventoryUI.gameObject.activeSelf)
+            {
+                inventoryUI.Hide();
+            }
+            else
+            {
+                inventoryUI.Show();
+            }
+        }
+        
         /// <summary>
         /// 사망 처리
         /// </summary>
@@ -232,6 +237,7 @@ namespace DungeonShooter
             _inputManager.OnSkill2Pressed -= HandleSkill2Input;
             _inputManager.OnDashPressed -= HandleDashInput;
             _inputManager.OnInteractPressed -= HandleInteractInput;
+            _inputManager.OnEscapePressed -= HandleEscapeInput;
         }
     }
 }
