@@ -21,26 +21,19 @@ namespace DungeonShooter
         private readonly HashSet<EntityBase> _appliedTargets = new HashSet<EntityBase>();
 
         public void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
-            SkillExecutionContext context, SkillOwner spawnPosition, int targetCount, float speed, float lifeTime,
+            SkillExecutionContext context, int targetCount, float speed, float lifeTime,
             bool rotateToCastDirection = false)
         {
-            base.Initialize(effects, skillTableEntry, context, spawnPosition);
+            base.Initialize(effects, skillTableEntry, context);
 
             _speed = speed;
             _lifeTime = lifeTime;
             _targetCount = targetCount;
-            _rotateToCastDirection = rotateToCastDirection;
 
             // TODO: 이동 전략에 대한 커스텀 기능 필요
             if (context.Caster != null && context.Caster.TryGetComponent(out MovementComponent movement))
             {
                 _direction = movement.LookDirection;
-            }
-
-            if (_rotateToCastDirection)
-            {
-                var angle = Mathf.Atan2(_direction.y, _direction.x) * Mathf.Rad2Deg;
-                transform.rotation = Quaternion.Euler(0f, 0f, angle);
             }
         }
 

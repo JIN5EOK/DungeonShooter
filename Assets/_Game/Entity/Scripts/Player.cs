@@ -112,7 +112,6 @@ namespace DungeonShooter
                 var a = await _uIManager.CreateUIAsync<InventoryUI>(UIAddresses.UI_Inventory, true);
                 a.Show();
             }
-            
         }
 
         // ==================== 입력 매니저 이벤트 구독/해제 ====================

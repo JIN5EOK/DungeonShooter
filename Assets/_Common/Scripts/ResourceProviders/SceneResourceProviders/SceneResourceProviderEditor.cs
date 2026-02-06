@@ -65,7 +65,7 @@ namespace DungeonShooter
         /// 주소에 해당하는 인스턴스를 동기적으로 생성합니다.
         /// 에디터에서는 프리팹 연결을 유지하기 위해 PrefabUtility.InstantiatePrefab을 사용합니다.
         /// </summary>
-        public GameObject GetInstanceSync(string address)
+        public GameObject GetInstanceSync(string address, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             // 에디터에서는 프리팹 에셋을 로드한 후 PrefabUtility로 인스턴스화
             var prefabHandle = _addressablesScope.LoadAssetAsync<GameObject>(address);
@@ -86,6 +86,10 @@ namespace DungeonShooter
 
             // PrefabUtility.InstantiatePrefab을 사용하여 프리팹 연결 유지
             var instance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+            instance.transform.position = position;
+            instance.transform.rotation = rotation;
+            instance.transform.SetParent(parent);
+            
             return instance;
         }
         
@@ -94,7 +98,7 @@ namespace DungeonShooter
             _addressablesScope?.Dispose();
         }
         
-        public UniTask<GameObject> GetInstanceAsync(string address) => throw new NotImplementedException();
+        public UniTask<GameObject> GetInstanceAsync(string address, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true) => throw new NotImplementedException();
         public UniTask<T> GetAssetAsync<T>(string address) where T : Object => throw new NotImplementedException();
         public UniTask<T> GetAssetAsync<T>(string address, string atlasAddress) where T : Object => throw new NotImplementedException();
         public T AddOrGetComponentWithInejct<T>(GameObject go) where T : Component => throw new NotImplementedException();

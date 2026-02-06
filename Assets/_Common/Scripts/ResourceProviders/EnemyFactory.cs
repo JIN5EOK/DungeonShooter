@@ -13,10 +13,10 @@ namespace DungeonShooter
     /// </summary>
     public interface IEnemyFactory
     {
-        UniTask<Enemy> GetRandomEnemyAsync();
-        Enemy GetRandomEnemySync();
-        UniTask<Enemy> GetEnemyByConfigIdAsync(int configId);
-        Enemy GetEnemyByConfigIdSync(int configId);
+        UniTask<Enemy> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        Enemy GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        UniTask<Enemy> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        Enemy GetEnemyByConfigIdSync(int configId,  Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
     
     /// <summary>
@@ -59,7 +59,7 @@ namespace DungeonShooter
         /// <summary>
         /// 스테이지에 맞는 랜덤 적을 가져옵니다.
         /// </summary>
-        public async UniTask<Enemy> GetRandomEnemyAsync()
+        public async UniTask<Enemy> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var enemyConfig = GetRandomEnemyTableConfig();
             if (enemyConfig == null)
@@ -67,14 +67,14 @@ namespace DungeonShooter
                 return null;
             }
 
-            var enemyInstance = await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey);
+            var enemyInstance = await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
             return GetEnemyFromInstance(enemyInstance, enemyConfig);
         }
 
         /// <summary>
         /// 스테이지에 맞는 랜덤 적을 동기적으로 가져옵니다.
         /// </summary>
-        public Enemy GetRandomEnemySync()
+        public Enemy GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var enemyConfig = GetRandomEnemyTableConfig();
             if (enemyConfig == null)
@@ -82,14 +82,14 @@ namespace DungeonShooter
                 return null;
             }
 
-            var enemyInstance = _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey);
+            var enemyInstance = _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey,  position, rotation, parent, instantiateInWorldSpace);
             return GetEnemyFromInstance(enemyInstance, enemyConfig);
         }
 
         /// <summary>
         /// 지정한 EnemyConfigTableEntry ID로 적을 비동기 생성합니다.
         /// </summary>
-        public async UniTask<Enemy> GetEnemyByConfigIdAsync(int configId)
+        public async UniTask<Enemy> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(configId);
             if (enemyConfig == null)
@@ -98,14 +98,14 @@ namespace DungeonShooter
                 return null;
             }
 
-            var enemyInstance = await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey);
+            var enemyInstance = await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey,  position, rotation, parent, instantiateInWorldSpace);
             return GetEnemyFromInstance(enemyInstance, enemyConfig);
         }
 
         /// <summary>
         /// 지정한 EnemyConfigTableEntry ID로 적을 동기 생성합니다.
         /// </summary>
-        public Enemy GetEnemyByConfigIdSync(int configId)
+        public Enemy GetEnemyByConfigIdSync(int configId,  Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
         {
             var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(configId);
             if (enemyConfig == null)
@@ -114,7 +114,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            var enemyInstance = _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey);
+            var enemyInstance = _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
             return GetEnemyFromInstance(enemyInstance, enemyConfig);
         }
 

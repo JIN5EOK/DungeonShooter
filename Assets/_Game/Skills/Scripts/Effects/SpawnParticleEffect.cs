@@ -33,12 +33,10 @@ namespace DungeonShooter
         {
             try
             {
-                var obj = await _resourceProvider.GetInstanceAsync(ParticlePrefabAddress);
-
                 var position = _spawnPosition == SkillOwner.LastHitTarget && context.LastHitTarget != null
                     ? context.LastHitTarget.transform.position
                     : context.Caster.transform.position;
-                obj.transform.position = position;
+                var obj = await _resourceProvider.GetInstanceAsync(ParticlePrefabAddress, position);
 
                 var particleSystem = obj.GetComponentInChildren<ParticleSystem>();
                 if (particleSystem != null)

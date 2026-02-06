@@ -21,9 +21,9 @@ namespace DungeonShooter
         /// <param name="duration">장판 지속시간 (초)</param>
         /// <param name="applyInterval">이펙트 적용 주기 (초)</param>
         public void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
-            SkillExecutionContext context, SkillOwner spawnPosition, float duration, float applyInterval)
+            SkillExecutionContext context, float duration, float applyInterval)
         {
-            base.Initialize(effects, skillTableEntry, context, spawnPosition);
+            base.Initialize(effects, skillTableEntry, context);
 
             _duration = duration;
             _applyInterval = Mathf.Max(0.01f, applyInterval);

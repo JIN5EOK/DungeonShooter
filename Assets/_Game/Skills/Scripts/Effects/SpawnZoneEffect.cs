@@ -55,10 +55,10 @@ namespace DungeonShooter
         {
             try
             {
-                var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress);
-
+                var position = _spawnPosition == SkillOwner.Caster ? context.Caster.transform.position : context.LastHitTarget.transform.position;
+                var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress,position);
                 var skillObj = obj.AddOrGetComponent<ZoneSkillObject>();
-                skillObj.Initialize(_effects, entry, context, _spawnPosition, _duration, _applyInterval);
+                skillObj.Initialize(_effects, entry, context, _duration, _applyInterval);
 
                 return true;
             }

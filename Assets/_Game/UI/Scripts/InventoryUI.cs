@@ -19,16 +19,11 @@ namespace DungeonShooter
         [SerializeField] private ItemInfoWindow _itemInfoPanel;
 
         private Inventory _inventory;
-        private ISceneResourceProvider _resourceProvider;
-        private ITableRepository _tableRepository;
-        
         private Dictionary<Item, InventorySlotUIElement> _slotsDict = new();
         
         [Inject]
-        public void Construct(ISceneResourceProvider resourceProvider, ITableRepository tableRepository, Inventory inventory)
+        public void Construct(Inventory inventory)
         {
-            _resourceProvider = resourceProvider;
-            _tableRepository = tableRepository;
             _inventory = inventory;
         }
 

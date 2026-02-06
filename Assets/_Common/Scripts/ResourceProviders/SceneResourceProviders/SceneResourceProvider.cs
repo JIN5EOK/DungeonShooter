@@ -28,10 +28,10 @@ namespace DungeonShooter
         /// <summary>
         /// 주소에 해당하는 인스턴스를 생성하고 의존성 주입
         /// </summary>
-        public async UniTask<GameObject> GetInstanceAsync(string address)
+        public async UniTask<GameObject> GetInstanceAsync(string address, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             await UniTask.SwitchToMainThread();
-            var handle = _addressablesScope.InstantiateAsync(address);
+            var handle = _addressablesScope.InstantiateAsync(address, position, rotation, parent, instantiateInWorldSpace);
             await handle.Task;
             return GetInstanceInternal(handle, address);
         }
@@ -39,9 +39,9 @@ namespace DungeonShooter
         /// <summary>
         /// 주소에 해당하는 인스턴스를 동기적으로 생성하고 의존성 주입
         /// </summary>
-        public GameObject GetInstanceSync(string address)
+        public GameObject GetInstanceSync(string address, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
-            var handle = _addressablesScope.InstantiateAsync(address);
+            var handle = _addressablesScope.InstantiateAsync(address, position,  rotation, parent, instantiateInWorldSpace);
             handle.WaitForCompletion();
             return GetInstanceInternal(handle, address);
         }

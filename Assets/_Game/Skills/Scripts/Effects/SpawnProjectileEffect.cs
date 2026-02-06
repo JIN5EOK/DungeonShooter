@@ -61,10 +61,23 @@ namespace DungeonShooter
         {
             try
             { 
-                var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress);
-
+                var position = _spawnPosition == SkillOwner.Caster ? context.Caster.transform.position : context.LastHitTarget.transform.position;
+                Quaternion rotation = Quaternion.identity;
+                if (_rotateToCastDirection)
+                {
+                    if (context.Caster.TryGetComponent(out MovementComponent moveComp))
+                    {
+                        var direction = moveComp.LookDirection;
+                        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                        rotation = Quaternion.Euler(0f, 0f, angle);    
+                    }
+                }
+                var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress, position, rotation);
                 var skillObj = obj.AddOrGetComponent<ProjectileSkillObject>();
-                skillObj.Initialize(_effects, entry, context, _spawnPosition, targetCount, speed, lifeTime, _rotateToCastDirection);
+                
+
+                
+                skillObj.Initialize(_effects, entry, context, targetCount, speed, lifeTime, _rotateToCastDirection);
 
                 return false;
             }
