@@ -159,6 +159,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cca6752d4f664461da4b400edcc0613d
+    m_Address: UI_Inventory
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d0ae26362f1784485a904c67a3241bbc
     m_Address: ItemIconAtlas
     m_ReadOnly: 0

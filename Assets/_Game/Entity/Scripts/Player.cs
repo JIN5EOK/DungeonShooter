@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Cysharp.Threading.Tasks;
 using Jin5eok;
@@ -28,7 +29,7 @@ namespace DungeonShooter
         private SkillCooldownHudUI _skillCooldownHudUI;
         private SkillCooldownSlot _skill1CooldownUI;
         private SkillCooldownSlot _skill2CooldownUI;
-        
+
         private bool _isDead;
         
         [Inject]
@@ -101,8 +102,17 @@ namespace DungeonShooter
             _healthBarUI.SetHealth(_healthComponent.CurrentHealth, _healthComponent.MaxHealth);
             _healthComponent.OnHealthChanged += _healthBarUI.SetHealth;
             
-
             SubscribeInputEvent();
+        }
+
+        private async UniTask Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                var a = await _stageUIManager.GetInventoryUI();
+                a.Show();
+            }
+            
         }
 
         // ==================== 입력 매니저 이벤트 구독/해제 ====================
