@@ -88,7 +88,8 @@ namespace DungeonShooter
             var weapon = await _itemFactory.CreateItemAsync(_playerConfigTableEntry.StartWeaponId);
             await _inventory.AddItem(weapon);
             await _inventory.EquipItem(weapon);
-
+            var weapon2 = await _itemFactory.CreateItemAsync(_playerConfigTableEntry.StartWeaponId);
+            await _inventory.AddItem(weapon2);
             _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
             _interactComponent = gameObject.AddOrGetComponent<InteractComponent>();
             _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();

@@ -10,11 +10,10 @@ namespace DungeonShooter
     /// </summary>
     public class InventorySlotUIElement : MonoBehaviour
     {
-        [Header("표시")]
         [SerializeField] private Image _iconImage;
         [SerializeField] private TextMeshProUGUI _textStack;
-
-        [Header("버튼")]
+        [SerializeField] private GameObject _equipMark;
+        
         [SerializeField] private Button _button;
 
         private Item _boundItem;
@@ -31,6 +30,11 @@ namespace DungeonShooter
                 _button.onClick.AddListener(HandleClick);
         }
 
+        public void SetEquipped(bool equipped)
+        {
+            _equipMark.gameObject.SetActive(equipped);
+        }
+        
         /// <summary>
         /// 슬롯에 표시할 아이템을 설정합니다.
         /// </summary>
