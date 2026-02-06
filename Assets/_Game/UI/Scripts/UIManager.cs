@@ -13,6 +13,8 @@ namespace DungeonShooter
     public class UIManager : MonoBehaviour
     {
         private readonly List<UIBase> _uiList = new();
+        private readonly Dictionary<string, UIBase> _uniqueUICache = new();
+        private readonly Dictionary<string, UniTask<UIBase>> _loadingUniqueUI = new();
         private Dictionary<UIType, Transform> _canvasByType;
         private ISceneResourceProvider _sceneResourceProvider;
         
@@ -57,8 +59,38 @@ namespace DungeonShooter
         /// 어드레서블 키로 UI 프리팹을 로드해 해당 타입 캔버스에 생성한다.
         /// </summary>
         /// <param name="addressableKey">어드레서블 키</param>
+        /// <param name="isUnique">true면 싱글턴으로 로드. 이미 로드된 경우 캐시된 인스턴스를 반환한다.</param>
         /// <returns>생성된 UI. 실패 시 null</returns>
-        public async UniTask<T> CreateUIAsync<T>(string addressableKey) where T : UIBase
+        public async UniTask<T> CreateUIAsync<T>(string addressableKey, bool isUnique = false) where T : UIBase
+        {
+            if (isUnique)
+            {
+                if (_uniqueUICache.TryGetValue(addressableKey, out var cached) && cached != null)
+                    return (T)cached;
+                if (_loadingUniqueUI.TryGetValue(addressableKey, out var loadingTask))
+                    return (T)(await loadingTask);
+
+                var task = LoadAndRegisterUniqueUIAsync<T>(addressableKey);
+                _loadingUniqueUI[addressableKey] = task;
+                return (T)(await task);
+            }
+
+            return await LoadUIAsync<T>(addressableKey);
+        }
+
+        private async UniTask<UIBase> LoadAndRegisterUniqueUIAsync<T>(string addressableKey) where T : UIBase
+        {
+            var ui = await LoadUIAsync<T>(addressableKey);
+            if (ui != null)
+            {
+                _uniqueUICache[addressableKey] = ui;
+            }
+            _loadingUniqueUI.Remove(addressableKey);
+            ui.OnDestroyEvent += () => _uniqueUICache.Remove(addressableKey);
+            return ui;
+        }
+
+        private async UniTask<T> LoadUIAsync<T>(string addressableKey) where T : UIBase
         {
             var instance = await _sceneResourceProvider.GetInstanceAsync(addressableKey);
             var ui = instance.GetComponent<T>();
@@ -68,10 +100,9 @@ namespace DungeonShooter
                 Destroy(instance);
                 return null;
             }
-            
+
             var parent = _canvasByType[ui.Type];
             instance.transform.SetParent(parent, false);
-
             _uiList.Add(ui);
             return ui;
         }
@@ -83,11 +114,13 @@ namespace DungeonShooter
         {
             if (uiBase == null)
                 return false;
-                
+
             var removed = _uiList.Remove(uiBase);
             if (removed)
+            {
                 uiBase.Destroy();
-            return true;
+            }
+            return removed;
         }
 
         /// <summary>

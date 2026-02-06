@@ -16,7 +16,7 @@ namespace DungeonShooter
         private ISceneResourceProvider _sceneResourceProvider;
         private IItemFactory _itemFactory;
         private ITableRepository _tableRepository;
-        private StageUIManager _stageUIManager;
+        private UIManager _uIManager;
         
         private HealthComponent _healthComponent;
         private MovementComponent _movementComponent;
@@ -38,14 +38,14 @@ namespace DungeonShooter
             , ISceneResourceProvider sceneResourceProvider
             , IItemFactory itemFactory
             , ITableRepository tableRepository
-            , StageUIManager stageUIManager)
+            , UIManager uIManager)
         {
             _inputManager = inputManager;
             _inventory = inventory;
             _sceneResourceProvider = sceneResourceProvider;
             _itemFactory = itemFactory;
             _tableRepository = tableRepository;
-            _stageUIManager = stageUIManager;
+            _uIManager = uIManager;
         }
 
         public async UniTask Initialize(PlayerConfigTableEntry playerConfigTableEntry)
@@ -73,7 +73,7 @@ namespace DungeonShooter
             var skill1 = await _skillComponent.GetOrRegistSkill(_playerConfigTableEntry.Skill1Id);
             var skill2 = await _skillComponent.GetOrRegistSkill(_playerConfigTableEntry.Skill2Id);
 
-            _skillCooldownHudUI = await _stageUIManager.GetSkillCooldownHudUI();
+            _skillCooldownHudUI = await _uIManager.CreateUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud, true);
             _skill1CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
             _skill2CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
 
@@ -98,7 +98,7 @@ namespace DungeonShooter
             _healthComponent.FullHeal();
             _healthComponent.OnDeath += HandleDeath;
 
-            _healthBarUI = await _stageUIManager.GetHealthBarUI();
+            _healthBarUI = await _uIManager.CreateUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud, true);
             _healthBarUI.SetHealth(_healthComponent.CurrentHealth, _healthComponent.MaxHealth);
             _healthComponent.OnHealthChanged += _healthBarUI.SetHealth;
             
@@ -109,7 +109,7 @@ namespace DungeonShooter
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                var a = await _stageUIManager.GetInventoryUI();
+                var a = await _uIManager.CreateUIAsync<InventoryUI>(UIAddresses.UI_Inventory, true);
                 a.Show();
             }
             
