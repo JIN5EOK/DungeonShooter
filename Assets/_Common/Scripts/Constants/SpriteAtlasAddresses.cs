@@ -4,5 +4,6 @@ namespace DungeonShooter
     {
         public const string UIAtals = "UIAtals";
         public const string SkillIconAtlas = "SkillIconAtlas";
+        public const string ItemIconAtlas = "ItemIconAtlas";
     }
 }

@@ -14,12 +14,13 @@ namespace DungeonShooter
     {
         private readonly ITableRepository _tableRepository;
         private readonly ISkillFactory _skillFactory;
-
+        private readonly ISceneResourceProvider _resourceProvider;
         [Inject]
-        public ItemFactory(ITableRepository tableRepository, ISkillFactory skillFactory)
+        public ItemFactory(ITableRepository tableRepository, ISkillFactory skillFactory, ISceneResourceProvider sceneResourceProvider)
         {
             _tableRepository = tableRepository;
             _skillFactory = skillFactory;
+            _resourceProvider = sceneResourceProvider;
         }
 
         /// <summary>
@@ -43,8 +44,8 @@ namespace DungeonShooter
                 return null;
             }
 
-            var item = new Item(itemTableEntry, _skillFactory);
-            await item.InitializeSkillsAsync();
+            var item = new Item(itemTableEntry, _skillFactory, _resourceProvider);
+            await item.InitializeAsync();
             
             return item;
         }

@@ -1,0 +1,126 @@
+using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using VContainer;
+
+namespace DungeonShooter
+{
+    /// <summary>
+    /// 아이템 정보를 표시하는 팝업 윈도우 UI.
+    /// </summary>
+    public class ItemInfoWindow : MonoBehaviour
+    {
+        [Header("아이템 정보")]
+        [SerializeField] private Image _iconImage;
+        [SerializeField] private TextMeshProUGUI _textName;
+        [SerializeField] private TextMeshProUGUI _textDescription;
+        [SerializeField] private TextMeshProUGUI _textType;
+        [SerializeField] private TextMeshProUGUI _textStats;
+        
+        private ISceneResourceProvider _resourceProvider;
+        
+        [Inject]
+        public void Construct(ISceneResourceProvider resourceProvider)
+        {
+            _resourceProvider = resourceProvider;
+        }
+        
+        /// <summary>
+        /// 아이템 테이블 엔트리로 표시 내용을 설정합니다.
+        /// </summary>
+        public async UniTask SetEntry(ItemTableEntry entry)
+        {
+            if (entry == null)
+            {
+                LogHandler.LogError<ItemInfoWindow>("아이템 정보가 올바르지 않습니다.");
+                return;
+            }
+
+            SetItemInternal(entry);
+            _iconImage.sprite = await _resourceProvider.GetAssetAsync<Sprite>(entry.ItemIcon, SpriteAtlasAddresses.ItemIconAtlas);
+        }
+
+        /// <summary>
+        /// 아이템 인스턴스로 표시 내용을 설정합니다.
+        /// </summary>
+        public void SetItem(Item item)
+        {
+            if (item == null || item.ItemTableEntry == null)
+            {
+                LogHandler.LogError<ItemInfoWindow>("아이템 정보가 올바르지 않습니다.");
+                return;
+            }
+
+            SetItemInternal(item.ItemTableEntry);
+            _iconImage.sprite = item.Icon;
+        }
+
+        private void SetItemInternal(ItemTableEntry entry)
+        {
+            SetText(_textName, entry.ItemName);
+            SetText(_textDescription, entry.ItemDescription);
+            SetText(_textType, GetItemTypeString(entry.ItemType));
+            SetText(_textStats, BuildStatsString(entry));
+        }
+        
+        public void Clear()
+        {
+            SetText(_textName, string.Empty);
+            SetText(_textDescription, string.Empty);
+            SetText(_textType, string.Empty);
+            SetText(_textStats, string.Empty);
+            _iconImage.sprite = null;
+        }
+
+        private static void SetText(TextMeshProUGUI textUi, string value)
+        {
+            textUi.text = value ?? string.Empty;
+        }
+
+        private static string GetItemTypeString(ItemType type)
+        {
+            // TODO: 하드코딩된 텍스트 추후 분리 필요
+            return type switch
+            {
+                ItemType.Weapon => "무기",
+                ItemType.Passive => "패시브",
+                ItemType.Consume => "소비",
+                _ => type.ToString()
+            };
+        }
+
+        private static string BuildStatsString(ItemTableEntry entry)
+        {
+            // TODO: 하드코딩된 텍스트 추후 분리 필요
+            if (entry == null)
+                return string.Empty;
+
+            var parts = new List<string>();
+
+            if (entry.HpAdd != 0)
+                parts.Add($"체력 +{entry.HpAdd}");
+            if (entry.HpMultiply != 100)
+                parts.Add($"체력 {entry.HpMultiply}%");
+
+            if (entry.AttackAdd != 0)
+                parts.Add($"공격력 +{entry.AttackAdd}");
+            if (entry.AttackMultiply != 100)
+                parts.Add($"공격력 {entry.AttackMultiply}%");
+
+            if (entry.DefenseAdd != 0)
+                parts.Add($"방어력 +{entry.DefenseAdd}");
+            if (entry.DefenseMultiply != 100)
+                parts.Add($"방어력 {entry.DefenseMultiply}%");
+
+            if (entry.MoveSpeedAdd != 0)
+                parts.Add($"이동속도 +{entry.MoveSpeedAdd}");
+            if (entry.MoveSpeedMultiply != 100)
+                parts.Add($"이동속도 {entry.MoveSpeedMultiply}%");
+
+            return parts.Count > 0 ? string.Join("  ", parts) : string.Empty;
+        }
+    }
+}

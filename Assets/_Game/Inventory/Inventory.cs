@@ -76,9 +76,9 @@ namespace DungeonShooter
             {
                 // 새 아이템 추가 (이미 초기화되어 있다고 가정)
                 // 초기화되지 않은 경우를 대비해 확인
-                if (!item.IsSkillsInitialized())
+                if (!item.IsInitialized())
                 {
-                    await item.InitializeSkillsAsync();
+                    await item.InitializeAsync();
                 }
                 
                 _items.Add(item);

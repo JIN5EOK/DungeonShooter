@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 using VContainer;
 
 namespace DungeonShooter
@@ -10,36 +11,27 @@ namespace DungeonShooter
     [Serializable]
     public class Item
     {
-        /// <summary>
-        /// 아이템 테이블 엔트리
-        /// </summary>
+        /// <summary> 아이템 테이블 엔트리 </summary>
         public ItemTableEntry ItemTableEntry { get; private set; }
 
-        /// <summary>
-        /// 스택 개수
-        /// </summary>
+        /// <summary> 스택 개수 </summary>
         public int StackCount { get; set; }
 
         private readonly ISkillFactory _skillFactory;
+        private readonly ISceneResourceProvider _sceneResourceProvider;
 
-        /// <summary>
-        /// 소비 아이템 사용 스킬 (Consume 전용)
-        /// </summary>
+        //// <summary> 아이템 아이콘 </summary>
+        public Sprite Icon { get; private set; }
+        /// <summary> 소비 아이템 사용 스킬 (Consume 전용) </summary>
         public Skill UseSkill { get; private set; }
 
-        /// <summary>
-        /// 패시브 효과 스킬 (Passive 전용)
-        /// </summary>
+        /// <summary> 패시브 효과 스킬 (Passive 전용)</summary>
         public Skill PassiveSkill { get; private set; }
 
-        /// <summary>
-        /// 장착 효과 스킬 (Weapon 전용)
-        /// </summary>
+        /// <summary> 장착 효과 스킬 (Weapon 전용) </summary>
         public Skill EquipSkill { get; private set; }
 
-        /// <summary>
-        /// 액티브 효과 스킬 (Weapon 전용)
-        /// </summary>
+        /// <summary> 액티브 효과 스킬 (Weapon 전용) </summary>
         public Skill ActiveSkill { get; private set; }
 
         /// <summary>
@@ -48,7 +40,7 @@ namespace DungeonShooter
         /// <param name="itemTableEntry">아이템 테이블 엔트리</param>
         /// <param name="skillFactory">스킬 팩토리</param>
         [Inject]
-        public Item(ItemTableEntry itemTableEntry, ISkillFactory skillFactory)
+        public Item(ItemTableEntry itemTableEntry, ISkillFactory skillFactory, ISceneResourceProvider sceneResourceProvider)
         {
             if (itemTableEntry == null)
             {
@@ -59,6 +51,7 @@ namespace DungeonShooter
             ItemTableEntry = itemTableEntry;
             StackCount = 1;
             _skillFactory = skillFactory;
+            _sceneResourceProvider = sceneResourceProvider;
         }
 
         /// <summary>
@@ -85,18 +78,17 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 스킬이 초기화되었는지 확인합니다.
+        /// 아이템이 초기화되었는지 확인합니다.
         /// </summary>
-        public bool IsSkillsInitialized()
+        public bool IsInitialized()
         {
-            // 스킬이 하나라도 생성되어 있으면 초기화된 것으로 간주
-            return UseSkill != null || PassiveSkill != null || EquipSkill != null || ActiveSkill != null;
+            return Icon != null || UseSkill != null || PassiveSkill != null || EquipSkill != null || ActiveSkill != null;
         }
 
         /// <summary>
         /// ItemTableEntry를 참고하여 스킬을 초기화합니다.
         /// </summary>
-        public async UniTask InitializeSkillsAsync()
+        public async UniTask InitializeAsync()
         {
             if (ItemTableEntry == null || _skillFactory == null)
             {
@@ -105,7 +97,7 @@ namespace DungeonShooter
             }
 
             // 이미 초기화된 경우 스킵
-            if (IsSkillsInitialized())
+            if (IsInitialized())
             {
                 return;
             }
@@ -114,6 +106,7 @@ namespace DungeonShooter
 
             try
             {
+                Icon = await _sceneResourceProvider.GetAssetAsync<Sprite>(entry.ItemIcon, SpriteAtlasAddresses.ItemIconAtlas);
                 // UseSkill 생성 (Consume 전용)
                 if (entry.UseSkillId > 0)
                 {

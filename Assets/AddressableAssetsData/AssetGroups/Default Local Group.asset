@@ -159,6 +159,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d0ae26362f1784485a904c67a3241bbc
+    m_Address: ItemIconAtlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d23af51e837924ec79bc4ef9a6c0d300
     m_Address: SwordAttackSkillData
     m_ReadOnly: 0
