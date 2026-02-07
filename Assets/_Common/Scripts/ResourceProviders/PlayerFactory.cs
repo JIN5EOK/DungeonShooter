@@ -26,15 +26,19 @@ namespace DungeonShooter
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
+        private readonly PlayerManager _playerManager;
         private PlayerConfigTableEntry _playerConfigTableEntry;
+
         [Inject]
         public PlayerFactory(StageContext context
             , ISceneResourceProvider sceneResourceProvider
-            , ITableRepository tableRepository)
+            , ITableRepository tableRepository
+            , PlayerManager playerManager)
         {
             _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
             _tableRepository = tableRepository;
+            _playerManager = playerManager;
             _playerConfigTableEntry = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
         }
 
@@ -119,7 +123,8 @@ namespace DungeonShooter
 
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
             var player = _sceneResourceProvider.AddOrGetComponentWithInejct<Player>(playerInstance);
-            await player.Initialize(config);
+            await _playerManager.Initialize(config);
+            await _playerManager.BindPlayerEntity(player);
             OnPlayerCreated?.Invoke(player);
             return player;
         }
@@ -156,7 +161,8 @@ namespace DungeonShooter
             }
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
             var player = _sceneResourceProvider.AddOrGetComponentWithInejct<Player>(playerInstance);
-            await player.Initialize(_playerConfigTableEntry);
+            await _playerManager.Initialize(_playerConfigTableEntry);
+            await _playerManager.BindPlayerEntity(player);
             OnPlayerCreated?.Invoke(player);
             return player;
         }
