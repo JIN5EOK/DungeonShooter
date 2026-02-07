@@ -15,7 +15,6 @@ namespace DungeonShooter
         public EntityStatGroup StatGroup { get; private set; }
         public EntitySkillGroup SkillGroup { get; private set; }
         public Inventory Inventory { get; private set; }
-        public EntityBase PlayerEntity => _playerEntity;
 
         private InputManager _inputManager;
         private UIManager _uIManager;
