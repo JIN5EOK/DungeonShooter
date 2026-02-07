@@ -5,7 +5,6 @@ using VContainer;
 
 public class MainMenuSceneInitializer : MonoBehaviour
 {
-    private readonly string GameStartUIAddress = "CharacterSelectUI";
     private readonly string StageScene = "StageScene";
     
     private UIManager _uiManager;
@@ -19,7 +18,7 @@ public class MainMenuSceneInitializer : MonoBehaviour
 
     public async UniTaskVoid Start()
     {
-        _gameStartUI = await _uiManager.CreateUIAsync<GameStartUI>(GameStartUIAddress);
+        _gameStartUI = await _uiManager.CreateUIAsync<GameStartUI>(UIAddresses.GameStartUIAddress);
         _gameStartUI.OnGameStartRequested += HandleGameStartRequested;
     }
 

@@ -21,16 +21,14 @@ namespace DungeonShooter
             builder.Register<ItemFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<StageManager>(Lifetime.Scoped);
             builder.RegisterComponentOnNewGameObject<GameManager>(Lifetime.Scoped);
-            builder.RegisterComponentOnNewGameObject<PlayerManager>(Lifetime.Scoped);
+            builder.Register<PlayerManager>(Lifetime.Scoped);
             base.Configure(builder);
         }
 
         protected override void Awake()
         {
             base.Awake();
-            Container.Resolve<UIManager>();
             Container.Resolve<GameManager>();
-            Container.Resolve<PlayerManager>();
         }
     }
 }

@@ -11,10 +11,12 @@ namespace DungeonShooter
     public class GameManager : MonoBehaviour
     {
         private StageManager _stageManager;
+        private PlayerManager _playerManager;
         [Inject]
-        public void Construct(StageManager stageManager)
+        public void Construct(StageManager stageManager, PlayerManager playerManager)
         {
             _stageManager = stageManager;
+            _playerManager = playerManager;
         }
         
         private async UniTaskVoid Start()

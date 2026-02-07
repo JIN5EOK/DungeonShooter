@@ -8,9 +8,9 @@ namespace DungeonShooter
 {
     /// <summary>
     /// 플레이어 초기화, 입력 바인딩, 스킬·인벤토리 관리를 담당합니다.
-    /// StatGroup, SkillGroup, Inventory를 소유하며 아바타(EntityBase)에 주입합니다.
+    /// StatGroup, SkillGroup, Inventory를 소유하며 플레이어 캐릭터(EntityBase)에 주입합니다.
     /// </summary>
-    public class PlayerManager : MonoBehaviour
+    public class PlayerManager
     {
         public EntityStatGroup StatGroup { get; private set; }
         public EntitySkillGroup SkillGroup { get; private set; }
@@ -27,7 +27,8 @@ namespace DungeonShooter
         private Skill _skill2;
         private EntityBase _playerEntity;
         private PlayerConfigTableEntry _playerConfigTableEntry;
-
+        private InteractComponent _interactComponent;
+        
         private HealthBarHudUI _healthBarUI;
         private SkillCooldownHudUI _skillCooldownHudUI;
         private SkillCooldownSlot _skill1CooldownUI;
@@ -99,15 +100,15 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 아바타에 StatGroup/SkillGroup/Inventory를 바인딩하고, UI를 설정합니다.
+        /// 플레이어 캐릭터에 StatGroup/SkillGroup/Inventory를 바인딩하고, UI를 설정합니다.
         /// </summary>
-        public async UniTask BindPlayerEntity(EntityBase avatar)
+        public async UniTask BindPlayerEntity(EntityBase player)
         {
-            if (avatar == null) return;
+            if (player == null) return;
 
-            _playerEntity = avatar;
-            avatar.SetStatGroup(StatGroup);
-            avatar.SetSkillGroup(SkillGroup);
+            _playerEntity = player;
+            player.SetStatGroup(StatGroup);
+            player.SetSkillGroup(SkillGroup);
 
             _skillCooldownHudUI = await _uIManager.CreateUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud, true);
             _skill1CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
@@ -125,23 +126,25 @@ namespace DungeonShooter
                 _skill2.OnCooldownChanged += _skill2CooldownUI.SetCooldown;
             }
 
-            avatar.OnDestroyed += _ => UnbindPlayerEntity(avatar);
+            player.OnDestroyed += _ => UnbindPlayerEntity(player);
 
-            var healthComponent = avatar.GetComponent<HealthComponent>();
+            var healthComponent = player.GetComponent<HealthComponent>();
             if (healthComponent != null)
             {
                 _healthBarUI = await _uIManager.CreateUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud, true);
                 _healthBarUI.SetHealth(healthComponent.CurrentHealth, healthComponent.MaxHealth);
                 healthComponent.OnHealthChanged += _healthBarUI.SetHealth;
             }
+            
+            _interactComponent = player.GetComponent<InteractComponent>();
         }
 
         /// <summary>
         /// 현재 플레이어 연결을 해제합니다.
         /// </summary>
-        public void UnbindPlayerEntity(EntityBase avatar)
+        public void UnbindPlayerEntity(EntityBase player)
         {
-            if (_playerEntity != avatar) return;
+            if (_playerEntity != player) return;
 
             var healthComponent = _playerEntity != null ? _playerEntity.GetComponent<HealthComponent>() : null;
             if (healthComponent != null && _healthBarUI != null)
@@ -163,6 +166,7 @@ namespace DungeonShooter
                 }
             }
 
+            _interactComponent = null;
             _playerEntity = null;
         }
 
@@ -224,9 +228,11 @@ namespace DungeonShooter
 
         private void HandleInteractPressed()
         {
-            if (_playerEntity == null) return;
-            var interact = _playerEntity.GetComponent<InteractComponent>();
-            interact?.TryInteract();
+            if (_playerEntity == null) 
+                return;
+            
+            _interactComponent = _interactComponent == null ? _playerEntity.GetComponent<InteractComponent>() : _interactComponent; 
+            _interactComponent?.TryInteract();
         }
 
         private async void HandleEscapePressed()
