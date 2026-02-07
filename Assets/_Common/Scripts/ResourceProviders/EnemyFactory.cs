@@ -27,14 +27,16 @@ namespace DungeonShooter
         private readonly ITableRepository _tableRepository;
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
+        private readonly PlayerManager _playerManager;
         private List<int> _enemyIds;
 
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider)
+        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, PlayerManager playerManager)
         {
             _tableRepository = tableRepository;
             _stageContext = stageContext;
             _sceneResourceProvider = sceneResourceProvider;
+            _playerManager = playerManager;
             Initialize();
         }
 
@@ -171,7 +173,12 @@ namespace DungeonShooter
 
             enemyInstance.AddOrGetComponent<MovementComponent>();
             var healthComponent = enemyInstance.AddOrGetComponent<HealthComponent>();
-            healthComponent.OnDeath += () => CoroutineManager.Delay(0.5f, () => entity.Destroy());
+            var exp = configTableEntry.Exp;
+            healthComponent.OnDeath += () =>
+            {
+                _playerManager.AddExp(exp);
+                CoroutineManager.Delay(0.5f, () => entity.Destroy());
+            };
 
             var aiBT = _sceneResourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
             enemyInstance.AddOrGetComponent<AIComponent>().SetBT(aiBT);

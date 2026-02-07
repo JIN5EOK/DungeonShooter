@@ -39,6 +39,14 @@ namespace DungeonShooter
                 Destroy(slot.gameObject);
         }
 
+        public void Clear()
+        {
+            foreach (var slot in _slots)
+            {
+                Destroy(slot.gameObject);
+            }
+        }
+        
         /// <summary>
         /// 현재 등록된 슬롯 수를 반환한다.
         /// </summary>

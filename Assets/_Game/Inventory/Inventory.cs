@@ -147,6 +147,16 @@ namespace DungeonShooter
         }
 
         /// <summary>
+        /// 소지·장착 중인 모든 아이템을 제거합니다.
+        /// </summary>
+        public void Clear()
+        {
+            var copy = _items.ToList();
+            foreach (var item in copy)
+                RemoveItem(item);
+        }
+
+        /// <summary>
         /// 아이템 제거
         /// </summary>
         /// <param name="item">제거할 아이템</param>

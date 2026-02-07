@@ -12,9 +12,20 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerManager
     {
+        private const int ExpPerLevel = 100;
+
         public EntityStatGroup StatGroup { get; private set; }
         public EntitySkillGroup SkillGroup { get; private set; }
         public Inventory Inventory { get; private set; }
+
+        public event Action<int> OnLevelChanged;
+        public event Action<int> OnExpChanged;
+
+        public int Level => _level;
+        public int Exp => _exp;
+
+        private int _level = 1;
+        private int _exp;
 
         private InputManager _inputManager;
         private UIManager _uIManager;
@@ -30,6 +41,7 @@ namespace DungeonShooter
         private InteractComponent _interactComponent;
         
         private HealthBarHudUI _healthBarUI;
+        private ExpGaugeHudUI _expGaugeHudUI;
         private SkillCooldownHudUI _skillCooldownHudUI;
         private SkillCooldownSlot _skill1CooldownUI;
         private SkillCooldownSlot _skill2CooldownUI;
@@ -59,7 +71,25 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 플레이어 설정으로 StatGroup, SkillGroup, 스킬, 인벤토리를 초기화하고 입력을 구독합니다.
+        /// 경험치를 추가합니다.
+        /// </summary>
+        public void AddExp(int amount)
+        {
+            if (amount <= 0) return;
+            var levelBefore = _level;
+            _exp += amount;
+            while (_exp >= ExpPerLevel)
+            {
+                _exp -= ExpPerLevel;
+                _level++;
+            }
+            OnExpChanged?.Invoke(_exp);
+            if (_level != levelBefore)
+                OnLevelChanged?.Invoke(_level);
+        }
+
+        /// <summary>
+        /// 플레이어 설정으로 StatGroup, SkillGroup, 스킬, 인벤토리를 초기화합니다.
         /// </summary>
         public async UniTask Initialize(PlayerConfigTableEntry config)
         {
@@ -86,17 +116,13 @@ namespace DungeonShooter
             _skill2 = await _skillFactory.CreateSkillAsync(config.Skill2Id);
             if (_skill1 != null) SkillGroup.Regist(_skill1);
             if (_skill2 != null) SkillGroup.Regist(_skill2);
-
+            
             Inventory.SetStatGroup(StatGroup);
             Inventory.SetSkillGroup(SkillGroup);
 
             var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);
             await Inventory.AddItem(weapon);
             await Inventory.EquipItem(weapon);
-            var weapon2 = await _itemFactory.CreateItemAsync(15000002);
-            await Inventory.AddItem(weapon2);
-
-            SubscribeInput();
         }
 
         /// <summary>
@@ -107,10 +133,9 @@ namespace DungeonShooter
             if (player == null) return;
 
             _playerEntity = player;
-            player.SetStatGroup(StatGroup);
-            player.SetSkillGroup(SkillGroup);
 
             _skillCooldownHudUI = await _uIManager.CreateUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud, true);
+            _skillCooldownHudUI.Clear();
             _skill1CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
             _skill2CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
             if (_skill1 != null)
@@ -126,17 +151,23 @@ namespace DungeonShooter
                 _skill2.OnCooldownChanged += _skill2CooldownUI.SetCooldown;
             }
 
-            player.OnDestroyed += _ => UnbindPlayerEntity(player);
+            player.OnDestroyed += UnbindPlayerEntity;
 
-            var healthComponent = player.GetComponent<HealthComponent>();
-            if (healthComponent != null)
-            {
-                _healthBarUI = await _uIManager.CreateUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud, true);
-                _healthBarUI.SetHealth(healthComponent.CurrentHealth, healthComponent.MaxHealth);
-                healthComponent.OnHealthChanged += _healthBarUI.SetHealth;
-            }
-            
+            var healthComponent = player.gameObject.AddOrGetComponent<HealthComponent>();
+            _healthBarUI = await _uIManager.CreateUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud, true);
+            _healthBarUI.SetHealth(healthComponent.CurrentHealth, healthComponent.MaxHealth);
+            healthComponent.OnHealthChanged += _healthBarUI.SetHealth;
+
+            _expGaugeHudUI = await _uIManager.CreateUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud, true);
+            _expGaugeHudUI.SetLevel(Level);
+            _expGaugeHudUI.SetExp(Exp);
+            _expGaugeHudUI.SetMaxExp(ExpPerLevel);
+            OnLevelChanged += _expGaugeHudUI.SetLevel;
+            OnExpChanged += _expGaugeHudUI.SetExp;
+
             _interactComponent = player.GetComponent<InteractComponent>();
+
+            SubscribeInput();
         }
 
         /// <summary>
@@ -144,26 +175,26 @@ namespace DungeonShooter
         /// </summary>
         public void UnbindPlayerEntity(EntityBase player)
         {
-            if (_playerEntity != player) return;
+            if (_playerEntity != player) 
+                return;
 
-            var healthComponent = _playerEntity != null ? _playerEntity.GetComponent<HealthComponent>() : null;
-            if (healthComponent != null && _healthBarUI != null)
+            if (_playerEntity.TryGetComponent(out HealthComponent healthComponent) && _healthBarUI != null)
             {
                 healthComponent.OnHealthChanged -= _healthBarUI.SetHealth;
+                _healthBarUI.Hide();
             }
 
             if (_skillCooldownHudUI != null)
             {
-                if (_skill1CooldownUI != null)
-                {
-                    _skillCooldownHudUI.RemoveSkillCooldownSlot(_skill1CooldownUI);
-                    if (_skill1 != null) _skill1.OnCooldownChanged -= _skill1CooldownUI.SetCooldown;
-                }
-                if (_skill2CooldownUI != null)
-                {
-                    _skillCooldownHudUI.RemoveSkillCooldownSlot(_skill2CooldownUI);
-                    if (_skill2 != null) _skill2.OnCooldownChanged -= _skill2CooldownUI.SetCooldown;
-                }
+                _skillCooldownHudUI.Clear();
+                _skillCooldownHudUI.Hide();    
+            }
+            
+            if (_expGaugeHudUI != null)
+            {
+                OnLevelChanged -= _expGaugeHudUI.SetLevel;
+                OnExpChanged -= _expGaugeHudUI.SetExp;
+                _expGaugeHudUI.Hide();
             }
 
             _interactComponent = null;
