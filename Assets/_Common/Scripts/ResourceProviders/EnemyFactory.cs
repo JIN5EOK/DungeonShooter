@@ -13,10 +13,10 @@ namespace DungeonShooter
     /// </summary>
     public interface IEnemyFactory
     {
-        UniTask<Enemy> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        Enemy GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        UniTask<Enemy> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        Enemy GetEnemyByConfigIdSync(int configId,  Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        UniTask<EntityBase> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        EntityBase GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        UniTask<EntityBase> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        EntityBase GetEnemyByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
     
     /// <summary>
@@ -59,7 +59,7 @@ namespace DungeonShooter
         /// <summary>
         /// 스테이지에 맞는 랜덤 적을 가져옵니다.
         /// </summary>
-        public async UniTask<Enemy> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        public async UniTask<EntityBase> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var enemyConfig = GetRandomEnemyTableConfig();
             if (enemyConfig == null)
@@ -74,7 +74,7 @@ namespace DungeonShooter
         /// <summary>
         /// 스테이지에 맞는 랜덤 적을 동기적으로 가져옵니다.
         /// </summary>
-        public Enemy GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        public EntityBase GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var enemyConfig = GetRandomEnemyTableConfig();
             if (enemyConfig == null)
@@ -89,7 +89,7 @@ namespace DungeonShooter
         /// <summary>
         /// 지정한 EnemyConfigTableEntry ID로 적을 비동기 생성합니다.
         /// </summary>
-        public async UniTask<Enemy> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        public async UniTask<EntityBase> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(configId);
             if (enemyConfig == null)
@@ -105,7 +105,7 @@ namespace DungeonShooter
         /// <summary>
         /// 지정한 EnemyConfigTableEntry ID로 적을 동기 생성합니다.
         /// </summary>
-        public Enemy GetEnemyByConfigIdSync(int configId,  Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
+        public EntityBase GetEnemyByConfigIdSync(int configId,  Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
         {
             var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(configId);
             if (enemyConfig == null)
@@ -147,9 +147,9 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 인스턴스에서 Enemy 컴포넌트 추출 및 검증
+        /// 인스턴스에 Enemy 컴포넌트를 붙이고, 스탯/컴포넌트/사망 시 Destroy 구독을 설정합니다.
         /// </summary>
-        private Enemy GetEnemyFromInstance(GameObject enemyInstance, EnemyConfigTableEntry configTableEntry)
+        private EntityBase GetEnemyFromInstance(GameObject enemyInstance, EnemyConfigTableEntry configTableEntry)
         {
             if (enemyInstance == null)
             {
@@ -157,10 +157,26 @@ namespace DungeonShooter
                 return null;
             }
 
+            enemyInstance.tag = GameTags.Enemy;
             enemyInstance.layer = PhysicalLayers.Enemy.LayerIndex;
-            var enemy = _sceneResourceProvider.AddOrGetComponentWithInejct<Enemy>(enemyInstance);
-            enemy.Initialize(configTableEntry);
-            return enemy;
+            var entity = _sceneResourceProvider.AddOrGetComponentWithInejct<EntityBase>(enemyInstance);
+
+            var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(configTableEntry.StatsId);
+            if (statsEntry != null)
+            {
+                var statGroup = new EntityStatGroup();
+                statGroup.Initialize(statsEntry);
+                entity.SetStatGroup(statGroup);
+            }
+
+            enemyInstance.AddOrGetComponent<MovementComponent>();
+            var healthComponent = enemyInstance.AddOrGetComponent<HealthComponent>();
+            healthComponent.OnDeath += () => CoroutineManager.Delay(0.5f, () => entity.Destroy());
+
+            var aiBT = _sceneResourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
+            enemyInstance.AddOrGetComponent<AIComponent>().SetBT(aiBT);
+
+            return entity;
         }
     }
 }

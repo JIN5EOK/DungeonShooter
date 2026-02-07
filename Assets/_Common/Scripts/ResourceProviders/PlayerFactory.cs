@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Jin5eok;
 using UnityEngine;
 using VContainer;
 
@@ -10,19 +11,19 @@ namespace DungeonShooter
     /// </summary>
     public interface IPlayerFactory
     {
-        public event Action<Player> OnPlayerCreated;
-        UniTask<Player> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        Player GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        UniTask<Player> GetPlayerByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        Player GetPlayerByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        public event Action<EntityBase> OnPlayerCreated;
+        UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        UniTask<EntityBase> GetPlayerByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        EntityBase GetPlayerByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
-    
+
     /// <summary>
     /// 런타임 중 플레이어 캐릭터를 생성하는 팩토리
     /// </summary>
     public class PlayerFactory : IPlayerFactory
     {
-        public event Action<Player> OnPlayerCreated;
+        public event Action<EntityBase> OnPlayerCreated;
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
@@ -45,7 +46,7 @@ namespace DungeonShooter
         /// <summary>
         /// 플레이어 캐릭터를 가져옵니다
         /// </summary>
-        public async UniTask<Player> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        public async UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             try
             {
@@ -63,7 +64,7 @@ namespace DungeonShooter
         /// <summary>
         /// 플레이어 캐릭터를 동기적으로 가져옵니다.
         /// </summary>
-        public Player GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        public EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             try
             {
@@ -81,7 +82,7 @@ namespace DungeonShooter
         /// <summary>
         /// 지정한 PlayerConfigTableEntry ID로 플레이어를 비동기 생성합니다.
         /// </summary>
-        public async UniTask<Player> GetPlayerByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        public async UniTask<EntityBase> GetPlayerByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(configId);
             if (config == null)
@@ -97,7 +98,7 @@ namespace DungeonShooter
         /// <summary>
         /// 지정한 PlayerConfigTableEntry ID로 플레이어를 동기 생성합니다.
         /// </summary>
-        public Player GetPlayerByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        public EntityBase GetPlayerByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(configId);
             if (config == null)
@@ -113,7 +114,7 @@ namespace DungeonShooter
         /// <summary>
         /// 지정한 설정으로 플레이어 인스턴스를 초기화합니다.
         /// </summary>
-        private async UniTask<Player> InitializePlayerInstanceWithConfig(GameObject playerInstance, PlayerConfigTableEntry config)
+        private async UniTask<EntityBase> InitializePlayerInstanceWithConfig(GameObject playerInstance, PlayerConfigTableEntry config)
         {
             if (playerInstance == null)
             {
@@ -121,12 +122,14 @@ namespace DungeonShooter
                 return null;
             }
 
+            playerInstance.tag = GameTags.Player;
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
-            var player = _sceneResourceProvider.AddOrGetComponentWithInejct<Player>(playerInstance);
+            var entity = _sceneResourceProvider.AddOrGetComponentWithInejct<EntityBase>(playerInstance);
+            await InitializePlayerObject(playerInstance, entity);
             await _playerManager.Initialize(config);
-            await _playerManager.BindPlayerEntity(player);
-            OnPlayerCreated?.Invoke(player);
-            return player;
+            await _playerManager.BindPlayerEntity(entity);
+            OnPlayerCreated?.Invoke(entity);
+            return entity;
         }
 
         /// <summary>
@@ -152,19 +155,36 @@ namespace DungeonShooter
         /// <summary>
         /// Player 게임오브젝트 초기화
         /// </summary>
-        private async UniTask<Player> InitializePlayerInstance(GameObject playerInstance)
+        private async UniTask<EntityBase> InitializePlayerInstance(GameObject playerInstance)
         {
             if (playerInstance == null)
             {
                 LogHandler.LogWarning<PlayerFactory>($"플레이어 인스턴스가 생성되지 않았습니다.");
                 return null;
             }
+            playerInstance.tag = GameTags.Player;
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
-            var player = _sceneResourceProvider.AddOrGetComponentWithInejct<Player>(playerInstance);
+            var entity = playerInstance.AddComponent<EntityBase>();
             await _playerManager.Initialize(_playerConfigTableEntry);
-            await _playerManager.BindPlayerEntity(player);
-            OnPlayerCreated?.Invoke(player);
-            return player;
+            await _playerManager.BindPlayerEntity(entity);
+            await InitializePlayerObject(playerInstance, entity);
+            OnPlayerCreated?.Invoke(entity);
+            return entity;
+        }
+
+        /// <summary>
+        /// 씬용 컴포넌트 추가 및 사망 시 Destroy 구독을 설정합니다.
+        /// </summary>
+        private async UniTask InitializePlayerObject(GameObject playerInstance, EntityBase entity)
+        {
+            playerInstance.AddOrGetComponent<MovementComponent>();
+            playerInstance.AddOrGetComponent<InteractComponent>();
+            var healthComponent = playerInstance.AddOrGetComponent<HealthComponent>();
+            playerInstance.AddOrGetComponent<DashComponent>();
+            var cameraTrackComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<CameraTrackComponent>(playerInstance);
+            await cameraTrackComponent.AttachCameraAsync();
+            healthComponent.FullHeal();
+            healthComponent.OnDeath += () => entity.Destroy();
         }
     }
 }

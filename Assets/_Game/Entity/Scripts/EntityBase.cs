@@ -1,12 +1,23 @@
+using System;
 using UnityEngine;
 using Jin5eok;
 
 namespace DungeonShooter
 {
-    public abstract class EntityBase : MonoBehaviour
+    public class EntityBase : MonoBehaviour
     {
+        public event Action<EntityBase> OnDestroyed;
+
         public EntityStatGroup StatGroup { get; private set; }
         public EntitySkillGroup SkillGroup { get; private set; }
+
+        /// <summary>
+        /// 엔티티를 제거합니다. 실제 제거 시점에 OnDestroyed가 호출됩니다.
+        /// </summary>
+        public void Destroy()
+        {
+            UnityEngine.Object.Destroy(gameObject);
+        }
 
         /// <summary> StatGroup을 주입합니다. </summary>
         public void SetStatGroup(EntityStatGroup statGroup)
@@ -59,6 +70,11 @@ namespace DungeonShooter
             {
                 skill.Deactivate(this);
             }
+        }
+
+        private void OnDestroy()
+        {
+            OnDestroyed?.Invoke(this);
         }
     }
 }

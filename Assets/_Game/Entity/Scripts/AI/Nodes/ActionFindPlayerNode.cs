@@ -11,11 +11,10 @@ namespace DungeonShooter
     {
         private readonly float _searchInterval;
         private float _lastSearchTime = float.MinValue;
-        private Player _cachedPlayer;
+        private EntityBase _cachedTarget;
 
         public ActionFindPlayerNode()
         {
-            // 한꺼번에 찾는거 조금이라도 줄이기 위해 대기시간 랜덤 간격으로 설정
             _searchInterval = Random.Range(0.5f, 1f);
         }
 
@@ -24,12 +23,13 @@ namespace DungeonShooter
         {
             if (Time.time - _lastSearchTime >= _searchInterval)
             {
-                _cachedPlayer = Object.FindFirstObjectByType<Player>();
+                var playerGo = GameObject.FindWithTag(GameTags.Player);
+                _cachedTarget = playerGo != null ? playerGo.GetComponent<EntityBase>() : null;
                 _lastSearchTime = Time.time;
             }
 
-            var valid = _cachedPlayer != null && _cachedPlayer;
-            context.Target = valid ? _cachedPlayer : null;
+            var valid = _cachedTarget != null && _cachedTarget;
+            context.Target = valid ? _cachedTarget : null;
             return valid ? BTStatus.Success : BTStatus.Failure;
         }
     }

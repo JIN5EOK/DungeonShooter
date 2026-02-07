@@ -8,7 +8,7 @@ namespace DungeonShooter
 {
     /// <summary>
     /// 플레이어 초기화, 입력 바인딩, 스킬·인벤토리 관리를 담당합니다.
-    /// StatGroup, SkillGroup, Inventory를 소유하며 아바타(Player)에 주입합니다.
+    /// StatGroup, SkillGroup, Inventory를 소유하며 아바타(EntityBase)에 주입합니다.
     /// </summary>
     public class PlayerManager : MonoBehaviour
     {
@@ -25,7 +25,7 @@ namespace DungeonShooter
 
         private Skill _skill1;
         private Skill _skill2;
-        private Player _currentAvatar;
+        private EntityBase _currentAvatar;
         private PlayerConfigTableEntry _playerConfigTableEntry;
 
         private HealthBarHudUI _healthBarUI;
@@ -93,9 +93,9 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// Player에 StatGroup/SkillGroup/Inventory를 바인딩하고, 씬용 컴포넌트·UI를 설정합니다.
+        /// 아바타에 StatGroup/SkillGroup/Inventory를 바인딩하고, UI를 설정합니다.
         /// </summary>
-        public async UniTask BindPlayerEntity(Player avatar)
+        public async UniTask BindPlayerEntity(EntityBase avatar)
         {
             if (avatar == null) return;
 
@@ -120,7 +120,7 @@ namespace DungeonShooter
                 _skill2.OnCooldownChanged += _skill2CooldownUI.SetCooldown;
             }
 
-            await avatar.SetupSceneComponents(this);
+            avatar.OnDestroyed += _ => UnbindPlayerEntity(avatar);
 
             var healthComponent = avatar.GetComponent<HealthComponent>();
             if (healthComponent != null)
@@ -134,7 +134,7 @@ namespace DungeonShooter
         /// <summary>
         /// 현재 플레이어 연결을 해제합니다.
         /// </summary>
-        public void UnbindPlayerEntity(Player avatar)
+        public void UnbindPlayerEntity(EntityBase avatar)
         {
             if (_currentAvatar != avatar) return;
 

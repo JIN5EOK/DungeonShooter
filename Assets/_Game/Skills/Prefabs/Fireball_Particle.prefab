@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 19819970, guid: dcc803728a9f0ec4c83dba45ffbeaeb5, type: 3}
+      propertyPath: stopAction
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 19880226, guid: dcc803728a9f0ec4c83dba45ffbeaeb5, type: 3}
       propertyPath: startDelay.scalar
       value: 0.1
