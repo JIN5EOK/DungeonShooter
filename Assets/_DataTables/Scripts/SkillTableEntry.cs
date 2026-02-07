@@ -36,8 +36,6 @@ namespace DungeonShooter
         public float Delay { get; set; }
 
         public float Cooldown { get; set; }
-        public int TargetCount { get; set; }
-        public float KnockbackForce { get; set; }
 
         /// <summary>스킬 그룹의 근간이 되는 SkillTableEntry의 ID</summary>
         public int SkillRootId { get; set; }

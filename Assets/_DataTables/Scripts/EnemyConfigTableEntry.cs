@@ -23,6 +23,9 @@ namespace DungeonShooter
 
         /// <summary>기본 스탯 EntityStatsTableEntry.Id </summary>
         public int StatsId { get; set; }
+
+        /// <summary>처치 시 획득 경험치</summary>
+        public int Exp { get; set; }
     }
 }
 
