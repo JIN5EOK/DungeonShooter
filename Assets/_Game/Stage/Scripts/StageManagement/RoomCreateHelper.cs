@@ -245,7 +245,7 @@ namespace DungeonShooter
             {
                 var worldPosition = new Vector3(objectData.Position.x, objectData.Position.y, 0) + worldOffset;
                 var instance = objectData.TableId == 0 ? null : await ResolveByTableIdAsync(objectData.TableId, worldPosition, objectData.Rotation, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
-                if (instance != null && objectData.TableId != 0)
+                if (instance != null && objectData.TableId != 0 && Application.isPlaying == false)
                 {
                     var marker = instance.AddOrGetComponent<RoomObjectMarker>();
                     marker.TableId = objectData.TableId;
@@ -262,7 +262,7 @@ namespace DungeonShooter
             {
                 var worldPosition = new Vector3(objectData.Position.x, objectData.Position.y, 0) + worldOffset;
                 var instance = objectData.TableId == 0 ? null : ResolveByTableIdSync(objectData.TableId, worldPosition, objectData.Rotation, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
-                if (instance != null && objectData.TableId != 0)
+                if (instance != null && objectData.TableId != 0 && Application.isPlaying == false)
                 {
                     var marker = instance.AddOrGetComponent<RoomObjectMarker>();
                     marker.TableId = objectData.TableId;

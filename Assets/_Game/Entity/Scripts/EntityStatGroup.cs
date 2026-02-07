@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace DungeonShooter
 {
     /// <summary>
-    /// Entity의 스탯 컴포넌트.
+    /// Entity의 스탯을 관리하는 Pure C# 객체.
     /// EntityStatsTableEntry를 기준으로 기본 스탯(Constant)을 설정하고, GetStat으로 최종 수치를 반환한다.
     /// </summary>
-    public class EntityStatsComponent : MonoBehaviour
+    public class EntityStatGroup
     {
         private readonly Dictionary<StatType, EntityStat> _stats = new Dictionary<StatType, EntityStat>();
         private EntityStatsTableEntry _statsTableEntry;
@@ -69,19 +68,16 @@ namespace DungeonShooter
             }
         }
 
-        /// <summary>
-        /// StatType에 해당하는 EntityStat을 반환합니다. 없으면 Constant 0으로 생성해 Dictionary에 추가한 뒤 반환합니다.
-        /// </summary>
         private EntityStat GetOrAddStat(StatType type)
         {
             if (_stats.TryGetValue(type, out var stat))
             {
                 return stat;
             }
-            
+
             var entityStat = new EntityStat();
             _stats[type] = entityStat;
-            
+
             return entityStat;
         }
 

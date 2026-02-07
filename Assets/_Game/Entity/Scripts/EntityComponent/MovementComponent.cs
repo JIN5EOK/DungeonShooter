@@ -33,17 +33,20 @@ namespace DungeonShooter
         
         public float MoveSpeed
         {
-            get => _moveSpeed;
+            get => _entityBase != null ? _entityBase.StatGroup.GetStat(StatType.MoveSpeed) : _moveSpeed;
             set => _moveSpeed = value;
         }
         private Rigidbody2D _rigidbody;
-        private EntityStatsComponent _statsComponent;
-        
+        private EntityBase _entityBase;
+
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
-            _statsComponent = GetComponent<EntityStatsComponent>();
-            _moveSpeed = _statsComponent.GetStat(StatType.MoveSpeed);
+            _entityBase = GetComponent<EntityBase>();
+            if (_entityBase != null)
+            {
+                _moveSpeed = _entityBase.StatGroup.GetStat(StatType.MoveSpeed);
+            }
         }
 
         private void Update()
@@ -56,7 +59,7 @@ namespace DungeonShooter
         /// </summary>
         private void Move()
         {
-            var velocity = Direction.normalized * _moveSpeed;
+            var velocity = Direction.normalized * MoveSpeed;
             _rigidbody.linearVelocity = velocity;
         }
     }

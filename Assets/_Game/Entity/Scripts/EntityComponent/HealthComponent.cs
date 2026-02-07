@@ -16,7 +16,7 @@ namespace DungeonShooter
 
         public int MaxHealth
         {
-            get => statsComponent.GetStat(StatType.Hp);
+            get => _entityBase != null ? _entityBase.StatGroup.GetStat(StatType.Hp) : 0;
         }
         public int CurrentHealth { get; private set; }
         public float HealthPercent => MaxHealth > 0 ? (float)CurrentHealth / MaxHealth : 0f;
@@ -24,7 +24,7 @@ namespace DungeonShooter
         private Color hitColor = Color.red;
         private float hitFlashDuration = 0.2f;
         private Color deathColor = Color.gray;
-        private EntityStatsComponent statsComponent;
+        private EntityBase _entityBase;
         private SpriteRenderer _spriteRenderer;
         private Color _originalColor;
         private Rigidbody2D _rigidbody;
@@ -32,7 +32,13 @@ namespace DungeonShooter
 
         private void Awake()
         {
-            statsComponent = gameObject.AddOrGetComponent<EntityStatsComponent>();
+            _entityBase = GetComponent<EntityBase>();
+            if (_entityBase == null)
+            {
+                LogHandler.LogError<HealthComponent>("EntityBase 컴포넌트를 찾을 수 없습니다.");
+                Destroy(this);
+            }
+
             CurrentHealth = MaxHealth;
             _spriteRenderer = gameObject.AddOrGetComponent<SpriteRenderer>();
             _originalColor = _spriteRenderer.color;

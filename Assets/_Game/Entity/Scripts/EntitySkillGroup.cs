@@ -1,0 +1,81 @@
+using System;
+using System.Collections.Generic;
+
+namespace DungeonShooter
+{
+    /// <summary>
+    /// Entity의 스킬을 관리하는 Pure C# 객체.
+    /// 스킬 등록/해제만 담당하며, 스킬 사용은 Skill 인스턴스를 직접 호출한다.
+    /// </summary>
+    public class EntitySkillGroup
+    {
+        private readonly List<Skill> _skills = new List<Skill>();
+        
+        public event Action<Skill> OnSkillRegisted;
+
+        public event Action<Skill> OnSkillUnregisted;
+        
+        public IReadOnlyList<Skill> GetRegistedSkills()
+        {
+            return _skills;
+        }
+        
+        /// <summary>
+        /// 스킬을 등록합니다. 등록 후 OnSkillRegisted를 발생시킵니다.
+        /// </summary>
+        public void Regist(Skill skill)
+        {
+            if (skill == null)
+            {
+                LogHandler.LogWarning<EntitySkillGroup>("등록할 스킬이 null입니다.");
+                return;
+            }
+
+            if (_skills.Contains(skill))
+            {
+                LogHandler.LogWarning<EntitySkillGroup>($"이미 등록된 스킬입니다: {skill.SkillTableEntry.SkillName}");
+                return;
+            }
+
+            _skills.Add(skill);
+            OnSkillRegisted?.Invoke(skill);
+            LogHandler.Log<EntitySkillGroup>($"스킬 등록 완료: {skill.SkillTableEntry.Id} ({skill.SkillTableEntry.SkillName})");
+        }
+
+        /// <summary>
+        /// 스킬 등록을 해제합니다. OnSkillUnregisted 발생 후 리소스를 정리합니다.
+        /// </summary>
+        public void Unregist(Skill skill, bool disposeAfterUnregist = false)
+        {
+            if (skill == null) return;
+
+            if (!_skills.Remove(skill))
+            {
+                LogHandler.LogWarning<EntitySkillGroup>($"등록되지 않은 스킬입니다: {skill.SkillTableEntry?.SkillName}");
+                return;
+            }
+
+            OnSkillUnregisted?.Invoke(skill);
+
+            if (disposeAfterUnregist)
+            {
+                skill.Dispose();
+            }
+            LogHandler.Log<EntitySkillGroup>($"스킬 등록 해제 완료: {skill.SkillTableEntry?.Id}");
+        }
+
+        /// <summary>
+        /// 등록된 모든 스킬에 대해 OnSkillUnregisted를 발생시키고 리소스를 정리합니다.
+        /// </summary>
+        public void Clear()
+        {
+            var copy = new List<Skill>(_skills);
+            _skills.Clear();
+            foreach (var skill in copy)
+            {
+                OnSkillUnregisted?.Invoke(skill);
+                skill.Dispose();
+            }
+        }
+    }
+}

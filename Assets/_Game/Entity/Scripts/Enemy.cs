@@ -45,7 +45,10 @@ namespace DungeonShooter
         public void Initialize(EnemyConfigTableEntry enemyConfigTableEntry)
         {
             _enemyConfigTableEntry = enemyConfigTableEntry;
-            Initialize(_tableRepository.GetTableEntry<EntityStatsTableEntry>(enemyConfigTableEntry.StatsId));
+            var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(enemyConfigTableEntry.StatsId);
+            var statGroup = new EntityStatGroup();
+            statGroup.Initialize(statsEntry ?? new EntityStatsTableEntry() { Attack = 10, Defense = 10, MaxHp = 100, MoveSpeed = 5 });
+            SetStatGroup(statGroup);
             
             _movementComponent = gameObject.AddOrGetComponent<MovementComponent>();
             _healthComponent = gameObject.AddOrGetComponent<HealthComponent>();

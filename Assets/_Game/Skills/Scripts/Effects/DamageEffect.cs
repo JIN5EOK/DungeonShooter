@@ -50,8 +50,8 @@ namespace DungeonShooter
             if (targetEntity.TryGetComponent(out HealthComponent health))
             {
                 var finalDamage =
-                    EntityStatsHelper.CalculatePercentDamage(context.Caster.StatsComponent.GetStat(StatType.Attack)
-                        , context.LastHitTarget.StatsComponent.GetStat(StatType.Defense)
+                    EntityStatsHelper.CalculatePercentDamage(context.Caster.StatGroup.GetStat(StatType.Attack)
+                        , context.LastHitTarget.StatGroup.GetStat(StatType.Defense)
                         , skillDamagePercent);
 
                 health.TakeDamage(finalDamage);

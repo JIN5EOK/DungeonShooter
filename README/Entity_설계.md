@@ -3,8 +3,8 @@
 
 ---
 ## 컴포넌트 위주 설계
-* 괸리자 역할을 담당하는 컴포넌트 + 다수의 기능 컴포넌트로 구성
-* 기능 추가는 단일 책임 원칙을 베이스로 하는 여러 기능 컴포넌트 추가를 통한 확장 구조를 통해 수행
+* 괸리자 역할과 공통 역할만을 담당하는 `EntityBase` 컴포넌트 + 다수의 기능 컴포넌트로 구성
+* 기능 추가는 단일 책임 원칙에 기반한 단일 기능 컴포넌트 추가를 통한 확장 구조를 통해 수행
 	* 예: 이동 컴포넌트는 이동만 담당하기
 
 ## EntityBase - Entity의 중추 기반 클래스
@@ -31,21 +31,10 @@ classDiagram
     class DashComponent["DashComponent<br>캐릭터 대시 기능 담당"]{
         +StartDash() void
     }
-    class EntityStatsComponent["EntityStatsComponent<br>캐릭터 스탯 기능 담당"]{
-        +GetValue(StatType statType) int
-        +AddModifier(...) void 
-        +RemoveModifier(...) void
-        // Modifier => 아이템 등에 의한 스탯 변화 추가
-    }
 ```
 
 ```mermaid
 classDiagram
-    class SkillComponent["SkillComponent<br>캐릭터 고유 스킬 담당"]{
-        +UseSkill(int skillId, EntityBase target) UniTask~bool~
-        +RegistSkill(int skillId) UniTask~bool~
-        +UnregistSkill(int skillId) UniTask~bool~
-    }
     class HealthComponent["HealthComponent<br>캐릭터 체력 기능 담당"]{ 
         +Hp : int
         +TakeDamage() void
@@ -103,7 +92,7 @@ classDiagram
         +RemoveModifier(object key) void
     }
 
-    class EntityStatsComponent["EntityStatsComponent:Monobehaviour<br>Entity의 스탯 컴포넌트"]{
+    class EntityStatGroup["EntityStatGroup<br>Entity의 스탯 그룹"]{
         +Stats : Dictionary~StatType, EntityStat~
         -StatsTableEntry : EntityStatsTableEntry
         // EntityStatsTableEntry의 수치는 AddModifier->Constant 타입으로 반영
@@ -145,14 +134,17 @@ classDiagram
         +AIType string // 행동 타입
         +StatsId int // 스텟 EntityStatsTableEntry.Id
     }
-    
-    EntityStatsComponent ..> StatBonus : 아이템등의 스탯 보너스 수치
+    class EntityBase["EntityBase : Monobehaviour<br>Entity Base 컴포넌트"]{
+        +StatGroup EntityStatGroup
+    }
+    EntityStatGroup ..> StatBonus : 아이템등의 스탯 보너스 수치
     StatModifierType "0..*"<--"1" EntityStat
-    StatType "0..*"<--"1" EntityStatsComponent
-    EntityStat "0..*"<--"1" EntityStatsComponent
-    EntityStatsComponent --> EntityStatsTableEntry  : 테이블 데이터에 기반하여 기본 스탯 설정
+    StatType "0..*"<--"1" EntityStatGroup
+    EntityStat "0..*"<--"1" EntityStatGroup
+    EntityStatGroup --> EntityStatsTableEntry  : 테이블 데이터에 기반하여 기본 스탯 설정
     EntityStatsTableEntry <.. PlayerConfigTableEntry : Table ID로 간접 참조
     EntityStatsTableEntry <.. EnemyConfigTableEntry : Table ID로 간접 참조
+    EntityStatGroup <-- EntityBase : 본인의 스탯 참조
 ```
 
 

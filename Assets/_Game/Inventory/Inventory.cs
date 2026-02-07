@@ -18,6 +18,8 @@ namespace DungeonShooter
         private readonly List<Item> _items = new List<Item>();
         private Item _equippedWeapon;
         private EntityBase _owner;
+        private EntityStatGroup _statGroup;
+        private EntitySkillGroup _skillGroup;
 
         // 인벤토리 아이템 목록 (읽기 전용)
         public IReadOnlyList<Item> Items => _items;
@@ -25,9 +27,24 @@ namespace DungeonShooter
         // 현재 장착된 무기
         public Item EquippedWeapon => _equippedWeapon;
 
+        /// <summary>
+        /// 스탯 적용 대상 그룹을 설정합니다. (EntityBase가 없어도 스탯 보너스 적용 가능)
+        /// </summary>
+        public void SetStatGroup(EntityStatGroup statGroup)
+        {
+            _statGroup = statGroup;
+        }
 
         /// <summary>
-        /// 인벤토리 소유자를 설정합니다.
+        /// 스킬 그룹을 설정합니다.
+        /// </summary>
+        public void SetSkillGroup(EntitySkillGroup skillGroup)
+        {
+            _skillGroup = skillGroup;
+        }
+
+        /// <summary>
+        /// 인벤토리 소유자를 설정합니다. (아이템 패시브/장착 스킬, 소비 스킬 실행 시 사용)
         /// </summary>
         /// <param name="owner">소유자 Entity</param>
         public void SetOwner(EntityBase owner)
@@ -193,18 +210,14 @@ namespace DungeonShooter
 
         private void ApplyItemStatBonus(Item item)
         {
-            if (_owner == null) return;
-            var comp = _owner.GetComponent<EntityStatsComponent>();
-            if (comp == null) return;
-            comp.ApplyStatBonus(item, StatBonus.From(item.ItemTableEntry));
+            if (_statGroup == null) return;
+            _statGroup.ApplyStatBonus(item, StatBonus.From(item.ItemTableEntry));
         }
 
         private void RemoveItemStatBonus(Item item)
         {
-            if (_owner == null) return;
-            var comp = _owner.GetComponent<EntityStatsComponent>();
-            if (comp == null) return;
-            comp.RemoveStatBonus(item);
+            if (_statGroup == null) return;
+            _statGroup.RemoveStatBonus(item);
         }
 
 

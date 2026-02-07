@@ -9,7 +9,7 @@ namespace DungeonShooter
     /// IInputHandler를 사용한 입력 매니저입니다.
     /// 플레이어 입력을 관리하고 이벤트를 제공합니다.
     /// </summary>
-    public class InputManager : IDisposable
+    public class InputManager : IDisposable 
     {
         // 이동 입력
         private readonly Vector2InputHandlerOldInputSystem _moveInputHandler;

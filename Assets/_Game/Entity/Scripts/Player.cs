@@ -20,7 +20,8 @@ namespace DungeonShooter
         
         private HealthComponent _healthComponent;
         private MovementComponent _movementComponent;
-        private SkillComponent _skillComponent;
+        private Skill _skill1;
+        private Skill _skill2;
         private InteractComponent _interactComponent;
         private DashComponent _dashComponent;
         private CameraTrackComponent _cameraTrackComponent;
@@ -32,13 +33,16 @@ namespace DungeonShooter
 
         private bool _isDead;
         
+        private ISkillFactory _skillFactory;
+
         [Inject]
         private void Construct(InputManager inputManager
             , Inventory inventory
             , ISceneResourceProvider sceneResourceProvider
             , IItemFactory itemFactory
             , ITableRepository tableRepository
-            , UIManager uIManager)
+            , UIManager uIManager
+            , ISkillFactory skillFactory)
         {
             _inputManager = inputManager;
             _inventory = inventory;
@@ -46,6 +50,7 @@ namespace DungeonShooter
             _itemFactory = itemFactory;
             _tableRepository = tableRepository;
             _uIManager = uIManager;
+            _skillFactory = skillFactory;
         }
 
         public async UniTask Initialize(PlayerConfigTableEntry playerConfigTableEntry)
@@ -58,7 +63,7 @@ namespace DungeonShooter
             _playerConfigTableEntry = playerConfigTableEntry;
 
 
-            // 스탯 테이블 엔트리 로드 및 EntityBase 초기화
+            // StatGroup 생성·주입
             var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(_playerConfigTableEntry.StatsId);
             if (statsEntry == null)
             {
@@ -66,24 +71,44 @@ namespace DungeonShooter
                 return;
             }
 
+            var statGroup = new EntityStatGroup();
+            statGroup.Initialize(statsEntry);
+            SetStatGroup(statGroup);
 
-            base.Initialize(statsEntry);
 
-            _skillComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<SkillComponent>(gameObject);
-            var skill1 = await _skillComponent.GetOrRegistSkill(_playerConfigTableEntry.Skill1Id);
-            var skill2 = await _skillComponent.GetOrRegistSkill(_playerConfigTableEntry.Skill2Id);
+            var skillGroup = new EntitySkillGroup();
+            SetSkillGroup(skillGroup);
+
+            _skill1 = await _skillFactory.CreateSkillAsync(_playerConfigTableEntry.Skill1Id);
+            _skill2 = await _skillFactory.CreateSkillAsync(_playerConfigTableEntry.Skill2Id);
+            if (_skill1 != null)
+            {
+                skillGroup.Regist(_skill1);
+            }
+            if (_skill2 != null)
+            {
+                skillGroup.Regist(_skill2);
+            }
 
             _skillCooldownHudUI = await _uIManager.CreateUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud, true);
             _skill1CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
             _skill2CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
 
-            _skill1CooldownUI.SetMaxCooldown(skill1.MaxCooldown);
-            _skill2CooldownUI.SetMaxCooldown(skill2.MaxCooldown);
-            _skill1CooldownUI.SetSkillIcon(skill1.Icon);
-            _skill2CooldownUI.SetSkillIcon(skill2.Icon);
-            skill1.OnCooldownChanged += _skill1CooldownUI.SetCooldown;
-            skill2.OnCooldownChanged += _skill2CooldownUI.SetCooldown;
-            
+            if (_skill1 != null)
+            {
+                _skill1CooldownUI.SetMaxCooldown(_skill1.MaxCooldown);
+                _skill1CooldownUI.SetSkillIcon(_skill1.Icon);
+                _skill1.OnCooldownChanged += _skill1CooldownUI.SetCooldown;
+            }
+            if (_skill2 != null)
+            {
+                _skill2CooldownUI.SetMaxCooldown(_skill2.MaxCooldown);
+                _skill2CooldownUI.SetSkillIcon(_skill2.Icon);
+                _skill2.OnCooldownChanged += _skill2CooldownUI.SetCooldown;
+            }
+
+            _inventory.SetStatGroup(StatGroup);
+            _inventory.SetSkillGroup(SkillGroup);
             _inventory.SetOwner(this);
             var weapon = await _itemFactory.CreateItemAsync(_playerConfigTableEntry.StartWeaponId);
             await _inventory.AddItem(weapon);
@@ -141,12 +166,12 @@ namespace DungeonShooter
 
         private void HandleSkill1Input()
         {
-            _skillComponent?.UseSkill(_playerConfigTableEntry.Skill1Id).Forget();
+            _skill1?.Execute(this).Forget();
         }
-        
+
         private void HandleSkill2Input()
         {
-            _skillComponent?.UseSkill(_playerConfigTableEntry.Skill2Id).Forget();
+            _skill2?.Execute(this).Forget();
         }
         
         private void HandleInteractInput()
