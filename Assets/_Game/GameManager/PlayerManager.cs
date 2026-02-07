@@ -242,6 +242,7 @@ namespace DungeonShooter
         private void OnDestroy()
         {
             UnsubscribeInput();
+            SkillGroup.Clear();
         }
     }
 }
