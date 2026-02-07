@@ -15,6 +15,7 @@ namespace DungeonShooter
         public EntityStatGroup StatGroup { get; private set; }
         public EntitySkillGroup SkillGroup { get; private set; }
         public Inventory Inventory { get; private set; }
+        public EntityBase PlayerEntity => _playerEntity;
 
         private InputManager _inputManager;
         private UIManager _uIManager;
@@ -25,7 +26,7 @@ namespace DungeonShooter
 
         private Skill _skill1;
         private Skill _skill2;
-        private EntityBase _currentAvatar;
+        private EntityBase _playerEntity;
         private PlayerConfigTableEntry _playerConfigTableEntry;
 
         private HealthBarHudUI _healthBarUI;
@@ -49,6 +50,12 @@ namespace DungeonShooter
             _tableRepository = tableRepository;
             _skillFactory = skillFactory;
             _sceneResourceProvider = sceneResourceProvider;
+            Inventory.OnItemUse += HandleItemUseRequested;
+        }
+
+        private async void HandleItemUseRequested(Item item)
+        {
+            await item.ExecuteUseSkill(_playerEntity);
         }
 
         /// <summary>
@@ -99,10 +106,9 @@ namespace DungeonShooter
         {
             if (avatar == null) return;
 
-            _currentAvatar = avatar;
+            _playerEntity = avatar;
             avatar.SetStatGroup(StatGroup);
             avatar.SetSkillGroup(SkillGroup);
-            Inventory.SetOwner(avatar);
 
             _skillCooldownHudUI = await _uIManager.CreateUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud, true);
             _skill1CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
@@ -136,9 +142,9 @@ namespace DungeonShooter
         /// </summary>
         public void UnbindPlayerEntity(EntityBase avatar)
         {
-            if (_currentAvatar != avatar) return;
+            if (_playerEntity != avatar) return;
 
-            var healthComponent = _currentAvatar != null ? _currentAvatar.GetComponent<HealthComponent>() : null;
+            var healthComponent = _playerEntity != null ? _playerEntity.GetComponent<HealthComponent>() : null;
             if (healthComponent != null && _healthBarUI != null)
             {
                 healthComponent.OnHealthChanged -= _healthBarUI.SetHealth;
@@ -158,7 +164,7 @@ namespace DungeonShooter
                 }
             }
 
-            _currentAvatar = null;
+            _playerEntity = null;
         }
 
         private void SubscribeInput()
@@ -187,40 +193,40 @@ namespace DungeonShooter
 
         private void HandleMoveInputChanged(Vector2 input)
         {
-            if (_currentAvatar == null) return;
-            var movement = _currentAvatar.GetComponent<MovementComponent>();
+            if (_playerEntity == null) return;
+            var movement = _playerEntity.GetComponent<MovementComponent>();
             if (movement != null) movement.Direction = input;
         }
 
         private void HandleDashPressed()
         {
-            if (_currentAvatar == null) return;
-            var dash = _currentAvatar.GetComponent<DashComponent>();
+            if (_playerEntity == null) return;
+            var dash = _playerEntity.GetComponent<DashComponent>();
             dash?.StartDash();
         }
 
         private void HandleWeaponAttack()
         {
-            if (_currentAvatar == null) return;
-            Inventory.EquippedWeapon?.ExecuteActiveSkill(_currentAvatar).Forget();
+            if (_playerEntity == null) return;
+            Inventory.EquippedWeapon?.ExecuteActiveSkill(_playerEntity).Forget();
         }
 
         private void HandleSkill1Pressed()
         {
-            if (_currentAvatar == null) return;
-            _skill1?.Execute(_currentAvatar).Forget();
+            if (_playerEntity == null) return;
+            _skill1?.Execute(_playerEntity).Forget();
         }
 
         private void HandleSkill2Pressed()
         {
-            if (_currentAvatar == null) return;
-            _skill2?.Execute(_currentAvatar).Forget();
+            if (_playerEntity == null) return;
+            _skill2?.Execute(_playerEntity).Forget();
         }
 
         private void HandleInteractPressed()
         {
-            if (_currentAvatar == null) return;
-            var interact = _currentAvatar.GetComponent<InteractComponent>();
+            if (_playerEntity == null) return;
+            var interact = _playerEntity.GetComponent<InteractComponent>();
             interact?.TryInteract();
         }
 

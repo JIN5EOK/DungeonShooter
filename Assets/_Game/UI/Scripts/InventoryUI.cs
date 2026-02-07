@@ -10,17 +10,17 @@ using VContainer;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 인벤토리 아이템 목록을 슬롯으로 표시하고, 슬롯 클릭 시 아이템 정보 요청을 전달하는 HUD.
+    /// 인벤토리 UI
     /// </summary>
     public class InventoryUI : PopupUI
     {
-        [Header("레이아웃")]
-        [SerializeField] private RectTransform _content;
-        [Header("슬롯 프리팹")]
-        [SerializeField] private InventorySlotUIElement _slotPrefab;
-        [Header("정보 패널")]
-        [SerializeField] private ItemInfoWindow _itemInfoPanel;
-
+        [SerializeField]
+        private RectTransform _content;
+        [SerializeField]
+        private InventorySlotUIElement _slotPrefab;
+        [SerializeField]
+        private ItemInfoWindow _itemInfoPanel;
+    
         [SerializeField] 
         private Button _closeButton;
         [SerializeField]
@@ -32,8 +32,9 @@ namespace DungeonShooter
         
         private Inventory _inventory;
         private readonly Dictionary<Item, InventorySlotUIElement> _slotsDict = new();
-        
+
         private Item _selectedItem;
+
         [Inject]
         public void Construct(Inventory inventory)
         {
@@ -68,13 +69,14 @@ namespace DungeonShooter
         
         public void OnClickUseButton()
         {
-            _inventory.UseItem(_selectedItem).Forget();
+            _inventory.UseItem(_selectedItem);
         }
         
         public void OnClickRemoveButton()
         {
             _inventory.RemoveItem(_selectedItem);
         }
+
         private void OnDestroy()
         {
             if (_inventory != null)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using VContainer;
 
@@ -14,18 +15,15 @@ namespace DungeonShooter
         public event Action<Item> OnItemRemoved;
         public event Action<Item> OnWeaponEquipped;
         public event Action<Item> OnWeaponUnequipped;
-        
-        private readonly List<Item> _items = new List<Item>();
+        public event Action<Item> OnItemUse;
+        public IReadOnlyCollection<Item> Items => _items;
+        public Item EquippedWeapon => _equippedWeapon;
+        private readonly HashSet<Item> _items = new HashSet<Item>();
         private Item _equippedWeapon;
-        private EntityBase _owner;
         private EntityStatGroup _statGroup;
         private EntitySkillGroup _skillGroup;
 
-        // 인벤토리 아이템 목록 (읽기 전용)
-        public IReadOnlyList<Item> Items => _items;
-
-        // 현재 장착된 무기
-        public Item EquippedWeapon => _equippedWeapon;
+        public bool IsContainsItem(Item item) => item != null && _items.Contains(item);
 
         /// <summary>
         /// 스탯 적용 대상 그룹을 설정합니다. (EntityBase가 없어도 스탯 보너스 적용 가능)
@@ -41,15 +39,6 @@ namespace DungeonShooter
         public void SetSkillGroup(EntitySkillGroup skillGroup)
         {
             _skillGroup = skillGroup;
-        }
-
-        /// <summary>
-        /// 인벤토리 소유자를 설정합니다. (아이템 패시브/장착 스킬, 소비 스킬 실행 시 사용)
-        /// </summary>
-        /// <param name="owner">소유자 Entity</param>
-        public void SetOwner(EntityBase owner)
-        {
-            _owner = owner;
         }
 
         /// <summary>
@@ -75,12 +64,9 @@ namespace DungeonShooter
                     // 받은 아이템의 스택 개수를 남은 개수로 설정하고 사용
                     item.StackCount = remaining;
                     _items.Add(item);
-                    
-                    // 패시브 스킬 활성화
+
                     if (item.PassiveSkill != null)
-                    {
-                        item.ActivatePassiveSkill(_owner);
-                    }
+                        _skillGroup?.Regist(item.PassiveSkill);
 
                     // Passive: 인벤토리에 들어오면 스탯 보너스 적용
                     if (item.ItemTableEntry.ItemType == ItemType.Passive)
@@ -99,12 +85,9 @@ namespace DungeonShooter
                 }
                 
                 _items.Add(item);
-                
-                // 패시브 스킬 활성화
+
                 if (item.PassiveSkill != null)
-                {
-                    item.ActivatePassiveSkill(_owner);
-                }
+                    _skillGroup?.Regist(item.PassiveSkill);
 
                 // Passive: 인벤토리에 들어오면 스탯 보너스 적용
                 if (item.ItemTableEntry.ItemType == ItemType.Passive)
@@ -145,7 +128,8 @@ namespace DungeonShooter
             // 기존 무기 해제
             if (_equippedWeapon != null)
             {
-                _equippedWeapon.DeactivateEquipSkill(_owner);
+                if (_equippedWeapon.EquipSkill != null)
+                    _skillGroup?.Unregist(_equippedWeapon.EquipSkill, false);
                 RemoveItemStatBonus(_equippedWeapon);
                 OnWeaponUnequipped?.Invoke(_equippedWeapon);
             }
@@ -153,9 +137,7 @@ namespace DungeonShooter
             // 새 무기 장착
             _equippedWeapon = item;
             if (item.EquipSkill != null)
-            {
-                item.ActivateEquipSkill(_owner);
-            }
+                _skillGroup?.Regist(item.EquipSkill);
 
             // Weapon: 장착하면 스탯 보너스 적용
             ApplyItemStatBonus(item);
@@ -178,21 +160,18 @@ namespace DungeonShooter
             // 장착된 아이템인지 확인
             if (item == _equippedWeapon)
             {
-                item.DeactivateEquipSkill(_owner);
+                if (item.EquipSkill != null)
+                    _skillGroup?.Unregist(item.EquipSkill, false);
                 RemoveItemStatBonus(item);
                 _equippedWeapon = null;
             }
 
-            // Passive: 인벤토리에서 나가면 스탯 보너스 제거
             if (item.ItemTableEntry.ItemType == ItemType.Passive)
-            {
                 RemoveItemStatBonus(item);
-            }
 
-            // 패시브 스킬 비활성화
-            item.DeactivatePassiveSkill(_owner);
+            if (item.PassiveSkill != null)
+                _skillGroup?.Unregist(item.PassiveSkill, false);
 
-            // 스킬 리소스 정리
             item.DisposeSkills();
 
             _items.Remove(item);
@@ -204,8 +183,9 @@ namespace DungeonShooter
         /// </summary>
         private Item FindStackableItem(int itemEntryId)
         {
-            return _items.Find(i => i.ItemTableEntry.Id == itemEntryId && 
-                                   i.StackCount < i.ItemTableEntry.MaxStackCount);
+            // TODO: 소지 아이템이 매우매우 많아지게 된다면 로직 개선 필요
+            return _items.FirstOrDefault(i => i.ItemTableEntry.Id == itemEntryId &&
+                                              i.StackCount < i.ItemTableEntry.MaxStackCount);
         }
 
         private void ApplyItemStatBonus(Item item)
@@ -221,47 +201,32 @@ namespace DungeonShooter
         }
 
 
-        /// <summary>
-        /// 소비 아이템을 사용합니다.
-        /// </summary>
-        /// <param name="item">사용할 아이템</param>
-        /// <param name="target">스킬을 적용할 Entity</param>
-        /// <returns>사용 성공 여부</returns>
-        public async UniTask<bool> UseItem(Item item)
+        /// <summary> 소비 아이템 사용후 이벤트 실행, 갯수 차감 /// </summary>
+        public void UseItem(Item item)
         {
             if (item == null)
             {
                 LogHandler.LogWarning<Inventory>("아이템이 null입니다.");
-                return false;
+                return;
             }
 
             if (item.ItemTableEntry.ItemType != ItemType.Consume)
             {
                 LogHandler.LogWarning<Inventory>("소비 아이템만 사용할 수 있습니다.");
-                return false;
+                return;
             }
 
             if (!_items.Contains(item))
             {
                 LogHandler.LogWarning<Inventory>("인벤토리에 없는 아이템입니다.");
-                return false;
+                return;
             }
 
-            // 스킬 실행 (시전자 = 인벤토리 소유자)
-            var success = await item.ExecuteUseSkill(_owner);
-
-            // 사용 성공 시 아이템 제거
-            if (success)
-            {
-                item.StackCount--;
-                if (item.StackCount <= 0)
-                {
-                    RemoveItem(item);
-                }
-            }
-
-            return success;
+            item.StackCount--;
+            if (item.StackCount <= 0)
+                RemoveItem(item);
+            
+            OnItemUse?.Invoke(item);
         }
-
     }
 }
