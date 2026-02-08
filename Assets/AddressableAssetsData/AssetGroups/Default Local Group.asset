@@ -98,6 +98,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 65aec94b226ad461b897710ad13a8c75
+    m_Address: DamageUpSkillIcon
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 676ca14f427fc4c74a76a8271e618549
     m_Address: Tile_Tree_002
     m_ReadOnly: 0
@@ -105,6 +110,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 68cbc2d8171cd407f81f321629c6e28a
     m_Address: PlayerSpawnPoint
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6cd82b140799940518d7a2aabc0d294e
+    m_Address: HealthUpSkillIcon
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -144,6 +154,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 958b9c088e3f94a3eb3a12316f5e1413
+    m_Address: AttackUpSkillData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 985d7166b22864ff5b1fb72d1f3daf52
     m_Address: PlayerConfigTable
     m_ReadOnly: 0
@@ -156,6 +171,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a2d38bb937839452ca673fe7aa5497b4
     m_Address: SkillTable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a5ceb778d441e4c40950b5a37e070fcf
+    m_Address: HealthUpSkillData
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -201,11 +221,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f5237e1a4b00d4fe0a0f4fa9d094686c
     m_Address: StageConfig_001
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f5c978ab5f436be48882cd620ac3dcc3
-    m_Address: Assets/_ExternalAssets/Pixel Arsenal/Sound/Explosion8.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

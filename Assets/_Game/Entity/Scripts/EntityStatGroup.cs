@@ -9,6 +9,11 @@ namespace DungeonShooter
     /// </summary>
     public class EntityStatGroup
     {
+        /// <summary>
+        /// 특정 스탯의 수치가 변경되었을 때 발생. (StatType, 변경된 최종 수치)
+        /// </summary>
+        public event Action<StatType, int> OnStatChanged;
+
         private readonly Dictionary<StatType, EntityStat> _stats = new Dictionary<StatType, EntityStat>();
         private EntityStatsTableEntry _statsTableEntry;
 
@@ -76,6 +81,7 @@ namespace DungeonShooter
             }
 
             var entityStat = new EntityStat();
+            entityStat.OnValueChanged += value => OnStatChanged?.Invoke(type, value);
             _stats[type] = entityStat;
 
             return entityStat;

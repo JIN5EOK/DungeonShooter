@@ -91,7 +91,7 @@ namespace DungeonShooter
         /// <summary>
         /// 플레이어 설정으로 StatGroup, SkillGroup, 스킬, 인벤토리를 초기화합니다.
         /// </summary>
-        public async UniTask Initialize(PlayerConfigTableEntry config)
+        public async UniTask InitializeData(PlayerConfigTableEntry config)
         {
             if (config == null)
             {
@@ -117,6 +117,7 @@ namespace DungeonShooter
             if (_skill1 != null) SkillGroup.Regist(_skill1);
             if (_skill2 != null) SkillGroup.Regist(_skill2);
             
+            Inventory.Clear();
             Inventory.SetStatGroup(StatGroup);
             Inventory.SetSkillGroup(SkillGroup);
 
@@ -155,8 +156,9 @@ namespace DungeonShooter
 
             var healthComponent = player.gameObject.AddOrGetComponent<HealthComponent>();
             _healthBarUI = await _uIManager.CreateUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud, true);
-            _healthBarUI.SetHealth(healthComponent.CurrentHealth, healthComponent.MaxHealth);
-            healthComponent.OnHealthChanged += _healthBarUI.SetHealth;
+            _healthBarUI.SetHealthAndMaxHealth(healthComponent.CurrentHealth, healthComponent.MaxHealth);
+            healthComponent.OnHealthChanged += _healthBarUI.SetHealthAndMaxHealth;
+            StatGroup.OnStatChanged += HandleMaxHpChanged;
 
             _expGaugeHudUI = await _uIManager.CreateUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud, true);
             _expGaugeHudUI.SetLevel(Level);
@@ -180,7 +182,8 @@ namespace DungeonShooter
 
             if (_playerEntity.TryGetComponent(out HealthComponent healthComponent) && _healthBarUI != null)
             {
-                healthComponent.OnHealthChanged -= _healthBarUI.SetHealth;
+                healthComponent.OnHealthChanged -= _healthBarUI.SetHealthAndMaxHealth;
+                StatGroup.OnStatChanged -= HandleMaxHpChanged;
                 _healthBarUI.Hide();
             }
 
@@ -199,6 +202,16 @@ namespace DungeonShooter
 
             _interactComponent = null;
             _playerEntity = null;
+        }
+
+        private void HandleMaxHpChanged(StatType type, int newValue)
+        {
+            if (type != StatType.Hp || _healthBarUI == null || _playerEntity == null)
+            {
+                return;
+            }
+
+            _healthBarUI.SetMaxHealth(newValue);
         }
 
         private void SubscribeInput()

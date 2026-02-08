@@ -126,7 +126,7 @@ namespace DungeonShooter
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
             var entity = _sceneResourceProvider.AddOrGetComponentWithInejct<EntityBase>(playerInstance);
             
-            await _playerManager.Initialize(config);
+            await _playerManager.InitializeData(config);
             await InitializePlayerObject(playerInstance, entity);
             await _playerManager.BindPlayerEntity(entity);
             
@@ -167,9 +167,9 @@ namespace DungeonShooter
             playerInstance.tag = GameTags.Player;
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
             var entity = playerInstance.AddComponent<EntityBase>();
-            await _playerManager.Initialize(_playerConfigTableEntry);
-            entity.SetSkillGroup(_playerManager.SkillGroup);
+            await _playerManager.InitializeData(_playerConfigTableEntry);
             entity.SetStatGroup(_playerManager.StatGroup);
+            entity.SetSkillGroup(_playerManager.SkillGroup);
             await InitializePlayerObject(playerInstance, entity);
             await _playerManager.BindPlayerEntity(entity);
             

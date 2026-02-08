@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,6 +16,11 @@ namespace DungeonShooter
         private int _cachedValue;
         private int _cachedOriginValue;
         private bool _dirty = true;
+
+        /// <summary>
+        /// 스탯 수치가 변경되었을 때 발생. 인자에는 변경된 최종 수치가 전달된다.
+        /// </summary>
+        public event Action<int> OnValueChanged;
 
         /// <summary>
         /// 최종 수치 (캐시 반영, 변동 시 재계산)
@@ -55,6 +61,7 @@ namespace DungeonShooter
 
             list.Add(new StatModifier(modiType, value));
             _dirty = true;
+            RecomputeAndNotify();
         }
 
         /// <summary>
@@ -64,6 +71,17 @@ namespace DungeonShooter
         {
             _modifiersByKey.Remove(key);
             _dirty = true;
+            RecomputeAndNotify();
+        }
+
+        private void RecomputeAndNotify()
+        {
+            var oldValue = _cachedValue;
+            Recompute();
+            if (_cachedValue != oldValue)
+            {
+                OnValueChanged?.Invoke(_cachedValue);
+            }
         }
 
         private void Recompute()
