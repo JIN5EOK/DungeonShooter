@@ -55,8 +55,6 @@ namespace DungeonShooter
         {
             var velocity = Direction.normalized * MoveSpeed;
             _rigidbody.linearVelocity = velocity;
-            
-            Debug.Log($"{Direction.normalized} * {MoveSpeed} {velocity}");
         }
     }
 }

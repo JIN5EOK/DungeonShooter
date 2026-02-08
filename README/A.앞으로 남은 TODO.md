@@ -1,16 +1,10 @@
 # 미해결 이슈
-- 스탯 컴포넌트와 스킬 컴포넌트를 Pure C# 객체로 변경하기
-    - https://github.com/JIN5EOK/DungeonShooter/issues/5
+- StageInstantiator, StageGenerator를 Static 객체가 아닌 일반 객체로 변경하기
+  - https://github.com/JIN5EOK/DungeonShooter/issues/6 
 
 # 남은일들
 ## 필수 구현
-- [x] 인벤토리 UI 구현
-  - [x] 현재 획득한 아이템 리스트를 보여주는 인벤토리 창
-  - [x] 아이템을 버리거나 사용하거나 장착할 수 있도록 하기
-  - [x] 아이템 정보 창
-
-- [ ] 레벨업 시스템 구현
-  - [ ] 레벨업시 스킬 레벨업 기능 추가
+- [ ] 레벨업시 스킬 레벨업 기능 추가
 
 - [ ] 추가 아이템 및 스킬, 플레이어, 적 추가
   - [ ] 보스몬스터 추가
@@ -24,7 +18,7 @@
 - [ ] 적 이동 AI 개선
     - [ ] 현재 적이 플레이어를 추적하는 로직은 단순히 일직선으로 다가갈 뿐임, 장애물이 있으면 막힘
 
-## 최적화 영역
+## 최적화 및 구조 개선
 
 - [ ] 오브젝트 풀링 구현
   - 현재 게임 구조상 적 캐릭터 같은 경우는 별로 필요하지 않음
@@ -38,10 +32,14 @@
   - 어드레서블 에셋 그룹 정리
   - 스프라이트 아틀라스 처리
 
-# 이슈 모음 (해결 완료)
+
+
+# 해결 완료 이슈
 - ~~타일맵 직렬화 데이터 용량 감량~~
   - https://github.com/JIN5EOK/DungeonShooter/issues/2
 - ~~스테이지,방 생성 로직의 분리 필요~~
   - https://github.com/JIN5EOK/DungeonShooter/issues/3
 - ~~방 저장 구조와 방 에디터 구조 개선~~
   - https://github.com/JIN5EOK/DungeonShooter/issues/4
+- ~~스탯 컴포넌트와 스킬 컴포넌트를 Pure C# 객체로 변경하기~~
+  - https://github.com/JIN5EOK/DungeonShooter/issues/5
