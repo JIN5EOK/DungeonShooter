@@ -100,7 +100,7 @@ namespace DungeonShooter
                 // 예시 데이터 추가
                 if (tableEntryType == typeof(SkillTableEntry))
                 {
-                    writer.WriteLine("1,파이어볼,적을 태우는 화염구,skill_fireball_icon,skill_example,range:5.0/speed:2.5,damage:30/count:3,30,0,0.5,5.0,1,10.0");
+                    writer.WriteLine("1,파이어볼,적을 태우는 화염구,skill_fireball_icon,skill_example,range:5.0/speed:2.5,damage:30/count:3,30,0.5,5.0,1");
                 }
                 else if (tableEntryType == typeof(ItemTableEntry))
                 {

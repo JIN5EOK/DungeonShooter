@@ -164,6 +164,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c2bcd1ebe362d46fb98e01c9c8399e20
+    m_Address: UpgradeFireballSkillData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cca6752d4f664461da4b400edcc0613d
     m_Address: UI_Inventory
     m_ReadOnly: 0

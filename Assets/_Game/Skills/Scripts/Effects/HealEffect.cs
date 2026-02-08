@@ -9,7 +9,7 @@ namespace DungeonShooter
     [System.Serializable]
     public class HealEffect : EffectBase
     {
-        [Header("테이블의 Heal에 적용할 배율 (0 = 미적용, 1.0f = 1배율)")]
+        [Header("테이블의 Amount에 적용할 배율 (0 = 미적용, 1.0f = 1배율)")]
         [SerializeField]
         private float _healPercent = 1.0f;
 
@@ -21,7 +21,7 @@ namespace DungeonShooter
                 return UniTask.FromResult(false);
             }
 
-            var rawHeal = entry.Heal;
+            var rawHeal = entry.Amount;
             var heal = Mathf.RoundToInt(rawHeal * _healPercent);
             if (heal <= 0)
             {

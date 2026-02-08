@@ -28,9 +28,8 @@ namespace DungeonShooter
         /// <summary>Int 타입 수치 딕셔너리 </summary>
         public Dictionary<string, int> IntAmounts { get; set; } = new Dictionary<string, int>();
 
-        public int Damage { get; set; }
-
-        public int Heal { get; set; }
+        /// <summary>데미지(%) 또는 회복량 등 스킬 수치 (효과 타입에 따라 의미 상이)</summary>
+        public int Amount { get; set; }
 
         /// <summary> 스킬 사용시 지연 시간 </summary>
         public float Delay { get; set; }

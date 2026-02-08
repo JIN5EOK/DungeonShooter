@@ -13,7 +13,7 @@ namespace DungeonShooter
     {
         private const string DamageTextAddress = "DamageText";
 
-        [Header("테이블의 지정된 Damage에 적용할 배율\n0 = 데미지 적용 안됨, 1.0f = 1배율")]
+        [Header("테이블의 Amount에 적용할 배율\n0 = 데미지 적용 안됨, 1.0f = 1배율")]
         public float damagePercent = 1.0f;
 
         private ISceneResourceProvider _resourceProvider;
@@ -31,7 +31,7 @@ namespace DungeonShooter
                 return false;
             }
 
-            var tableDamagePercent = entry.Damage;
+            var tableDamagePercent = entry.Amount;
             var skillDamagePercent = Mathf.RoundToInt(tableDamagePercent * damagePercent);
             if (skillDamagePercent <= 0)
             {
