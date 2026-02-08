@@ -15,7 +15,7 @@ namespace DungeonShooter
         {
             _context.Self = GetComponent<EntityBase>();
         }
-
+ 
         private void Update()
         {
             if (_rootNode == null || _context == null)

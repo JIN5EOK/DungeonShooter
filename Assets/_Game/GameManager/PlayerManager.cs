@@ -43,8 +43,10 @@ namespace DungeonShooter
         private HealthBarHudUI _healthBarUI;
         private ExpGaugeHudUI _expGaugeHudUI;
         private SkillCooldownHudUI _skillCooldownHudUI;
+        private SkillCooldownSlot _weaponCooldownUI;
         private SkillCooldownSlot _skill1CooldownUI;
         private SkillCooldownSlot _skill2CooldownUI;
+        private Skill _boundWeaponActiveSkill;
 
         [Inject]
         private void Construct(InputManager inputManager
@@ -137,8 +139,14 @@ namespace DungeonShooter
 
             _skillCooldownHudUI = await _uIManager.CreateUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud, true);
             _skillCooldownHudUI.Clear();
+
+            _weaponCooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
             _skill1CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
             _skill2CooldownUI = _skillCooldownHudUI.AddSkillCooldownSlot();
+
+            OnWeaponEquipped(Inventory.EquippedWeapon);
+            Inventory.OnWeaponEquipped += OnWeaponEquipped;
+
             if (_skill1 != null)
             {
                 _skill1CooldownUI.SetMaxCooldown(_skill1.MaxCooldown);
@@ -189,8 +197,11 @@ namespace DungeonShooter
 
             if (_skillCooldownHudUI != null)
             {
+                Inventory.OnWeaponEquipped -= OnWeaponEquipped;
+                _boundWeaponActiveSkill.OnCooldownChanged -= _weaponCooldownUI.SetCooldown;
+                _boundWeaponActiveSkill = null;
                 _skillCooldownHudUI.Clear();
-                _skillCooldownHudUI.Hide();    
+                _skillCooldownHudUI.Hide();
             }
             
             if (_expGaugeHudUI != null)
@@ -202,6 +213,33 @@ namespace DungeonShooter
 
             _interactComponent = null;
             _playerEntity = null;
+        }
+
+        private void OnWeaponEquipped(Item weapon)
+        {
+            if (_weaponCooldownUI == null)
+            {
+                return;
+            }
+
+            if (_boundWeaponActiveSkill != null)
+            {
+                _boundWeaponActiveSkill.OnCooldownChanged -= _weaponCooldownUI.SetCooldown;
+                _boundWeaponActiveSkill = null;
+            }
+
+            if (weapon?.ActiveSkill == null)
+            {
+                _weaponCooldownUI.SetMaxCooldown(0f);
+                _weaponCooldownUI.SetCooldown(0f);
+                return;
+            }
+
+            _boundWeaponActiveSkill = weapon.ActiveSkill;
+            _weaponCooldownUI.SetMaxCooldown(_boundWeaponActiveSkill.MaxCooldown);
+            _weaponCooldownUI.SetSkillIcon(_boundWeaponActiveSkill.Icon);
+            _weaponCooldownUI.SetCooldown(_boundWeaponActiveSkill.Cooldown);
+            _boundWeaponActiveSkill.OnCooldownChanged += _weaponCooldownUI.SetCooldown;
         }
 
         private void HandleMaxHpChanged(StatType type, int newValue)

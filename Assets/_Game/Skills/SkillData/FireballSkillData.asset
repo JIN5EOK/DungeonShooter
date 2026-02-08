@@ -48,7 +48,7 @@ MonoBehaviour:
       data:
         executeTarget: 0
         _audioClipRef:
-          m_AssetGUID: f5c978ab5f436be48882cd620ac3dcc3
+          m_AssetGUID: 00263528ab539443f9c2392a9459c0cd
           m_SubObjectName: 
           m_SubObjectType: 
           m_SubObjectGUID: 
@@ -58,7 +58,7 @@ MonoBehaviour:
       data:
         executeTarget: 0
         _audioClipRef:
-          m_AssetGUID: f5c978ab5f436be48882cd620ac3dcc3
+          m_AssetGUID: 00263528ab539443f9c2392a9459c0cd
           m_SubObjectName: 
           m_SubObjectType: 
           m_SubObjectGUID: 
