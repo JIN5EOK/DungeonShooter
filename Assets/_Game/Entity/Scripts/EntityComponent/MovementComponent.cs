@@ -39,8 +39,8 @@ namespace DungeonShooter
 
         private void Awake()
         {
-            _rigidbody = GetComponent<Rigidbody2D>();
             _entityBase = GetComponent<EntityBase>();
+            _rigidbody = GetComponent<Rigidbody2D>();
         }
 
         private void Update()
@@ -55,6 +55,8 @@ namespace DungeonShooter
         {
             var velocity = Direction.normalized * MoveSpeed;
             _rigidbody.linearVelocity = velocity;
+            
+            Debug.Log($"{Direction.normalized} * {MoveSpeed} {velocity}");
         }
     }
 }

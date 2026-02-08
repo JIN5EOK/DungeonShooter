@@ -69,7 +69,7 @@ namespace DungeonShooter
             _escapeInputHandler = new ButtonInputHandlerKeyCode(KeyCode.Escape);
             _escapeInputHandler.InputValueChanged += isPressed => { if(isPressed) OnEscapePressed?.Invoke();};
         }
-
+        
         public void Dispose()
         {
             _moveInputHandler?.Dispose();

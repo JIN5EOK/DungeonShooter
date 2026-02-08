@@ -37,13 +37,18 @@ namespace DungeonShooter
 
         private Skill _skill1;
         private Skill _skill2;
+        
         private EntityBase _playerEntity;
         private PlayerConfigTableEntry _playerConfigTableEntry;
+        private MovementComponent _movementComponent;
+        private DashComponent _dashComponent;
         private InteractComponent _interactComponent;
+        private HealthComponent _healthComponent;
         
         private HealthBarHudUI _healthBarUI;
         private ExpGaugeHudUI _expGaugeHudUI;
         private SkillCooldownHudUI _skillCooldownHudUI;
+        
         private SkillCooldownSlot _weaponCooldownUI;
         private SkillCooldownSlot _skill1CooldownUI;
         private SkillCooldownSlot _skill2CooldownUI;
@@ -113,17 +118,15 @@ namespace DungeonShooter
 
             StatGroup = new EntityStatGroup();
             StatGroup.Initialize(statsEntry);
-
+            
             SkillGroup = new EntitySkillGroup();
             _skill1 = await _skillFactory.CreateSkillAsync(config.Skill1Id);
             _skill2 = await _skillFactory.CreateSkillAsync(config.Skill2Id);
             if (_skill1 != null) SkillGroup.Regist(_skill1);
             if (_skill2 != null) SkillGroup.Regist(_skill2);
-
+            
             Inventory.Clear();
-            Inventory.SetStatGroup(StatGroup);
-            Inventory.SetSkillGroup(SkillGroup);
-
+            
             var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);
             await Inventory.AddItem(weapon);
             await Inventory.EquipItem(weapon);
@@ -139,10 +142,15 @@ namespace DungeonShooter
             if (player == null) 
                 return;
 
-            player.gameObject.AddOrGetComponent<MovementComponent>();
-            player.gameObject.AddOrGetComponent<InteractComponent>();
+            Inventory.SetStatGroup(StatGroup);
+            Inventory.SetSkillGroup(SkillGroup);
+            player.SetStatGroup(StatGroup);
+            player.SetSkillGroup(SkillGroup);
+            
+            _movementComponent = player.gameObject.AddOrGetComponent<MovementComponent>();
+            _interactComponent = player.gameObject.AddOrGetComponent<InteractComponent>();
             var healthComponent = player.gameObject.AddOrGetComponent<HealthComponent>();
-            player.gameObject.AddOrGetComponent<DashComponent>();
+            _dashComponent = player.gameObject.AddOrGetComponent<DashComponent>();
             var cameraTrackComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<CameraTrackComponent>(player.gameObject);
             await cameraTrackComponent.AttachCameraAsync();
             healthComponent.FullHeal();
@@ -186,8 +194,6 @@ namespace DungeonShooter
             _expGaugeHudUI.SetMaxExp(ExpPerLevel);
             OnLevelChanged += _expGaugeHudUI.SetLevel;
             OnExpChanged += _expGaugeHudUI.SetExp;
-
-            _interactComponent = player.GetComponent<InteractComponent>();
 
             SubscribeInput();
         }
@@ -266,7 +272,9 @@ namespace DungeonShooter
 
         private void SubscribeInput()
         {
-            if (_inputManager == null) return;
+            if (_inputManager == null) 
+                return;
+            
             _inputManager.OnMoveInputChanged += HandleMoveInputChanged;
             _inputManager.OnWeaponAttack += HandleWeaponAttack;
             _inputManager.OnSkill1Pressed += HandleSkill1Pressed;
@@ -278,7 +286,9 @@ namespace DungeonShooter
 
         private void UnsubscribeInput()
         {
-            if (_inputManager == null) return;
+            if (_inputManager == null) 
+                return;
+            
             _inputManager.OnMoveInputChanged -= HandleMoveInputChanged;
             _inputManager.OnWeaponAttack -= HandleWeaponAttack;
             _inputManager.OnSkill1Pressed -= HandleSkill1Pressed;
@@ -290,33 +300,44 @@ namespace DungeonShooter
 
         private void HandleMoveInputChanged(Vector2 input)
         {
-            if (_playerEntity == null) return;
-            var movement = _playerEntity.GetComponent<MovementComponent>();
-            if (movement != null) movement.Direction = input;
+            if (_playerEntity == null) 
+                return;
+            
+            if (_movementComponent != null)
+            {
+                _movementComponent.Direction = input;
+            }
         }
 
         private void HandleDashPressed()
         {
-            if (_playerEntity == null) return;
-            var dash = _playerEntity.GetComponent<DashComponent>();
-            dash?.StartDash();
+            if (_playerEntity == null)
+                return;
+            
+            _dashComponent?.StartDash();
         }
 
         private void HandleWeaponAttack()
         {
-            if (_playerEntity == null) return;
+            if (_playerEntity == null) 
+                return;
+            
             Inventory.EquippedWeapon?.ExecuteActiveSkill(_playerEntity).Forget();
         }
 
         private void HandleSkill1Pressed()
         {
-            if (_playerEntity == null) return;
+            if (_playerEntity == null) 
+                return;
+            
             _skill1?.Execute(_playerEntity).Forget();
         }
 
         private void HandleSkill2Pressed()
         {
-            if (_playerEntity == null) return;
+            if (_playerEntity == null) 
+                return;
+            
             _skill2?.Execute(_playerEntity).Forget();
         }
 
@@ -332,10 +353,15 @@ namespace DungeonShooter
         private async void HandleEscapePressed()
         {
             var inventoryUI = await _uIManager.CreateUIAsync<InventoryUI>(UIAddresses.UI_Inventory, true);
+
             if (inventoryUI.gameObject.activeSelf)
+            {
                 inventoryUI.Hide();
+            }
             else
+            {
                 inventoryUI.Show();
+            }
         }
 
         private void OnDestroy()

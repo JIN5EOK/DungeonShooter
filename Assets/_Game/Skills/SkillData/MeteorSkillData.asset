@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 283c72616b63046e8aa598bcb4aa5e6d, type: 3}
+  m_Name: MeteorSkillData
+  m_EditorClassIdentifier: 
+  _activeEffects:
+  - rid: 2338584428129026282
+  - rid: 2338584455566852190
+  _passiveEffects: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 2338584428129026282
+      type: {class: SpawnMeteorEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      data:
+        executeTarget: 0
+        _searchCenter: 0
+        _searchRadius: 10
+        _maxTargetCount: 5
+        _skillObject:
+          m_AssetGUID: 1654f787912fc4307b0db38dc6acf3a7
+          m_SubObjectName: 
+          m_SubObjectType: 
+          m_SubObjectGUID: 
+          m_EditorAssetChanged: 0
+        _speed: 15
+        _lifeTime: 5
+        _hitRadius: 0.5
+        _spawnOffset: {x: -7, y: 7}
+        _effects:
+        - rid: 2338584428129026283
+        - rid: 2338584455566852188
+        - rid: 2338584455566852189
+    - rid: 2338584428129026283
+      type: {class: DamageEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      data:
+        executeTarget: 1
+        damagePercent: 1
+    - rid: 2338584455566852188
+      type: {class: SpawnParticleEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      data:
+        executeTarget: 0
+        _particlePrefab:
+          m_AssetGUID: 550f8ea83664141b3ae95895d662ca51
+          m_SubObjectName: 
+          m_SubObjectType: 
+          m_SubObjectGUID: 
+          m_EditorAssetChanged: 0
+        _spawnPosition: 1
+    - rid: 2338584455566852189
+      type: {class: PlaySoundEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      data:
+        executeTarget: 0
+        _audioClipRef:
+          m_AssetGUID: 00263528ab539443f9c2392a9459c0cd
+          m_SubObjectName: 
+          m_SubObjectType: 
+          m_SubObjectGUID: 
+          m_EditorAssetChanged: 0
+    - rid: 2338584455566852190
+      type: {class: PlaySoundEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      data:
+        executeTarget: 0
+        _audioClipRef:
+          m_AssetGUID: 00263528ab539443f9c2392a9459c0cd
+          m_SubObjectName: 
+          m_SubObjectType: 
+          m_SubObjectGUID: 
+          m_EditorAssetChanged: 0
