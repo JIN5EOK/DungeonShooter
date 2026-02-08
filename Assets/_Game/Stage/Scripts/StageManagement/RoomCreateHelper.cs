@@ -283,8 +283,6 @@ namespace DungeonShooter
                 return await ResolveRoomEventTriggerEntryAsync(eventTriggerEntry, position, rotation, playerFactory, enemyFactory, sceneResourceProvider);
             if (entry is EnemyConfigTableEntry enemyConfig)
                 return await ResolveEnemyEntryAsync(tableId, enemyConfig, position, rotation, enemyFactory, sceneResourceProvider);
-            if (entry is PlayerConfigTableEntry playerConfig)
-                return await ResolvePlayerEntryAsync(tableId, playerConfig, position, rotation, playerFactory, sceneResourceProvider);
             return null;
         }
 
@@ -298,8 +296,6 @@ namespace DungeonShooter
                 return ResolveRoomEventTriggerEntrySync(eventTriggerEntry, position, rotation, playerFactory, enemyFactory, sceneResourceProvider);
             if (entry is EnemyConfigTableEntry enemyConfig)
                 return ResolveEnemyEntrySync(tableId, enemyConfig, position, rotation, enemyFactory, sceneResourceProvider);
-            if (entry is PlayerConfigTableEntry playerConfig)
-                return ResolvePlayerEntrySync(tableId, playerConfig, position, rotation, playerFactory, sceneResourceProvider);
             return null;
         }
 
@@ -321,26 +317,6 @@ namespace DungeonShooter
                 return enemy != null ? enemy.gameObject : null;
             }
             return sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey, position, rotation);
-        }
-
-        private static async Task<GameObject> ResolvePlayerEntryAsync(int tableId, PlayerConfigTableEntry playerConfig, Vector3 position, Quaternion rotation, IPlayerFactory playerFactory, ISceneResourceProvider sceneResourceProvider)
-        {
-            if (Application.isPlaying && playerFactory != null)
-            {
-                var player = await playerFactory.GetPlayerByConfigIdAsync(tableId, position, rotation);
-                return player != null ? player.gameObject : null;
-            }
-            return await sceneResourceProvider.GetInstanceAsync(playerConfig.GameObjectKey, position, rotation);
-        }
-
-        private static GameObject ResolvePlayerEntrySync(int tableId, PlayerConfigTableEntry playerConfig, Vector3 position, Quaternion rotation, IPlayerFactory playerFactory, ISceneResourceProvider sceneResourceProvider)
-        {
-            if (Application.isPlaying && playerFactory != null)
-            {
-                var player = playerFactory.GetPlayerByConfigIdSync(tableId, position, rotation);
-                return player != null ? player.gameObject : null;
-            }
-            return sceneResourceProvider.GetInstanceSync(playerConfig.GameObjectKey, position, rotation);
         }
 
         private static async Task<GameObject> ResolveRoomEventTriggerEntryAsync(RoomEventTriggerTableEntry eventTriggerEntry, Vector3 position, Quaternion rotation, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)

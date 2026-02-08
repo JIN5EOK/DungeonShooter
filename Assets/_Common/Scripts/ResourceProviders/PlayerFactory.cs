@@ -11,11 +11,8 @@ namespace DungeonShooter
     /// </summary>
     public interface IPlayerFactory
     {
-        public event Action<EntityBase> OnPlayerCreated;
         UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
         EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        UniTask<EntityBase> GetPlayerByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        EntityBase GetPlayerByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
 
     /// <summary>
@@ -23,7 +20,6 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerFactory : IPlayerFactory
     {
-        public event Action<EntityBase> OnPlayerCreated;
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
@@ -42,7 +38,7 @@ namespace DungeonShooter
             _playerManager = playerManager;
             _playerConfigTableEntry = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
         }
-
+        
         /// <summary>
         /// 플레이어 캐릭터를 가져옵니다
         /// </summary>
@@ -80,61 +76,6 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 지정한 PlayerConfigTableEntry ID로 플레이어를 비동기 생성합니다.
-        /// </summary>
-        public async UniTask<EntityBase> GetPlayerByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
-        {
-            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(configId);
-            if (config == null)
-            {
-                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigTableEntry를 찾을 수 없습니다. ID: {configId}");
-                return null;
-            }
-
-            var playerInstance = await _sceneResourceProvider.GetInstanceAsync(config.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
-            return await InitializePlayerInstanceWithConfig(playerInstance, config);
-        }
-
-        /// <summary>
-        /// 지정한 PlayerConfigTableEntry ID로 플레이어를 동기 생성합니다.
-        /// </summary>
-        public EntityBase GetPlayerByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
-        {
-            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(configId);
-            if (config == null)
-            {
-                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigTableEntry를 찾을 수 없습니다. ID: {configId}");
-                return null;
-            }
-
-            var playerInstance = _sceneResourceProvider.GetInstanceSync(config.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
-            return InitializePlayerInstanceWithConfig(playerInstance, config).GetAwaiter().GetResult();
-        }
-
-        /// <summary>
-        /// 지정한 설정으로 플레이어 인스턴스를 초기화합니다.
-        /// </summary>
-        private async UniTask<EntityBase> InitializePlayerInstanceWithConfig(GameObject playerInstance, PlayerConfigTableEntry config)
-        {
-            if (playerInstance == null)
-            {
-                LogHandler.LogWarning<PlayerFactory>("플레이어 인스턴스가 생성되지 않았습니다.");
-                return null;
-            }
-
-            playerInstance.tag = GameTags.Player;
-            playerInstance.layer = PhysicalLayers.Player.LayerIndex;
-            var entity = _sceneResourceProvider.AddOrGetComponentWithInejct<EntityBase>(playerInstance);
-            
-            await _playerManager.InitializeData(config);
-            await InitializePlayerObject(playerInstance, entity);
-            await _playerManager.BindPlayerEntity(entity);
-            
-            OnPlayerCreated?.Invoke(entity);
-            return entity;
-        }
-
-        /// <summary>
         /// 플레이어 프리팹 어드레스 추출 및 검증
         /// </summary>
         private string GetPlayerAddress()
@@ -167,29 +108,8 @@ namespace DungeonShooter
             playerInstance.tag = GameTags.Player;
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
             var entity = playerInstance.AddComponent<EntityBase>();
-            await _playerManager.InitializeData(_playerConfigTableEntry);
-            entity.SetStatGroup(_playerManager.StatGroup);
-            entity.SetSkillGroup(_playerManager.SkillGroup);
-            await InitializePlayerObject(playerInstance, entity);
-            await _playerManager.BindPlayerEntity(entity);
-            
-            OnPlayerCreated?.Invoke(entity);
+            await _playerManager.InitializePlayer(_playerConfigTableEntry, entity);
             return entity;
-        }
-
-        /// <summary>
-        /// 씬용 컴포넌트 추가 및 사망 시 Destroy 구독을 설정합니다.
-        /// </summary>
-        private async UniTask InitializePlayerObject(GameObject playerInstance, EntityBase entity)
-        {
-            playerInstance.AddOrGetComponent<MovementComponent>();
-            playerInstance.AddOrGetComponent<InteractComponent>();
-            var healthComponent = playerInstance.AddOrGetComponent<HealthComponent>();
-            playerInstance.AddOrGetComponent<DashComponent>();
-            var cameraTrackComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<CameraTrackComponent>(playerInstance);
-            await cameraTrackComponent.AttachCameraAsync();
-            healthComponent.FullHeal();
-            healthComponent.OnDeath += () => entity.Destroy();
         }
     }
 }

@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
 using VContainer;
+using Object = UnityEngine.Object;
 
 namespace DungeonShooter
 {
@@ -91,9 +92,9 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 플레이어 설정으로 StatGroup, SkillGroup, 스킬, 인벤토리를 초기화합니다.
+        /// 플레이어 설정으로 StatGroup, SkillGroup, 스킬, 인벤토리를 초기화하고 플레이어 캐릭터에 바인딩합니다.
         /// </summary>
-        public async UniTask InitializeData(PlayerConfigTableEntry config)
+        public async UniTask InitializePlayer(PlayerConfigTableEntry config, EntityBase entity)
         {
             if (config == null)
             {
@@ -118,7 +119,7 @@ namespace DungeonShooter
             _skill2 = await _skillFactory.CreateSkillAsync(config.Skill2Id);
             if (_skill1 != null) SkillGroup.Regist(_skill1);
             if (_skill2 != null) SkillGroup.Regist(_skill2);
-            
+
             Inventory.Clear();
             Inventory.SetStatGroup(StatGroup);
             Inventory.SetSkillGroup(SkillGroup);
@@ -126,15 +127,27 @@ namespace DungeonShooter
             var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);
             await Inventory.AddItem(weapon);
             await Inventory.EquipItem(weapon);
+            
+            await BindPlayerEntity(entity);
         }
 
         /// <summary>
-        /// 플레이어 캐릭터에 StatGroup/SkillGroup/Inventory를 바인딩하고, UI를 설정합니다.
+        /// 기존에 갖고있던 스킬,스탯,인벤토리 데이터를 기반으로 새로운 플레이어 인스턴스를 바인딩합니다.
         /// </summary>
         public async UniTask BindPlayerEntity(EntityBase player)
         {
-            if (player == null) return;
+            if (player == null) 
+                return;
 
+            player.gameObject.AddOrGetComponent<MovementComponent>();
+            player.gameObject.AddOrGetComponent<InteractComponent>();
+            var healthComponent = player.gameObject.AddOrGetComponent<HealthComponent>();
+            player.gameObject.AddOrGetComponent<DashComponent>();
+            var cameraTrackComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<CameraTrackComponent>(player.gameObject);
+            await cameraTrackComponent.AttachCameraAsync();
+            healthComponent.FullHeal();
+            healthComponent.OnDeath += () => Object.Destroy(player.gameObject);
+            
             _playerEntity = player;
 
             _skillCooldownHudUI = await _uIManager.CreateUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud, true);
@@ -162,7 +175,6 @@ namespace DungeonShooter
 
             player.OnDestroyed += UnbindPlayerEntity;
 
-            var healthComponent = player.gameObject.AddOrGetComponent<HealthComponent>();
             _healthBarUI = await _uIManager.CreateUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud, true);
             _healthBarUI.SetHealthAndMaxHealth(healthComponent.CurrentHealth, healthComponent.MaxHealth);
             healthComponent.OnHealthChanged += _healthBarUI.SetHealthAndMaxHealth;
@@ -181,13 +193,13 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 현재 플레이어 연결을 해제합니다.
+        /// 현재 플레이어 인스턴스 연결을 해제합니다.
         /// </summary>
         public void UnbindPlayerEntity(EntityBase player)
         {
             if (_playerEntity != player) 
                 return;
-
+            
             if (_playerEntity.TryGetComponent(out HealthComponent healthComponent) && _healthBarUI != null)
             {
                 healthComponent.OnHealthChanged -= _healthBarUI.SetHealthAndMaxHealth;
