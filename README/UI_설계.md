@@ -45,8 +45,5 @@ classDiagram
   * `UIType`별 캔버스 및 계층구조 생성
     * `UIType`별로 캔버스를 생성한다 
     * 캔버스간 정렬 순서는 UIType에 정의된 순서를 따른다 (HudUI < PopupUI)
-* `StageUIManager`를 비롯한 서브 UIManager들 
-  * 실질적인 UI 관리 책임 담당, `UIManager`를 통해 UI를 얻어오되 생명주기 책임 및 특정 UI관련 구체적인 기능 제공
-  * UI 사용자들은 UIManager보다는 서브 UIManager를 통해 통신
 * `CreateUIAsync` 의 `isUnique`
   * UI를 불러올때 동일한 UI를 사용할건지 여부, 처음 불러올때 내부에 주소 : UI 형태로 캐시해두고 같은 요청이 있을때 같은 UI반환
