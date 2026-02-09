@@ -58,37 +58,30 @@ namespace DungeonShooter
 
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
-            if (context.Caster == null)
-            {
-                LogHandler.LogError<SpawnMeteorEffect>("시전자가 없습니다.");
+            if(!await base.Execute(context, entry))
                 return false;
-            }
 
             var center = _searchCenter == SkillOwner.LastHitTarget && context.LastHitTarget != null ? (Vector2)context.LastHitTarget.transform.position : 
                 (Vector2)context.Caster.transform.position;
 
             var targets = FindTargetsInRange(center, context);
-            if (targets.Count == 0)
-                return true;
 
-            try
+            var isSucceed = true;
+            
+            foreach (var target in targets)
             {
-                foreach (var target in targets)
-                {
-                    var spawnPosition = (Vector2)target.transform.position + _spawnOffset;
-                    var obj = await context.ResourceProvider.GetInstanceAsync(SkillObjectAddress, spawnPosition, Quaternion.identity);
-                    var skillObj = obj.AddOrGetComponent<HomingSkillObject>();
-                    context = context.WithLastHitTarget(target);
-                    skillObj.Initialize(_effects, entry, context, target, _speed, _lifeTime, _hitRadius);
-                }
+                var spawnPosition = (Vector2)target.transform.position + _spawnOffset;
+                var obj = await context.SceneResourceProvider.GetInstanceAsync(SkillObjectAddress, spawnPosition, Quaternion.identity);
 
-                return true;
+                if (obj == null)
+                    return false;
+                
+                var skillObj = obj.AddOrGetComponent<HomingSkillObject>();
+                context = context.WithLastHitTarget(target);
+                skillObj.Initialize(_effects, entry, context, target, _speed, _lifeTime, _hitRadius);
             }
-            catch (Exception e)
-            {
-                LogHandler.LogException<SpawnMeteorEffect>(e, "메테오 스킬 오브젝트 생성 실패");
-                return false;
-            }
+
+            return true;
         }
 
         /// <summary>

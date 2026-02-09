@@ -53,13 +53,13 @@ namespace DungeonShooter
         {
             if (handle.Status != AsyncOperationStatus.Succeeded)
             {
-                Debug.LogWarning($"[{nameof(SceneResourceProvider)}] 인스턴스 생성 실패: {address}");
+                Debug.LogError($"[{nameof(SceneResourceProvider)}] 인스턴스 생성 실패: {address}");
                 return null;
             }
 
             if (handle.Result == null)
             {
-                Debug.LogWarning($"[{nameof(SceneResourceProvider)}] 인스턴스가 null입니다: {address}");
+                Debug.LogError($"[{nameof(SceneResourceProvider)}] 인스턴스가 null입니다: {address}");
                 return null;
             }
 
@@ -123,7 +123,7 @@ namespace DungeonShooter
         {
             if (handle.Status != AsyncOperationStatus.Succeeded)
             {
-                Debug.LogWarning($"[{nameof(SceneResourceProvider)}] 에셋 로드 실패: {address}");
+                Debug.LogError($"[{nameof(SceneResourceProvider)}] 에셋 로드 실패: {address}");
                 return null;
             }
 
@@ -184,14 +184,14 @@ namespace DungeonShooter
         {
             if (handle.Status != AsyncOperationStatus.Succeeded || handle.Result == null)
             {
-                Debug.LogWarning($"[{nameof(SceneResourceProvider)}] 스프라이트 아틀라스 로드 실패: {atlasAddress}");
+                Debug.LogError($"[{nameof(SceneResourceProvider)}] 스프라이트 아틀라스 로드 실패: {atlasAddress}");
                 return null;
             }
 
             var sprite = handle.Result.GetSprite(spriteName);
             if (sprite == null)
             {
-                Debug.LogWarning($"[{nameof(SceneResourceProvider)}] 아틀라스 내 스프라이트를 찾을 수 없음: {spriteName}");
+                Debug.LogError($"[{nameof(SceneResourceProvider)}] 아틀라스 내 스프라이트를 찾을 수 없음: {spriteName}");
                 return null;
             }
 

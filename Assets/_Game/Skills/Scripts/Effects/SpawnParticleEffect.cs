@@ -24,27 +24,22 @@ namespace DungeonShooter
 
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
-            try
-            {
-                var position = _spawnPosition == SkillOwner.LastHitTarget && context.LastHitTarget != null
-                    ? context.LastHitTarget.transform.position
-                    : context.Caster.transform.position;
+            var position = _spawnPosition == SkillOwner.LastHitTarget && context.LastHitTarget != null
+                ? context.LastHitTarget.transform.position
+                : context.Caster.transform.position;
                 
-                var obj = await context.ResourceProvider.GetInstanceAsync(ParticlePrefabAddress, position);
+            var obj = await context.SceneResourceProvider.GetInstanceAsync(ParticlePrefabAddress, position);
 
-                var particleSystem = obj.GetComponentInChildren<ParticleSystem>();
-                if (particleSystem != null)
-                {
-                    particleSystem.Play();
-                }
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                LogHandler.LogException<SpawnParticleEffect>(e, "파티클 오브젝트 생성 실패");
+            if (obj == null)
                 return false;
+                
+            var particleSystem = obj.GetComponentInChildren<ParticleSystem>();
+            if (particleSystem != null)
+            {
+                particleSystem.Play();
             }
+
+            return true;
         }
     }
 }

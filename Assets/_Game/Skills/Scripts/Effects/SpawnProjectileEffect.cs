@@ -46,32 +46,27 @@ namespace DungeonShooter
 
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
-            try
-            { 
-                var position = _spawnPosition == SkillOwner.Caster ? context.Caster.transform.position : context.LastHitTarget.transform.position;
-                Quaternion rotation = Quaternion.identity;
-                if (_rotateToCastDirection)
-                {
-                    if (context.Caster.TryGetComponent(out MovementComponent moveComp))
-                    {
-                        var direction = moveComp.LookDirection;
-                        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                        rotation = Quaternion.Euler(0f, 0f, angle);    
-                    }
-                }
-                var obj = await context.ResourceProvider.GetInstanceAsync(SkillObjectAddress, position, rotation);
-                var skillObj = obj.AddOrGetComponent<ProjectileSkillObject>();
-                
-                skillObj.Initialize(_effects, entry, context, targetCount, speed, lifeTime, _rotateToCastDirection);
-
-                return false;
-            }
-            catch (Exception e)
+            var position = _spawnPosition == SkillOwner.Caster ? context.Caster.transform.position : context.LastHitTarget.transform.position;
+            Quaternion rotation = Quaternion.identity;
+            if (_rotateToCastDirection)
             {
-                LogHandler.LogException<SpawnProjectileEffect>(e, "스킬 오브젝트 생성 실패");
+                if (context.Caster.TryGetComponent(out MovementComponent moveComp))
+                {
+                    var direction = moveComp.LookDirection;
+                    var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                    rotation = Quaternion.Euler(0f, 0f, angle);    
+                }
             }
+            
+            var obj = await context.SceneResourceProvider.GetInstanceAsync(SkillObjectAddress, position, rotation);
 
-            return false;
+            if (obj == null)
+                return false;
+            
+            var skillObj = obj.AddOrGetComponent<ProjectileSkillObject>();
+            skillObj.Initialize(_effects, entry, context, targetCount, speed, lifeTime, _rotateToCastDirection);
+
+            return true;
         }
     }
 }

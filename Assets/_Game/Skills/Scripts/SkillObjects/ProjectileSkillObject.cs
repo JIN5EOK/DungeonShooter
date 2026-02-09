@@ -13,11 +13,8 @@ namespace DungeonShooter
         private float _lifeTime;
         private int _targetCount;
         private bool _rotateToCastDirection;
-
         private float _elapsedTime = 0f;
-
         private Vector2 _direction = Vector2.right;
-
         private readonly HashSet<EntityBase> _appliedTargets = new HashSet<EntityBase>();
 
         public void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
@@ -71,6 +68,7 @@ namespace DungeonShooter
                 return;
 
             _appliedTargets.Add(otherEntity);
+            
             if (effects != null)
             {
                 var newContext = context.WithLastHitTarget(otherEntity);
@@ -79,6 +77,7 @@ namespace DungeonShooter
 
             if (_appliedTargets.Count >= _targetCount)
             {
+                // 풀링 로직 적용 필요
                 Destroy(gameObject);
             }
         }

@@ -22,29 +22,22 @@ namespace DungeonShooter
 
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
-            if (!_audioClipRef.RuntimeKeyIsValid())
+            if (!await base.Execute(context, entry))
+                return false;
+                
+            if (_audioClipRef == null)
             {
                 LogHandler.LogWarning<PlaySoundEffect>("오디오 클립 에셋 레퍼런스가 비어 있습니다.");
                 return false;
             }
 
-            try
-            {
-                var clip = await context.ResourceProvider.GetAssetAsync<AudioClip>(AudioClipAddress);
-                if (clip == null)
-                {
-                    LogHandler.LogError<PlaySoundEffect>($"오디오 클립을 로드할 수 없습니다: {AudioClipAddress}");
-                    return false;
-                }
-
-                AudioPlayer.PlayOneShot(clip);
-                return true;
-            }
-            catch (Exception e)
-            {
-                LogHandler.LogException<PlaySoundEffect>(e, "효과음 재생 실패");
+            var clip = await context.SceneResourceProvider.GetAssetAsync<AudioClip>(AudioClipAddress);
+            
+            if (clip == null)
                 return false;
-            }
+            
+            AudioPlayer.PlayOneShot(clip);
+            return true;
         }
     }
 }

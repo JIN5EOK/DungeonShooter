@@ -18,12 +18,8 @@ namespace DungeonShooter
 
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
-            if (entry == null)
-            {
-                LogHandler.LogError<DamageEffect>("SkillTableEntry가 null입니다.");
+            if (!await base.Execute(context, entry))
                 return false;
-            }
-
         
             var targetEntity = executeTarget == SkillOwner.Caster
             ? context.Caster 
@@ -47,20 +43,14 @@ namespace DungeonShooter
 
                 health.TakeDamage(finalDamage);
 
-                if (context.ResourceProvider != null)
+                // TODO: 데미지 텍스트는 아주 많이 사용되는 객체라 풀링 및 최적화 적용 반드시 필요
+                var damageTextGo = await context.SceneResourceProvider.GetInstanceAsync(DamageTextAddress);
+                if (damageTextGo != null)
                 {
-                    // TODO: 데미지 텍스트는 아주 많이 사용되는 객체라 풀링 및 최적화 적용 반드시 필요
-                    var damageTextGo = await context.ResourceProvider.GetInstanceAsync(DamageTextAddress);
-                    if (damageTextGo != null)
-                    {
-                        var hitPosition = context.LastHitTarget.transform.position;
-                        damageTextGo.transform.position = hitPosition + (Vector3)(UnityEngine.Random.insideUnitCircle * 0.5f) + Vector3.up;
-                        var tmpText = damageTextGo.GetComponentInChildren<TMP_Text>(true);
-                        if (tmpText != null)
-                        {
-                            tmpText.text = finalDamage.ToString();
-                        }
-                    }
+                    var hitPosition = context.LastHitTarget.transform.position;
+                    damageTextGo.transform.position = hitPosition + (Vector3)(UnityEngine.Random.insideUnitCircle * 0.5f) + Vector3.up;
+                    var tmpText = damageTextGo.GetComponentInChildren<TMP_Text>(true);
+                    tmpText.SetText(finalDamage.ToString());
                 }
 
                 return true;

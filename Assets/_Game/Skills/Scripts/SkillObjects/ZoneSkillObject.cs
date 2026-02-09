@@ -18,8 +18,6 @@ namespace DungeonShooter
         /// <summary>
         /// 장판 스킬 오브젝트를 초기화합니다.
         /// </summary>
-        /// <param name="duration">장판 지속시간 (초)</param>
-        /// <param name="applyInterval">이펙트 적용 주기 (초)</param>
         public void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
             SkillExecutionContext context, float duration, float applyInterval)
         {

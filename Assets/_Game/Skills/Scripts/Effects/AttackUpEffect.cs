@@ -20,29 +20,19 @@ namespace DungeonShooter
 
         public override void Activate(EntityBase owner, SkillTableEntry entry)
         {
-            if (entry == null || owner?.StatGroup == null)
-            {
-                return;
-            }
+            base.Activate(owner, entry);
 
             var percent = Mathf.RoundToInt(entry.Amount * _amountPercent);
-            if (percent <= 0)
-            {
-                return;
-            }
-
-            var multiply = 100 + percent;
-            var bonus = new StatBonus(0, 100, 0, multiply, 0, 100, 0, 100);
+            var attackMultiply = 100 + percent;
+            
+            var bonus = new StatBonus(0, 100, 0, attackMultiply, 0, 100, 0, 100);
             
             owner.StatGroup.ApplyStatBonus(this, bonus);
         }
 
         public override void Deactivate(EntityBase owner, SkillTableEntry entry)
         {
-            if (owner?.StatGroup == null)
-            {
-                return;
-            }
+            base.Deactivate(owner, entry);
 
             owner.StatGroup.RemoveStatBonus(this);
         }

@@ -40,21 +40,16 @@ namespace DungeonShooter
 
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
-            try
-            {
-                var position = _spawnPosition == SkillOwner.Caster ? context.Caster.transform.position : context.LastHitTarget.transform.position;
-                var obj = await context.ResourceProvider.GetInstanceAsync(SkillObjectAddress, position);
-                var skillObj = obj.AddOrGetComponent<ZoneSkillObject>();
-                skillObj.Initialize(_effects, entry, context, _duration, _applyInterval);
+            var position = _spawnPosition == SkillOwner.Caster ? context.Caster.transform.position : context.LastHitTarget.transform.position;
+            var obj = await context.SceneResourceProvider.GetInstanceAsync(SkillObjectAddress, position);
+            
+            if(obj == null)
+                return false;
+            
+            var skillObj = obj.AddOrGetComponent<ZoneSkillObject>();
+            skillObj.Initialize(_effects, entry, context, _duration, _applyInterval);
 
-                return true;
-            }
-            catch (Exception e)
-            {
-                LogHandler.LogException<SpawnZoneEffect>(e, "장판 스킬 오브젝트 생성 실패");
-            }
-
-            return false;
+            return true;
         }
     }
 }

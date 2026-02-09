@@ -15,19 +15,10 @@ namespace DungeonShooter
 
         public override UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
-            if (entry == null)
-            {
-                LogHandler.LogError<HealEffect>("SkillTableEntry가 null입니다.");
-                return UniTask.FromResult(false);
-            }
-
+            base.Execute(context, entry);
+            
             var rawHeal = entry.Amount;
             var heal = Mathf.RoundToInt(rawHeal * _healPercent);
-            if (heal <= 0)
-            {
-                LogHandler.LogWarning<HealEffect>("회복량이 0 이하입니다.");
-                return UniTask.FromResult(false);
-            }
 
             if (context.LastHitTarget.TryGetComponent(out HealthComponent health))
             {

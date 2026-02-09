@@ -5,7 +5,7 @@ using UnityEngine;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 지정한 타겟을 추적하다가, 타겟에 도달하면 이펙트를 실행하는 스킬 오브젝트. (메테오 등)
+    /// 지정한 타겟을 추적하다가 타겟에 도달하면 이펙트를 실행하는 스킬 오브젝트
     /// </summary>
     public class HomingSkillObject : SkillObjectBase
     {
@@ -17,12 +17,8 @@ namespace DungeonShooter
         private bool _effectExecuted;
 
         /// <summary>
-        /// 타겟 추적 스킬 오브젝트를 초기화합니다.
+        /// 스킬 오브젝트를 초기화합니다.
         /// </summary>
-        /// <param name="target">추적할 대상</param>
-        /// <param name="speed">이동 속도</param>
-        /// <param name="lifeTime">수명 (초)</param>
-        /// <param name="hitRadius">이 거리 이내 접근 시 도달로 간주</param>
         public void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
             SkillExecutionContext context, EntityBase target, float speed, float lifeTime, float hitRadius)
         {
@@ -76,11 +72,16 @@ namespace DungeonShooter
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (_effectExecuted) return;
-            if (_target == null) return;
+            if (_effectExecuted) 
+                return;
+            
+            if (_target == null) 
+                return;
 
             var otherEntity = other.GetComponent<EntityBase>();
-            if (otherEntity != _target) return;
+            
+            if (otherEntity != _target) 
+                return;
 
             if (context.Caster != null && context.Caster.gameObject.layer == other.gameObject.layer)
                 return;
@@ -99,6 +100,7 @@ namespace DungeonShooter
                 RunEffectsAsync(newContext).Forget();
             }
 
+            // 풀링 로직 적용 필요
             Destroy(gameObject);
         }
     }
