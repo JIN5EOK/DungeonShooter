@@ -16,13 +16,6 @@ namespace DungeonShooter
         [Header("테이블의 Amount에 적용할 배율\n0 = 데미지 적용 안됨, 1.0f = 1배율")]
         public float damagePercent = 1.0f;
 
-        private ISceneResourceProvider _resourceProvider;
-
-        public override void Initialize(ISceneResourceProvider resourceProvider)
-        {
-            _resourceProvider = resourceProvider;
-        }
-
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
             if (entry == null)
@@ -31,35 +24,33 @@ namespace DungeonShooter
                 return false;
             }
 
-            var tableDamagePercent = entry.Amount;
-            var skillDamagePercent = Mathf.RoundToInt(tableDamagePercent * damagePercent);
-            if (skillDamagePercent <= 0)
-            {
-                LogHandler.LogWarning<DamageEffect>("데미지 값이 0 이하입니다.");
-                return false;
-            }
-
-            var targetEntity = executeTarget == SkillOwner.Caster ? context.Caster : context.LastHitTarget;
+        
+            var targetEntity = executeTarget == SkillOwner.Caster
+            ? context.Caster 
+            : context.LastHitTarget;
 
             if (targetEntity == null)
             {
-                LogHandler.LogWarning<DamageEffect>("데미지 적용 대상이 없습니다.");
+                LogHandler.LogError<DamageEffect>("데미지 적용 대상이 없습니다.");
                 return false;
             }
             
+            var tableDamagePercent = entry.Amount;
+            var skillDamagePercent = Mathf.RoundToInt(tableDamagePercent * damagePercent);
+            
+
             if (targetEntity.TryGetComponent(out HealthComponent health))
             {
-                var finalDamage =
-                    EntityStatsHelper.CalculatePercentDamage(context.Caster.StatGroup.GetStat(StatType.Attack)
-                        , context.LastHitTarget.StatGroup.GetStat(StatType.Defense)
-                        , skillDamagePercent);
+                var casterAtk = context.Caster.StatGroup.GetStat(StatType.Attack);
+                var targetDef = context.LastHitTarget.StatGroup.GetStat(StatType.Defense);
+                var finalDamage = EntityStatsHelper.CalculatePercentDamage(casterAtk, targetDef, skillDamagePercent);
 
                 health.TakeDamage(finalDamage);
-                
-                if (_resourceProvider != null)
+
+                if (context.ResourceProvider != null)
                 {
-                    // 추후 로직 최적화 필요
-                    var damageTextGo = await _resourceProvider.GetInstanceAsync(DamageTextAddress);
+                    // TODO: 데미지 텍스트는 아주 많이 사용되는 객체라 풀링 및 최적화 적용 반드시 필요
+                    var damageTextGo = await context.ResourceProvider.GetInstanceAsync(DamageTextAddress);
                     if (damageTextGo != null)
                     {
                         var hitPosition = context.LastHitTarget.transform.position;

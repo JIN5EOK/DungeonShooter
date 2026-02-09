@@ -44,19 +44,6 @@ namespace DungeonShooter
         
         private string SkillObjectAddress => _skillObject.AssetGUID.ToString();
 
-        protected ISceneResourceProvider _resourceProvider;
-        public override void Initialize(ISceneResourceProvider resourceProvider)
-        {
-            if (_effects == null)
-                return;
-
-            _resourceProvider = resourceProvider;
-            foreach (var effect in _effects)
-            {
-                effect.Initialize(resourceProvider);
-            }
-        }
-        
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
             try
@@ -72,10 +59,8 @@ namespace DungeonShooter
                         rotation = Quaternion.Euler(0f, 0f, angle);    
                     }
                 }
-                var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress, position, rotation);
+                var obj = await context.ResourceProvider.GetInstanceAsync(SkillObjectAddress, position, rotation);
                 var skillObj = obj.AddOrGetComponent<ProjectileSkillObject>();
-                
-
                 
                 skillObj.Initialize(_effects, entry, context, targetCount, speed, lifeTime, _rotateToCastDirection);
 

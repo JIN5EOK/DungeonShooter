@@ -18,14 +18,7 @@ namespace DungeonShooter
         [SerializeField]
         private AssetReferenceT<AudioClip> _audioClipRef;
 
-        private ISceneResourceProvider _resourceProvider;
-
         private string AudioClipAddress => _audioClipRef.AssetGUID.ToString();
-
-        public override void Initialize(ISceneResourceProvider resourceProvider)
-        {
-            _resourceProvider = resourceProvider;
-        }
 
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
@@ -37,7 +30,7 @@ namespace DungeonShooter
 
             try
             {
-                var clip = await _resourceProvider.GetAssetAsync<AudioClip>(AudioClipAddress);
+                var clip = await context.ResourceProvider.GetAssetAsync<AudioClip>(AudioClipAddress);
                 if (clip == null)
                 {
                     LogHandler.LogError<PlaySoundEffect>($"오디오 클립을 로드할 수 없습니다: {AudioClipAddress}");

@@ -8,11 +8,12 @@ namespace DungeonShooter
     /// <summary>
     /// 스킬 인스턴스 구현 클래스
     /// </summary>
-    public class Skill : ISkill
+    public class Skill
     {
         private readonly SkillData _skillData;
         private readonly SkillTableEntry _skillTableEntry;
         private readonly Sprite _icon;
+        private readonly ISceneResourceProvider _resourceProvider;
         private CancellationTokenSource _cooldownCancellationTokenSource;
 
         public SkillData SkillData => _skillData;
@@ -25,7 +26,7 @@ namespace DungeonShooter
         public Action<float> OnCooldownChanged { get; set; }
         public Action OnCooldownEnded { get; set; }
         
-        public Skill(SkillTableEntry skillTableEntry, SkillData skillData, Sprite icon)
+        public Skill(SkillTableEntry skillTableEntry, SkillData skillData, Sprite icon, ISceneResourceProvider resourceProvider)
         {
             if (skillTableEntry == null)
             {
@@ -42,6 +43,7 @@ namespace DungeonShooter
             _skillTableEntry = skillTableEntry;
             _skillData = skillData;
             _icon = icon;
+            _resourceProvider = resourceProvider;
             Cooldown = 0f;
             IsCooldown = false;
         }
@@ -60,7 +62,8 @@ namespace DungeonShooter
             }
 
             var context = SkillExecutionContext.Create()
-                .WithCaster(caster);
+                .WithCaster(caster)
+                .WithResourceProvider(_resourceProvider);
 
             bool success = await ExecuteEffectsAsync(context);
             LogHandler.Log<Skill>($"스킬 실행 : {SkillTableEntry.Id}({_skillTableEntry.SkillName})");

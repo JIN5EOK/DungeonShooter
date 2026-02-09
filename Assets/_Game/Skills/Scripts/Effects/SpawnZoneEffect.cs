@@ -38,25 +38,12 @@ namespace DungeonShooter
 
         private string SkillObjectAddress => _skillObject.AssetGUID.ToString();
 
-        private ISceneResourceProvider _resourceProvider;
-        public override void Initialize(ISceneResourceProvider resourceProvider)
-        {
-            if (_effects == null)
-                return;
-
-            _resourceProvider = resourceProvider;
-            foreach (var effect in _effects)
-            {
-                effect.Initialize(resourceProvider);
-            }
-        }
-
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
             try
             {
                 var position = _spawnPosition == SkillOwner.Caster ? context.Caster.transform.position : context.LastHitTarget.transform.position;
-                var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress,position);
+                var obj = await context.ResourceProvider.GetInstanceAsync(SkillObjectAddress, position);
                 var skillObj = obj.AddOrGetComponent<ZoneSkillObject>();
                 skillObj.Initialize(_effects, entry, context, _duration, _applyInterval);
 

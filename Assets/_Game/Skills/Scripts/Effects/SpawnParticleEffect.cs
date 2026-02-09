@@ -22,13 +22,6 @@ namespace DungeonShooter
 
         private string ParticlePrefabAddress => _particlePrefab.AssetGUID.ToString();
 
-        private ISceneResourceProvider _resourceProvider;
-
-        public override void Initialize(ISceneResourceProvider resourceProvider)
-        {
-            _resourceProvider = resourceProvider;
-        }
-
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
             try
@@ -36,7 +29,8 @@ namespace DungeonShooter
                 var position = _spawnPosition == SkillOwner.LastHitTarget && context.LastHitTarget != null
                     ? context.LastHitTarget.transform.position
                     : context.Caster.transform.position;
-                var obj = await _resourceProvider.GetInstanceAsync(ParticlePrefabAddress, position);
+                
+                var obj = await context.ResourceProvider.GetInstanceAsync(ParticlePrefabAddress, position);
 
                 var particleSystem = obj.GetComponentInChildren<ParticleSystem>();
                 if (particleSystem != null)

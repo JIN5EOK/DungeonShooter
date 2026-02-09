@@ -66,7 +66,7 @@ namespace DungeonShooter
                 Sprite icon = await _resourceProvider.GetAssetAsync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
 
                 // Skill 인스턴스 생성
-                return new Skill(skillTableEntry, skillData, icon);
+                return new Skill(skillTableEntry, skillData, icon, _resourceProvider);
             }
             catch (Exception ex)
             {

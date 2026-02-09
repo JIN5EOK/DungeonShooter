@@ -55,19 +55,6 @@ namespace DungeonShooter
         private List<EffectBase> _effects;
 
         private string SkillObjectAddress => _skillObject.AssetGUID.ToString();
-        private ISceneResourceProvider _resourceProvider;
-
-        public override void Initialize(ISceneResourceProvider resourceProvider)
-        {
-            if (_effects == null)
-                return;
-
-            _resourceProvider = resourceProvider;
-            foreach (var effect in _effects)
-            {
-                effect.Initialize(resourceProvider);
-            }
-        }
 
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
@@ -89,7 +76,7 @@ namespace DungeonShooter
                 foreach (var target in targets)
                 {
                     var spawnPosition = (Vector2)target.transform.position + _spawnOffset;
-                    var obj = await _resourceProvider.GetInstanceAsync(SkillObjectAddress, spawnPosition, Quaternion.identity);
+                    var obj = await context.ResourceProvider.GetInstanceAsync(SkillObjectAddress, spawnPosition, Quaternion.identity);
                     var skillObj = obj.AddOrGetComponent<HomingSkillObject>();
                     context = context.WithLastHitTarget(target);
                     skillObj.Initialize(_effects, entry, context, target, _speed, _lifeTime, _hitRadius);
@@ -115,10 +102,11 @@ namespace DungeonShooter
             var candidates = new List<EntityBase>();
             foreach (var col in colliders)
             {
-                if (col == null) continue;
                 var entity = col.GetComponent<EntityBase>();
+                
                 if (entity == null || entity.gameObject.layer == casterLayer)
                     continue;
+                
                 candidates.Add(entity);
             }
 

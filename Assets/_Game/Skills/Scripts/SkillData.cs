@@ -3,13 +3,10 @@ using Cysharp.Threading.Tasks;
 using DungeonShooter;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using VContainer;
 
 namespace DungeonShooter
 {
-    /// <summary>
-    /// 스킬 효과 리스트와 기타 정보를 담는 ScriptableObject
-    /// </summary>
+    /// <summary>스킬 효과 리스트와 기타 정보를 담는 ScriptableObject /// </summary>
     [CreateAssetMenu(fileName = "New Skill", menuName = "Game/Skill")]
     public class SkillData : ScriptableObject
     {
@@ -25,20 +22,5 @@ namespace DungeonShooter
         [Header("패시브 스킬 효과")]
         [SerializeReference]
         private List<EffectBase> _passiveEffects = new List<EffectBase>();
-
-        // 이펙트에 의존성 주입
-        [Inject]
-        private void Construct(ISceneResourceProvider provider)
-        {
-            foreach (var effect in _activeEffects)
-            {
-                effect.Initialize(provider);
-            }
-            
-            foreach(var effect in _passiveEffects)
-            {
-                effect.Initialize(provider);
-            }
-        }
     }
 }
