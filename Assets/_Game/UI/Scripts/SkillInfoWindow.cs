@@ -17,32 +17,16 @@ namespace DungeonShooter
         [SerializeField] private TextMeshProUGUI _textName;
         [SerializeField] private TextMeshProUGUI _textDescription;
         [SerializeField] private TextMeshProUGUI _textCooldown;
-
-        private ISceneResourceProvider _resourceProvider;
-
-        [Inject]
-        public void Construct(ISceneResourceProvider resourceProvider, ITableRepository tableRepository)
-        {
-            _resourceProvider = resourceProvider;
-        }
-
+        
         /// <summary>
         /// 스킬 테이블 엔트리로 표시 내용을 설정합니다.
         /// </summary>
-        public async UniTask SetEntry(SkillTableEntry entry)
+        public void SetInfo(string skillName, string skillDescription, float cooldown, Sprite icon)
         {
-            if (entry == null)
-            {
-                LogHandler.LogError<SkillInfoWindow>("스킬 정보가 올바르지 않습니다.");
-                return;
-            }
-
-            _textName.text = entry.SkillName;
-            _textDescription.text = entry.SkillDescription;
-            _textCooldown.text = FormatCooldown(entry.Cooldown);
-
-            var sprite = await _resourceProvider.GetAssetAsync<Sprite>(entry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
-            _iconImage.sprite = sprite == null ? null : sprite;
+            _textName.text = skillName;
+            _textDescription.text = skillDescription;
+            _textCooldown.text = FormatCooldown(cooldown);
+            _iconImage.sprite = icon;
         }
 
         /// <summary>

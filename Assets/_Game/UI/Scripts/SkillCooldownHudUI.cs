@@ -26,7 +26,7 @@ namespace DungeonShooter
             _slots.Add(instance);
             return instance;
         }
-
+        
         /// <summary>
         /// 지정한 쿨다운 슬롯을 제거한다.
         /// </summary>

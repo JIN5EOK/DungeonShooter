@@ -10,14 +10,6 @@ namespace DungeonShooter
     /// </summary>
     public class Skill
     {
-        private bool _isDisposed = false;
-        
-        private readonly SkillData _skillData;
-        private readonly SkillTableEntry _skillTableEntry;
-        private readonly Sprite _icon;
-        private readonly ISceneResourceProvider _resourceProvider;
-        private readonly CancellationTokenSource _cooldownCancellationTokenSource = new CancellationTokenSource();
-
         public SkillData SkillData => _skillData;
         public SkillTableEntry SkillTableEntry => _skillTableEntry;
         public Sprite Icon => _icon;
@@ -28,19 +20,36 @@ namespace DungeonShooter
         public Action<float> OnCooldownChanged { get; set; }
         public Action OnCooldownEnded { get; set; }
         
-        public Skill(SkillTableEntry skillTableEntry, SkillData skillData, Sprite icon, ISceneResourceProvider resourceProvider)
+        private bool _isDisposed = false;
+        private SkillData _skillData;
+        private SkillTableEntry _skillTableEntry;
+        private Sprite _icon;
+        private readonly ISceneResourceProvider _resourceProvider;
+        private readonly CancellationTokenSource _cooldownCancellationTokenSource = new CancellationTokenSource();
+        
+        public Skill(ISceneResourceProvider resourceProvider)
         {
-            if (skillTableEntry == null || SkillData == null || icon == null || resourceProvider == null)
+            _resourceProvider = resourceProvider;
+            Cooldown = 0f;
+            IsCooldown = false;
+        }
+
+        /// <summary>
+        /// 기존 Skill 인스턴스는 유지한 채로, 스킬 테이블 엔트리/아이콘/SkillData를 교체합니다.
+        /// </summary>
+        public void ChangeSkillEntry(SkillTableEntry skillTableEntry, SkillData skillData, Sprite icon)
+        {
+            ThrowIfDisposed();
+
+            if (skillTableEntry == null || skillData == null || icon == null)
             {
-                throw new ArgumentNullException(nameof(Skill), "생성자 파라미터가 올바르지 않습니다.");
+                LogHandler.LogError<Skill>($"{nameof(ChangeSkillEntry)} 파라미터가 올바르지 않습니다.");
+                return;
             }
 
             _skillTableEntry = skillTableEntry;
             _skillData = skillData;
             _icon = icon;
-            _resourceProvider = resourceProvider;
-            Cooldown = 0f;
-            IsCooldown = false;
         }
         
         /// <summary>

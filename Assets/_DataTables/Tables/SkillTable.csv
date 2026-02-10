@@ -9,10 +9,10 @@ Memo,Id,SkillName,SkillDescription,SkillIconKey,SkillDataKey,FloatAmounts,IntAmo
 체력 증가 패시브 레벨1,14000301,체력 증가 LV1,최대 체력이 50% 증가합니다.,HealthUpSkillIcon,HealthUpSkillData,,,25,,,14000300
 체력 증가 패시브 레벨2,14000302,체력 증가 LV2,최대 체력이 80% 증가합니다.,HealthUpSkillIcon,HealthUpSkillData,,,80,,,14000300
 체력 증가 패시브 레벨3,14000303,체력 증가 LV3,최대 체력이 100% 증가합니다.,HealthUpSkillIcon,HealthUpSkillData,,,100,,,14000300
-공격력 증가 패시브 루트,14000400,공격력 증가,최대 공격력이 증가합니다.,DamageUpSkillIcon,,,,,,,14000400
-공격력 증가 패시브 레벨1,14000401,공격력 증가 LV1,최대 공격력이 25% 증가합니다.,DamageUpSkillIcon,DamageUpSkillData,,,25,,,14000400
-공격력 증가 패시브 레벨2,14000402,공격력 증가 LV2,최대 공격력이 40% 증가합니다.,DamageUpSkillIcon,DamageUpSkillData,,,45,,,14000400
-공격력 증가 패시브 레벨3,14000403,공격력 증가 LV3,최대 공격력이 50% 증가합니다.,DamageUpSkillIcon,DamageUpSkillData,,,50,,,14000400
+공격력 증가 패시브 루트,14000400,공격력 증가,최대 공격력이 증가합니다.,AttackUpSkillIcon,,,,,,,14000400
+공격력 증가 패시브 레벨1,14000401,공격력 증가 LV1,최대 공격력이 25% 증가합니다.,AttackUpSkillIcon,AttackUpSkillData,,,25,,,14000400
+공격력 증가 패시브 레벨2,14000402,공격력 증가 LV2,최대 공격력이 40% 증가합니다.,AttackUpSkillIcon,AttackUpSkillData,,,45,,,14000400
+공격력 증가 패시브 레벨3,14000403,공격력 증가 LV3,최대 공격력이 50% 증가합니다.,AttackUpSkillIcon,AttackUpSkillData,,,50,,,14000400
 메테오 스킬 루트,14000500,메테오,주변 다수의 적들에게 화염구를 떨굽니다,FireballSkillIcon,,,,,,,14000500
 메테오 레벨1,14000501,메테오 LV1,주변 다수의 적들에게 데미지 150%의 화염구를 떨굽니다.,MeteorSkillIcon,MeteorSkillData,,,150,0.5,10,14000500
 메테오 레벨2,14000502,메테오 LV2,주변 다수의 적들에게 데미지 180%의 화염구를 떨굽니다.,MeteorSkillIcon,MeteorSkillData,,,200,0.5,8,14000500

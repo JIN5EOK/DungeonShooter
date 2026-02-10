@@ -32,9 +32,6 @@ namespace DungeonShooter
             UpdateCooldownVisuals();
         }
 
-        /// <summary>
-        /// 쿨다운 수치를 설정한다.
-        /// </summary>
         public void SetCooldown(float remainingTime)
         {
             _remainingTime = Mathf.Max(0f, remainingTime);
@@ -43,6 +40,12 @@ namespace DungeonShooter
         public void SetMaxCooldown(float totalCooldown)
         {
             _totalCooldown = Mathf.Max(0f, totalCooldown);
+        }
+        
+        public void SetSkillIcon(Sprite iconSprite)
+        {
+            if (_skillIcon != null && iconSprite != null)
+                _skillIcon.sprite = iconSprite;
         }
         
         private void UpdateCooldownVisuals()
@@ -73,50 +76,6 @@ namespace DungeonShooter
                 else
                     _cooldownText.text = _remainingTime.ToString("F1");
             }
-        }
-
-        /// <summary>
-        /// 스킬 아이콘을 설정한다.
-        /// </summary>
-        public void SetSkillIcon(Sprite iconSprite)
-        {
-            if (_skillIcon != null && iconSprite != null)
-                _skillIcon.sprite = iconSprite;
-        }
-
-        /// <summary>
-        /// 스킬 사용 시각 피드백을 재생한다.
-        /// </summary>
-        public void OnSkillUsed()
-        {
-            StartCoroutine(SkillUsedEffect());
-        }
-
-        private IEnumerator SkillUsedEffect()
-        {
-            if (_skillIcon == null) yield break;
-
-            var originalScale = _skillIcon.transform.localScale;
-            var bigScale = originalScale * 1.2f;
-            var duration = 0.1f;
-            var elapsed = 0f;
-
-            while (elapsed < duration)
-            {
-                _skillIcon.transform.localScale = Vector3.Lerp(originalScale, bigScale, elapsed / duration);
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            elapsed = 0f;
-            while (elapsed < duration)
-            {
-                _skillIcon.transform.localScale = Vector3.Lerp(bigScale, originalScale, elapsed / duration);
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            _skillIcon.transform.localScale = originalScale;
         }
     }
 }
