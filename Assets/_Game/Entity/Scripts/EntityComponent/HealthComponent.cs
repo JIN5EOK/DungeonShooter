@@ -146,6 +146,15 @@ namespace DungeonShooter
         }
 
         /// <summary>
+        /// 현재 체력을 설정합니다.
+        /// </summary>
+        public void SetCurrentHealth(int value)
+        {
+            CurrentHealth = Mathf.Clamp(value, 0, MaxHealth);
+            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+        }
+
+        /// <summary>
         /// 피격 시 색상 변경 효과
         /// </summary>
         private System.Collections.IEnumerator HitFlashEffect()

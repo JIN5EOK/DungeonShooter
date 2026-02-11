@@ -47,11 +47,15 @@ namespace DungeonShooter
         /// </summary>
         public void Unregist(Skill skill, bool disposeAfterUnregist = false)
         {
-            if (skill == null) return;
+            if (skill == null)
+            {
+                LogHandler.LogWarning<EntitySkillGroup>("스킬해제 실패: 스킬이 null입니다.");
+                return;
+            }
 
             if (!_skills.Remove(skill))
             {
-                LogHandler.LogWarning<EntitySkillGroup>($"등록되지 않은 스킬입니다: {skill.SkillTableEntry?.SkillName}");
+                LogHandler.LogWarning<EntitySkillGroup>($"스킬해제 실패: 등록되지 않은 스킬입니다: {skill.SkillTableEntry?.SkillName}");
                 return;
             }
 
@@ -63,7 +67,7 @@ namespace DungeonShooter
             }
             LogHandler.Log<EntitySkillGroup>($"스킬 등록 해제 완료: {skill.SkillTableEntry?.Id}");
         }
-
+        
         /// <summary>
         /// 등록된 모든 스킬에 대해 OnSkillUnregisted를 발생시키고 리소스를 정리합니다.
         /// </summary>

@@ -22,8 +22,29 @@ namespace DungeonShooter
         private Item _equippedWeapon;
         private EntityStatGroup _statGroup;
         private EntitySkillGroup _skillGroup;
+        private EntityBase _ownerEntity;
 
         public bool IsContainsItem(Item item) => item != null && _items.Contains(item);
+
+        /// <summary>
+        /// 이 인벤토리의 소유 엔티티를 바인딩합니다.
+        /// </summary>
+        public void BindOwner(EntityBase entity)
+        {
+            UnbindOwner(_ownerEntity);
+            _ownerEntity = entity;
+            if (entity != null)
+                entity.OnDestroyed += UnbindOwner;
+        }
+
+        private void UnbindOwner(EntityBase entity)
+        {
+            if (entity == null || _ownerEntity != entity)
+                return;
+
+            _ownerEntity = null;
+            entity.OnDestroyed -= UnbindOwner;
+        }
 
         /// <summary>
         /// 스탯 적용 대상 그룹을 설정합니다. (EntityBase가 없어도 스탯 보너스 적용 가능)
@@ -235,7 +256,10 @@ namespace DungeonShooter
             item.StackCount--;
             if (item.StackCount <= 0)
                 RemoveItem(item);
-            
+
+            if (_ownerEntity != null)
+                item.ExecuteUseSkill(_ownerEntity).Forget();
+
             OnItemUse?.Invoke(item);
         }
     }
