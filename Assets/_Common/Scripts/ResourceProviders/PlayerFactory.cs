@@ -38,10 +38,8 @@ namespace DungeonShooter
         private ExpGaugeHudUI _expGaugeHudUI;
         private SkillCooldownHudUI _skillCooldownHudUI;
         private SkillCooldownSlot _weaponCooldownSlot;
-        private SkillCooldownSlot _skill1CooldownSlot;
-        private SkillCooldownSlot _skill2CooldownSlot;
         private Skill _boundWeaponActiveSkill;
-        
+
         private EntityBase _currentPlayerEntity;
 
         [Inject]
@@ -197,26 +195,13 @@ namespace DungeonShooter
             _skillCooldownHudUI = await _uIManager.CreateUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud, true);
             _skillCooldownHudUI.Clear();
             _weaponCooldownSlot = _skillCooldownHudUI.AddSkillCooldownSlot();
-            _skill1CooldownSlot = _skillCooldownHudUI.AddSkillCooldownSlot();
-            _skill2CooldownSlot = _skillCooldownHudUI.AddSkillCooldownSlot();
+            var skill1CooldownSlot = _skillCooldownHudUI.AddSkillCooldownSlot();
+            var skill2CooldownSlot = _skillCooldownHudUI.AddSkillCooldownSlot();
 
             BindWeaponCooldownSlot(_inventory.EquippedWeapon);
             _inventory.OnWeaponEquipped += BindWeaponCooldownSlot;
 
-            var skill1 = _playerSkillController.GetActiveSkill1();
-            var skill2 = _playerSkillController.GetActiveSkill2();
-            if (skill1 != null)
-            {
-                _skill1CooldownSlot.SetMaxCooldown(skill1.MaxCooldown);
-                _skill1CooldownSlot.SetSkillIcon(skill1.Icon);
-                skill1.OnCooldownChanged += _skill1CooldownSlot.SetCooldown;
-            }
-            if (skill2 != null)
-            {
-                _skill2CooldownSlot.SetMaxCooldown(skill2.MaxCooldown);
-                _skill2CooldownSlot.SetSkillIcon(skill2.Icon);
-                skill2.OnCooldownChanged += _skill2CooldownSlot.SetCooldown;
-            }
+            await _playerSkillController.SetupSkillUIAsync(skill1CooldownSlot, skill2CooldownSlot);
         }
 
         private void BindWeaponCooldownSlot(Item weapon)
@@ -261,6 +246,8 @@ namespace DungeonShooter
                 _expGaugeHudUI.Hide();
             }
 
+            _playerSkillController.CleanupSkillUI();
+
             if (_skillCooldownHudUI != null)
             {
                 _inventory.OnWeaponEquipped -= BindWeaponCooldownSlot;
@@ -269,10 +256,6 @@ namespace DungeonShooter
                     _boundWeaponActiveSkill.OnCooldownChanged -= _weaponCooldownSlot.SetCooldown;
                     _boundWeaponActiveSkill = null;
                 }
-                var skill1 = _playerSkillController.GetActiveSkill1();
-                var skill2 = _playerSkillController.GetActiveSkill2();
-                if (skill1 != null) skill1.OnCooldownChanged -= _skill1CooldownSlot.SetCooldown;
-                if (skill2 != null) skill2.OnCooldownChanged -= _skill2CooldownSlot.SetCooldown;
                 _skillCooldownHudUI.Clear();
                 _skillCooldownHudUI.Hide();
             }
@@ -282,8 +265,6 @@ namespace DungeonShooter
             _expGaugeHudUI = null;
             _skillCooldownHudUI = null;
             _weaponCooldownSlot = null;
-            _skill1CooldownSlot = null;
-            _skill2CooldownSlot = null;
 
             _playerInputController.UnbindPlayerInstance();
 
