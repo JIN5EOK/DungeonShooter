@@ -1,4 +1,5 @@
 using System;
+using Jin5eok;
 using UnityEngine;
 
 namespace DungeonShooter
@@ -36,18 +37,47 @@ namespace DungeonShooter
         }
         private Rigidbody2D _rigidbody;
         private EntityBase _entityBase;
+        private EntityAnimationHandler _animationHandler;
 
         private void Awake()
         {
             _entityBase = GetComponent<EntityBase>();
             _rigidbody = GetComponent<Rigidbody2D>();
+            _animationHandler = GetComponent<EntityAnimationHandler>();
         }
 
         private void Update()
         {
             Move();
+            UpdateAnimation();
         }
-        
+
+        /// <summary>
+        /// 이동 방향과 이동 여부에 따라 애니메이션을 갱신한다.
+        /// </summary>
+        private void UpdateAnimation()
+        {
+            if (_animationHandler == null)
+                return;
+
+            var isMoving = !Direction.ApproximatelyEquals(Vector2.zero, 0.01f);
+            _animationHandler.SetMoving(isMoving);
+
+            if (isMoving)
+            {
+                var dir = Vector2ToDirection(LookDirection);
+                _animationHandler.SetDirection(dir);
+            }
+        }
+
+        private static DungeonShooter.Direction Vector2ToDirection(Vector2 v)
+        {
+            if (Mathf.Abs(v.x) > Mathf.Abs(v.y))
+                return v.x > 0 ? DungeonShooter.Direction.Right : DungeonShooter.Direction.Left;
+
+            return v.y > 0 ? DungeonShooter.Direction.Up : DungeonShooter.Direction.Down;
+        }
+
         /// <summary>
         /// 캐릭터를 이동시킵니다.
         /// </summary>
