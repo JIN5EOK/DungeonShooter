@@ -35,7 +35,7 @@ namespace DungeonShooter
         }
         private void UpdateVisuals()
         {
-            _targetFillAmount = (float)_currentHealth / _maxHealth;
+            _targetFillAmount = (float)_currentHealth / (float)_maxHealth;
             
             if (_healthText != null)
                 _healthText.text = $"{_currentHealth} / {_maxHealth}";

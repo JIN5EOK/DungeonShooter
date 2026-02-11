@@ -14,15 +14,23 @@ namespace DungeonShooter
         public const int ExpPerLevel = 100;
 
         public EntityStatGroup StatGroup { get; private set; }
+        public event Action<int> OnHpChanged;
         public event Action<int> OnLevelChanged;
         public event Action<int> OnExpChanged;
-        public int Level => _level;
-        public int Exp => _exp;
-        public int Hp => _hp;
+        public int Level { get; private set; } = 1;
+        public int Exp {get; private set; }
 
-        private int _level = 1;
-        private int _exp;
+        public int Hp
+        {
+            get => _hp;
+            private set
+            {
+                _hp = value;
+                OnHpChanged?.Invoke(value);
+            }
+        }
         private int _hp;
+        
 
         private ITableRepository _tableRepository;
         private Inventory _inventory;
@@ -56,8 +64,8 @@ namespace DungeonShooter
 
             StatGroup = new EntityStatGroup();
             StatGroup.Initialize(statsEntry);
-            _level = 1;
-            _exp = 0;
+            Level = 1;
+            Exp = 0;
             _hp = StatGroup.GetStat(StatType.Hp);
         }
 
@@ -67,16 +75,17 @@ namespace DungeonShooter
         public void AddExp(int amount)
         {
             if (amount <= 0) return;
-            var levelBefore = _level;
-            _exp += amount;
-            while (_exp >= ExpPerLevel)
+            var levelBefore = Level;
+            Exp += amount;
+            while (Exp >= ExpPerLevel)
             {
-                _exp -= ExpPerLevel;
-                _level++;
+                Exp -= ExpPerLevel;
+                Level++;
             }
-            OnExpChanged?.Invoke(_exp);
-            if (_level != levelBefore)
-                OnLevelChanged?.Invoke(_level);
+            OnExpChanged?.Invoke(Exp);
+            
+            if (Level != levelBefore)
+                OnLevelChanged?.Invoke(Level);
         }
 
         /// <summary>
@@ -90,47 +99,25 @@ namespace DungeonShooter
             entity.SetStatGroup(StatGroup);
             _playerInstance = entity;
             entity.OnDestroyed += UnbindPlayerInstance;
-        }
 
-        /// <summary>
-        /// HealthComponent와 체력을 동기화하도록 합니다.
-        /// </summary>
-        public void SyncFromHealthComponent(HealthComponent healthComponent)
-        {
-            if (healthComponent == null) return;
-
-            UnsyncFromHealthComponent();
-
-            _boundHealthComponent = healthComponent;
-            healthComponent.SetCurrentHealth(_hp);
+            _boundHealthComponent = _playerInstance.gameObject.AddOrGetComponent<HealthComponent>();
+            _boundHealthComponent.SetCurrentHealth(_hp);
             _boundHealthComponent.OnHealthChanged += OnHealthChangedFromComponent;
         }
-
+        
         /// <summary>
-        /// HealthComponent와의 동기화를 해제합니다.
+        /// 플레이어 엔티티 바인딩을 해제합니다.
         /// </summary>
-        public void UnsyncFromHealthComponent()
+        public void UnbindPlayerInstance(EntityBase player)
         {
-            if (_boundHealthComponent != null)
-            {
-                _boundHealthComponent.OnHealthChanged -= OnHealthChangedFromComponent;
-                _boundHealthComponent = null;
-            }
+            _boundHealthComponent.OnHealthChanged -= OnHealthChangedFromComponent;
+            _boundHealthComponent = null;
+            _playerInstance = null;
         }
 
         private void OnHealthChangedFromComponent(int current, int max)
         {
-            _hp = current;
-        }
-
-        /// <summary>
-        /// 플레이어 엔티티 바인딩을 해제합니다.
-        /// </summary>
-        public void UnbindPlayerInstance(EntityBase entity)
-        {
-            if (_playerInstance != entity) return;
-            UnsyncFromHealthComponent();
-            _playerInstance = null;
+            Hp = current;
         }
     }
 }

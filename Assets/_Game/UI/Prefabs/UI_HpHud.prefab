@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d328c78a8869a456391d88a7fbb44fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _healthFillImage: {fileID: 4243959653753323526}
+  _healthFillImage: {fileID: 8839687004206255245}
   _healthText: {fileID: 7611550177601230393}
 --- !u!222 &4763658563795884312
 CanvasRenderer:

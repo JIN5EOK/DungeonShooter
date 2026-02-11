@@ -1,48 +1,41 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Jin5eok;
-using UnityEngine;
 using VContainer;
 
 namespace DungeonShooter
 {
     /// <summary>
     /// 플레이어 고유 스킬을 담당합니다.
-    /// SkillGroup 소유, 엔티티 바인딩, 스킬 쿨다운 HUD·레벨업 UI 연동을 담당합니다.
+    /// SkillGroup 소유, 엔티티 바인딩, 스킬 실행/교체 로직을 담당합니다.
     /// </summary>
     public class PlayerSkillController
     {
         public EntitySkillGroup SkillGroup { get; private set; } = new EntitySkillGroup();
         public EntityBase PlayerInstance => _playerInstance;
+        public event Action<int, Skill> OnActiveSkillChanged;
 
         private ISkillFactory _skillFactory;
-        private Inventory _inventory;
-        private UIManager _uIManager;
-        private PlayerStatusController _playerStatusController;
 
-        private Skill _skill1;
-        private Skill _skill2;
+        private readonly Skill[] _activeSkills = new Skill[PlayerSkillSlots.Count];
         private EntityBase _playerInstance;
-        private SkillLevelUpUI _skillLevelUpUI;
-        private SkillCooldownSlot _skill1CooldownSlot;
-        private SkillCooldownSlot _skill2CooldownSlot;
-        private Skill _boundSkill1;
-        private Skill _boundSkill2;
 
         [Inject]
-        private void Construct(ISkillFactory skillFactory, Inventory inventory, UIManager uIManager, PlayerStatusController playerStatusController)
+        private void Construct(ISkillFactory skillFactory)
         {
             _skillFactory = skillFactory;
-            _inventory = inventory;
-            _uIManager = uIManager;
-            _playerStatusController = playerStatusController;
         }
 
-        /// <summary> 1번 액티브 스킬을 반환합니다. </summary>
-        public Skill GetActiveSkill1() => _skill1;
+        public Skill GetActiveSkill(int index)
+        {
+            if (index < 0 || index >= PlayerSkillSlots.Count)
+            {
+                LogHandler.LogWarning<PlayerSkillController>($"GetActiveSkill: 잘못된 인덱스 입니다. index: {index}");
+                return null;
+            }
 
-        /// <summary>2번 액티브 스킬을 반환합니다. </summary>
-        public Skill GetActiveSkill2() => _skill2;
+            return _activeSkills[index];
+        }
 
         /// <summary>
         /// 선택한 플레이어 정보로 스킬 세션을 초기화합니다.
@@ -55,13 +48,19 @@ namespace DungeonShooter
                 return;
             }
             SkillGroup?.Clear();
-            _skill1 = await _skillFactory.CreateSkillAsync(config.Skill1Id);
-            _skill2 = await _skillFactory.CreateSkillAsync(config.Skill2Id);
+            _activeSkills[PlayerSkillSlots.Skill1Index] = await _skillFactory.CreateSkillAsync(config.Skill1Id);
+            _activeSkills[PlayerSkillSlots.Skill2Index] = await _skillFactory.CreateSkillAsync(config.Skill2Id);
             
-            if (_skill1 != null) 
-                SkillGroup?.Regist(_skill1);
-            if (_skill2 != null) 
-                SkillGroup?.Regist(_skill2);
+            if (_activeSkills[PlayerSkillSlots.Skill1Index] != null) 
+                SkillGroup?.Regist(_activeSkills[PlayerSkillSlots.Skill1Index]);
+            if (_activeSkills[PlayerSkillSlots.Skill2Index] != null) 
+                SkillGroup?.Regist(_activeSkills[PlayerSkillSlots.Skill2Index]);
+            
+            // 임시코드, 패시브 스킬 등록
+            SkillGroup?.Regist(await _skillFactory.CreateSkillAsync(14000301));
+            SkillGroup?.Regist(await _skillFactory.CreateSkillAsync(14000401));
+            InvokeActiveSkillChanged(PlayerSkillSlots.Skill1Index);
+            InvokeActiveSkillChanged(PlayerSkillSlots.Skill2Index);
         }
 
         /// <summary>
@@ -71,7 +70,6 @@ namespace DungeonShooter
         {
             if (entity == null) return;
 
-            _inventory.SetSkillGroup(SkillGroup);
             entity.SetSkillGroup(SkillGroup);
             _playerInstance = entity;
             entity.OnDestroyed += UnbindPlayerInstance;
@@ -92,7 +90,7 @@ namespace DungeonShooter
         public void ExecuteActiveSkill1(EntityBase caster)
         {
             if (caster == null) return;
-            _skill1?.Execute(caster).Forget();
+            _activeSkills[PlayerSkillSlots.Skill1Index]?.Execute(caster).Forget();
         }
 
         /// <summary>
@@ -101,119 +99,45 @@ namespace DungeonShooter
         public void ExecuteActiveSkill2(EntityBase caster)
         {
             if (caster == null) return;
-            _skill2?.Execute(caster).Forget();
+            _activeSkills[PlayerSkillSlots.Skill2Index]?.Execute(caster).Forget();
         }
 
         /// <summary>
-        /// 기존 스킬을 다음 레벨 스킬로 교체합니다. SkillGroup 및 액티브 슬롯(_skill1/_skill2)을 갱신합니다.
+        /// 기존 스킬을 다음 레벨 스킬로 교체합니다.
         /// </summary>
         public async UniTask ReplaceSkillAsync(Skill oldSkill, SkillTableEntry nextLevelEntry)
         {
             if (oldSkill == null || nextLevelEntry == null)
             {
-                LogHandler.LogWarning<PlayerSkillController>("ReplaceSkillAsync: oldSkill 또는 nextLevelEntry가 null입니다.");
+                LogHandler.LogError<PlayerSkillController>("파라미터가 올바르지 않습니다.");
                 return;
             }
 
             var newSkill = await _skillFactory.CreateSkillAsync(nextLevelEntry.Id);
             if (newSkill == null)
             {
-                LogHandler.LogWarning<PlayerSkillController>($"다음 레벨 스킬 생성 실패. ID: {nextLevelEntry.Id}");
+                LogHandler.LogWarning<PlayerSkillController>($"다음 레벨 스킬이 없습니다: {nextLevelEntry.Id}");
                 return;
             }
 
             SkillGroup.Unregist(oldSkill, true);
             SkillGroup.Regist(newSkill);
 
-            if (oldSkill == _skill1)
-                _skill1 = newSkill;
-            else if (oldSkill == _skill2)
-                _skill2 = newSkill;
-        }
-
-        /// <summary>
-        /// 스킬 쿨다운 슬롯과 레벨업 UI를 설정합니다. 플레이어 스폰 시 Factory에서 호출합니다.
-        /// </summary>
-        public async UniTask SetupSkillUIAsync(SkillCooldownSlot skill1Slot, SkillCooldownSlot skill2Slot)
-        {
-            _skill1CooldownSlot = skill1Slot;
-            _skill2CooldownSlot = skill2Slot;
-            _playerStatusController.OnLevelChanged += OnPlayerLevelChanged;
-            BindSkillCooldownSlots();
-            await UniTask.CompletedTask;
-        }
-
-        /// <summary>
-        /// 스킬 UI 구독 및 참조를 해제합니다. 플레이어 디스폰 시 Factory에서 호출합니다.
-        /// </summary>
-        public void CleanupSkillUI()
-        {
-            _playerStatusController.OnLevelChanged -= OnPlayerLevelChanged;
-            UnbindSkillCooldownSlots();
-            _skillLevelUpUI = null;
-            _skill1CooldownSlot = null;
-            _skill2CooldownSlot = null;
-        }
-
-        private void OnPlayerLevelChanged(int level)
-        {
-            ShowSkillLevelUpUIAsync().Forget();
-        }
-
-        private async UniTaskVoid ShowSkillLevelUpUIAsync()
-        {
-            if (_skillLevelUpUI == null)
-                _skillLevelUpUI = await _uIManager.CreateUIAsync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp, false);
-
-            await _skillLevelUpUI.ShowSkillLevelUp(
-                SkillGroup,
-                async (skill, nextEntry) =>
-                {
-                    await ReplaceSkillAsync(skill, nextEntry);
-                    RefreshSkillCooldownSlots();
-                });
-        }
-
-        private void BindSkillCooldownSlots()
-        {
-            UnbindSkillCooldownSlots();
-
-            var skill1 = GetActiveSkill1();
-            var skill2 = GetActiveSkill2();
-            _boundSkill1 = skill1;
-            _boundSkill2 = skill2;
-
-            if (skill1 != null && _skill1CooldownSlot != null)
+            if (oldSkill == _activeSkills[PlayerSkillSlots.Skill1Index])
             {
-                _skill1CooldownSlot.SetMaxCooldown(skill1.MaxCooldown);
-                _skill1CooldownSlot.SetSkillIcon(skill1.Icon);
-                skill1.OnCooldownChanged += _skill1CooldownSlot.SetCooldown;
+                _activeSkills[PlayerSkillSlots.Skill1Index] = newSkill;
+                InvokeActiveSkillChanged(PlayerSkillSlots.Skill1Index);
             }
-            if (skill2 != null && _skill2CooldownSlot != null)
+            else if (oldSkill == _activeSkills[PlayerSkillSlots.Skill2Index])
             {
-                _skill2CooldownSlot.SetMaxCooldown(skill2.MaxCooldown);
-                _skill2CooldownSlot.SetSkillIcon(skill2.Icon);
-                skill2.OnCooldownChanged += _skill2CooldownSlot.SetCooldown;
+                _activeSkills[PlayerSkillSlots.Skill2Index] = newSkill;
+                InvokeActiveSkillChanged(PlayerSkillSlots.Skill2Index);
             }
         }
 
-        private void UnbindSkillCooldownSlots()
+        private void InvokeActiveSkillChanged(int index)
         {
-            if (_skill1CooldownSlot != null && _boundSkill1 != null)
-            {
-                _boundSkill1.OnCooldownChanged -= _skill1CooldownSlot.SetCooldown;
-                _boundSkill1 = null;
-            }
-            if (_skill2CooldownSlot != null && _boundSkill2 != null)
-            {
-                _boundSkill2.OnCooldownChanged -= _skill2CooldownSlot.SetCooldown;
-                _boundSkill2 = null;
-            }
-        }
-
-        private void RefreshSkillCooldownSlots()
-        {
-            BindSkillCooldownSlots();
+            OnActiveSkillChanged?.Invoke(index, GetActiveSkill(index));
         }
     }
 }

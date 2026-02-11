@@ -24,6 +24,7 @@ namespace DungeonShooter
             builder.Register<PlayerStatusController>(Lifetime.Scoped);
             builder.Register<PlayerSkillController>(Lifetime.Scoped);
             builder.Register<PlayerInputController>(Lifetime.Scoped);
+            builder.Register<PlayerInstanceManager>(Lifetime.Scoped);
             base.Configure(builder);
         }
 

@@ -27,9 +27,9 @@ namespace DungeonShooter
         public bool IsContainsItem(Item item) => item != null && _items.Contains(item);
 
         /// <summary>
-        /// 이 인벤토리의 소유 엔티티를 바인딩합니다.
+        /// 플레이어 인스턴스 바인딩
         /// </summary>
-        public void BindOwner(EntityBase entity)
+        public void BindPlayerInstance(EntityBase entity)
         {
             UnbindOwner(_ownerEntity);
             _ownerEntity = entity;

@@ -30,15 +30,7 @@ namespace DungeonShooter
         private readonly PlayerStatusController _playerStatusController;
         private readonly PlayerSkillController _playerSkillController;
         private readonly Inventory _inventory;
-        private readonly UIManager _uIManager;
-        private readonly PlayerInputController _playerInputController;
-
-        private HealthComponent _boundHealthComponent;
-        private HealthBarHudUI _healthBarUI;
-        private ExpGaugeHudUI _expGaugeHudUI;
-        private SkillCooldownHudUI _skillCooldownHudUI;
-        private SkillCooldownSlot _weaponCooldownSlot;
-        private Skill _boundWeaponActiveSkill;
+        private readonly PlayerInstanceManager _playerInstanceManager;
 
         private EntityBase _currentPlayerEntity;
 
@@ -49,8 +41,7 @@ namespace DungeonShooter
             , PlayerStatusController playerStatusController
             , PlayerSkillController playerSkillController
             , Inventory inventory
-            , UIManager uIManager
-            , PlayerInputController playerInputController)
+            , PlayerInstanceManager playerInstanceManager)
         {
             _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
@@ -58,8 +49,7 @@ namespace DungeonShooter
             _playerStatusController = playerStatusController;
             _playerSkillController = playerSkillController;
             _inventory = inventory;
-            _uIManager = uIManager;
-            _playerInputController = playerInputController;
+            _playerInstanceManager = playerInstanceManager;
         }
 
         /// <summary>
@@ -155,77 +145,19 @@ namespace DungeonShooter
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
             var entity = playerInstance.AddComponent<EntityBase>();
 
-            _playerStatusController.BindPlayerInstance(entity);
-            _playerSkillController.BindPlayerInstance(entity);
-            _inventory.BindOwner(entity);
-
             entity.gameObject.AddOrGetComponent<MovementComponent>();
             entity.gameObject.AddOrGetComponent<InteractComponent>();
             var healthComponent = entity.gameObject.AddOrGetComponent<HealthComponent>();
             entity.gameObject.AddOrGetComponent<DashComponent>();
             var cameraTrackComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<CameraTrackComponent>(entity.gameObject);
             await cameraTrackComponent.AttachCameraAsync();
-            healthComponent.FullHeal();
+            
             healthComponent.OnDeath += () => Object.Destroy(entity.gameObject);
 
-            _playerStatusController.SyncFromHealthComponent(healthComponent);
-            _boundHealthComponent = healthComponent;
             entity.OnDestroyed += CleanupPlayerUIAndInput;
-
-            await SetupPlayerUIAsync();
-
-            _playerInputController.BindPlayerInstance(entity);
+            await _playerInstanceManager.BindAsync(entity);
 
             return entity;
-        }
-
-        private async UniTask SetupPlayerUIAsync()
-        {
-            _healthBarUI = await _uIManager.CreateUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud, true);
-            _healthBarUI.SetHealthAndMaxHealth(_boundHealthComponent.CurrentHealth, _boundHealthComponent.MaxHealth);
-            _boundHealthComponent.OnHealthChanged += _healthBarUI.SetHealthAndMaxHealth;
-
-            _expGaugeHudUI = await _uIManager.CreateUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud, true);
-            _expGaugeHudUI.SetLevel(_playerStatusController.Level);
-            _expGaugeHudUI.SetExp(_playerStatusController.Exp);
-            _expGaugeHudUI.SetMaxExp(PlayerStatusController.ExpPerLevel);
-            _playerStatusController.OnLevelChanged += _expGaugeHudUI.SetLevel;
-            _playerStatusController.OnExpChanged += _expGaugeHudUI.SetExp;
-
-            _skillCooldownHudUI = await _uIManager.CreateUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud, true);
-            _skillCooldownHudUI.Clear();
-            _weaponCooldownSlot = _skillCooldownHudUI.AddSkillCooldownSlot();
-            var skill1CooldownSlot = _skillCooldownHudUI.AddSkillCooldownSlot();
-            var skill2CooldownSlot = _skillCooldownHudUI.AddSkillCooldownSlot();
-
-            BindWeaponCooldownSlot(_inventory.EquippedWeapon);
-            _inventory.OnWeaponEquipped += BindWeaponCooldownSlot;
-
-            await _playerSkillController.SetupSkillUIAsync(skill1CooldownSlot, skill2CooldownSlot);
-        }
-
-        private void BindWeaponCooldownSlot(Item weapon)
-        {
-            if (_weaponCooldownSlot == null) return;
-
-            if (_boundWeaponActiveSkill != null)
-            {
-                _boundWeaponActiveSkill.OnCooldownChanged -= _weaponCooldownSlot.SetCooldown;
-                _boundWeaponActiveSkill = null;
-            }
-
-            if (weapon?.ActiveSkill == null)
-            {
-                _weaponCooldownSlot.SetMaxCooldown(0f);
-                _weaponCooldownSlot.SetCooldown(0f);
-                return;
-            }
-
-            _boundWeaponActiveSkill = weapon.ActiveSkill;
-            _weaponCooldownSlot.SetMaxCooldown(_boundWeaponActiveSkill.MaxCooldown);
-            _weaponCooldownSlot.SetSkillIcon(_boundWeaponActiveSkill.Icon);
-            _weaponCooldownSlot.SetCooldown(_boundWeaponActiveSkill.Cooldown);
-            _boundWeaponActiveSkill.OnCooldownChanged += _weaponCooldownSlot.SetCooldown;
         }
 
         private void CleanupPlayerUIAndInput(EntityBase entity)
@@ -233,40 +165,7 @@ namespace DungeonShooter
             if (entity != _currentPlayerEntity && _currentPlayerEntity != null)
                 return;
 
-            if (_boundHealthComponent != null && _healthBarUI != null)
-            {
-                _boundHealthComponent.OnHealthChanged -= _healthBarUI.SetHealthAndMaxHealth;
-                _healthBarUI.Hide();
-            }
-
-            if (_expGaugeHudUI != null)
-            {
-                _playerStatusController.OnLevelChanged -= _expGaugeHudUI.SetLevel;
-                _playerStatusController.OnExpChanged -= _expGaugeHudUI.SetExp;
-                _expGaugeHudUI.Hide();
-            }
-
-            _playerSkillController.CleanupSkillUI();
-
-            if (_skillCooldownHudUI != null)
-            {
-                _inventory.OnWeaponEquipped -= BindWeaponCooldownSlot;
-                if (_boundWeaponActiveSkill != null)
-                {
-                    _boundWeaponActiveSkill.OnCooldownChanged -= _weaponCooldownSlot.SetCooldown;
-                    _boundWeaponActiveSkill = null;
-                }
-                _skillCooldownHudUI.Clear();
-                _skillCooldownHudUI.Hide();
-            }
-
-            _boundHealthComponent = null;
-            _healthBarUI = null;
-            _expGaugeHudUI = null;
-            _skillCooldownHudUI = null;
-            _weaponCooldownSlot = null;
-
-            _playerInputController.UnbindPlayerInstance();
+            _playerInstanceManager.UnbindAndDestroy();
 
             _currentPlayerEntity = null;
         }

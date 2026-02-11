@@ -12,7 +12,6 @@ namespace DungeonShooter
         private readonly List<Skill> _skills = new List<Skill>();
         
         public event Action<Skill> OnSkillRegisted;
-
         public event Action<Skill> OnSkillUnregisted;
         
         public IReadOnlyList<Skill> GetRegistedSkills()
