@@ -9,7 +9,7 @@ namespace DungeonShooter
     /// 플레이어 스탯·경험치·레벨을 담당합니다.
     /// StatGroup을 소유하며, 엔티티 바인딩 시 데이터만 연동합니다.
     /// </summary>
-    public class PlayerStatusController
+    public class PlayerStatusSession
     {
         public const int ExpPerLevel = 100;
 
@@ -33,15 +33,13 @@ namespace DungeonShooter
         
 
         private ITableRepository _tableRepository;
-        private Inventory _inventory;
         private EntityBase _playerInstance;
         private HealthComponent _boundHealthComponent;
 
         [Inject]
-        private void Construct(ITableRepository tableRepository, Inventory inventory)
+        private void Construct(ITableRepository tableRepository)
         {
             _tableRepository = tableRepository;
-            _inventory = inventory;
         }
 
         /// <summary>
@@ -51,14 +49,14 @@ namespace DungeonShooter
         {
             if (config == null)
             {
-                LogHandler.LogWarning<PlayerStatusController>("PlayerConfigTableEntry가 null입니다.");
+                LogHandler.LogWarning<PlayerStatusSession>("PlayerConfigTableEntry가 null입니다.");
                 return;
             }
 
             var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(config.StatsId);
             if (statsEntry == null)
             {
-                LogHandler.LogWarning<PlayerStatusController>($"EntityStatsTableEntry를 찾을 수 없습니다. ID: {config.StatsId}");
+                LogHandler.LogWarning<PlayerStatusSession>($"EntityStatsTableEntry를 찾을 수 없습니다. ID: {config.StatsId}");
                 return;
             }
 
@@ -95,7 +93,6 @@ namespace DungeonShooter
         {
             if (entity == null) return;
 
-            _inventory.SetStatGroup(StatGroup);
             entity.SetStatGroup(StatGroup);
             _playerInstance = entity;
             entity.OnDestroyed += UnbindPlayerInstance;

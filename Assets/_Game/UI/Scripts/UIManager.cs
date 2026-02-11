@@ -61,23 +61,23 @@ namespace DungeonShooter
         /// <param name="addressableKey">어드레서블 키</param>
         /// <param name="isUnique">true면 싱글턴으로 로드. 이미 로드된 경우 캐시된 인스턴스를 반환한다.</param>
         /// <returns>생성된 UI. 실패 시 null</returns>
-        public async UniTask<T> CreateUIAsync<T>(string addressableKey, bool isUnique = false) where T : UIBase
+        public async UniTask<T> GetSingletonUIAsync<T>(string addressableKey) where T : UIBase
         {
-            if (isUnique)
-            {
-                if (_uniqueUICache.TryGetValue(addressableKey, out var cached) && cached != null)
-                    return (T)cached;
-                if (_loadingUniqueUI.TryGetValue(addressableKey, out var loadingTask))
-                    return (T)(await loadingTask);
+            if (_uniqueUICache.TryGetValue(addressableKey, out var cached) && cached != null)
+                return (T)cached;
+            if (_loadingUniqueUI.TryGetValue(addressableKey, out var loadingTask))
+                return (T)(await loadingTask);
 
-                var task = LoadAndRegisterUniqueUIAsync<T>(addressableKey);
-                _loadingUniqueUI[addressableKey] = task;
-                return (T)(await task);
-            }
-
+            var task = LoadAndRegisterUniqueUIAsync<T>(addressableKey);
+            _loadingUniqueUI[addressableKey] = task;
+            return (T)(await task);
+        }
+        
+        public async UniTask<T> CreateUIAsync<T>(string addressableKey) where T : UIBase
+        {
             return await LoadUIAsync<T>(addressableKey);
         }
-
+        
         private async UniTask<UIBase> LoadAndRegisterUniqueUIAsync<T>(string addressableKey) where T : UIBase
         {
             var ui = await LoadUIAsync<T>(addressableKey);

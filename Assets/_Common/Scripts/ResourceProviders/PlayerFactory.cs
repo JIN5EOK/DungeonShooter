@@ -27,8 +27,8 @@ namespace DungeonShooter
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
         
-        private readonly PlayerStatusController _playerStatusController;
-        private readonly PlayerSkillController _playerSkillController;
+        private readonly PlayerStatusSession _playerStatusSession;
+        private readonly PlayerSkillSession _playerSkillSession;
         private readonly Inventory _inventory;
         private readonly PlayerInstanceManager _playerInstanceManager;
 
@@ -36,16 +36,16 @@ namespace DungeonShooter
         public PlayerFactory(StageContext context
             , ISceneResourceProvider sceneResourceProvider
             , ITableRepository tableRepository
-            , PlayerStatusController playerStatusController
-            , PlayerSkillController playerSkillController
+            , PlayerStatusSession playerStatusSession
+            , PlayerSkillSession playerSkillSession
             , Inventory inventory
             , PlayerInstanceManager playerInstanceManager)
         {
             _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
             _tableRepository = tableRepository;
-            _playerStatusController = playerStatusController;
-            _playerSkillController = playerSkillController;
+            _playerStatusSession = playerStatusSession;
+            _playerSkillSession = playerSkillSession;
             _inventory = inventory;
             _playerInstanceManager = playerInstanceManager;
         }

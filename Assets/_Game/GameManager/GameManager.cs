@@ -13,8 +13,8 @@ namespace DungeonShooter
         private StageManager _stageManager;
         private StageContext _stageContext;
         private ITableRepository _tableRepository;
-        private PlayerStatusController _playerStatusController;
-        private PlayerSkillController _playerSkillController;
+        private PlayerStatusSession _playerStatusSession;
+        private PlayerSkillSession _playerSkillSession;
         private Inventory _inventory;
         private IItemFactory _itemFactory;
 
@@ -22,16 +22,16 @@ namespace DungeonShooter
         public void Construct(StageManager stageManager
             , StageContext stageContext
             , ITableRepository tableRepository
-            , PlayerStatusController playerStatusController
-            , PlayerSkillController playerSkillController
+            , PlayerStatusSession playerStatusSession
+            , PlayerSkillSession playerSkillSession
             , Inventory inventory
             , IItemFactory itemFactory)
         {
             _stageManager = stageManager;
             _stageContext = stageContext;
             _tableRepository = tableRepository;
-            _playerStatusController = playerStatusController;
-            _playerSkillController = playerSkillController;
+            _playerStatusSession = playerStatusSession;
+            _playerSkillSession = playerSkillSession;
             _inventory = inventory;
             _itemFactory = itemFactory;
         }
@@ -45,12 +45,12 @@ namespace DungeonShooter
                 return;
             }
 
-            _playerStatusController.Initialize(config);
-            await _playerSkillController.InitializeAsync(config);
+            _playerStatusSession.Initialize(config);
+            await _playerSkillSession.InitializeAsync(config);
 
             _inventory.Clear();
-            _inventory.SetStatGroup(_playerStatusController.StatGroup);
-            _inventory.SetSkillGroup(_playerSkillController.SkillGroup);
+            _inventory.SetStatGroup(_playerStatusSession.StatGroup);
+            _inventory.SetSkillGroup(_playerSkillSession.SkillGroup);
             
             var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);
             await _inventory.AddItem(weapon);

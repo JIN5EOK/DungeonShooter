@@ -92,7 +92,6 @@ namespace DungeonShooter
             // TODO: 임시코드, 타임스케일 조정은 별도의 시간 매니저로 분리 필요
             Time.timeScale = 1f;
             
-            
             base.Hide();
         }
     }

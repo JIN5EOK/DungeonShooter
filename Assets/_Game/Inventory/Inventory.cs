@@ -47,7 +47,7 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 스탯 적용 대상 그룹을 설정합니다. (EntityBase가 없어도 스탯 보너스 적용 가능)
+        /// 스탯 적용 대상 그룹을 설정합니다.
         /// </summary>
         public void SetStatGroup(EntityStatGroup statGroup)
         {

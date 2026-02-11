@@ -27,16 +27,16 @@ namespace DungeonShooter
         private readonly ITableRepository _tableRepository;
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
-        private readonly PlayerStatusController _playerStatusController;
+        private readonly PlayerStatusSession _playerStatusSession;
         private List<int> _enemyIds;
 
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, PlayerStatusController playerStatusController)
+        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, PlayerStatusSession playerStatusSession)
         {
             _tableRepository = tableRepository;
             _stageContext = stageContext;
             _sceneResourceProvider = sceneResourceProvider;
-            _playerStatusController = playerStatusController;
+            _playerStatusSession = playerStatusSession;
             Initialize();
         }
 
@@ -176,7 +176,7 @@ namespace DungeonShooter
             var exp = configTableEntry.Exp;
             healthComponent.OnDeath += () =>
             {
-                _playerStatusController.AddExp(exp);
+                _playerStatusSession.AddExp(exp);
                 CoroutineManager.Delay(0.5f, () => entity.Destroy());
             };
 

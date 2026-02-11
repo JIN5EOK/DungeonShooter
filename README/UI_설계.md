@@ -11,7 +11,8 @@ classDiagram
     }
     
     class UIManager["UIManager<br>UI생성 및 게임오브젝트 계층구조 담당"]{
-        +CreateUI(string key, bool isUnique) UIBase
+        +GetSingletonUIAsync(string key) UniTask~UIBase~ // 싱글톤 형태로 UI 생성 혹은 기존 UI 반환
+        +CreateUIAsync(string key) UniTask~UIBase~ // 항상 새로운 UI 생성
         +RemoveUI(UIBase uiBase) UIBase
         +GetOrder(UIBase uiBase) int // 정렬순서 조회
         +SetOrder(UIBase uiBase, int order) void // 정렬순서 조절
@@ -45,5 +46,3 @@ classDiagram
   * `UIType`별 캔버스 및 계층구조 생성
     * `UIType`별로 캔버스를 생성한다 
     * 캔버스간 정렬 순서는 UIType에 정의된 순서를 따른다 (HudUI < PopupUI)
-* `CreateUIAsync` 의 `isUnique`
-  * UI를 불러올때 동일한 UI를 사용할건지 여부, 처음 불러올때 내부에 주소 : UI 형태로 캐시해두고 같은 요청이 있을때 같은 UI반환

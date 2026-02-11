@@ -9,17 +9,17 @@ namespace DungeonShooter
     /// 플레이어 고유 스킬을 담당합니다.
     /// SkillGroup 소유, 엔티티 바인딩, 스킬 실행/교체 로직을 담당합니다.
     /// </summary>
-    public class PlayerSkillController
+    public class PlayerSkillSession
     {
         public EntitySkillGroup SkillGroup { get; private set; } = new EntitySkillGroup();
         public EntityBase PlayerInstance => _playerInstance;
         public event Action<int, Skill> OnActiveSkillChanged;
-
-        private ISkillFactory _skillFactory;
-
+        
         private readonly Skill[] _activeSkills = new Skill[PlayerSkillSlots.Count];
         private EntityBase _playerInstance;
 
+        private ISkillFactory _skillFactory;
+        
         [Inject]
         private void Construct(ISkillFactory skillFactory)
         {
@@ -30,7 +30,7 @@ namespace DungeonShooter
         {
             if (index < 0 || index >= PlayerSkillSlots.Count)
             {
-                LogHandler.LogWarning<PlayerSkillController>($"GetActiveSkill: 잘못된 인덱스 입니다. index: {index}");
+                LogHandler.LogWarning<PlayerSkillSession>($"GetActiveSkill: 잘못된 인덱스 입니다. index: {index}");
                 return null;
             }
 
@@ -44,7 +44,7 @@ namespace DungeonShooter
         {
             if (config == null)
             {
-                LogHandler.LogWarning<PlayerSkillController>("PlayerConfigTableEntry가 null입니다.");
+                LogHandler.LogWarning<PlayerSkillSession>("PlayerConfigTableEntry가 null입니다.");
                 return;
             }
             SkillGroup?.Clear();
@@ -56,15 +56,16 @@ namespace DungeonShooter
             if (_activeSkills[PlayerSkillSlots.Skill2Index] != null) 
                 SkillGroup?.Regist(_activeSkills[PlayerSkillSlots.Skill2Index]);
             
+            InvokeActiveSkillChanged(PlayerSkillSlots.Skill1Index);
+            InvokeActiveSkillChanged(PlayerSkillSlots.Skill2Index);
+            
             // 임시코드, 패시브 스킬 등록
             SkillGroup?.Regist(await _skillFactory.CreateSkillAsync(14000301));
             SkillGroup?.Regist(await _skillFactory.CreateSkillAsync(14000401));
-            InvokeActiveSkillChanged(PlayerSkillSlots.Skill1Index);
-            InvokeActiveSkillChanged(PlayerSkillSlots.Skill2Index);
         }
 
         /// <summary>
-        /// 플레이어 엔티티에 SkillGroup만 바인딩합니다.
+        /// 플레이어 엔티티를 바인딩합니다.
         /// </summary>
         public void BindPlayerInstance(EntityBase entity)
         {
@@ -109,14 +110,14 @@ namespace DungeonShooter
         {
             if (oldSkill == null || nextLevelEntry == null)
             {
-                LogHandler.LogError<PlayerSkillController>("파라미터가 올바르지 않습니다.");
+                LogHandler.LogError<PlayerSkillSession>("파라미터가 올바르지 않습니다.");
                 return;
             }
 
             var newSkill = await _skillFactory.CreateSkillAsync(nextLevelEntry.Id);
             if (newSkill == null)
             {
-                LogHandler.LogWarning<PlayerSkillController>($"다음 레벨 스킬이 없습니다: {nextLevelEntry.Id}");
+                LogHandler.LogWarning<PlayerSkillSession>($"다음 레벨 스킬이 없습니다: {nextLevelEntry.Id}");
                 return;
             }
 

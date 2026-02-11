@@ -9,11 +9,11 @@ namespace DungeonShooter
 /// </summary>
     public class PlayerInstanceManager
     {
-        private readonly PlayerStatusController _playerStatusController;
-        private readonly PlayerSkillController _playerSkillController;
+        private readonly PlayerStatusSession _playerStatusSession;
+        private readonly PlayerSkillSession _playerSkillSession;
         private readonly Inventory _inventory;
         private readonly UIManager _uIManager;
-        private readonly PlayerInputController _playerInputController;
+        private readonly PlayerInputSession _playerInputSession;
 
         private EntityBase _currentPlayerEntity;
         private HealthBarHudUI _healthBarUI;
@@ -27,17 +27,17 @@ namespace DungeonShooter
         private readonly Skill[] _boundActiveSkills = new Skill[PlayerSkillSlots.Count];
 
         [Inject]
-        public PlayerInstanceManager(PlayerStatusController playerStatusController
-            , PlayerSkillController playerSkillController
+        public PlayerInstanceManager(PlayerStatusSession playerStatusSession
+            , PlayerSkillSession playerSkillSession
             , Inventory inventory
             , UIManager uIManager
-            , PlayerInputController playerInputController)
+            , PlayerInputSession playerInputSession)
         {
-            _playerStatusController = playerStatusController;
-            _playerSkillController = playerSkillController;
+            _playerStatusSession = playerStatusSession;
+            _playerSkillSession = playerSkillSession;
             _inventory = inventory;
             _uIManager = uIManager;
-            _playerInputController = playerInputController;
+            _playerInputSession = playerInputSession;
         }
 
         public async UniTask BindAsync(EntityBase entity)
@@ -50,12 +50,12 @@ namespace DungeonShooter
 
             _currentPlayerEntity = entity;
             
-            _playerStatusController.BindPlayerInstance(entity);
-            _playerSkillController.BindPlayerInstance(entity);
+            _playerStatusSession.BindPlayerInstance(entity);
+            _playerSkillSession.BindPlayerInstance(entity);
             _inventory.BindPlayerInstance(entity);
 
             await SetupPlayerUIAsync();
-            _playerInputController.BindPlayerInstance(entity);
+            _playerInputSession.BindPlayerInstance(entity);
         }
 
         public void UnbindAndDestroy()
@@ -64,7 +64,7 @@ namespace DungeonShooter
                 return;
 
             CleanupPlayerUI();
-            _playerInputController.UnbindPlayerInstance();
+            _playerInputSession.UnbindPlayerInstance();
 
             Object.Destroy(_currentPlayerEntity.gameObject);
             _currentPlayerEntity = null;
@@ -80,20 +80,20 @@ namespace DungeonShooter
         
         private async UniTask SetupPlayerUIAsync()
         {
-            _healthBarUI = await _uIManager.CreateUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud, true);
-            _healthBarUI.SetHealthAndMaxHealth(_playerStatusController.Hp, _playerStatusController.StatGroup.GetStat(StatType.Hp));
-            _playerStatusController.OnHpChanged += _healthBarUI.SetHealth;
-            _playerStatusController.StatGroup.OnStatChanged += OnMaxHealthChanged;
+            _healthBarUI = await _uIManager.GetSingletonUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud);
+            _healthBarUI.SetHealthAndMaxHealth(_playerStatusSession.Hp, _playerStatusSession.StatGroup.GetStat(StatType.Hp));
+            _playerStatusSession.OnHpChanged += _healthBarUI.SetHealth;
+            _playerStatusSession.StatGroup.OnStatChanged += OnMaxHealthChanged;
 
-            _expGaugeHudUI = await _uIManager.CreateUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud, true);
-            _expGaugeHudUI.SetLevel(_playerStatusController.Level);
-            _expGaugeHudUI.SetExp(_playerStatusController.Exp);
-            _expGaugeHudUI.SetMaxExp(PlayerStatusController.ExpPerLevel);
-            _playerStatusController.OnLevelChanged += _expGaugeHudUI.SetLevel;
-            _playerStatusController.OnExpChanged += _expGaugeHudUI.SetExp;
-            _playerStatusController.OnLevelChanged += OnPlayerLevelChanged;
+            _expGaugeHudUI = await _uIManager.GetSingletonUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud);
+            _expGaugeHudUI.SetLevel(_playerStatusSession.Level);
+            _expGaugeHudUI.SetExp(_playerStatusSession.Exp);
+            _expGaugeHudUI.SetMaxExp(PlayerStatusSession.ExpPerLevel);
+            _playerStatusSession.OnLevelChanged += _expGaugeHudUI.SetLevel;
+            _playerStatusSession.OnExpChanged += _expGaugeHudUI.SetExp;
+            _playerStatusSession.OnLevelChanged += OnPlayerLevelChanged;
 
-            _skillCooldownHudUI = await _uIManager.CreateUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud, true);
+            _skillCooldownHudUI = await _uIManager.GetSingletonUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud);
             _skillCooldownHudUI.Clear();
             _weaponCooldownSlot = _skillCooldownHudUI.AddSkillCooldownSlot();
             _activeSkillCooldownSlots[PlayerSkillSlots.Skill1Index] = _skillCooldownHudUI.AddSkillCooldownSlot();
@@ -102,21 +102,21 @@ namespace DungeonShooter
             BindWeaponCooldownSlot(_inventory.EquippedWeapon);
             _inventory.OnWeaponEquipped += BindWeaponCooldownSlot;
 
-            _playerSkillController.OnActiveSkillChanged += OnActiveSkillChanged;
+            _playerSkillSession.OnActiveSkillChanged += OnActiveSkillChanged;
             
             BindSkillCooldownSlots();
         }
 
         private void CleanupPlayerUI()
         {
-            _playerStatusController.OnHpChanged -= _healthBarUI.SetHealth;
-            _playerStatusController.StatGroup.OnStatChanged -= OnMaxHealthChanged;
+            _playerStatusSession.OnHpChanged -= _healthBarUI.SetHealth;
+            _playerStatusSession.StatGroup.OnStatChanged -= OnMaxHealthChanged;
 
             if (_expGaugeHudUI != null)
             {
-                _playerStatusController.OnLevelChanged -= _expGaugeHudUI.SetLevel;
-                _playerStatusController.OnExpChanged -= _expGaugeHudUI.SetExp;
-                _playerStatusController.OnLevelChanged -= OnPlayerLevelChanged;
+                _playerStatusSession.OnLevelChanged -= _expGaugeHudUI.SetLevel;
+                _playerStatusSession.OnExpChanged -= _expGaugeHudUI.SetExp;
+                _playerStatusSession.OnLevelChanged -= OnPlayerLevelChanged;
                 _expGaugeHudUI.Destroy();
             }
 
@@ -124,7 +124,7 @@ namespace DungeonShooter
 
             if (_skillCooldownHudUI != null)
             {
-                _playerSkillController.OnActiveSkillChanged -= OnActiveSkillChanged;
+                _playerSkillSession.OnActiveSkillChanged -= OnActiveSkillChanged;
                 _inventory.OnWeaponEquipped -= BindWeaponCooldownSlot;
 
                 if (_boundWeaponActiveSkill != null)
@@ -211,8 +211,8 @@ namespace DungeonShooter
 
         private void BindSkillCooldownSlots()
         {
-            HandleActiveSkillChanged(PlayerSkillSlots.Skill1Index, _playerSkillController.GetActiveSkill(PlayerSkillSlots.Skill1Index));
-            HandleActiveSkillChanged(PlayerSkillSlots.Skill2Index, _playerSkillController.GetActiveSkill(PlayerSkillSlots.Skill2Index));
+            HandleActiveSkillChanged(PlayerSkillSlots.Skill1Index, _playerSkillSession.GetActiveSkill(PlayerSkillSlots.Skill1Index));
+            HandleActiveSkillChanged(PlayerSkillSlots.Skill2Index, _playerSkillSession.GetActiveSkill(PlayerSkillSlots.Skill2Index));
         }
         
         private void UnbindSkillCooldownSlots()
@@ -237,11 +237,11 @@ namespace DungeonShooter
         private async UniTaskVoid ShowSkillLevelUpUIAsync()
         {
             if (_skillLevelUpUI == null)
-                _skillLevelUpUI = await _uIManager.CreateUIAsync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp, false);
+                _skillLevelUpUI = await _uIManager.GetSingletonUIAsync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp);
 
             await _skillLevelUpUI.ShowSkillLevelUp(
-                _playerSkillController.SkillGroup,
-                _playerSkillController.ReplaceSkillAsync);
+                _playerSkillSession.SkillGroup,
+                _playerSkillSession.ReplaceSkillAsync);
         }
     }
 }

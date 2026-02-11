@@ -5,12 +5,12 @@ using VContainer;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 플레이어 조작 관련 입력 컨트롤러 입니다.
+    /// 플레이어 조작 관련 입력 세션입니다.
     /// </summary>
-    public class PlayerInputController
+    public class PlayerInputSession
     {
         private InputManager _inputManager;
-        private PlayerSkillController _playerSkillController;
+        private PlayerSkillSession _playerSkillSession;
         private Inventory _inventory;
         private UIManager _uIManager;
         private bool _isSubscribed;
@@ -22,12 +22,12 @@ namespace DungeonShooter
 
         [Inject]
         private void Construct(InputManager inputManager
-            , PlayerSkillController playerSkillController
+            , PlayerSkillSession playerSkillSession
             , Inventory inventory
             , UIManager uIManager)
         {
             _inputManager = inputManager;
-            _playerSkillController = playerSkillController;
+            _playerSkillSession = playerSkillSession;
             _inventory = inventory;
             _uIManager = uIManager;
         }
@@ -124,13 +124,13 @@ namespace DungeonShooter
         private void HandleSkill1Pressed()
         {
             if (_playerInstance == null) return;
-            _playerSkillController.ExecuteActiveSkill1(_playerInstance);
+            _playerSkillSession.ExecuteActiveSkill1(_playerInstance);
         }
 
         private void HandleSkill2Pressed()
         {
             if (_playerInstance == null) return;
-            _playerSkillController.ExecuteActiveSkill2(_playerInstance);
+            _playerSkillSession.ExecuteActiveSkill2(_playerInstance);
         }
 
         private void HandleInteractPressed()
@@ -142,7 +142,7 @@ namespace DungeonShooter
 
         private async void HandleEscapePressed()
         {
-            var inventoryUI = await _uIManager.CreateUIAsync<InventoryUI>(UIAddresses.UI_Inventory, true);
+            var inventoryUI = await _uIManager.GetSingletonUIAsync<InventoryUI>(UIAddresses.UI_Inventory);
             if (inventoryUI.gameObject.activeSelf)
                 inventoryUI.Hide();
             else
