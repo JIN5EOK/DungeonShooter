@@ -32,8 +32,6 @@ namespace DungeonShooter
         private readonly Inventory _inventory;
         private readonly PlayerInstanceManager _playerInstanceManager;
 
-        private EntityBase _currentPlayerEntity;
-
         [Inject]
         public PlayerFactory(StageContext context
             , ISceneResourceProvider sceneResourceProvider
@@ -59,11 +57,9 @@ namespace DungeonShooter
         {
             try
             {
-                DestroyCurrentPlayerIfExists();
                 var playerAddress = GetPlayerAddress();
                 var playerInstance = await _sceneResourceProvider.GetInstanceAsync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
                 var entity = await InitializePlayerInstance(playerInstance);
-                _currentPlayerEntity = entity;
                 return entity;
             }
             catch (Exception e)
@@ -80,11 +76,9 @@ namespace DungeonShooter
         {
             try
             {
-                DestroyCurrentPlayerIfExists();
                 var playerAddress = GetPlayerAddress();
                 var playerInstance = _sceneResourceProvider.GetInstanceSync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
                 var entity = InitializePlayerInstance(playerInstance).GetAwaiter().GetResult();
-                _currentPlayerEntity = entity;
                 return entity;
             }
             catch (Exception e)
@@ -92,21 +86,6 @@ namespace DungeonShooter
                 LogHandler.LogException<PlayerFactory>(e, "플레이어를 불러오지 못했습니다.");
                 return null;
             }
-        }
-
-        /// <summary>
-        /// 현재 플레이어 인스턴스가 있으면 UI/입력 정리 후 파괴합니다.
-        /// </summary>
-        private void DestroyCurrentPlayerIfExists()
-        {
-            if (_currentPlayerEntity == null) 
-                return;
-
-            var toDestroy = _currentPlayerEntity;
-            _currentPlayerEntity = null;
-            toDestroy.OnDestroyed -= CleanupPlayerUIAndInput;
-            CleanupPlayerUIAndInput(toDestroy);
-            Object.Destroy(toDestroy.gameObject);
         }
 
         /// <summary>
@@ -141,6 +120,9 @@ namespace DungeonShooter
                 return null;
             }
 
+            // 기존 플레이어가 있다면 파괴,바인딩 해제
+            _playerInstanceManager.UnbindAndDestroy();
+            
             playerInstance.tag = GameTags.Player;
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
             var entity = playerInstance.AddComponent<EntityBase>();
@@ -154,20 +136,10 @@ namespace DungeonShooter
             
             healthComponent.OnDeath += () => Object.Destroy(entity.gameObject);
 
-            entity.OnDestroyed += CleanupPlayerUIAndInput;
+            entity.OnDestroyed += (entity) => _playerInstanceManager.UnbindAndDestroy();
             await _playerInstanceManager.BindAsync(entity);
 
             return entity;
-        }
-
-        private void CleanupPlayerUIAndInput(EntityBase entity)
-        {
-            if (entity != _currentPlayerEntity && _currentPlayerEntity != null)
-                return;
-
-            _playerInstanceManager.UnbindAndDestroy();
-
-            _currentPlayerEntity = null;
         }
     }
 }
