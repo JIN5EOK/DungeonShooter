@@ -21,7 +21,7 @@ namespace DungeonShooter
         private readonly HashSet<Item> _items = new HashSet<Item>();
         private Item _equippedWeapon;
         private EntityStatGroup _statGroup;
-        private EntitySkillGroup _skillGroup;
+        private EntitySkillContainer _skillContainer;
         private EntityBase _ownerEntity;
 
         public bool IsContainsItem(Item item) => item != null && _items.Contains(item);
@@ -57,9 +57,9 @@ namespace DungeonShooter
         /// <summary>
         /// 스킬 그룹을 설정합니다.
         /// </summary>
-        public void SetSkillGroup(EntitySkillGroup skillGroup)
+        public void SetSkillGroup(EntitySkillContainer skillContainer)
         {
-            _skillGroup = skillGroup;
+            _skillContainer = skillContainer;
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace DungeonShooter
                     _items.Add(item);
 
                     if (item.PassiveSkill != null)
-                        _skillGroup?.Regist(item.PassiveSkill);
+                        _skillContainer?.Regist(item.PassiveSkill);
 
                     // Passive: 인벤토리에 들어오면 스탯 보너스 적용
                     if (item.ItemTableEntry.ItemType == ItemType.Passive)
@@ -108,7 +108,7 @@ namespace DungeonShooter
                 _items.Add(item);
 
                 if (item.PassiveSkill != null)
-                    _skillGroup?.Regist(item.PassiveSkill);
+                    _skillContainer?.Regist(item.PassiveSkill);
 
                 // Passive: 인벤토리에 들어오면 스탯 보너스 적용
                 if (item.ItemTableEntry.ItemType == ItemType.Passive)
@@ -150,7 +150,7 @@ namespace DungeonShooter
             if (_equippedWeapon != null)
             {
                 if (_equippedWeapon.EquipSkill != null)
-                    _skillGroup?.Unregist(_equippedWeapon.EquipSkill, false);
+                    _skillContainer?.Unregist(_equippedWeapon.EquipSkill, false);
                 RemoveItemStatBonus(_equippedWeapon);
                 OnWeaponUnequipped?.Invoke(_equippedWeapon);
             }
@@ -158,7 +158,7 @@ namespace DungeonShooter
             // 새 무기 장착
             _equippedWeapon = item;
             if (item.EquipSkill != null)
-                _skillGroup?.Regist(item.EquipSkill);
+                _skillContainer?.Regist(item.EquipSkill);
 
             // Weapon: 장착하면 스탯 보너스 적용
             ApplyItemStatBonus(item);
@@ -192,7 +192,7 @@ namespace DungeonShooter
             if (item == _equippedWeapon)
             {
                 if (item.EquipSkill != null)
-                    _skillGroup?.Unregist(item.EquipSkill, false);
+                    _skillContainer?.Unregist(item.EquipSkill, false);
                 RemoveItemStatBonus(item);
                 _equippedWeapon = null;
             }
@@ -201,7 +201,7 @@ namespace DungeonShooter
                 RemoveItemStatBonus(item);
 
             if (item.PassiveSkill != null)
-                _skillGroup?.Unregist(item.PassiveSkill, false);
+                _skillContainer?.Unregist(item.PassiveSkill, false);
 
             item.DisposeSkills();
 

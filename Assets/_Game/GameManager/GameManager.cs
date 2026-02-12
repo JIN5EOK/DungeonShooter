@@ -50,7 +50,7 @@ namespace DungeonShooter
 
             _inventory.Clear();
             _inventory.SetStatGroup(_playerStatusSession.StatGroup);
-            _inventory.SetSkillGroup(_playerSkillSession.SkillGroup);
+            _inventory.SetSkillGroup(_playerSkillSession.SkillContainer);
             
             var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);
             await _inventory.AddItem(weapon);

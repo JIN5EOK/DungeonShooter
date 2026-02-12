@@ -7,7 +7,7 @@ namespace DungeonShooter
     /// Entity의 스킬을 관리하는 Pure C# 객체.
     /// 스킬 등록/해제만 담당하며, 스킬 사용은 Skill 인스턴스를 직접 호출한다.
     /// </summary>
-    public class EntitySkillGroup
+    public class EntitySkillContainer
     {
         private readonly List<Skill> _skills = new List<Skill>();
         
@@ -26,19 +26,19 @@ namespace DungeonShooter
         {
             if (skill == null)
             {
-                LogHandler.LogWarning<EntitySkillGroup>("등록할 스킬이 null입니다.");
+                LogHandler.LogWarning<EntitySkillContainer>("등록할 스킬이 null입니다.");
                 return;
             }
 
             if (_skills.Contains(skill))
             {
-                LogHandler.LogWarning<EntitySkillGroup>($"이미 등록된 스킬입니다: {skill.SkillTableEntry.SkillName}");
+                LogHandler.LogWarning<EntitySkillContainer>($"이미 등록된 스킬입니다: {skill.SkillTableEntry.SkillName}");
                 return;
             }
 
             _skills.Add(skill);
             OnSkillRegisted?.Invoke(skill);
-            LogHandler.Log<EntitySkillGroup>($"스킬 등록 완료: {skill.SkillTableEntry.Id} ({skill.SkillTableEntry.SkillName})");
+            LogHandler.Log<EntitySkillContainer>($"스킬 등록 완료: {skill.SkillTableEntry.Id} ({skill.SkillTableEntry.SkillName})");
         }
 
         /// <summary>
@@ -48,13 +48,13 @@ namespace DungeonShooter
         {
             if (skill == null)
             {
-                LogHandler.LogWarning<EntitySkillGroup>("스킬해제 실패: 스킬이 null입니다.");
+                LogHandler.LogWarning<EntitySkillContainer>("스킬해제 실패: 스킬이 null입니다.");
                 return;
             }
 
             if (!_skills.Remove(skill))
             {
-                LogHandler.LogWarning<EntitySkillGroup>($"스킬해제 실패: 등록되지 않은 스킬입니다: {skill.SkillTableEntry?.SkillName}");
+                LogHandler.LogWarning<EntitySkillContainer>($"스킬해제 실패: 등록되지 않은 스킬입니다: {skill.SkillTableEntry?.SkillName}");
                 return;
             }
 
@@ -64,7 +64,7 @@ namespace DungeonShooter
             {
                 skill.Dispose();
             }
-            LogHandler.Log<EntitySkillGroup>($"스킬 등록 해제 완료: {skill.SkillTableEntry?.Id}");
+            LogHandler.Log<EntitySkillContainer>($"스킬 등록 해제 완료: {skill.SkillTableEntry?.Id}");
         }
         
         /// <summary>

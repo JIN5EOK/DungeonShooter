@@ -9,7 +9,7 @@ namespace DungeonShooter
         public event Action<EntityBase> OnDestroyed;
 
         public EntityStatGroup StatGroup { get; private set; }
-        public EntitySkillGroup SkillGroup { get; private set; }
+        public EntitySkillContainer SkillContainer { get; private set; }
 
         /// <summary>
         /// 엔티티를 제거합니다. 실제 제거 시점에 OnDestroyed가 호출됩니다.
@@ -29,27 +29,27 @@ namespace DungeonShooter
         /// SkillGroup을 주입합니다.
         /// 기존 그룹의 스킬은 모두 적용 해제하고, 새 그룹의 스킬은 순회하여 적용합니다.
         /// </summary>
-        public void SetSkillGroup(EntitySkillGroup skillGroup)
+        public void SetSkillGroup(EntitySkillContainer skillContainer)
         {
-            if (SkillGroup != null)
+            if (SkillContainer != null)
             {
-                foreach (var s in SkillGroup.GetRegistedSkills())
+                foreach (var s in SkillContainer.GetRegistedSkills())
                 {
                     UnapplySkill(s);
                 }
 
-                SkillGroup.OnSkillRegisted -= ApplySkill;
-                SkillGroup.OnSkillUnregisted -= UnapplySkill;
+                SkillContainer.OnSkillRegisted -= ApplySkill;
+                SkillContainer.OnSkillUnregisted -= UnapplySkill;
             }
 
-            SkillGroup = skillGroup;
+            SkillContainer = skillContainer;
 
-            if (skillGroup != null)
+            if (skillContainer != null)
             {
-                skillGroup.OnSkillRegisted += ApplySkill;
-                skillGroup.OnSkillUnregisted += UnapplySkill;
+                skillContainer.OnSkillRegisted += ApplySkill;
+                skillContainer.OnSkillUnregisted += UnapplySkill;
 
-                foreach (var s in skillGroup.GetRegistedSkills())
+                foreach (var s in skillContainer.GetRegistedSkills())
                 {
                     ApplySkill(s);
                 }

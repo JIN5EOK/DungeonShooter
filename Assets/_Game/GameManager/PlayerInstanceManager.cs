@@ -240,7 +240,7 @@ namespace DungeonShooter
                 _skillLevelUpUI = await _uIManager.GetSingletonUIAsync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp);
 
             await _skillLevelUpUI.ShowSkillLevelUp(
-                _playerSkillSession.SkillGroup,
+                _playerSkillSession.SkillContainer,
                 _playerSkillSession.ReplaceSkillAsync);
         }
     }

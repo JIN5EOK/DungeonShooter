@@ -11,7 +11,7 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerSkillSession
     {
-        public EntitySkillGroup SkillGroup { get; private set; } = new EntitySkillGroup();
+        public EntitySkillContainer SkillContainer { get; private set; } = new EntitySkillContainer();
         public EntityBase PlayerInstance => _playerInstance;
         public event Action<int, Skill> OnActiveSkillChanged;
         
@@ -47,21 +47,21 @@ namespace DungeonShooter
                 LogHandler.LogWarning<PlayerSkillSession>("PlayerConfigTableEntry가 null입니다.");
                 return;
             }
-            SkillGroup?.Clear();
+            SkillContainer?.Clear();
             _activeSkills[PlayerSkillSlots.Skill1Index] = await _skillFactory.CreateSkillAsync(config.Skill1Id);
             _activeSkills[PlayerSkillSlots.Skill2Index] = await _skillFactory.CreateSkillAsync(config.Skill2Id);
             
             if (_activeSkills[PlayerSkillSlots.Skill1Index] != null) 
-                SkillGroup?.Regist(_activeSkills[PlayerSkillSlots.Skill1Index]);
+                SkillContainer?.Regist(_activeSkills[PlayerSkillSlots.Skill1Index]);
             if (_activeSkills[PlayerSkillSlots.Skill2Index] != null) 
-                SkillGroup?.Regist(_activeSkills[PlayerSkillSlots.Skill2Index]);
+                SkillContainer?.Regist(_activeSkills[PlayerSkillSlots.Skill2Index]);
             
             InvokeActiveSkillChanged(PlayerSkillSlots.Skill1Index);
             InvokeActiveSkillChanged(PlayerSkillSlots.Skill2Index);
             
             // 임시코드, 패시브 스킬 등록
-            SkillGroup?.Regist(await _skillFactory.CreateSkillAsync(14000301));
-            SkillGroup?.Regist(await _skillFactory.CreateSkillAsync(14000401));
+            SkillContainer?.Regist(await _skillFactory.CreateSkillAsync(14000301));
+            SkillContainer?.Regist(await _skillFactory.CreateSkillAsync(14000401));
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace DungeonShooter
         {
             if (entity == null) return;
 
-            entity.SetSkillGroup(SkillGroup);
+            entity.SetSkillGroup(SkillContainer);
             _playerInstance = entity;
             entity.OnDestroyed += UnbindPlayerInstance;
         }
@@ -121,8 +121,8 @@ namespace DungeonShooter
                 return;
             }
 
-            SkillGroup.Unregist(oldSkill, true);
-            SkillGroup.Regist(newSkill);
+            SkillContainer.Unregist(oldSkill, true);
+            SkillContainer.Regist(newSkill);
 
             if (oldSkill == _activeSkills[PlayerSkillSlots.Skill1Index])
             {

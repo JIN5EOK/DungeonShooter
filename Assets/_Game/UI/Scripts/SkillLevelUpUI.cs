@@ -14,7 +14,7 @@ namespace DungeonShooter
         [SerializeField]
         private SkillLevelUpSlot _skillLevelUpSlotPrefab;
         
-        private EntitySkillGroup _skillGroup;
+        private EntitySkillContainer _skillContainer;
         private ITableRepository _tableRepository;
         private ISceneResourceProvider _sceneResourceProvider;
         private List<SkillLevelUpSlot> _slots = new ();
@@ -29,11 +29,11 @@ namespace DungeonShooter
         /// <summary>
         /// 지니고 있는 스킬중 레벨업 가능한 스킬을 찾아내어 표시
         /// </summary>
-        public async UniTask ShowSkillLevelUp(EntitySkillGroup skillGroup,  Func<Skill, SkillTableEntry, UniTask> onSkillLevelUp)
+        public async UniTask ShowSkillLevelUp(EntitySkillContainer skillContainer,  Func<Skill, SkillTableEntry, UniTask> onSkillLevelUp)
         {
-            _skillGroup = skillGroup;
+            _skillContainer = skillContainer;
             
-            var skills = _skillGroup.GetRegistedSkills();
+            var skills = _skillContainer.GetRegistedSkills();
             
             var slotIndex = 0;
             foreach (var skill in skills)
