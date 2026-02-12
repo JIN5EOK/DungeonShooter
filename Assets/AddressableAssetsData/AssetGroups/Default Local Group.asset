@@ -20,6 +20,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0161f133fe6fc45f7b9fddbcd8b7a6e6
+    m_Address: Goblin
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0b01011d905fb4cbea08a65af348edc9
     m_Address: Stage001_0001
     m_ReadOnly: 0
