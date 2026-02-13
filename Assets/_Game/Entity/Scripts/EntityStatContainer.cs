@@ -33,20 +33,9 @@ namespace DungeonShooter
             GetOrAddStat(StatType.MoveSpeed).AddModifier(_statsTableEntry, StatModifierType.Constant, entry.MoveSpeed);
         }
 
-        /// <summary>
-        /// 최종 스탯 수치를 반환합니다. 해당 StatType이 없으면 0으로 생성 후 반환합니다.
-        /// </summary>
-        public int GetStat(StatType type)
+        public IEntityStat GetStat(StatType type)
         {
-            return GetOrAddStat(type).GetValue();
-        }
-
-        /// <summary>
-        /// 해당 스탯의 원본(Constant) 수치를 반환합니다. 해당 StatType이 없으면 0으로 생성 후 반환합니다.
-        /// </summary>
-        public int GetOriginStat(StatType type)
-        {
-            return GetOrAddStat(type).GetOriginValue();
+            return GetOrAddStat(type);
         }
 
         /// <summary>

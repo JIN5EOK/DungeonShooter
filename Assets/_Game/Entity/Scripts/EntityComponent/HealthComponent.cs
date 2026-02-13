@@ -14,9 +14,19 @@ namespace DungeonShooter
 
         private int MaxHealth
         {
-            get => _entityBase != null && _entityBase.StatGroup != null ? _entityBase.StatGroup.GetStat(StatType.Hp) : 0;
+            get => _entityBase != null && _entityBase.StatGroup != null ? _entityBase.StatGroup.GetStat(StatType.Hp).GetValue() : 0;
         }
-        public int CurrentHealth { get; private set; }
+
+        public int CurrentHealth
+        {
+            get => _currentHealth;
+            private set
+            {
+                _currentHealth = value;
+                OnHealthChanged?.Invoke(value);
+            }
+        }
+        private int _currentHealth;
         public float HealthPercent => MaxHealth > 0 ? (float)CurrentHealth / MaxHealth : 0f;
         public bool IsDead => CurrentHealth <= 0;
         private Color hitColor = Color.red;
@@ -54,8 +64,6 @@ namespace DungeonShooter
 
             CurrentHealth -= damage;
             CurrentHealth = Mathf.Max(0, CurrentHealth);
-            
-            OnHealthChanged?.Invoke(CurrentHealth);
 
             // 피격 이펙트 실행
             if (damage > 0)
@@ -77,15 +85,8 @@ namespace DungeonShooter
             if (IsDead) return;
             if (amount < 0) amount = 0;
 
-            var oldHealth = CurrentHealth;
             CurrentHealth += amount;
             CurrentHealth = Mathf.Min(CurrentHealth, MaxHealth);
-
-            var actualHealed = CurrentHealth - oldHealth;
-            if (actualHealed > 0)
-            {
-                OnHealthChanged?.Invoke(CurrentHealth);
-            }
         }
 
         /// <summary>
@@ -102,8 +103,6 @@ namespace DungeonShooter
         private void Die()
         {
             OnDeath?.Invoke();
-            OnHealthChanged?.Invoke(CurrentHealth);
-
             // 사망 효과 실행
             ApplyDeathEffects();
         }
@@ -147,7 +146,6 @@ namespace DungeonShooter
         public void SetCurrentHealth(int value)
         {
             CurrentHealth = Mathf.Clamp(value, 0, MaxHealth);
-            OnHealthChanged?.Invoke(CurrentHealth);
         }
 
         /// <summary>

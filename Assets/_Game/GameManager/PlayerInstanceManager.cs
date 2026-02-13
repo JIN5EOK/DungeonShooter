@@ -9,7 +9,7 @@ namespace DungeonShooter
 /// </summary>
     public class PlayerInstanceManager
     {
-        private readonly PlayerStatusSession _playerStatusSession;
+        private readonly PlayerStatusManager _playerStatusManager;
         private readonly PlayerSkillSession _playerSkillSession;
         private readonly Inventory _inventory;
         private readonly UIManager _uIManager;
@@ -25,13 +25,13 @@ namespace DungeonShooter
         private readonly Skill[] _boundActiveSkills = new Skill[PlayerSkillSlots.Count];
 
         [Inject]
-        public PlayerInstanceManager(PlayerStatusSession playerStatusSession
+        public PlayerInstanceManager(PlayerStatusManager playerStatusManager
             , PlayerSkillSession playerSkillSession
             , Inventory inventory
             , UIManager uIManager
             , PlayerInputSession playerInputSession)
         {
-            _playerStatusSession = playerStatusSession;
+            _playerStatusManager = playerStatusManager;
             _playerSkillSession = playerSkillSession;
             _inventory = inventory;
             _uIManager = uIManager;
@@ -48,7 +48,7 @@ namespace DungeonShooter
 
             _currentPlayerEntity = entity;
             
-            _playerStatusSession.BindPlayerInstance(entity);
+            _playerStatusManager.BindPlayerInstance(entity);
             _playerSkillSession.BindPlayerInstance(entity);
             _inventory.BindPlayerInstance(entity);
 

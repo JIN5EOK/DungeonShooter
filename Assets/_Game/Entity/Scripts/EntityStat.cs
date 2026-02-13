@@ -4,11 +4,18 @@ using UnityEngine;
 
 namespace DungeonShooter
 {
+    public interface IEntityStat
+    {
+        public int GetValue();
+        public int GetOriginValue();
+        public event Action<int> OnValueChanged;
+    }
+    
     /// <summary>
     /// 개별 스탯. 장비·아이템 등에 의한 modifier를 반영해 최종 수치를 계산한다.
     /// Constant·Add는 int 합산, Multiply는 100 단위(100=1.0, 200=2배, 50=0.5배). 최종만 int로 반환한다.
     /// </summary>
-    public class EntityStat
+    public class EntityStat : IEntityStat
     {
         private const int MultiplyUnit = 100;
 

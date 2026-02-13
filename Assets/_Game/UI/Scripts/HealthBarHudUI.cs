@@ -16,18 +16,16 @@ namespace DungeonShooter
         
         private int _currentHealth;
         private int _maxHealth;
-        private float _targetFillAmount;
 
-        private IEventBus _eventBus;
-        private HealthComponent _healthComponent;
+        private PlayerStatusManager _statusManager;
         private EntityStatGroup _entityStatGroup;
         
         [Inject]
-        public void Construct(IEventBus eventBus)
+        public void Construct(PlayerStatusManager statusManager)
         {
-            _eventBus = eventBus;
-            _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerSpawned);
-            _eventBus.Subscribe<PlayerObjectDestroyEvent>(PlayerDestroyed);
+            _statusManager = statusManager;
+            _statusManager.OnHpChanged += SetHealth;
+            _statusManager.StatGroup.GetStat(StatType.Hp).OnValueChanged += SetMaxHealth;
         }
 
         public void SetHealth(int current)
@@ -41,64 +39,22 @@ namespace DungeonShooter
             _maxHealth = max;
             UpdateVisuals();
         }
-        
-        private void PlayerSpawned(PlayerObjectSpawnEvent spawnEvent)
-        {
-            _healthComponent = spawnEvent.player.GetComponent<HealthComponent>();
-            _entityStatGroup = spawnEvent.player.StatGroup;
-            if (_healthComponent != null)
-            {
-                _healthComponent.OnHealthChanged += SetHealth;
-                SetHealth(_healthComponent.CurrentHealth);
-            }
 
-            if (_entityStatGroup != null)
-            {
-                _entityStatGroup.OnStatChanged += MaxHpChanged;
-                SetMaxHealth(_entityStatGroup.GetStat(StatType.Hp));
-            }
-        }
-
-        
-        private void MaxHpChanged(StatType statType, int maxHp)
-        {
-            if (statType != StatType.Hp)
-                return;
-            
-            SetMaxHealth(maxHp);
-        }
-        
-        private void PlayerDestroyed(PlayerObjectDestroyEvent destroyEvent)
-        {
-            if (_healthComponent != null)
-                _healthComponent.OnHealthChanged -= SetHealth;
-            if (_entityStatGroup != null)
-                _entityStatGroup.OnStatChanged -= MaxHpChanged;
-            
-            _healthComponent = null;
-        }
-        
         private void UpdateVisuals()
         {
-            _targetFillAmount = (float)_currentHealth / (float)_maxHealth;
+            var targetFillAmount = (float)_currentHealth / (float)_maxHealth;
             
             if (_healthText != null)
                 _healthText.text = $"{_currentHealth} / {_maxHealth}";
 
             if (_healthFillImage != null)
-                _healthFillImage.fillAmount = _targetFillAmount;
+                _healthFillImage.fillAmount = targetFillAmount;
         }
         
         protected override void OnDestroy()
         {
-            if (_healthComponent != null)
-                _healthComponent.OnHealthChanged -= SetHealth;
-
-            if (_entityStatGroup != null)
-                _entityStatGroup.OnStatChanged -= MaxHpChanged;
-            
-            _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(PlayerSpawned);
-            _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(PlayerDestroyed);
+            _statusManager.OnHpChanged -= SetHealth;
+            _statusManager.StatGroup.GetStat(StatType.Hp).OnValueChanged -= SetMaxHealth;
         }
     }
 }

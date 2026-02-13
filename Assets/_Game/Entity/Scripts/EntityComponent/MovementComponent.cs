@@ -33,7 +33,7 @@ namespace DungeonShooter
         
         public float MoveSpeed
         {
-            get => _entityBase != null && _entityBase.StatGroup != null ? _entityBase.StatGroup.GetStat(StatType.MoveSpeed) : 0;
+            get => _entityBase != null && _entityBase.StatGroup != null ? _entityBase.StatGroup.GetStat(StatType.MoveSpeed).GetValue() : 0;
         }
         private Rigidbody2D _rigidbody;
         private EntityBase _entityBase;

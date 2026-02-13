@@ -6,17 +6,12 @@ using VContainer;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 플레이어 스탯·경험치·레벨을 담당합니다.
-    /// StatGroup을 소유하며, 엔티티 바인딩 시 데이터만 연동합니다.
+    /// 플레이어의 스탯, 현재 스테이터스를 담당합니다.
     /// </summary>
-    public class PlayerStatusSession
+    public class PlayerStatusManager
     {
-        public const int ExpPerLevel = 100;
-
         public EntityStatGroup StatGroup { get; private set; }
         public event Action<int> OnHpChanged;
-        public event Action<int> OnLevelChanged;
-        public event Action<int> OnExpChanged;
 
         public int Hp
         {
@@ -46,20 +41,20 @@ namespace DungeonShooter
         {
             if (config == null)
             {
-                LogHandler.LogWarning<PlayerStatusSession>("PlayerConfigTableEntry가 null입니다.");
+                LogHandler.LogWarning<PlayerStatusManager>("PlayerConfigTableEntry가 null입니다.");
                 return;
             }
 
             var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(config.StatsId);
             if (statsEntry == null)
             {
-                LogHandler.LogWarning<PlayerStatusSession>($"EntityStatsTableEntry를 찾을 수 없습니다. ID: {config.StatsId}");
+                LogHandler.LogWarning<PlayerStatusManager>($"EntityStatsTableEntry를 찾을 수 없습니다. ID: {config.StatsId}");
                 return;
             }
 
             StatGroup = new EntityStatGroup();
             StatGroup.Initialize(statsEntry);
-            _hp = StatGroup.GetStat(StatType.Hp);
+            _hp = StatGroup.GetStat(StatType.Hp).GetValue();
         }
 
         /// <summary>
