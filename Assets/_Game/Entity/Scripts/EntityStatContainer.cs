@@ -5,15 +5,9 @@ namespace DungeonShooter
 {
     /// <summary>
     /// Entity의 스탯을 관리하는 Pure C# 객체.
-    /// EntityStatsTableEntry를 기준으로 기본 스탯(Constant)을 설정하고, GetStat으로 최종 수치를 반환한다.
     /// </summary>
     public class EntityStatGroup
     {
-        /// <summary>
-        /// 특정 스탯의 수치가 변경되었을 때 발생. (StatType, 변경된 최종 수치)
-        /// </summary>
-        public event Action<StatType, int> OnStatChanged;
-
         private readonly Dictionary<StatType, EntityStat> _stats = new Dictionary<StatType, EntityStat>();
         private EntityStatsTableEntry _statsTableEntry;
 
@@ -70,7 +64,6 @@ namespace DungeonShooter
             }
 
             var entityStat = new EntityStat();
-            entityStat.OnValueChanged += value => OnStatChanged?.Invoke(type, value);
             _stats[type] = entityStat;
 
             return entityStat;

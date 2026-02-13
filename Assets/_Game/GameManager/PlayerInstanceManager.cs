@@ -48,7 +48,6 @@ namespace DungeonShooter
 
             _currentPlayerEntity = entity;
             
-            _playerStatusManager.BindPlayerInstance(entity);
             _playerSkillSession.BindPlayerInstance(entity);
             _inventory.BindPlayerInstance(entity);
 

@@ -125,10 +125,11 @@ namespace DungeonShooter
             entity.gameObject.AddOrGetComponent<DashComponent>();
             var cameraTrackComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<CameraTrackComponent>(entity.gameObject);
             await cameraTrackComponent.AttachCameraAsync();
-            await _playerInstanceManager.BindAsync(entity);
+            
             var healthComponent = entity.gameObject.AddOrGetComponent<HealthComponent>();
             healthComponent.OnDeath += () => Object.Destroy(entity.gameObject);
             var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
+            
             
             entity.OnDestroyed += (self) =>
             {
@@ -138,7 +139,7 @@ namespace DungeonShooter
             
             
             _eventBus.Publish(new PlayerObjectSpawnEvent{ player = entity, playerConfigTableEntry = config, position = playerInstance.transform.position});
-            healthComponent.FullHeal();
+            await _playerInstanceManager.BindAsync(entity);
             return entity;
         }
     }

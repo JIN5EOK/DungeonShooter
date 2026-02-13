@@ -1,14 +1,12 @@
 using System;
-using Jin5eok;
-using UnityEngine;
 using VContainer;
 
 namespace DungeonShooter
 {
     /// <summary>
-    /// 플레이어의 스탯, 현재 스테이터스를 담당합니다.
+    /// 플레이어의 스탯, 현재 스테이터스를 담당하고 플레이어 게임오브젝트와 데이터를 연동합니다.
     /// </summary>
-    public class PlayerStatusManager
+    public class PlayerStatusManager : IDisposable
     {
         public EntityStatGroup StatGroup { get; private set; }
         public event Action<int> OnHpChanged;
@@ -22,18 +20,25 @@ namespace DungeonShooter
                 OnHpChanged?.Invoke(value);
             }
         }
+        
         private int _hp;
         
-        private ITableRepository _tableRepository;
         private EntityBase _playerInstance;
         private HealthComponent _boundHealthComponent;
         
+        private ITableRepository _tableRepository;
+        private IEventBus _eventBus;
+        
         [Inject]
-        private void Construct(ITableRepository tableRepository)
+        public void Construct(ITableRepository tableRepository, IEventBus eventBus)
         {
             _tableRepository = tableRepository;
+            _eventBus = eventBus;
+            
+            _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
         }
 
+                
         /// <summary>
         /// 선택한 플레이어 정보로 스탯 세션을 초기화합니다.
         /// </summary>
@@ -54,27 +59,27 @@ namespace DungeonShooter
 
             StatGroup = new EntityStatGroup();
             StatGroup.Initialize(statsEntry);
-            _hp = StatGroup.GetStat(StatType.Hp).GetValue();
-        }
-
-        /// <summary>
-        /// 플레이어 게임오브젝트와 데이터를 바인딩 합니다.
-        /// </summary>
-        public void BindPlayerInstance(EntityBase entity)
-        {
-            if (entity == null) return;
-
-            entity.SetStatGroup(StatGroup);
-            _playerInstance = entity;
-            entity.OnDestroyed += UnbindPlayerInstance;
+            Hp = StatGroup.GetStat(StatType.Hp).GetValue();
         }
         
-        /// <summary>
-        /// 플레이어 엔티티 바인딩을 해제합니다.
-        /// </summary>
-        public void UnbindPlayerInstance(EntityBase player)
+        private void PlayerObjectSpawned(PlayerObjectSpawnEvent spawnEvent)
         {
-            _playerInstance = null;
+            _playerInstance = spawnEvent.player;
+            _playerInstance.SetStatGroup(StatGroup);
+            
+            _boundHealthComponent = _playerInstance.GetComponent<HealthComponent>();
+            _boundHealthComponent.SetCurrentHealth(Hp);
+            _boundHealthComponent.OnHealthChanged += HealthComponentHpChanged;
+        }
+
+        private void HealthComponentHpChanged(int health)
+        {
+            Hp = health;
+        }
+        
+        public void Dispose()
+        {
+            _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
         }
     }
 }

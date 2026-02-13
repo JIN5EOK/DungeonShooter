@@ -7,7 +7,6 @@ namespace DungeonShooter
 {
     /// <summary>
     /// 플레이어 고유 스킬을 담당합니다.
-    /// SkillGroup 소유, 엔티티 바인딩, 스킬 실행/교체 로직을 담당합니다.
     /// </summary>
     public class PlayerSkillSession
     {

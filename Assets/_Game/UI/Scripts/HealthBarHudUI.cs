@@ -18,7 +18,6 @@ namespace DungeonShooter
         private int _maxHealth;
 
         private PlayerStatusManager _statusManager;
-        private EntityStatGroup _entityStatGroup;
         
         [Inject]
         public void Construct(PlayerStatusManager statusManager)
@@ -26,6 +25,8 @@ namespace DungeonShooter
             _statusManager = statusManager;
             _statusManager.OnHpChanged += SetHealth;
             _statusManager.StatGroup.GetStat(StatType.Hp).OnValueChanged += SetMaxHealth;
+            SetHealth(_statusManager.Hp);
+            SetMaxHealth(_statusManager.StatGroup.GetStat(StatType.Hp).GetValue());
         }
 
         public void SetHealth(int current)
