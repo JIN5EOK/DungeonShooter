@@ -17,7 +17,7 @@ namespace DungeonShooter
         private PlayerSkillSession _playerSkillSession;
         private Inventory _inventory;
         private IItemFactory _itemFactory;
-
+        private UIManager _uiManager;
         [Inject]
         public void Construct(StageManager stageManager
             , StageContext stageContext
@@ -25,7 +25,8 @@ namespace DungeonShooter
             , PlayerStatusSession playerStatusSession
             , PlayerSkillSession playerSkillSession
             , Inventory inventory
-            , IItemFactory itemFactory)
+            , IItemFactory itemFactory
+            , UIManager uiManager)
         {
             _stageManager = stageManager;
             _stageContext = stageContext;
@@ -34,6 +35,7 @@ namespace DungeonShooter
             _playerSkillSession = playerSkillSession;
             _inventory = inventory;
             _itemFactory = itemFactory;
+            _uiManager = uiManager;
         }
 
         private async UniTaskVoid Start()
@@ -56,6 +58,8 @@ namespace DungeonShooter
             await _inventory.AddItem(weapon);
             await _inventory.EquipItem(weapon);
 
+            await _uiManager.GetSingletonUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud);
+            
             await _stageManager.CreateStageAsync();
         }
     }

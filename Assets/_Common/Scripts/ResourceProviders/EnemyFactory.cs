@@ -27,16 +27,16 @@ namespace DungeonShooter
         private readonly ITableRepository _tableRepository;
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
-        private readonly PlayerStatusSession _playerStatusSession;
+        private readonly IEventBus _eventBus;
         private List<int> _enemyIds;
 
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, PlayerStatusSession playerStatusSession)
+        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, IEventBus eventBus)
         {
             _tableRepository = tableRepository;
             _stageContext = stageContext;
             _sceneResourceProvider = sceneResourceProvider;
-            _playerStatusSession = playerStatusSession;
+            _eventBus = eventBus;
             Initialize();
         }
 
@@ -173,10 +173,9 @@ namespace DungeonShooter
 
             enemyInstance.AddOrGetComponent<MovementComponent>();
             var healthComponent = enemyInstance.AddOrGetComponent<HealthComponent>();
-            var exp = configTableEntry.Exp;
             healthComponent.OnDeath += () =>
             {
-                _playerStatusSession.AddExp(exp);
+                _eventBus.Publish(new EnemyDestroyEvent { enemy = entity, enemyConfigTableEntry = configTableEntry });
                 CoroutineManager.Delay(0.5f, () => entity.Destroy());
             };
 

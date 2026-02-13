@@ -85,13 +85,7 @@ namespace DungeonShooter
             _playerStatusSession.OnHpChanged += _healthBarUI.SetHealth;
             _playerStatusSession.StatGroup.OnStatChanged += OnMaxHealthChanged;
 
-            _expGaugeHudUI = await _uIManager.GetSingletonUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud);
-            _expGaugeHudUI.SetLevel(_playerStatusSession.Level);
-            _expGaugeHudUI.SetExp(_playerStatusSession.Exp);
-            _expGaugeHudUI.SetMaxExp(PlayerStatusSession.ExpPerLevel);
-            _playerStatusSession.OnLevelChanged += _expGaugeHudUI.SetLevel;
-            _playerStatusSession.OnExpChanged += _expGaugeHudUI.SetExp;
-            _playerStatusSession.OnLevelChanged += OnPlayerLevelChanged;
+            
 
             _skillCooldownHudUI = await _uIManager.GetSingletonUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud);
             _skillCooldownHudUI.Clear();

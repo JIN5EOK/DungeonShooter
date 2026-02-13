@@ -17,8 +17,6 @@ namespace DungeonShooter
         public event Action<int> OnHpChanged;
         public event Action<int> OnLevelChanged;
         public event Action<int> OnExpChanged;
-        public int Level { get; private set; } = 1;
-        public int Exp {get; private set; }
 
         public int Hp
         {
@@ -31,11 +29,10 @@ namespace DungeonShooter
         }
         private int _hp;
         
-
         private ITableRepository _tableRepository;
         private EntityBase _playerInstance;
         private HealthComponent _boundHealthComponent;
-
+        
         [Inject]
         private void Construct(ITableRepository tableRepository)
         {
@@ -62,28 +59,7 @@ namespace DungeonShooter
 
             StatGroup = new EntityStatGroup();
             StatGroup.Initialize(statsEntry);
-            Level = 1;
-            Exp = 0;
             _hp = StatGroup.GetStat(StatType.Hp);
-        }
-
-        /// <summary>
-        /// 경험치를 추가합니다.
-        /// </summary>
-        public void AddExp(int amount)
-        {
-            if (amount <= 0) return;
-            var levelBefore = Level;
-            Exp += amount;
-            while (Exp >= ExpPerLevel)
-            {
-                Exp -= ExpPerLevel;
-                Level++;
-            }
-            OnExpChanged?.Invoke(Exp);
-            
-            if (Level != levelBefore)
-                OnLevelChanged?.Invoke(Level);
         }
 
         /// <summary>

@@ -27,15 +27,14 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// UI를 제거한다. UIManager에서 관리 중이면 RemoveUI를 사용하는 것이 좋다.
+        /// UI를 제거한다.
         /// </summary>
         public virtual void Destroy()
         {
-            OnDestroyEvent?.Invoke();
             Destroy(gameObject);
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             OnDestroyEvent?.Invoke();
         }
