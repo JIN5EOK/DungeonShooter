@@ -16,8 +16,6 @@ namespace DungeonShooter
         private readonly PlayerInputSession _playerInputSession;
 
         private EntityBase _currentPlayerEntity;
-        private HealthBarHudUI _healthBarUI;
-        private ExpGaugeHudUI _expGaugeHudUI;
         private SkillCooldownHudUI _skillCooldownHudUI;
         private SkillCooldownSlot _weaponCooldownSlot;
         private readonly SkillCooldownSlot[] _activeSkillCooldownSlots = new SkillCooldownSlot[PlayerSkillSlots.Count];
@@ -69,24 +67,10 @@ namespace DungeonShooter
             Object.Destroy(_currentPlayerEntity.gameObject);
             _currentPlayerEntity = null;
         }
-
-        private void OnMaxHealthChanged(StatType type, int value)
-        {
-            if (type == StatType.Hp)
-            {
-                _healthBarUI.SetMaxHealth(value);    
-            }
-        }
+        
         
         private async UniTask SetupPlayerUIAsync()
         {
-            _healthBarUI = await _uIManager.GetSingletonUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud);
-            _healthBarUI.SetHealthAndMaxHealth(_playerStatusSession.Hp, _playerStatusSession.StatGroup.GetStat(StatType.Hp));
-            _playerStatusSession.OnHpChanged += _healthBarUI.SetHealth;
-            _playerStatusSession.StatGroup.OnStatChanged += OnMaxHealthChanged;
-
-            
-
             _skillCooldownHudUI = await _uIManager.GetSingletonUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud);
             _skillCooldownHudUI.Clear();
             _weaponCooldownSlot = _skillCooldownHudUI.AddSkillCooldownSlot();
@@ -103,17 +87,6 @@ namespace DungeonShooter
 
         private void CleanupPlayerUI()
         {
-            _playerStatusSession.OnHpChanged -= _healthBarUI.SetHealth;
-            _playerStatusSession.StatGroup.OnStatChanged -= OnMaxHealthChanged;
-
-            if (_expGaugeHudUI != null)
-            {
-                _playerStatusSession.OnLevelChanged -= _expGaugeHudUI.SetLevel;
-                _playerStatusSession.OnExpChanged -= _expGaugeHudUI.SetExp;
-                _playerStatusSession.OnLevelChanged -= OnPlayerLevelChanged;
-                _expGaugeHudUI.Destroy();
-            }
-
             _skillLevelUpUI = null;
 
             if (_skillCooldownHudUI != null)
@@ -132,9 +105,6 @@ namespace DungeonShooter
                 _skillCooldownHudUI.Clear();
                 _skillCooldownHudUI.Destroy();
             }
-
-            _healthBarUI = null;
-            _expGaugeHudUI = null;
             _skillCooldownHudUI = null;
             _weaponCooldownSlot = null;
             _activeSkillCooldownSlots[PlayerSkillSlots.Skill1Index] = null;

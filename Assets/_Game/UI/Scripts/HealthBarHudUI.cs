@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using VContainer;
 
 namespace DungeonShooter
 {
     /// <summary>
-    /// 체력 비율과 수치를 표시하는 HUD. HealthComponent를 참조하지 않고, 외부에서 SetHealth로 갱신한다.
+    /// 체력 비율과 수치를 표시하는 HUD
     /// </summary>
     public class HealthBarHudUI : HudUI
     {
@@ -16,23 +17,67 @@ namespace DungeonShooter
         private int _currentHealth;
         private int _maxHealth;
         private float _targetFillAmount;
+
+        private IEventBus _eventBus;
+        private HealthComponent _healthComponent;
+        private EntityStatGroup _entityStatGroup;
         
-        public void SetHealthAndMaxHealth(int current, int max)
+        [Inject]
+        public void Construct(IEventBus eventBus)
         {
-            _currentHealth = current;
-            _maxHealth = max;
-            UpdateVisuals();
+            _eventBus = eventBus;
+            _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerSpawned);
+            _eventBus.Subscribe<PlayerObjectDestroyEvent>(PlayerDestroyed);
         }
+
         public void SetHealth(int current)
         {
             _currentHealth = current;
             UpdateVisuals();
         }
+        
         public void SetMaxHealth(int max)
         {
             _maxHealth = max;
             UpdateVisuals();
         }
+        
+        private void PlayerSpawned(PlayerObjectSpawnEvent spawnEvent)
+        {
+            _healthComponent = spawnEvent.player.GetComponent<HealthComponent>();
+            _entityStatGroup = spawnEvent.player.StatGroup;
+            if (_healthComponent != null)
+            {
+                _healthComponent.OnHealthChanged += SetHealth;
+                SetHealth(_healthComponent.CurrentHealth);
+            }
+
+            if (_entityStatGroup != null)
+            {
+                _entityStatGroup.OnStatChanged += MaxHpChanged;
+                SetMaxHealth(_entityStatGroup.GetStat(StatType.Hp));
+            }
+        }
+
+        
+        private void MaxHpChanged(StatType statType, int maxHp)
+        {
+            if (statType != StatType.Hp)
+                return;
+            
+            SetMaxHealth(maxHp);
+        }
+        
+        private void PlayerDestroyed(PlayerObjectDestroyEvent destroyEvent)
+        {
+            if (_healthComponent != null)
+                _healthComponent.OnHealthChanged -= SetHealth;
+            if (_entityStatGroup != null)
+                _entityStatGroup.OnStatChanged -= MaxHpChanged;
+            
+            _healthComponent = null;
+        }
+        
         private void UpdateVisuals()
         {
             _targetFillAmount = (float)_currentHealth / (float)_maxHealth;
@@ -42,6 +87,18 @@ namespace DungeonShooter
 
             if (_healthFillImage != null)
                 _healthFillImage.fillAmount = _targetFillAmount;
+        }
+        
+        protected override void OnDestroy()
+        {
+            if (_healthComponent != null)
+                _healthComponent.OnHealthChanged -= SetHealth;
+
+            if (_entityStatGroup != null)
+                _entityStatGroup.OnStatChanged -= MaxHpChanged;
+            
+            _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(PlayerSpawned);
+            _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(PlayerDestroyed);
         }
     }
 }

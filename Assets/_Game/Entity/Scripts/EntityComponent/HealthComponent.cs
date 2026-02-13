@@ -9,12 +9,10 @@ namespace DungeonShooter
     /// </summary>
     public class HealthComponent : MonoBehaviour
     {
-        public event Action<int, int> OnHealthChanged; // (current, max)
-        public event Action<int, int> OnDamaged; // (damage, currentHealth)
-        public event Action<int, int> OnHealed; // (amount, currentHealth)
+        public event Action<int> OnHealthChanged;
         public event Action OnDeath;
 
-        public int MaxHealth
+        private int MaxHealth
         {
             get => _entityBase != null && _entityBase.StatGroup != null ? _entityBase.StatGroup.GetStat(StatType.Hp) : 0;
         }
@@ -56,9 +54,8 @@ namespace DungeonShooter
 
             CurrentHealth -= damage;
             CurrentHealth = Mathf.Max(0, CurrentHealth);
-
-            OnDamaged?.Invoke(damage, CurrentHealth);
-            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+            
+            OnHealthChanged?.Invoke(CurrentHealth);
 
             // 피격 이펙트 실행
             if (damage > 0)
@@ -87,8 +84,7 @@ namespace DungeonShooter
             var actualHealed = CurrentHealth - oldHealth;
             if (actualHealed > 0)
             {
-                OnHealed?.Invoke(actualHealed, CurrentHealth);
-                OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+                OnHealthChanged?.Invoke(CurrentHealth);
             }
         }
 
@@ -106,7 +102,7 @@ namespace DungeonShooter
         private void Die()
         {
             OnDeath?.Invoke();
-            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+            OnHealthChanged?.Invoke(CurrentHealth);
 
             // 사망 효과 실행
             ApplyDeathEffects();
@@ -151,7 +147,7 @@ namespace DungeonShooter
         public void SetCurrentHealth(int value)
         {
             CurrentHealth = Mathf.Clamp(value, 0, MaxHealth);
-            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+            OnHealthChanged?.Invoke(CurrentHealth);
         }
 
         /// <summary>

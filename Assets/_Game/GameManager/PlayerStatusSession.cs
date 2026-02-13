@@ -72,10 +72,6 @@ namespace DungeonShooter
             entity.SetStatGroup(StatGroup);
             _playerInstance = entity;
             entity.OnDestroyed += UnbindPlayerInstance;
-
-            _boundHealthComponent = _playerInstance.gameObject.AddOrGetComponent<HealthComponent>();
-            _boundHealthComponent.SetCurrentHealth(_hp);
-            _boundHealthComponent.OnHealthChanged += OnHealthChangedFromComponent;
         }
         
         /// <summary>
@@ -83,14 +79,7 @@ namespace DungeonShooter
         /// </summary>
         public void UnbindPlayerInstance(EntityBase player)
         {
-            _boundHealthComponent.OnHealthChanged -= OnHealthChangedFromComponent;
-            _boundHealthComponent = null;
             _playerInstance = null;
-        }
-
-        private void OnHealthChangedFromComponent(int current, int max)
-        {
-            Hp = current;
         }
     }
 }

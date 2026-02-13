@@ -57,7 +57,7 @@ namespace DungeonShooter
             var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);
             await _inventory.AddItem(weapon);
             await _inventory.EquipItem(weapon);
-
+            await _uiManager.GetSingletonUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud);
             await _uiManager.GetSingletonUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud);
             
             await _stageManager.CreateStageAsync();

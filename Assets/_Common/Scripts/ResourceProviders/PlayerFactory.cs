@@ -26,28 +26,20 @@ namespace DungeonShooter
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
-        
-        private readonly PlayerStatusSession _playerStatusSession;
-        private readonly PlayerSkillSession _playerSkillSession;
-        private readonly Inventory _inventory;
         private readonly PlayerInstanceManager _playerInstanceManager;
-
+        private IEventBus _eventBus;
         [Inject]
         public PlayerFactory(StageContext context
             , ISceneResourceProvider sceneResourceProvider
             , ITableRepository tableRepository
-            , PlayerStatusSession playerStatusSession
-            , PlayerSkillSession playerSkillSession
-            , Inventory inventory
-            , PlayerInstanceManager playerInstanceManager)
+            , PlayerInstanceManager playerInstanceManager
+            , IEventBus eventBus)
         {
             _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
             _tableRepository = tableRepository;
-            _playerStatusSession = playerStatusSession;
-            _playerSkillSession = playerSkillSession;
-            _inventory = inventory;
             _playerInstanceManager = playerInstanceManager;
+            _eventBus = eventBus;
         }
 
         /// <summary>
@@ -129,16 +121,24 @@ namespace DungeonShooter
 
             entity.gameObject.AddOrGetComponent<MovementComponent>();
             entity.gameObject.AddOrGetComponent<InteractComponent>();
-            var healthComponent = entity.gameObject.AddOrGetComponent<HealthComponent>();
+            
             entity.gameObject.AddOrGetComponent<DashComponent>();
             var cameraTrackComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<CameraTrackComponent>(entity.gameObject);
             await cameraTrackComponent.AttachCameraAsync();
-            
-            healthComponent.OnDeath += () => Object.Destroy(entity.gameObject);
-
-            entity.OnDestroyed += (entity) => _playerInstanceManager.UnbindAndDestroy();
             await _playerInstanceManager.BindAsync(entity);
-
+            var healthComponent = entity.gameObject.AddOrGetComponent<HealthComponent>();
+            healthComponent.OnDeath += () => Object.Destroy(entity.gameObject);
+            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
+            
+            entity.OnDestroyed += (self) =>
+            {
+                _playerInstanceManager.UnbindAndDestroy();
+                _eventBus.Publish(new PlayerObjectDestroyEvent {player = self, position = playerInstance.transform.position});
+            };
+            
+            
+            _eventBus.Publish(new PlayerObjectSpawnEvent{ player = entity, playerConfigTableEntry = config, position = playerInstance.transform.position});
+            healthComponent.FullHeal();
             return entity;
         }
     }

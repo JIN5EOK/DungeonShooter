@@ -124,7 +124,7 @@ namespace DungeonShooter
                 ? $"예외 발생: {exception.Message}" 
                 : $"{context}: {exception.Message}";
             
-            Debug.LogError(GetMessage(header, message));
+            Debug.LogException(exception);
         }
 
         private static string GetMessage<T>(string message) => GetMessage(typeof(T).Name, message);
