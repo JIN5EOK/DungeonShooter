@@ -8,9 +8,7 @@ namespace DungeonShooter
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Initialize()
         {
-            // GlobalLifeTimeScope 생성 및 초기화
-            var globalScopeObject = new GameObject("GlobalLifeTimeScope");
-            globalScopeObject.AddComponent<GlobalLifeTimeScope>();
+            // 런타임 시작 전 처리할 내용이 있다면 여기서 정의
         }       
     }
 }

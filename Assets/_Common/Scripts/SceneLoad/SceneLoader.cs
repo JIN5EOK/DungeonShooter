@@ -19,9 +19,6 @@ namespace DungeonShooter
         /// <summary>
         /// 로드할 씬의 LifeTimeScope에 반영할 Context를 추가한다
         /// </summary>
-        /// <typeparam name="T">컨텍스트 타입</typeparam>
-        /// <param name="context">추가할 컨텍스트</param>
-        /// <returns>메서드 체이닝을 위한 SceneLoader 인스턴스</returns>
         public SceneLoader AddContext<T>(T context) where T : class
         {
             _contextRegistrations.Add(builder => builder.RegisterInstance(context));
@@ -32,15 +29,8 @@ namespace DungeonShooter
         /// Addressables를 통해 비동기로 씬을 로드한다
         /// 내부적으로 LifetimeScope.Enqueue 블록을 생성하여 이전에 AddContext로 추가한 모든 컨텍스트를 등록한 후 씬을 로드한다
         /// </summary>
-        /// <param name="sceneName">로드할 씬 이름</param>
         public async Awaitable LoadScene(string sceneName)
         {
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                Debug.LogError($"[{nameof(SceneLoader)}] 씬 이름이 비었습니다.");
-                return;
-            }
-
             using (LifetimeScope.Enqueue(builder =>
             {
                 foreach (var registration in _contextRegistrations)
@@ -56,12 +46,12 @@ namespace DungeonShooter
 
                     if (handle.Status != AsyncOperationStatus.Succeeded)
                     {
-                        Debug.LogError($"[{nameof(SceneLoader)}] 씬 로드에 실패했습니다: {sceneName}");
+                        LogHandler.LogError<SceneLoader>($"씬 로드에 실패했습니다: {sceneName}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"[{nameof(SceneLoader)}] 씬 로드에 실패했습니다: {ex.Message}");
+                    LogHandler.LogError<SceneLoader>($"씬 로드에 실패했습니다: {sceneName}");
                     throw;
                 }
             }
