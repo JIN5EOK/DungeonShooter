@@ -10,7 +10,7 @@ namespace DungeonShooter
     public class PlayerInstanceManager
     {
         private readonly PlayerStatusManager _playerStatusManager;
-        private readonly PlayerSkillSession _playerSkillSession;
+        private readonly PlayerSkillManager _playerSkillManager;
         private readonly Inventory _inventory;
         private readonly UIManager _uIManager;
         private readonly PlayerInputSession _playerInputSession;
@@ -26,13 +26,13 @@ namespace DungeonShooter
 
         [Inject]
         public PlayerInstanceManager(PlayerStatusManager playerStatusManager
-            , PlayerSkillSession playerSkillSession
+            , PlayerSkillManager playerSkillManager
             , Inventory inventory
             , UIManager uIManager
             , PlayerInputSession playerInputSession)
         {
             _playerStatusManager = playerStatusManager;
-            _playerSkillSession = playerSkillSession;
+            _playerSkillManager = playerSkillManager;
             _inventory = inventory;
             _uIManager = uIManager;
             _playerInputSession = playerInputSession;
@@ -48,7 +48,6 @@ namespace DungeonShooter
 
             _currentPlayerEntity = entity;
             
-            _playerSkillSession.BindPlayerInstance(entity);
             _inventory.BindPlayerInstance(entity);
 
             await SetupPlayerUIAsync();
@@ -79,7 +78,7 @@ namespace DungeonShooter
             BindWeaponCooldownSlot(_inventory.EquippedWeapon);
             _inventory.OnWeaponEquipped += BindWeaponCooldownSlot;
 
-            _playerSkillSession.OnActiveSkillChanged += OnActiveSkillChanged;
+            // _playerSkillManager.OnActiveSkillChanged += OnActiveSkillChanged;
             
             BindSkillCooldownSlots();
         }
@@ -90,7 +89,7 @@ namespace DungeonShooter
 
             if (_skillCooldownHudUI != null)
             {
-                _playerSkillSession.OnActiveSkillChanged -= OnActiveSkillChanged;
+                // _playerSkillManager.OnActiveSkillChanged -= OnActiveSkillChanged;
                 _inventory.OnWeaponEquipped -= BindWeaponCooldownSlot;
 
                 if (_boundWeaponActiveSkill != null)
@@ -174,8 +173,8 @@ namespace DungeonShooter
 
         private void BindSkillCooldownSlots()
         {
-            HandleActiveSkillChanged(PlayerSkillSlots.Skill1Index, _playerSkillSession.GetActiveSkill(PlayerSkillSlots.Skill1Index));
-            HandleActiveSkillChanged(PlayerSkillSlots.Skill2Index, _playerSkillSession.GetActiveSkill(PlayerSkillSlots.Skill2Index));
+            HandleActiveSkillChanged(PlayerSkillSlots.Skill1Index, _playerSkillManager.GetActiveSkill(PlayerSkillSlots.Skill1Index));
+            HandleActiveSkillChanged(PlayerSkillSlots.Skill2Index, _playerSkillManager.GetActiveSkill(PlayerSkillSlots.Skill2Index));
         }
         
         private void UnbindSkillCooldownSlots()
@@ -203,8 +202,8 @@ namespace DungeonShooter
                 _skillLevelUpUI = await _uIManager.GetSingletonUIAsync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp);
 
             await _skillLevelUpUI.ShowSkillLevelUp(
-                _playerSkillSession.SkillContainer,
-                _playerSkillSession.ReplaceSkillAsync);
+                _playerSkillManager.SkillContainer,
+                _playerSkillManager.ReplaceSkillAsync);
         }
     }
 }

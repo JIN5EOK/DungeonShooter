@@ -14,7 +14,7 @@ namespace DungeonShooter
         private StageContext _stageContext;
         private ITableRepository _tableRepository;
         private PlayerStatusManager _playerStatusManager;
-        private PlayerSkillSession _playerSkillSession;
+        private PlayerSkillManager _playerSkillManager;
         private Inventory _inventory;
         private IItemFactory _itemFactory;
         private UIManager _uiManager;
@@ -23,7 +23,7 @@ namespace DungeonShooter
             , StageContext stageContext
             , ITableRepository tableRepository
             , PlayerStatusManager playerStatusManager
-            , PlayerSkillSession playerSkillSession
+            , PlayerSkillManager playerSkillManager
             , Inventory inventory
             , IItemFactory itemFactory
             , UIManager uiManager)
@@ -32,7 +32,7 @@ namespace DungeonShooter
             _stageContext = stageContext;
             _tableRepository = tableRepository;
             _playerStatusManager = playerStatusManager;
-            _playerSkillSession = playerSkillSession;
+            _playerSkillManager = playerSkillManager;
             _inventory = inventory;
             _itemFactory = itemFactory;
             _uiManager = uiManager;
@@ -48,11 +48,11 @@ namespace DungeonShooter
             }
 
             _playerStatusManager.Initialize(config);
-            await _playerSkillSession.InitializeAsync(config);
+            await _playerSkillManager.InitializeAsync(config);
 
             _inventory.Clear();
             _inventory.SetStatGroup(_playerStatusManager.StatGroup);
-            _inventory.SetSkillGroup(_playerSkillSession.SkillContainer);
+            _inventory.SetSkillGroup(_playerSkillManager.SkillContainer);
             
             var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);
             await _inventory.AddItem(weapon);

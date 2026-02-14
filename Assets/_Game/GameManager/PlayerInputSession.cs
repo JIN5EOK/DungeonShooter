@@ -10,7 +10,7 @@ namespace DungeonShooter
     public class PlayerInputSession
     {
         private InputManager _inputManager;
-        private PlayerSkillSession _playerSkillSession;
+        private PlayerSkillManager _playerSkillManager;
         private Inventory _inventory;
         private UIManager _uIManager;
         private bool _isSubscribed;
@@ -22,12 +22,12 @@ namespace DungeonShooter
 
         [Inject]
         private void Construct(InputManager inputManager
-            , PlayerSkillSession playerSkillSession
+            , PlayerSkillManager playerSkillManager
             , Inventory inventory
             , UIManager uIManager)
         {
             _inputManager = inputManager;
-            _playerSkillSession = playerSkillSession;
+            _playerSkillManager = playerSkillManager;
             _inventory = inventory;
             _uIManager = uIManager;
         }
@@ -123,14 +123,16 @@ namespace DungeonShooter
 
         private void HandleSkill1Pressed()
         {
-            if (_playerInstance == null) return;
-            _playerSkillSession.ExecuteActiveSkill1(_playerInstance);
+            if (_playerInstance == null) 
+                return;
+            _playerSkillManager.ExecuteActiveSkill(0);
         }
 
         private void HandleSkill2Pressed()
         {
-            if (_playerInstance == null) return;
-            _playerSkillSession.ExecuteActiveSkill2(_playerInstance);
+            if (_playerInstance == null) 
+                return;
+            _playerSkillManager.ExecuteActiveSkill(1);
         }
 
         private void HandleInteractPressed()
