@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 
@@ -36,16 +34,14 @@ namespace DungeonShooter
         
         private void PlayerLevelChanged(PlayerLevelChangeEvent playerLevelChangeEvent)
         {
-            ShowSkillLevelUp(_playerSkillManager.SkillContainer).Forget();
+            Show();
         }
         
         /// <summary>
         /// 지니고 있는 스킬중 레벨업 가능한 스킬을 찾아내어 표시
         /// </summary>
-        public async UniTask ShowSkillLevelUp(EntitySkillContainer skillContainer)
+        public override void Show()
         {
-            _skillContainer = skillContainer;
-            
             var skills = _skillContainer.GetRegistedSkills();
             
             var slotIndex = 0;
@@ -70,17 +66,16 @@ namespace DungeonShooter
                 slot._currentSkillInfo.SetInfo(skill.SkillTableEntry.SkillName
                     , skill.SkillTableEntry.SkillDescription
                     , skill.SkillTableEntry.Cooldown
-                    , await _sceneResourceProvider.GetAssetAsync<Sprite>(skill.SkillTableEntry.SkillIconKey,SpriteAtlasAddresses.SkillIconAtlas));
+                    , _sceneResourceProvider.GetAssetSync<Sprite>(skill.SkillTableEntry.SkillIconKey,SpriteAtlasAddresses.SkillIconAtlas));
                 
                 slot._nextSkillInfo.SetInfo(nextSkillEntry.SkillName
                     , nextSkillEntry.SkillDescription
                     , nextSkillEntry.Cooldown
-                    , await _sceneResourceProvider.GetAssetAsync<Sprite>(nextSkillEntry.SkillIconKey,SpriteAtlasAddresses.SkillIconAtlas));
+                    , _sceneResourceProvider.GetAssetSync<Sprite>(nextSkillEntry.SkillIconKey,SpriteAtlasAddresses.SkillIconAtlas));
                 
                 slot.SetSelectHandler(() =>
                 {
-                    HideSlot();
-                    skillContainer.SkillLevelChange(skill, _skillFactory.CreateSkillSync(nextSkillEntry.Id));
+                    _playerSkillManager.SkillContainer.SkillLevelChange(skill, _skillFactory.CreateSkillSync(nextSkillEntry.Id));
                     Hide();
                 });
                 
@@ -94,14 +89,11 @@ namespace DungeonShooter
             }
         }
         
-        private void HideSlot()
+        public override void Hide()
         {
             foreach (var slot in _slots)
                 slot.gameObject.SetActive(false);
-        }
-        
-        public override void Hide()
-        {
+            
             // TODO: 임시코드, 타임스케일 조정은 별도의 시간 매니저로 분리 필요
             Time.timeScale = 1f;
             

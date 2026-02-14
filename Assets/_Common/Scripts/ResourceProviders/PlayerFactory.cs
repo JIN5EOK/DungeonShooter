@@ -27,19 +27,25 @@ namespace DungeonShooter
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
         private readonly PlayerInstanceManager _playerInstanceManager;
+        private readonly PlayerStatusManager _playerStatusManager;
+        private readonly PlayerSkillManager _playerSkillManager;
         private IEventBus _eventBus;
         [Inject]
         public PlayerFactory(StageContext context
             , ISceneResourceProvider sceneResourceProvider
             , ITableRepository tableRepository
             , PlayerInstanceManager playerInstanceManager
-            , IEventBus eventBus)
+            , IEventBus eventBus
+            , PlayerStatusManager playerStatusManager
+            , PlayerSkillManager playerSkillManager)
         {
             _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
             _tableRepository = tableRepository;
             _playerInstanceManager = playerInstanceManager;
             _eventBus = eventBus;
+            _playerStatusManager = playerStatusManager;
+            _playerSkillManager = playerSkillManager;
         }
 
         /// <summary>
@@ -137,6 +143,8 @@ namespace DungeonShooter
                 _eventBus.Publish(new PlayerObjectDestroyEvent {player = self, position = playerInstance.transform.position});
             };
             
+            entity.SetStatGroup(_playerStatusManager.StatGroup);
+            entity.SetSkillGroup(_playerSkillManager.SkillContainer);
             
             _eventBus.Publish(new PlayerObjectSpawnEvent{ player = entity, playerConfigTableEntry = config, position = playerInstance.transform.position});
             await _playerInstanceManager.BindAsync(entity);

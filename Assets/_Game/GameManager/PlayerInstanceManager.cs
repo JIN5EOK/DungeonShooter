@@ -9,51 +9,24 @@ namespace DungeonShooter
 /// </summary>
     public class PlayerInstanceManager
     {
-        private readonly PlayerSkillManager _playerSkillManager;
-        private readonly Inventory _inventory;
-        private readonly UIManager _uIManager;
         private readonly PlayerInputSession _playerInputSession;
 
         private EntityBase _currentPlayerEntity;
-        private Skill _boundWeaponActiveSkill;
 
         [Inject]
-        public PlayerInstanceManager(PlayerStatusManager playerStatusManager
-            , PlayerSkillManager playerSkillManager
-            , Inventory inventory
-            , UIManager uIManager
-            , PlayerInputSession playerInputSession)
+        public PlayerInstanceManager(PlayerInputSession playerInputSession)
         {
-            _playerSkillManager = playerSkillManager;
-            _inventory = inventory;
-            _uIManager = uIManager;
             _playerInputSession = playerInputSession;
         }
 
         public async UniTask BindAsync(EntityBase entity)
         {
-            if (entity == null)
-                return;
-
-            if (_currentPlayerEntity != null)
-                UnbindAndDestroy();
-
-            _currentPlayerEntity = entity;
-            
-            _inventory.BindPlayerInstance(entity);
-
             _playerInputSession.BindPlayerInstance(entity);
         }
 
         public void UnbindAndDestroy()
         {
-            if (_currentPlayerEntity == null)
-                return;
-
             _playerInputSession.UnbindPlayerInstance();
-
-            Object.Destroy(_currentPlayerEntity.gameObject);
-            _currentPlayerEntity = null;
         }
     }
 }

@@ -10,14 +10,11 @@ namespace DungeonShooter
     /// </summary>
     public class Skill
     {
-        private bool _isDisposed = false;
-        
         private readonly SkillData _skillData;
         private readonly SkillTableEntry _skillTableEntry;
         private readonly Sprite _icon;
         private readonly ISceneResourceProvider _resourceProvider;
-        private readonly CancellationTokenSource _cooldownCancellationTokenSource = new CancellationTokenSource();
-
+        
         public SkillData SkillData => _skillData;
         public SkillTableEntry SkillTableEntry => _skillTableEntry;
         public Sprite Icon => _icon;
@@ -45,8 +42,6 @@ namespace DungeonShooter
         /// <returns>실행 성공 여부</returns>
         public async UniTask<bool> Execute(EntityBase caster)
         {
-            ThrowIfDisposed();
-            
             if (IsCooldown)
             {
                 LogHandler.Log<Skill>($"스킬 쿨다운 중: {SkillTableEntry.Id}({_skillTableEntry.SkillName})");
@@ -75,7 +70,7 @@ namespace DungeonShooter
             IsCooldown = true;
             Cooldown = cooldown;
 
-            UpdateCooldownAsync(_cooldownCancellationTokenSource.Token).Forget();
+            UpdateCooldownAsync().Forget();
         }
         
         /// <summary>
@@ -83,8 +78,6 @@ namespace DungeonShooter
         /// </summary>
         private async UniTask<bool> ExecuteEffectsAsync(SkillExecutionContext context)
         {
-            ThrowIfDisposed();
-            
             bool allSuccess = true;
 
             foreach (var effect in _skillData.ActiveEffects)
@@ -104,8 +97,6 @@ namespace DungeonShooter
         /// </summary>
         public void Activate(EntityBase owner)
         {
-            ThrowIfDisposed();
-            
             if (_skillData == null || owner == null || _skillTableEntry == null)
                 return;
             
@@ -123,8 +114,6 @@ namespace DungeonShooter
         /// </summary>
         public void Deactivate(EntityBase owner)
         {
-            ThrowIfDisposed();
-            
             if (_skillData == null || owner == null || _skillTableEntry == null)
                 return;
             
@@ -140,11 +129,11 @@ namespace DungeonShooter
         /// <summary>
         /// 쿨다운을 업데이트합니다.
         /// </summary>
-        private async UniTaskVoid UpdateCooldownAsync(CancellationToken cancellationToken)
+        private async UniTaskVoid UpdateCooldownAsync()
         {
-            while (Cooldown > 0f && !cancellationToken.IsCancellationRequested)
+            while (Cooldown > 0f)
             {
-                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                await UniTask.Yield(PlayerLoopTiming.Update);
 
                 Cooldown -= Time.deltaTime;
                 Cooldown = Mathf.Max(0f, Cooldown);
@@ -152,30 +141,9 @@ namespace DungeonShooter
                 OnCooldownChanged?.Invoke(Cooldown);
             }
 
-            if (!cancellationToken.IsCancellationRequested)
-            {
-                IsCooldown = false;
-                Cooldown = 0f;
-                OnCooldownEnded?.Invoke();
-            }
-        }
-        
-        /// <summary>
-        /// 리소스를 정리합니다.
-        /// </summary>
-        public void Dispose()
-        {
-            ThrowIfDisposed();
-
-            _isDisposed = true;
-            _cooldownCancellationTokenSource.Cancel();
-            _cooldownCancellationTokenSource.Dispose();
-        }
-
-        private void ThrowIfDisposed()
-        {
-            if(_isDisposed)
-                throw new ObjectDisposedException(nameof(Skill));
+            IsCooldown = false;
+            Cooldown = 0f;
+            OnCooldownEnded?.Invoke();
         }
     }
 }

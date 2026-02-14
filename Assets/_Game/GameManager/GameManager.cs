@@ -57,13 +57,9 @@ namespace DungeonShooter
             _playerStatusManager.Initialize(config);
             await _playerSkillManager.InitializeAsync(config);
 
-            _inventory.Clear();
-            _inventory.SetStatGroup(_playerStatusManager.StatGroup);
-            _inventory.SetSkillGroup(_playerSkillManager.SkillContainer);
-            
             var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);
-            await _inventory.AddItem(weapon);
-            await _inventory.EquipItem(weapon);
+            _inventory.AddItem(weapon);
+            _inventory.EquipItem(weapon);
             
             var hpUI = await _uiManager.GetSingletonUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud);
             hpUI.Show();

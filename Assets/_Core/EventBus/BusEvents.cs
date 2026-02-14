@@ -37,4 +37,14 @@ namespace DungeonShooter
         public Skill beforeSkill;
         public Skill afterSkill;
     }
+    
+    public struct ItemEquipEvent
+    {
+        private Item item;
+    }
+    
+    public struct ItemUnequipEvent
+    {
+        private Item item;
+    }
 }

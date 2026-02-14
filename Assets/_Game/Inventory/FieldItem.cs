@@ -93,15 +93,15 @@ namespace DungeonShooter
                 return;
             }
 
-            AddToInventory().Forget();
+            AddToInventory();
         }
 
         /// <summary>
         /// 아이템을 인벤토리에 추가합니다.
         /// </summary>
-        private async UniTaskVoid AddToInventory()
+        private void AddToInventory()
         {
-            await _inventory.AddItem(item);
+            _inventory.AddItem(item);
             OnCollected();
         }
 

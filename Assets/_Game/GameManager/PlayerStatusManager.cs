@@ -36,6 +36,7 @@ namespace DungeonShooter
             _eventBus = eventBus;
             
             _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
+            _eventBus.Subscribe<PlayerObjectDestroyEvent>(PlayerObjectDestroyed);
         }
 
                 
@@ -65,13 +66,18 @@ namespace DungeonShooter
         private void PlayerObjectSpawned(PlayerObjectSpawnEvent spawnEvent)
         {
             _playerInstance = spawnEvent.player;
-            _playerInstance.SetStatGroup(StatGroup);
             
             _boundHealthComponent = _playerInstance.GetComponent<HealthComponent>();
             _boundHealthComponent.SetCurrentHealth(Hp);
             _boundHealthComponent.OnHealthChanged += HealthComponentHpChanged;
         }
 
+        private void PlayerObjectDestroyed(PlayerObjectDestroyEvent destroyEvent)
+        {
+            if(_boundHealthComponent != null)
+                _boundHealthComponent.OnHealthChanged -= HealthComponentHpChanged;
+        }
+        
         private void HealthComponentHpChanged(int health)
         {
             Hp = health;
@@ -79,6 +85,9 @@ namespace DungeonShooter
         
         public void Dispose()
         {
+            if(_boundHealthComponent != null)
+                _boundHealthComponent.OnHealthChanged -= HealthComponentHpChanged;
+            
             _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
         }
     }

@@ -47,7 +47,7 @@ namespace DungeonShooter
             _eventBus.Publish(new SkillLevelUpEvent {beforeSkill = before, afterSkill = after});
             
             after.StartCooldown(before.Cooldown);
-            Unregist(before, true);
+            Unregist(before);
             Regist(after);
             return true;
         }
@@ -77,7 +77,7 @@ namespace DungeonShooter
         /// <summary>
         /// 스킬 등록을 해제합니다. OnSkillUnregisted 발생 후 리소스를 정리합니다.
         /// </summary>
-        public void Unregist(Skill skill, bool disposeAfterUnregist = false)
+        public void Unregist(Skill skill)
         {
             if (skill == null)
             {
@@ -92,11 +92,6 @@ namespace DungeonShooter
             }
 
             OnSkillUnregisted?.Invoke(skill);
-
-            if (disposeAfterUnregist)
-            {
-                skill.Dispose();
-            }
             LogHandler.Log<EntitySkillContainer>($"스킬 등록 해제 완료: {skill.SkillTableEntry?.Id}");
         }
         
@@ -110,7 +105,6 @@ namespace DungeonShooter
             foreach (var skill in copy)
             {
                 OnSkillUnregisted?.Invoke(skill);
-                skill.Dispose();
             }
         }
     }

@@ -216,21 +216,5 @@ namespace DungeonShooter
                 EquipSkill.Deactivate(owner);
             }
         }
-
-        /// <summary>
-        /// 모든 스킬 리소스를 정리합니다.
-        /// </summary>
-        public void DisposeSkills()
-        {
-            UseSkill?.Dispose();
-            PassiveSkill?.Dispose();
-            EquipSkill?.Dispose();
-            ActiveSkill?.Dispose();
-
-            UseSkill = null;
-            PassiveSkill = null;
-            EquipSkill = null;
-            ActiveSkill = null;
-        }
     }
 }

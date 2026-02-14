@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 using VContainer;
 
 namespace DungeonShooter
@@ -9,7 +10,7 @@ namespace DungeonShooter
     /// <summary>
     /// 아이템 장착/소지 관리 인벤토리
     /// </summary>
-    public class Inventory
+    public class Inventory : IDisposable
     {
         public event Action<Item> OnItemAdded;
         public event Action<Item> OnItemRemoved;
@@ -20,58 +21,46 @@ namespace DungeonShooter
         public Item EquippedWeapon => _equippedWeapon;
         private readonly HashSet<Item> _items = new HashSet<Item>();
         private Item _equippedWeapon;
-        private EntityStatGroup _statGroup;
-        private EntitySkillContainer _skillContainer;
+        
+        private PlayerStatusManager _playerStatusManager;
+        private PlayerSkillManager _playerSkillManager;
+        private IEventBus _eventBus;
+        
+        private EntityStatGroup StatGroup => _playerStatusManager?.StatGroup;
+        private EntitySkillContainer SkillContainer => _playerSkillManager?.SkillContainer;
+        
         private EntityBase _ownerEntity;
 
-        public bool IsContainsItem(Item item) => item != null && _items.Contains(item);
-
-        /// <summary>
-        /// 플레이어 인스턴스 바인딩
-        /// </summary>
-        public void BindPlayerInstance(EntityBase entity)
+        [Inject]
+        public Inventory(IEventBus eventBus, PlayerStatusManager playerStatusManager, PlayerSkillManager playerSkillManager)
         {
-            UnbindOwner(_ownerEntity);
-            _ownerEntity = entity;
-            if (entity != null)
-                entity.OnDestroyed += UnbindOwner;
+            _playerStatusManager = playerStatusManager;
+            _playerSkillManager = playerSkillManager;
+            _eventBus = eventBus;
+            _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
+            _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(PlayerObjectDespawned);
         }
 
-        private void UnbindOwner(EntityBase entity)
+        private void PlayerObjectSpawned(PlayerObjectSpawnEvent playerObjectSpawnEvent)
         {
-            if (entity == null || _ownerEntity != entity)
-                return;
+            _ownerEntity = playerObjectSpawnEvent.player;
+        }
 
+        private void PlayerObjectDespawned(PlayerObjectDestroyEvent playerObjectDestroyEvent)
+        {
             _ownerEntity = null;
-            entity.OnDestroyed -= UnbindOwner;
-        }
-
-        /// <summary>
-        /// 스탯 적용 대상 그룹을 설정합니다.
-        /// </summary>
-        public void SetStatGroup(EntityStatGroup statGroup)
-        {
-            _statGroup = statGroup;
-        }
-
-        /// <summary>
-        /// 스킬 그룹을 설정합니다.
-        /// </summary>
-        public void SetSkillGroup(EntitySkillContainer skillContainer)
-        {
-            _skillContainer = skillContainer;
         }
 
         /// <summary>
         /// 아이템 추가
         /// </summary>
         /// <param name="item">추가할 아이템</param>
-        public async UniTask AddItem(Item item)
+        public bool AddItem(Item item)
         {
             if (item == null)
             {
                 LogHandler.LogWarning<Inventory>("아이템이 null입니다.");
-                return;
+                return false;
             }
 
             // 스택 가능한 아이템인지 확인
@@ -85,72 +74,55 @@ namespace DungeonShooter
                     // 받은 아이템의 스택 개수를 남은 개수로 설정하고 사용
                     item.StackCount = remaining;
                     _items.Add(item);
-
-                    if (item.PassiveSkill != null)
-                        _skillContainer?.Regist(item.PassiveSkill);
-
-                    // Passive: 인벤토리에 들어오면 스탯 보너스 적용
-                    if (item.ItemTableEntry.ItemType == ItemType.Passive)
-                    {
-                        ApplyItemStatBonus(item);
-                    }
                 }
             }
-            else
+            else // 없는 경우 새 아이템 추가
             {
-                // 새 아이템 추가 (이미 초기화되어 있다고 가정)
-                // 초기화되지 않은 경우를 대비해 확인
-                if (!item.IsInitialized())
-                {
-                    await item.InitializeAsync();
-                }
-                
                 _items.Add(item);
 
+                // TODO: 아이템 패시브 스킬 자체를 안쓸 것 같긴 함, 없앨지 고민 필요
+                // 아이템 소지 패시브 스킬이 있다면 적용 
                 if (item.PassiveSkill != null)
-                    _skillContainer?.Regist(item.PassiveSkill);
-
-                // Passive: 인벤토리에 들어오면 스탯 보너스 적용
-                if (item.ItemTableEntry.ItemType == ItemType.Passive)
                 {
-                    ApplyItemStatBonus(item);
+                    SkillContainer?.Regist(item.PassiveSkill);
                 }
             }
 
             OnItemAdded?.Invoke(item);
+            return true;
         }
 
         /// <summary>
         /// 아이템 장착
         /// </summary>
         /// <param name="item">장착할 아이템</param>
-        public UniTask EquipItem(Item item)
+        public bool EquipItem(Item item)
         {
             if (item == null)
             {
                 LogHandler.LogWarning<Inventory>("아이템이 null입니다.");
-                return UniTask.CompletedTask;
+                return false;
             }
 
             // 무기 타입인지 확인
             if (item.ItemTableEntry.ItemType != ItemType.Weapon)
             {
                 LogHandler.LogWarning<Inventory>("무기 타입의 아이템만 장착할 수 있습니다.");
-                return UniTask.CompletedTask;
+                return false;
             }
 
             // 인벤토리에 있는지 확인
             if (!_items.Contains(item))
             {
                 LogHandler.LogWarning<Inventory>("인벤토리에 없는 아이템입니다.");
-                return UniTask.CompletedTask;
+                return false;
             }
 
             // 기존 무기 해제
             if (_equippedWeapon != null)
             {
                 if (_equippedWeapon.EquipSkill != null)
-                    _skillContainer?.Unregist(_equippedWeapon.EquipSkill, false);
+                    SkillContainer?.Unregist(_equippedWeapon.EquipSkill);
                 RemoveItemStatBonus(_equippedWeapon);
                 OnWeaponUnequipped?.Invoke(_equippedWeapon);
             }
@@ -158,13 +130,13 @@ namespace DungeonShooter
             // 새 무기 장착
             _equippedWeapon = item;
             if (item.EquipSkill != null)
-                _skillContainer?.Regist(item.EquipSkill);
+                SkillContainer?.Regist(item.EquipSkill);
 
             // Weapon: 장착하면 스탯 보너스 적용
             ApplyItemStatBonus(item);
 
             OnWeaponEquipped?.Invoke(item);
-            return UniTask.CompletedTask;
+            return true;
         }
 
         /// <summary>
@@ -185,6 +157,7 @@ namespace DungeonShooter
         {
             if (item == null)
             {
+                LogHandler.LogError<Inventory>("제거하려는 아이템이 인벤토리에 없습니다.");
                 return;
             }
 
@@ -192,7 +165,7 @@ namespace DungeonShooter
             if (item == _equippedWeapon)
             {
                 if (item.EquipSkill != null)
-                    _skillContainer?.Unregist(item.EquipSkill, false);
+                    SkillContainer?.Unregist(item.EquipSkill);
                 RemoveItemStatBonus(item);
                 _equippedWeapon = null;
             }
@@ -201,9 +174,7 @@ namespace DungeonShooter
                 RemoveItemStatBonus(item);
 
             if (item.PassiveSkill != null)
-                _skillContainer?.Unregist(item.PassiveSkill, false);
-
-            item.DisposeSkills();
+                SkillContainer?.Unregist(item.PassiveSkill);
 
             _items.Remove(item);
             OnItemRemoved?.Invoke(item);
@@ -221,14 +192,12 @@ namespace DungeonShooter
 
         private void ApplyItemStatBonus(Item item)
         {
-            if (_statGroup == null) return;
-            _statGroup.ApplyStatBonus(item, StatBonus.From(item.ItemTableEntry));
+            StatGroup?.ApplyStatBonus(item, StatBonus.From(item.ItemTableEntry));
         }
 
         private void RemoveItemStatBonus(Item item)
         {
-            if (_statGroup == null) return;
-            _statGroup.RemoveStatBonus(item);
+            StatGroup?.RemoveStatBonus(item);
         }
 
 
@@ -262,5 +231,12 @@ namespace DungeonShooter
 
             OnItemUse?.Invoke(item);
         }
+
+        public void Dispose()
+        {
+            _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
+            _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(PlayerObjectDespawned);
+        }
     }
+    
 }

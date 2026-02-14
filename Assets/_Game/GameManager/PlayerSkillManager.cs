@@ -24,11 +24,12 @@ namespace DungeonShooter
             _eventBus = eventBus;
             _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
             _eventBus.Subscribe<PlayerObjectDestroyEvent>(PlayerObjectDestroyed);
-            _eventBus.Subscribe<SkillLevelUpEvent>(SkillLevelUped);
+            _eventBus.Subscribe<SkillLevelUpEvent>(SkillLevelUpped);
         }
 
-        private void SkillLevelUped(SkillLevelUpEvent skillLevelUpEvent)
+        private void SkillLevelUpped(SkillLevelUpEvent skillLevelUpEvent)
         {
+            // 비효율적.. 개선 필요할듯
             for (var i = 0; i < _activeSkills.Length; i++)
             {
                 var activeSkill = _activeSkills[i];
@@ -42,7 +43,6 @@ namespace DungeonShooter
         /// <summary>플레이어 오브젝트 생성 이벤트 </summary>
         private void PlayerObjectSpawned(PlayerObjectSpawnEvent spawnEvent)
         {
-            spawnEvent.player.SetSkillGroup(SkillContainer);
             PlayerInstance = spawnEvent.player;
         }
 
@@ -102,36 +102,12 @@ namespace DungeonShooter
             
             _activeSkills[index]?.Execute(PlayerInstance).Forget();
         }
-
-        /// <summary>
-        /// 기존 스킬을 다음 레벨 스킬로 교체합니다.
-        /// </summary>
-        public async UniTask ReplaceSkillAsync(Skill oldSkill, SkillTableEntry nextLevelEntry)
-        {
-            if (oldSkill == null || nextLevelEntry == null)
-            {
-                LogHandler.LogError<PlayerSkillManager>("파라미터가 올바르지 않습니다.");
-                return;
-            }
-
-            var newSkill = await _skillFactory.CreateSkillAsync(nextLevelEntry.Id);
-            if (newSkill == null)
-            {
-                LogHandler.LogWarning<PlayerSkillManager>($"다음 레벨 스킬이 없습니다: {nextLevelEntry.Id}");
-                return;
-            }
-
-            _eventBus.Publish(new SkillLevelUpEvent() {beforeSkill = oldSkill, afterSkill = newSkill});
-            
-            SkillContainer.Unregist(oldSkill, true);
-            SkillContainer.Regist(newSkill);
-        }
-
+        
         public void Dispose()
         {
             _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
             _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(PlayerObjectDestroyed);
-            _eventBus.Unsubscribe<SkillLevelUpEvent>(SkillLevelUped);
+            _eventBus.Unsubscribe<SkillLevelUpEvent>(SkillLevelUpped);
         }
     }
 }
