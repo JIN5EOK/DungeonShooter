@@ -1,6 +1,6 @@
-using System;
 using Jin5eok;
 using UnityEngine;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -39,13 +39,14 @@ namespace DungeonShooter
         private EntityBase _entityBase;
         private EntityAnimationHandler _animationHandler;
 
-        private void Awake()
+        [Inject]
+        private void Construct(EntityBase entityBase, Rigidbody2D rigidbody2D, EntityAnimationHandler animationHandler)
         {
-            _entityBase = GetComponent<EntityBase>();
-            _rigidbody = GetComponent<Rigidbody2D>();
-            _animationHandler = GetComponent<EntityAnimationHandler>();
+            _animationHandler = animationHandler;
+            _entityBase = entityBase;
+            _rigidbody = rigidbody2D;
         }
-
+        
         private void Update()
         {
             Move();
@@ -70,7 +71,7 @@ namespace DungeonShooter
             }
         }
 
-        private static DungeonShooter.Direction Vector2ToDirection(Vector2 v)
+        private static Direction Vector2ToDirection(Vector2 v)
         {
             if (Mathf.Abs(v.x) > Mathf.Abs(v.y))
                 return v.x > 0 ? DungeonShooter.Direction.Right : DungeonShooter.Direction.Left;

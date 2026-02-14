@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -17,6 +18,7 @@ namespace DungeonShooter
         
         private IEventBus _eventBus;
 
+        [Inject]
         public EntitySkillContainer(IEventBus eventBus)
         {
             _eventBus = eventBus;

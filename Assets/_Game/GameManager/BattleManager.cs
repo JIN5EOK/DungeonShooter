@@ -4,7 +4,7 @@ using VContainer.Unity;
 
 namespace DungeonShooter
 {
-    public class BattleManager : IStartable, IDisposable 
+    public class BattleManager : IDisposable 
     {
         private IEventBus _eventBus;
         
@@ -12,10 +12,6 @@ namespace DungeonShooter
         public BattleManager(IEventBus eventBus)
         {
             _eventBus = eventBus;
-        }
-
-        public void Start()
-        {
             _eventBus.Subscribe<EnemyDestroyEvent>(EnemyDestroyed);
         }
         

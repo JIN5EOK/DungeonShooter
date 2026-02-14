@@ -1,4 +1,5 @@
 using UnityEngine;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -27,10 +28,12 @@ namespace DungeonShooter
         public bool IsDashing => _isDashing;
         public bool IsReady => _cooldownRemaining <= 0f;
         
-        private void Start()
+        [Inject]
+        private void Construct(Rigidbody2D rigidbody2D,  MovementComponent movementComponent)
         {
-            _rigidbody = GetComponent<Rigidbody2D>();
-            _movementComponent = GetComponent<MovementComponent>();
+
+            _rigidbody = rigidbody2D;
+            _movementComponent = movementComponent;
         }
 
         private void Update()

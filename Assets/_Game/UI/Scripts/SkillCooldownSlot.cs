@@ -34,7 +34,6 @@ namespace DungeonShooter
 
         public void SetCooldown(float remainingTime)
         {
-            LogHandler.Log<SkillCooldownSlot>($"SetCooldown({remainingTime})");
             _remainingTime = Mathf.Max(0f, remainingTime);
         }
 

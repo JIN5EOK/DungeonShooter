@@ -11,7 +11,7 @@
       * AI를 담당하는 `AIComponent`
 * Entity들의 프리팹 자체에는 기능 컴포넌트를 달아두지 않음, 런타임 조합이나 로직에 따라 어떤 프리팹이라도 플레이어, 적으로 만들 수 있도록 함
   * Player / Enemy에 필요한 컴포넌트와 초기화, 레이어,태그 설정은 `PlayerFactory`/`EnemyFactory`에서 캐릭터를 생성하며 수행
-
+* 각 컴포넌트간 참조관계는 `EntityLifeTimeScope`를 통한 의존성 주입으로 해결
 ### 관련 문서
 - [스탯시스템_설계.md](%EC%8A%A4%ED%83%AF%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%84%A4%EA%B3%84.md)
 - [스킬시스템_설계.md](%EC%8A%A4%ED%82%AC%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%84%A4%EA%B3%84.md)

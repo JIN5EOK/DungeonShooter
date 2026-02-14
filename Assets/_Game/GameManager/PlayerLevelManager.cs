@@ -5,7 +5,7 @@ using VContainer.Unity;
 
 namespace DungeonShooter
 {
-    public class PlayerLevelManager : IStartable, IDisposable
+    public class PlayerLevelManager : IDisposable
     {
         public Action<int> OnLevelChanged;
         public Action<int> OnExpChanged;
@@ -16,15 +16,11 @@ namespace DungeonShooter
         public int MaxExp => 100; // 일단 경험치통은 레벨 상관없이 100으로 고정
         
         private IEventBus _eventBus;
-        
+
         [Inject]
         public PlayerLevelManager(IEventBus eventBus)
         {
             _eventBus = eventBus;
-        }
-        
-        public void Start()
-        {
             _eventBus.Subscribe<ExpUpEvent>(ExpUpped);
         }
         

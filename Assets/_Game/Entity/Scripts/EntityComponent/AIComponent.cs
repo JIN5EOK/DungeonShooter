@@ -1,5 +1,6 @@
 using Jin5eok;
 using UnityEngine;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -11,9 +12,10 @@ namespace DungeonShooter
         private AiBTContext _context = new AiBTContext();
         private IBehaviourTreeNode<AiBTContext> _rootNode;
 
-        private void Start()
+        [Inject]
+        private void Construct(EntityBase entityBase)
         {
-            _context.Self = GetComponent<EntityBase>();
+            _context.Self = entityBase;
         }
  
         private void Update()

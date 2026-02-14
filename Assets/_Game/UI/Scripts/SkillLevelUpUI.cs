@@ -21,6 +21,7 @@ namespace DungeonShooter
         private EntitySkillContainer _skillContainer;
         private IEventBus _eventBus;
         private PlayerSkillManager _playerSkillManager;
+        
         [Inject]
         public void Construct(ITableRepository tableRepository, ISceneResourceProvider sceneResourceProvider, PlayerSkillManager playerSkillManager, ISkillFactory skillFactory, IEventBus eventBus)
         {
@@ -29,6 +30,7 @@ namespace DungeonShooter
             _skillFactory = skillFactory;
             _eventBus = eventBus;
             _playerSkillManager = playerSkillManager;
+            _skillContainer = playerSkillManager.SkillContainer;
             _eventBus.Subscribe<PlayerLevelChangeEvent>(PlayerLevelChanged);
         }
         

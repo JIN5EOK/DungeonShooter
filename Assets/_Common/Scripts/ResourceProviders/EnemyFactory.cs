@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
 using VContainer;
+using VContainer.Unity;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
@@ -29,14 +30,15 @@ namespace DungeonShooter
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly IEventBus _eventBus;
         private List<int> _enemyIds;
-
+        private LifetimeScope _sceneLifetimeScope;
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, IEventBus eventBus)
+        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope)
         {
             _tableRepository = tableRepository;
             _stageContext = stageContext;
             _sceneResourceProvider = sceneResourceProvider;
             _eventBus = eventBus;
+            _sceneLifetimeScope = sceneLifeTimeScope;
             Initialize();
         }
 
@@ -161,8 +163,15 @@ namespace DungeonShooter
 
             enemyInstance.tag = GameTags.Enemy;
             enemyInstance.layer = PhysicalLayers.Enemy.LayerIndex;
-            var entity = _sceneResourceProvider.AddOrGetComponentWithInejct<EntityBase>(enemyInstance);
-
+            
+            // 씬 LifeTimeScope를 부모로 삼기
+            EntityLifeTimeScope entityLifeTimeScope = null;
+            using (LifetimeScope.EnqueueParent(_sceneLifetimeScope))
+            {
+                entityLifeTimeScope = enemyInstance.AddOrGetComponent<EntityLifeTimeScope>();    
+            }
+            
+            var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
             var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(configTableEntry.StatsId);
             if (statsEntry != null)
             {
@@ -171,8 +180,8 @@ namespace DungeonShooter
                 entity.SetStatGroup(statGroup);
             }
 
-            enemyInstance.AddOrGetComponent<MovementComponent>();
-            var healthComponent = enemyInstance.AddOrGetComponent<HealthComponent>();
+            var movementCompoent = entityLifeTimeScope.Container.Resolve<MovementComponent>();
+            var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();
             healthComponent.OnDeath += () =>
             {
                 _eventBus.Publish(new EnemyDestroyEvent { enemy = entity, enemyConfigTableEntry = configTableEntry });
@@ -180,7 +189,7 @@ namespace DungeonShooter
             };
 
             var aiBT = _sceneResourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
-            enemyInstance.AddOrGetComponent<AIComponent>().SetBT(aiBT);
+            entityLifeTimeScope.Container.Resolve<AIComponent>().SetBT(aiBT);
 
             return entity;
         }

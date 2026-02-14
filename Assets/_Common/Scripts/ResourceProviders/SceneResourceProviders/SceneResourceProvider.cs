@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
@@ -134,29 +135,7 @@ namespace DungeonShooter
 
             return handle.Result;
         }
-
-        /// <summary>
-        /// 컴포넌트를 가져오거나 추가하고 의존성 주입
-        /// </summary>
-        public T AddOrGetComponentWithInejct<T>(GameObject go) where T : Component
-        {
-            if (go.TryGetComponent(out T comp))
-            {
-                return comp;
-            }
-            return AddComponentWithInejct<T>(go);
-        }
-
-        /// <summary>
-        /// 컴포넌트를 추가하고 의존성 주입
-        /// </summary>
-        public T AddComponentWithInejct<T>(GameObject go) where T : Component
-        {
-            var comp = go.AddComponent<T>();
-            _resolver?.Inject(comp);
-            return comp;
-        }
-
+        
         public void Dispose()
         {
             SpriteAtlasManager.atlasRequested -= OnAtlasRequested;
@@ -200,7 +179,7 @@ namespace DungeonShooter
         }
 
         /// <summary> 스프라이트 아틀라스 요청 이벤트 /// </summary>
-        private void OnAtlasRequested(string tag, System.Action<SpriteAtlas> action)
+        private void OnAtlasRequested(string tag, Action<SpriteAtlas> action)
         {
             LogHandler.Log<SceneResourceProvider>($"아틀라스 요청됨: {tag}");
 

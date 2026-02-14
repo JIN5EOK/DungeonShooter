@@ -1,4 +1,5 @@
 using UnityEngine;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -18,13 +19,12 @@ namespace DungeonShooter
         private static readonly int DirectionLeft = 4;
         private static readonly int DirectionRight = 6;
 
-        [SerializeField]
         private Animator _animator;
-
-        private void Awake()
+        
+        [Inject]
+        private void Construct(Animator animator)
         {
-            if (_animator == null)
-                _animator = GetComponent<Animator>();
+            _animator = animator;
         }
 
         /// <summary>

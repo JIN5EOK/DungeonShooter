@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
 using VContainer;
+using VContainer.Unity;
 using Object = UnityEngine.Object;
 
 namespace DungeonShooter
@@ -29,7 +30,8 @@ namespace DungeonShooter
         private readonly PlayerInstanceManager _playerInstanceManager;
         private readonly PlayerStatusManager _playerStatusManager;
         private readonly PlayerSkillManager _playerSkillManager;
-        private IEventBus _eventBus;
+        private readonly IEventBus _eventBus;
+        private readonly LifetimeScope _sceneLifetimeScope;
         [Inject]
         public PlayerFactory(StageContext context
             , ISceneResourceProvider sceneResourceProvider
@@ -37,7 +39,8 @@ namespace DungeonShooter
             , PlayerInstanceManager playerInstanceManager
             , IEventBus eventBus
             , PlayerStatusManager playerStatusManager
-            , PlayerSkillManager playerSkillManager)
+            , PlayerSkillManager playerSkillManager
+            , LifetimeScope sceneLifetimeScope)
         {
             _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
@@ -46,6 +49,7 @@ namespace DungeonShooter
             _eventBus = eventBus;
             _playerStatusManager = playerStatusManager;
             _playerSkillManager = playerSkillManager;
+            _sceneLifetimeScope = sceneLifetimeScope;
         }
 
         /// <summary>
@@ -123,19 +127,24 @@ namespace DungeonShooter
             
             playerInstance.tag = GameTags.Player;
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
-            var entity = playerInstance.AddComponent<EntityBase>();
 
-            entity.gameObject.AddOrGetComponent<MovementComponent>();
-            entity.gameObject.AddOrGetComponent<InteractComponent>();
+            // 씬 LifeTimeScope를 부모로 삼기
+            EntityLifeTimeScope entityLifeTimeScope = null;
+            using (LifetimeScope.EnqueueParent(_sceneLifetimeScope))
+            {
+                entityLifeTimeScope = playerInstance.AddOrGetComponent<EntityLifeTimeScope>();    
+            }
             
-            entity.gameObject.AddOrGetComponent<DashComponent>();
-            var cameraTrackComponent = _sceneResourceProvider.AddOrGetComponentWithInejct<CameraTrackComponent>(entity.gameObject);
+            var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
+            var movementCompoent = entityLifeTimeScope.Container.Resolve<MovementComponent>();
+            var interactComponent = entityLifeTimeScope.Container.Resolve<InteractComponent>();
+            var dashComponent = entityLifeTimeScope.Container.Resolve<DashComponent>();
+            var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();
+            healthComponent.OnDeath += () => Object.Destroy(entity.gameObject);
+            var cameraTrackComponent = entityLifeTimeScope.Container.Resolve<CameraTrackComponent>();
             await cameraTrackComponent.AttachCameraAsync();
             
-            var healthComponent = entity.gameObject.AddOrGetComponent<HealthComponent>();
-            healthComponent.OnDeath += () => Object.Destroy(entity.gameObject);
             var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
-            
             
             entity.OnDestroyed += (self) =>
             {

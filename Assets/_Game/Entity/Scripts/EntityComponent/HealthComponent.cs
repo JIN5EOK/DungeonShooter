@@ -1,6 +1,8 @@
-using UnityEngine;
 using System;
+using System.Collections;
 using Jin5eok;
+using UnityEngine;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -32,26 +34,19 @@ namespace DungeonShooter
         private Color hitColor = Color.red;
         private float hitFlashDuration = 0.2f;
         private Color deathColor = Color.gray;
+        private Color _originalColor;
         private EntityBase _entityBase;
         private SpriteRenderer _spriteRenderer;
-        private Color _originalColor;
         private Rigidbody2D _rigidbody;
-        private Collider2D _collider;
 
-        private void Awake()
+        [Inject]
+        private void Construct(EntityBase entityBase, SpriteRenderer spriteRenderer, Rigidbody2D rigidbody2D)
         {
-            _entityBase = GetComponent<EntityBase>();
-            if (_entityBase == null)
-            {
-                LogHandler.LogError<HealthComponent>("EntityBase 컴포넌트를 찾을 수 없습니다.");
-                Destroy(this);
-            }
-
+            _entityBase = entityBase;
+            _spriteRenderer = spriteRenderer;
+            _rigidbody = rigidbody2D;
             CurrentHealth = MaxHealth;
-            _spriteRenderer = gameObject.AddOrGetComponent<SpriteRenderer>();
             _originalColor = _spriteRenderer.color;
-            _rigidbody = gameObject.AddOrGetComponent<Rigidbody2D>();
-            _collider = gameObject.AddOrGetComponent<Collider2D>();
         }
 
         /// <summary>
@@ -124,12 +119,6 @@ namespace DungeonShooter
                 _rigidbody.linearVelocity = Vector2.zero;
                 _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
             }
-
-            // Collider 비활성화
-            if (_collider != null)
-            {
-                _collider.enabled = false;
-            }
         }
 
         /// <summary>
@@ -151,7 +140,7 @@ namespace DungeonShooter
         /// <summary>
         /// 피격 시 색상 변경 효과
         /// </summary>
-        private System.Collections.IEnumerator HitFlashEffect()
+        private IEnumerator HitFlashEffect()
         {
             if (_spriteRenderer == null) yield break;
 
