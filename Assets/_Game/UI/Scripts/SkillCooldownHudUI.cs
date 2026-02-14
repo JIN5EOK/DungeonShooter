@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -11,55 +12,69 @@ namespace DungeonShooter
         [Header("레이아웃")]
         [SerializeField] private RectTransform _content;
         [SerializeField] private SkillCooldownSlot _skillCooldownSlotPrefab;
-
-        private readonly List<SkillCooldownSlot> _slots = new();
-
-        /// <summary>
-        /// 쿨다운 슬롯을 하나 추가하고 해당 컴포넌트를 반환한다.
-        /// </summary>
-        public SkillCooldownSlot AddSkillCooldownSlot()
-        {
-            if (_content == null || _skillCooldownSlotPrefab == null)
-                return null;
-
-            var instance = Instantiate(_skillCooldownSlotPrefab, _content, false);
-            _slots.Add(instance);
-            return instance;
-        }
         
-        /// <summary>
-        /// 지정한 쿨다운 슬롯을 제거한다.
-        /// </summary>
-        public void RemoveSkillCooldownSlot(SkillCooldownSlot slot)
+        public IReadOnlyDictionary<Skill, SkillCooldownSlot> Slots => _slots;
+        private readonly Dictionary<Skill, SkillCooldownSlot> _slots = new();
+        
+        private IEventBus _eventBus;
+        
+        [Inject]
+        public void Construct(IEventBus eventBus)
         {
-            if (slot == null)
-                return;
-
-            if (_slots.Remove(slot))
-                Destroy(slot.gameObject);
+            _eventBus = eventBus;
+            _eventBus.Subscribe<SkillLevelUpEvent>(SkillChanged);
         }
 
-        public void Clear()
+        private void SkillChanged(SkillLevelUpEvent skillLevelUpEvent)
         {
-            foreach (var slot in _slots)
+            if (!_slots.TryGetValue(skillLevelUpEvent.beforeSkill, out var slot))
             {
-                Destroy(slot.gameObject);
+                var beforeSkill = skillLevelUpEvent.beforeSkill;
+                beforeSkill.OnCooldownChanged -= slot.SetCooldown;
+                var afterSkill = skillLevelUpEvent.afterSkill;
+                SetupSlot(slot, afterSkill.Cooldown, afterSkill.MaxCooldown, afterSkill.Icon);
             }
         }
         
         /// <summary>
-        /// 현재 등록된 슬롯 수를 반환한다.
+        /// 쿨다운 슬롯을 하나 추가하고 해당 컴포넌트를 반환한다.
         /// </summary>
-        public int SlotCount => _slots.Count;
-
-        /// <summary>
-        /// 지정한 인덱스의 하위 슬롯을 반환한다. 범위 밖이면 null.
-        /// </summary>
-        public SkillCooldownSlot GetSlot(int index)
+        public void AddSkillCooldownSlot(Skill skill)
         {
-            if (index < 0 || index >= _slots.Count)
-                return null;
-            return _slots[index];
+            if (_content == null || _skillCooldownSlotPrefab == null)
+                return;
+
+            var slot = Instantiate(_skillCooldownSlotPrefab, _content, false);
+            
+            _slots.Add(skill, slot);
+                            
+            SetupSlot(slot, skill.Cooldown, skill.MaxCooldown, skill.Icon);
+            skill.OnCooldownChanged += slot.SetCooldown;
+        }
+
+        private void SetupSlot(SkillCooldownSlot slot, float cooldown, float maxCooldown, Sprite icon)
+        {
+            slot.SetCooldown(cooldown);
+            slot.SetMaxCooldown(maxCooldown);
+            slot.SetSkillIcon(icon);
+        }
+
+        public void Clear()
+        {
+            foreach (var s in _slots)
+            {
+                s.Key.OnCooldownChanged -= s.Value.SetCooldown;
+                Destroy(s.Value.gameObject);
+            }
+            
+            _slots.Clear();
+        }
+        
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            Clear();
+            _eventBus.Unsubscribe<SkillLevelUpEvent>(SkillChanged);
         }
     }
 }

@@ -40,10 +40,16 @@ namespace DungeonShooter
 
         private async UniTaskVoid Start()
         {
+            await InitializePlayerData();
+            await _stageManager.CreateStageAsync();
+        }
+
+        private async UniTask InitializePlayerData()
+        {
             var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
             if (config == null)
             {
-                UnityEngine.Debug.LogError($"[{nameof(GameManager)}] PlayerConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.PlayerConfigTableId}");
+                LogHandler.LogError($"[{nameof(GameManager)}] PlayerConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.PlayerConfigTableId}");
                 return;
             }
 
@@ -60,8 +66,11 @@ namespace DungeonShooter
             
             await _uiManager.GetSingletonUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud);
             await _uiManager.GetSingletonUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud);
+            var cooldownHudUI = await _uiManager.GetSingletonUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud);
             
-            await _stageManager.CreateStageAsync();
+            cooldownHudUI.Clear();
+            cooldownHudUI.AddSkillCooldownSlot(_playerSkillManager.GetActiveSkill(0));
+            cooldownHudUI.AddSkillCooldownSlot(_playerSkillManager.GetActiveSkill(1));
         }
     }
 }

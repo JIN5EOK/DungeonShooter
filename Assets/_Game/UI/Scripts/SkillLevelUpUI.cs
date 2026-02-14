@@ -29,7 +29,7 @@ namespace DungeonShooter
         /// <summary>
         /// 지니고 있는 스킬중 레벨업 가능한 스킬을 찾아내어 표시
         /// </summary>
-        public async UniTask ShowSkillLevelUp(EntitySkillContainer skillContainer,  Func<Skill, SkillTableEntry, UniTask> onSkillLevelUp)
+        public async UniTask ShowSkillLevelUp(EntitySkillContainer skillContainer, Func<Skill, SkillTableEntry, UniTask> onSkillLevelUp)
         {
             _skillContainer = skillContainer;
             
