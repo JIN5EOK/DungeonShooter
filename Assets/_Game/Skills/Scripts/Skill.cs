@@ -58,11 +58,26 @@ namespace DungeonShooter
                 .WithResourceProvider(_resourceProvider);
 
             OnExecute?.Invoke();
-            StartCooldown();
+            StartCooldown(MaxCooldown);
             
             return await ExecuteEffectsAsync(context);
         }
 
+                
+        /// <summary>
+        /// 쿨다운을 시작합니다.
+        /// </summary>
+        public void StartCooldown(float cooldown)
+        {
+            if (_skillTableEntry == null || _skillTableEntry.Cooldown <= 0f)
+                return;
+
+            IsCooldown = true;
+            Cooldown = cooldown;
+
+            UpdateCooldownAsync(_cooldownCancellationTokenSource.Token).Forget();
+        }
+        
         /// <summary>
         /// 스킬 효과를 비동기로 실행합니다.
         /// </summary>
@@ -87,7 +102,6 @@ namespace DungeonShooter
         /// <summary>
         /// 패시브 효과를 활성화합니다.
         /// </summary>
-        /// <param name="owner">스킬 소유자</param>
         public void Activate(EntityBase owner)
         {
             ThrowIfDisposed();
@@ -107,7 +121,6 @@ namespace DungeonShooter
         /// <summary>
         /// 패시브 효과를 비활성화합니다.
         /// </summary>
-        /// <param name="owner">스킬 소유자</param>
         public void Deactivate(EntityBase owner)
         {
             ThrowIfDisposed();
@@ -122,20 +135,6 @@ namespace DungeonShooter
                 
                 effect.Deactivate(owner, _skillTableEntry);
             }
-        }
-        
-        /// <summary>
-        /// 쿨다운을 시작합니다.
-        /// </summary>
-        private void StartCooldown()
-        {
-            if (_skillTableEntry == null || _skillTableEntry.Cooldown <= 0f)
-                return;
-
-            IsCooldown = true;
-            Cooldown = _skillTableEntry.Cooldown;
-
-            UpdateCooldownAsync(_cooldownCancellationTokenSource.Token).Forget();
         }
 
         /// <summary>

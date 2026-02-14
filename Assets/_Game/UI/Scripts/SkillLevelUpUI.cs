@@ -14,22 +14,35 @@ namespace DungeonShooter
         [SerializeField]
         private SkillLevelUpSlot _skillLevelUpSlotPrefab;
         
-        private EntitySkillContainer _skillContainer;
-        private ITableRepository _tableRepository;
-        private ISceneResourceProvider _sceneResourceProvider;
         private List<SkillLevelUpSlot> _slots = new ();
         
+        private ITableRepository _tableRepository;
+        private ISceneResourceProvider _sceneResourceProvider;
+        private ISkillFactory _skillFactory;
+        
+        private EntitySkillContainer _skillContainer;
+        private IEventBus _eventBus;
+        private PlayerSkillManager _playerSkillManager;
         [Inject]
-        public void Construct(ITableRepository tableRepository, ISceneResourceProvider sceneResourceProvider)
+        public void Construct(ITableRepository tableRepository, ISceneResourceProvider sceneResourceProvider, PlayerSkillManager playerSkillManager, ISkillFactory skillFactory, IEventBus eventBus)
         {
             _tableRepository = tableRepository;
             _sceneResourceProvider = sceneResourceProvider;
+            _skillFactory = skillFactory;
+            _eventBus = eventBus;
+            _playerSkillManager = playerSkillManager;
+            _eventBus.Subscribe<PlayerLevelChangeEvent>(PlayerLevelChanged);
+        }
+        
+        private void PlayerLevelChanged(PlayerLevelChangeEvent playerLevelChangeEvent)
+        {
+            ShowSkillLevelUp(_playerSkillManager.SkillContainer).Forget();
         }
         
         /// <summary>
         /// 지니고 있는 스킬중 레벨업 가능한 스킬을 찾아내어 표시
         /// </summary>
-        public async UniTask ShowSkillLevelUp(EntitySkillContainer skillContainer, Func<Skill, SkillTableEntry, UniTask> onSkillLevelUp)
+        public async UniTask ShowSkillLevelUp(EntitySkillContainer skillContainer)
         {
             _skillContainer = skillContainer;
             
@@ -64,10 +77,10 @@ namespace DungeonShooter
                     , nextSkillEntry.Cooldown
                     , await _sceneResourceProvider.GetAssetAsync<Sprite>(nextSkillEntry.SkillIconKey,SpriteAtlasAddresses.SkillIconAtlas));
                 
-                slot.SetSelectHandler(async () =>
+                slot.SetSelectHandler(() =>
                 {
                     HideSlot();
-                    await onSkillLevelUp(skill, nextSkillEntry);
+                    skillContainer.SkillLevelChange(skill, _skillFactory.CreateSkillSync(nextSkillEntry.Id));
                     Hide();
                 });
                 
@@ -80,7 +93,7 @@ namespace DungeonShooter
                 Time.timeScale = 0f; // TODO: 임시코드, 타임스케일 조정은 별도의 시간 매니저로 분리 필요
             }
         }
-
+        
         private void HideSlot()
         {
             foreach (var slot in _slots)

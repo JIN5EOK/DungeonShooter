@@ -10,7 +10,8 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerSkillManager : IDisposable
     {
-        public EntitySkillContainer SkillContainer { get; private set; } = new EntitySkillContainer();
+        [Inject]
+        public EntitySkillContainer SkillContainer { get; private set; }
         public EntityBase PlayerInstance { get; private set; }
         private readonly Skill[] _activeSkills = new Skill[PlayerSkillSlots.Count];
 

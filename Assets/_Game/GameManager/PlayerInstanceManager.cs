@@ -15,10 +15,6 @@ namespace DungeonShooter
         private readonly PlayerInputSession _playerInputSession;
 
         private EntityBase _currentPlayerEntity;
-        private SkillCooldownHudUI _skillCooldownHudUI;
-        private SkillCooldownSlot _weaponCooldownSlot;
-        private SkillLevelUpUI _skillLevelUpUI;
-
         private Skill _boundWeaponActiveSkill;
 
         [Inject]
@@ -54,26 +50,10 @@ namespace DungeonShooter
             if (_currentPlayerEntity == null)
                 return;
 
-            CleanupPlayerUI();
             _playerInputSession.UnbindPlayerInstance();
 
             Object.Destroy(_currentPlayerEntity.gameObject);
             _currentPlayerEntity = null;
-        }
-
-        private void CleanupPlayerUI()
-        {
-            _skillLevelUpUI = null;
-        }
-        
-        private async UniTaskVoid ShowSkillLevelUpUIAsync()
-        {
-            if (_skillLevelUpUI == null)
-                _skillLevelUpUI = await _uIManager.GetSingletonUIAsync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp);
-
-            await _skillLevelUpUI.ShowSkillLevelUp(
-                _playerSkillManager.SkillContainer,
-                _playerSkillManager.ReplaceSkillAsync);
         }
     }
 }

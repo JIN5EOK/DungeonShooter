@@ -26,7 +26,8 @@ namespace DungeonShooter
             , PlayerSkillManager playerSkillManager
             , Inventory inventory
             , IItemFactory itemFactory
-            , UIManager uiManager)
+            , UIManager uiManager
+            , PlayerLevelManager playerLevelManager)
         {
             _stageManager = stageManager;
             _stageContext = stageContext;
@@ -64,11 +65,14 @@ namespace DungeonShooter
             await _inventory.AddItem(weapon);
             await _inventory.EquipItem(weapon);
             
-            await _uiManager.GetSingletonUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud);
-            await _uiManager.GetSingletonUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud);
+            var hpUI = await _uiManager.GetSingletonUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud);
+            hpUI.Show();
+            var expUI = await _uiManager.GetSingletonUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud);
+            expUI.Show();
+            var skillLevelUpUI = await _uiManager.GetSingletonUIAsync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp);
+            skillLevelUpUI.Hide();
             var cooldownHudUI = await _uiManager.GetSingletonUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud);
-            
-            cooldownHudUI.Clear();
+            cooldownHudUI.Show();
             cooldownHudUI.AddSkillCooldownSlot(_playerSkillManager.GetActiveSkill(0));
             cooldownHudUI.AddSkillCooldownSlot(_playerSkillManager.GetActiveSkill(1));
         }

@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using UnityEngine.UI;
+using Action = System.Action;
 
 namespace DungeonShooter
 {
@@ -20,7 +21,7 @@ namespace DungeonShooter
         [Header("선택버튼")]
         [SerializeField] private Button _selectButton;
 
-        private Func<UniTask> _onSelect;
+        private Action _onSelect;
         private ISceneResourceProvider _sceneResourceProvider;
         
         private void Awake()
@@ -29,7 +30,7 @@ namespace DungeonShooter
                 _selectButton.onClick.AddListener(HandleSelectClicked);
         }
         
-        public void SetSelectHandler(Func<UniTask> onSelect)
+        public void SetSelectHandler(Action onSelect)
         {
             _onSelect = onSelect;
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DungeonShooter
 {
@@ -9,14 +10,46 @@ namespace DungeonShooter
     /// </summary>
     public class EntitySkillContainer
     {
-        private readonly List<Skill> _skills = new List<Skill>();
+        private readonly HashSet<Skill> _skills = new();
         
         public event Action<Skill> OnSkillRegisted;
         public event Action<Skill> OnSkillUnregisted;
         
+        private IEventBus _eventBus;
+
+        public EntitySkillContainer(IEventBus eventBus)
+        {
+            _eventBus = eventBus;
+        }
+        
         public IReadOnlyList<Skill> GetRegistedSkills()
         {
-            return _skills;
+            return _skills.ToList();
+        }
+
+        /// <summary>
+        /// 스킬을 변경하고 스킬 변경 이벤트를 실행합니다.
+        /// </summary>
+        public bool SkillLevelChange(Skill before, Skill after)
+        {
+            if (!_skills.Contains(before))
+            {
+                LogHandler.LogError<EntitySkillContainer>($"이전 스킬이 존재하지 않습니다");
+                return false;
+            }
+
+            if (_skills.Contains(after))
+            {
+                LogHandler.LogError<EntitySkillContainer>($"변경하려는 스킬이 이미 존재합니다");
+                return false;
+            }
+            
+            _eventBus.Publish(new SkillLevelUpEvent {beforeSkill = before, afterSkill = after});
+            
+            after.StartCooldown(before.Cooldown);
+            Unregist(before, true);
+            Regist(after);
+            return true;
         }
         
         /// <summary>

@@ -25,10 +25,10 @@ namespace DungeonShooter
         
         public void Start()
         {
-            _eventBus.Subscribe<ExpUpEvent>(ExpUped);
+            _eventBus.Subscribe<ExpUpEvent>(ExpUpped);
         }
         
-        private void ExpUped(ExpUpEvent ev)
+        private void ExpUpped(ExpUpEvent ev)
         {
             AddExp(ev.exp);
         }
@@ -47,10 +47,10 @@ namespace DungeonShooter
             }
             OnExpChanged?.Invoke(Exp);
         }
-
+        
         public void Dispose()
         {
-            _eventBus.Unsubscribe<ExpUpEvent>(ExpUped);
+            _eventBus.Unsubscribe<ExpUpEvent>(ExpUpped);
         }
     }
 }

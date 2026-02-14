@@ -27,12 +27,15 @@ namespace DungeonShooter
 
         private void SkillChanged(SkillLevelUpEvent skillLevelUpEvent)
         {
-            if (!_slots.TryGetValue(skillLevelUpEvent.beforeSkill, out var slot))
+            if (_slots.TryGetValue(skillLevelUpEvent.beforeSkill, out var slot))
             {
                 var beforeSkill = skillLevelUpEvent.beforeSkill;
                 beforeSkill.OnCooldownChanged -= slot.SetCooldown;
                 var afterSkill = skillLevelUpEvent.afterSkill;
                 SetupSlot(slot, afterSkill.Cooldown, afterSkill.MaxCooldown, afterSkill.Icon);
+                afterSkill.OnCooldownChanged += slot.SetCooldown;
+                _slots.Remove(skillLevelUpEvent.beforeSkill);
+                _slots.Add(skillLevelUpEvent.afterSkill, slot);
             }
         }
         
