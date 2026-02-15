@@ -175,7 +175,7 @@ namespace DungeonShooter
             var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(configTableEntry.StatsId);
             if (statsEntry != null)
             {
-                var statGroup = new EntityStatGroup();
+                var statGroup = new EntityStatContainer();
                 statGroup.Initialize(statsEntry);
                 entity.SetStatGroup(statGroup);
             }

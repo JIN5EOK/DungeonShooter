@@ -8,7 +8,7 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerStatusManager : IDisposable
     {
-        public EntityStatGroup StatGroup { get; private set; }
+        public EntityStatContainer StatContainer { get; private set; }
         public event Action<int> OnHpChanged;
 
         public int Hp
@@ -58,9 +58,9 @@ namespace DungeonShooter
                 return;
             }
 
-            StatGroup = new EntityStatGroup();
-            StatGroup.Initialize(statsEntry);
-            Hp = StatGroup.GetStat(StatType.Hp).GetValue();
+            StatContainer = new EntityStatContainer();
+            StatContainer.Initialize(statsEntry);
+            Hp = StatContainer.GetStat(StatType.Hp).GetValue();
         }
         
         private void PlayerObjectSpawned(PlayerObjectSpawnEvent spawnEvent)

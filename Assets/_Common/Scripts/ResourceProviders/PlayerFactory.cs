@@ -123,8 +123,6 @@ namespace DungeonShooter
             }
 
             // 기존 플레이어가 있다면 파괴,바인딩 해제
-            _playerInstanceManager.UnbindAndDestroy();
-            
             playerInstance.tag = GameTags.Player;
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
 
@@ -148,15 +146,13 @@ namespace DungeonShooter
             
             entity.OnDestroyed += (self) =>
             {
-                _playerInstanceManager.UnbindAndDestroy();
                 _eventBus.Publish(new PlayerObjectDestroyEvent {player = self, position = playerInstance.transform.position});
             };
             
-            entity.SetStatGroup(_playerStatusManager.StatGroup);
+            entity.SetStatGroup(_playerStatusManager.StatContainer);
             entity.SetSkillGroup(_playerSkillManager.SkillContainer);
             
             _eventBus.Publish(new PlayerObjectSpawnEvent{ player = entity, playerConfigTableEntry = config, position = playerInstance.transform.position});
-            await _playerInstanceManager.BindAsync(entity);
             return entity;
         }
     }

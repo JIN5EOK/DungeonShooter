@@ -24,12 +24,12 @@ namespace DungeonShooter
 
         // 이벤트
         public event Action<Vector2> OnMoveInputChanged;
-        public event Action OnDashPressed;
-        public event Action OnWeaponAttack;
-        public event Action OnSkill1Pressed;
-        public event Action OnSkill2Pressed;
-        public event Action OnInteractPressed;
-        public event Action OnEscapePressed;
+        public event Action<bool> OnDashPressed;
+        public event Action<bool> OnWeaponAttack;
+        public event Action<bool> OnSkill1Pressed;
+        public event Action<bool> OnSkill2Pressed;
+        public event Action<bool> OnInteractPressed;
+        public event Action<bool> OnEscapePressed;
 
         // 현재 입력 값
         public Vector2 MoveInput => _moveInputHandler.Value;
@@ -48,26 +48,26 @@ namespace DungeonShooter
 
             // 구르기 (Space)
             _dashInputHandler = new ButtonInputHandlerKeyCode(KeyCode.Space);
-            _dashInputHandler.InputValueChanged += isPressed => { if (isPressed) OnDashPressed?.Invoke(); };
+            _dashInputHandler.InputValueChanged += isPressed => { OnDashPressed?.Invoke(isPressed); };
 
             // 스킬1 (J)
             _skill1InputHandler = new ButtonInputHandlerKeyCode(KeyCode.J);
-            _skill1InputHandler.InputValueChanged += isPressed => { if (isPressed) OnWeaponAttack?.Invoke(); };
+            _skill1InputHandler.InputValueChanged += isPressed => {  OnWeaponAttack?.Invoke(isPressed); };
 
             // 스킬2 (K)
             _skill2InputHandler = new ButtonInputHandlerKeyCode(KeyCode.K);
-            _skill2InputHandler.InputValueChanged += isPressed => { if (isPressed) OnSkill1Pressed?.Invoke(); };
+            _skill2InputHandler.InputValueChanged += isPressed => {  OnSkill1Pressed?.Invoke(isPressed); };
 
             // 스킬3 (L)
             _skill3InputHandler = new ButtonInputHandlerKeyCode(KeyCode.L);
-            _skill3InputHandler.InputValueChanged += isPressed => { if (isPressed) OnSkill2Pressed?.Invoke(); };
+            _skill3InputHandler.InputValueChanged += isPressed => {  OnSkill2Pressed?.Invoke(isPressed); };
 
             // 상호작용 (E)
             _interactInputHandler = new ButtonInputHandlerKeyCode(KeyCode.E);
-            _interactInputHandler.InputValueChanged += isPressed => { if (isPressed) OnInteractPressed?.Invoke(); };
+            _interactInputHandler.InputValueChanged += isPressed => { OnInteractPressed?.Invoke(isPressed); };
             
             _escapeInputHandler = new ButtonInputHandlerKeyCode(KeyCode.Escape);
-            _escapeInputHandler.InputValueChanged += isPressed => { if(isPressed) OnEscapePressed?.Invoke();};
+            _escapeInputHandler.InputValueChanged += isPressed => {  OnEscapePressed?.Invoke(isPressed);};
         }
         
         public void Dispose()

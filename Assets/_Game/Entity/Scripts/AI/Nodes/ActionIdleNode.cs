@@ -15,12 +15,7 @@ namespace DungeonShooter
                 return BTStatus.Failure;
             }
 
-            var movement = context.Self.GetComponent<MovementComponent>();
-            if (movement != null)
-            {
-                movement.Direction = UnityEngine.Vector2.zero;
-            }
-
+            context.Self.EntityInputContext.moveInput = UnityEngine.Vector2.zero;
             return BTStatus.Success;
         }
     }

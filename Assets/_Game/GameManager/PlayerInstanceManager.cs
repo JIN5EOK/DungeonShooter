@@ -9,24 +9,14 @@ namespace DungeonShooter
 /// </summary>
     public class PlayerInstanceManager
     {
-        private readonly PlayerInputSession _playerInputSession;
+        private readonly PlayerInputController _playerInputController;
 
         private EntityBase _currentPlayerEntity;
 
         [Inject]
-        public PlayerInstanceManager(PlayerInputSession playerInputSession)
+        public PlayerInstanceManager(PlayerInputController playerInputController)
         {
-            _playerInputSession = playerInputSession;
-        }
-
-        public async UniTask BindAsync(EntityBase entity)
-        {
-            _playerInputSession.BindPlayerInstance(entity);
-        }
-
-        public void UnbindAndDestroy()
-        {
-            _playerInputSession.UnbindPlayerInstance();
+            _playerInputController = playerInputController;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace DungeonShooter
         private PlayerSkillManager _playerSkillManager;
         private IEventBus _eventBus;
         
-        private EntityStatGroup StatGroup => _playerStatusManager?.StatGroup;
+        private EntityStatContainer StatContainer => _playerStatusManager?.StatContainer;
         private EntitySkillContainer SkillContainer => _playerSkillManager?.SkillContainer;
         
         private EntityBase _ownerEntity;
@@ -192,12 +192,12 @@ namespace DungeonShooter
 
         private void ApplyItemStatBonus(Item item)
         {
-            StatGroup?.ApplyStatBonus(item, StatBonus.From(item.ItemTableEntry));
+            StatContainer?.ApplyStatBonus(item, StatBonus.From(item.ItemTableEntry));
         }
 
         private void RemoveItemStatBonus(Item item)
         {
-            StatGroup?.RemoveStatBonus(item);
+            StatContainer?.RemoveStatBonus(item);
         }
 
 

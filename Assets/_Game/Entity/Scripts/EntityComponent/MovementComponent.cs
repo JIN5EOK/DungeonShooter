@@ -10,21 +10,7 @@ namespace DungeonShooter
     [RequireComponent(typeof(Rigidbody2D))]
     public class MovementComponent : MonoBehaviour
     {
-        private Vector2 _direction;
-        public Vector2 Direction
-        {
-            get => _direction;
-            set
-            {
-                _direction = value;
-
-                if (value != Vector2.zero)
-                {
-                    LookDirection =  value.normalized;
-                }
-            }
-        }
-
+        public Vector2 Direction => _entityBase.EntityInputContext.moveInput;
         public Vector2 LookDirection
         {
             get;
@@ -33,7 +19,7 @@ namespace DungeonShooter
         
         public float MoveSpeed
         {
-            get => _entityBase != null && _entityBase.StatGroup != null ? _entityBase.StatGroup.GetStat(StatType.MoveSpeed).GetValue() : 0;
+            get => _entityBase != null && _entityBase.StatContainer != null ? _entityBase.StatContainer.GetStat(StatType.MoveSpeed).GetValue() : 0;
         }
         private Rigidbody2D _rigidbody;
         private EntityBase _entityBase;
@@ -84,6 +70,10 @@ namespace DungeonShooter
         /// </summary>
         private void Move()
         {
+            if (Direction != Vector2.zero)
+            {
+                LookDirection = Direction.normalized;    
+            }
             var velocity = Direction.normalized * MoveSpeed;
             _rigidbody.linearVelocity = velocity;
         }

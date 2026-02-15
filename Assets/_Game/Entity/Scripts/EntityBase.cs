@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Jin5eok;
 
@@ -7,8 +8,9 @@ namespace DungeonShooter
     public class EntityBase : MonoBehaviour
     {
         public event Action<EntityBase> OnDestroyed;
-
-        public EntityStatGroup StatGroup { get; private set; }
+        
+        public EntityInputContext EntityInputContext { get; private set; } = new EntityInputContext();
+        public EntityStatContainer StatContainer { get; private set; }
         public EntitySkillContainer SkillContainer { get; private set; }
 
         /// <summary>
@@ -20,9 +22,9 @@ namespace DungeonShooter
         }
 
         /// <summary> StatGroup을 주입합니다. </summary>
-        public void SetStatGroup(EntityStatGroup statGroup)
+        public void SetStatGroup(EntityStatContainer statContainer)
         {
-            StatGroup = statGroup;
+            StatContainer = statContainer;
         }
 
         /// <summary>

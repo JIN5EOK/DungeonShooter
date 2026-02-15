@@ -24,9 +24,9 @@ namespace DungeonShooter
         {
             _statusManager = statusManager;
             _statusManager.OnHpChanged += SetHealth;
-            _statusManager.StatGroup.GetStat(StatType.Hp).OnValueChanged += SetMaxHealth;
+            _statusManager.StatContainer.GetStat(StatType.Hp).OnValueChanged += SetMaxHealth;
             SetHealth(_statusManager.Hp);
-            SetMaxHealth(_statusManager.StatGroup.GetStat(StatType.Hp).GetValue());
+            SetMaxHealth(_statusManager.StatContainer.GetStat(StatType.Hp).GetValue());
         }
 
         public void SetHealth(int current)
@@ -55,7 +55,7 @@ namespace DungeonShooter
         protected override void OnDestroy()
         {
             _statusManager.OnHpChanged -= SetHealth;
-            _statusManager.StatGroup.GetStat(StatType.Hp).OnValueChanged -= SetMaxHealth;
+            _statusManager.StatContainer.GetStat(StatType.Hp).OnValueChanged -= SetMaxHealth;
         }
     }
 }

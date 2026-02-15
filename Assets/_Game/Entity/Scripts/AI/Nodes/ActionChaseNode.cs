@@ -15,15 +15,9 @@ namespace DungeonShooter
             {
                 return BTStatus.Failure;
             }
-
-            var movement = context.Self.GetComponent<MovementComponent>();
-            if (movement == null)
-            {
-                return BTStatus.Failure;
-            }
-
+            
             var direction = (context.Target.transform.position - context.Self.transform.position).normalized;
-            movement.Direction = direction;
+            context.Self.EntityInputContext.moveInput = direction;
             return BTStatus.Success;
         }
     }

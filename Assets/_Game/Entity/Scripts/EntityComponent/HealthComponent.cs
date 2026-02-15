@@ -16,7 +16,7 @@ namespace DungeonShooter
 
         private int MaxHealth
         {
-            get => _entityBase != null && _entityBase.StatGroup != null ? _entityBase.StatGroup.GetStat(StatType.Hp).GetValue() : 0;
+            get => _entityBase != null && _entityBase.StatContainer != null ? _entityBase.StatContainer.GetStat(StatType.Hp).GetValue() : 0;
         }
 
         public int CurrentHealth
