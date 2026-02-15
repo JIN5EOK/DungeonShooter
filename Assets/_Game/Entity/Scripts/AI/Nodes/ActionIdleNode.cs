@@ -15,7 +15,7 @@ namespace DungeonShooter
                 return BTStatus.Failure;
             }
 
-            context.Self.EntityInputContext.moveInput = UnityEngine.Vector2.zero;
+            context.Self.EntityInputContext.MoveInput = UnityEngine.Vector2.zero;
             return BTStatus.Success;
         }
     }

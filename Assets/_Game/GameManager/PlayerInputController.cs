@@ -72,12 +72,12 @@ namespace DungeonShooter
             if (_entityInputContext == null)
                 return;
             
-            _entityInputContext.moveInput = input;
+            _entityInputContext.MoveInput = input;
         }
 
         private void HandleDashPressed(bool isPressed)
         {
-            _entityInputContext.dashInput = isPressed;
+            _entityInputContext.DashInput = isPressed;
         }
 
         private void HandleWeaponAttack(bool isPressed)
@@ -108,11 +108,11 @@ namespace DungeonShooter
         {
             if (isPressed == true)
             {
-                _entityInputContext.skillInput = skill;    
+                _entityInputContext.SkillInput = skill;    
             }
-            else if(_entityInputContext.skillInput == skill)
+            else if(_entityInputContext.SkillInput == skill)
             {
-                _entityInputContext.skillInput = null;
+                _entityInputContext.SkillInput = null;
             }
         }
         
@@ -121,7 +121,7 @@ namespace DungeonShooter
             if (_entityInputContext == null)
                 return;
             
-            _entityInputContext.interactInput = isPressed;
+            _entityInputContext.InteractInput = isPressed;
         }
 
         private async void HandleEscapePressed(bool isPressed)

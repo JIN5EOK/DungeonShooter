@@ -5,77 +5,41 @@ using VContainer;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 캐릭터 이동을 담당하는 MonoBehaviour 컴포넌트
+    /// 캐릭터 이동을 담당하는 MonoBehaviour 컴포넌트.
+    /// 상태에서 Move(Vector2 input)를 호출하여 이동을 적용합니다.
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     public class MovementComponent : MonoBehaviour
     {
-        public Vector2 Direction => _entityBase.EntityInputContext.moveInput;
-        public Vector2 LookDirection
-        {
-            get;
-            private set;
-        }
-        
-        public float MoveSpeed
-        {
-            get => _entityBase != null && _entityBase.StatContainer != null ? _entityBase.StatContainer.GetStat(StatType.MoveSpeed).GetValue() : 0;
-        }
+        public float MoveSpeed =>
+            _entityBase != null && _entityBase.StatContainer != null
+                ? _entityBase.StatContainer.GetStat(StatType.MoveSpeed).GetValue()
+                : 0;
+
         private Rigidbody2D _rigidbody;
         private EntityBase _entityBase;
-        private EntityAnimationHandler _animationHandler;
 
         [Inject]
-        private void Construct(EntityBase entityBase, Rigidbody2D rigidbody2D, EntityAnimationHandler animationHandler)
+        private void Construct(EntityBase entityBase, Rigidbody2D rigidbody2D)
         {
-            _animationHandler = animationHandler;
             _entityBase = entityBase;
             _rigidbody = rigidbody2D;
         }
-        
-        private void Update()
-        {
-            Move();
-            UpdateAnimation();
-        }
 
         /// <summary>
-        /// 이동 방향과 이동 여부에 따라 애니메이션을 갱신한다.
+        /// 입력 벡터에 따라 이동을 적용합니다. 호출 측(상태)에서만 사용합니다.
         /// </summary>
-        private void UpdateAnimation()
+        /// <param name="input">이동 입력 (정규화되지 않아도 됨)</param>
+        public void Move(Vector2 input)
         {
-            if (_animationHandler == null)
-                return;
-
-            var isMoving = !Direction.ApproximatelyEquals(Vector2.zero, 0.01f);
-            _animationHandler.SetMoving(isMoving);
-
-            if (isMoving)
+            if (!input.ApproximatelyEquals(Vector2.zero, 0.01f))
             {
-                var dir = Vector2ToDirection(LookDirection);
-                _animationHandler.SetDirection(dir);
+                _rigidbody.linearVelocity = input.normalized * MoveSpeed;
             }
-        }
-
-        private static Direction Vector2ToDirection(Vector2 v)
-        {
-            if (Mathf.Abs(v.x) > Mathf.Abs(v.y))
-                return v.x > 0 ? DungeonShooter.Direction.Right : DungeonShooter.Direction.Left;
-
-            return v.y > 0 ? DungeonShooter.Direction.Up : DungeonShooter.Direction.Down;
-        }
-
-        /// <summary>
-        /// 캐릭터를 이동시킵니다.
-        /// </summary>
-        private void Move()
-        {
-            if (Direction != Vector2.zero)
+            else
             {
-                LookDirection = Direction.normalized;    
+                _rigidbody.linearVelocity = Vector2.zero;
             }
-            var velocity = Direction.normalized * MoveSpeed;
-            _rigidbody.linearVelocity = velocity;
         }
     }
 }

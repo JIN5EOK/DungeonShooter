@@ -72,7 +72,7 @@ namespace DungeonShooter
             }
 
             var enemyInstance = await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
-            return GetEnemyFromInstance(enemyInstance, enemyConfig);
+            return InitializeEnemyInstance(enemyInstance, enemyConfig);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace DungeonShooter
             }
 
             var enemyInstance = _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey,  position, rotation, parent, instantiateInWorldSpace);
-            return GetEnemyFromInstance(enemyInstance, enemyConfig);
+            return InitializeEnemyInstance(enemyInstance, enemyConfig);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace DungeonShooter
             }
 
             var enemyInstance = await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey,  position, rotation, parent, instantiateInWorldSpace);
-            return GetEnemyFromInstance(enemyInstance, enemyConfig);
+            return InitializeEnemyInstance(enemyInstance, enemyConfig);
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace DungeonShooter
             }
 
             var enemyInstance = _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
-            return GetEnemyFromInstance(enemyInstance, enemyConfig);
+            return InitializeEnemyInstance(enemyInstance, enemyConfig);
         }
 
         /// <summary>
@@ -151,9 +151,9 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 인스턴스에 Enemy 컴포넌트를 붙이고, 스탯/컴포넌트/사망 시 Destroy 구독을 설정합니다.
+        /// 인스턴스에 필요한 컴포넌트를 붙이고 초기화합니다
         /// </summary>
-        private EntityBase GetEnemyFromInstance(GameObject enemyInstance, EnemyConfigTableEntry configTableEntry)
+        private EntityBase InitializeEnemyInstance(GameObject enemyInstance, EnemyConfigTableEntry configTableEntry)
         {
             if (enemyInstance == null)
             {
@@ -182,6 +182,8 @@ namespace DungeonShooter
 
             var movementCompoent = entityLifeTimeScope.Container.Resolve<MovementComponent>();
             var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();
+            
+            // 체력이 0이되어 사망시 이벤트 등록
             healthComponent.OnDeath += () =>
             {
                 _eventBus.Publish(new EnemyDestroyEvent { enemy = entity, enemyConfigTableEntry = configTableEntry });
@@ -189,6 +191,7 @@ namespace DungeonShooter
             };
 
             var aiBT = _sceneResourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
+            var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
             entityLifeTimeScope.Container.Resolve<AIComponent>().SetBT(aiBT);
 
             return entity;

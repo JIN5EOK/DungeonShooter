@@ -14,24 +14,16 @@ namespace DungeonShooter
         private int _targetCount;
         private bool _rotateToCastDirection;
         private float _elapsedTime = 0f;
-        private Vector2 _direction = Vector2.right;
-        private readonly HashSet<EntityBase> _appliedTargets = new HashSet<EntityBase>();
+        private readonly HashSet<EntityBase> _appliedTargets = new ();
 
         public void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
-            SkillExecutionContext context, int targetCount, float speed, float lifeTime,
-            bool rotateToCastDirection = false)
+            SkillExecutionContext context, int targetCount, float speed, float lifeTime)
         {
             base.Initialize(effects, skillTableEntry, context);
 
             _speed = speed;
             _lifeTime = lifeTime;
             _targetCount = targetCount;
-
-            // TODO: 이동 전략에 대한 커스텀 기능 필요
-            if (context.Caster != null && context.Caster.TryGetComponent(out MovementComponent movement))
-            {
-                _direction = movement.LookDirection;
-            }
         }
 
         private void Update()
@@ -46,7 +38,7 @@ namespace DungeonShooter
             }
             
             // 전진 이동
-            transform.position += (Vector3)_direction * _speed * Time.deltaTime;
+            transform.position += transform.right * _speed * Time.deltaTime;
         }
 
         private void OnTriggerStay2D(Collider2D other)

@@ -1,3 +1,4 @@
+using Jin5eok;
 using UnityEngine;
 using VContainer;
 
@@ -5,6 +6,7 @@ namespace DungeonShooter
 {
     /// <summary>
     /// 애니메이터를 감싸서 방향(Direction)과 이동(Walk) 파라미터를 설정하는 컴포넌트.
+    /// 상태에서 SetMovementFromInput(Vector2) 또는 SetDirection/SetMoving을 호출합니다.
     /// </summary>
     public class EntityAnimationHandler : MonoBehaviour
     {
@@ -20,11 +22,29 @@ namespace DungeonShooter
         private static readonly int DirectionRight = 6;
 
         private Animator _animator;
-        
+
         [Inject]
         private void Construct(Animator animator)
         {
             _animator = animator;
+        }
+
+        /// <summary>
+        /// 이동 입력에 따라 IsWalk와 Direction 파라미터를 한 번에 설정한다.
+        /// </summary>
+        public void SetMovementFromInput(Vector2 moveInput)
+        {
+            if (_animator == null || !_animator.isActiveAndEnabled)
+                return;
+
+            var isMoving = !moveInput.ApproximatelyEquals(Vector2.zero, 0.01f);
+            _animator.SetBool(WalkParamId, isMoving);
+
+            if (isMoving)
+            {
+                var dir = Vector2ToDirection(moveInput.normalized);
+                SetDirection(dir);
+            }
         }
 
         /// <summary>
@@ -44,7 +64,7 @@ namespace DungeonShooter
                 Direction.Right => DirectionRight,
                 _ => DirectionUp
             };
-            
+
             _animator.SetInteger(DirectionParamId, value);
         }
 
@@ -57,6 +77,13 @@ namespace DungeonShooter
                 return;
 
             _animator.SetBool(WalkParamId, value);
+        }
+
+        private static Direction Vector2ToDirection(Vector2 v)
+        {
+            if (Mathf.Abs(v.x) > Mathf.Abs(v.y))
+                return v.x > 0 ? Direction.Right : Direction.Left;
+            return v.y > 0 ? Direction.Up : Direction.Down;
         }
     }
 }

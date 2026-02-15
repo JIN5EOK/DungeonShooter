@@ -140,6 +140,7 @@ namespace DungeonShooter
             var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();
             healthComponent.OnDeath += () => Object.Destroy(entity.gameObject);
             var cameraTrackComponent = entityLifeTimeScope.Container.Resolve<CameraTrackComponent>();
+            var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
             await cameraTrackComponent.AttachCameraAsync();
             
             var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);

@@ -10,30 +10,28 @@ namespace DungeonShooter
     public class DashComponent : MonoBehaviour
     {
         [Header("구르기 설정")]
-        [SerializeField] private float _dashSpeed = 15f;
-        [SerializeField] private float _dashDuration = 0.3f;
-        [SerializeField] private float _dashCooldown = 1.0f;
+        private float _dashSpeed = 15f;
+        private float _dashDuration = 0.3f;
+        private float _dashCooldown = 1.0f;
 
         public float DashSpeed => _dashSpeed;
         public float DashDuration => _dashDuration;
         public float DashCooldown => _dashCooldown;
         
         private Rigidbody2D _rigidbody;
-        private MovementComponent _movementComponent;
         private bool _isDashing;
         private float _dashTimer;
         private float _cooldownRemaining;
-        private Vector2 _moveInput;
+        private Vector2 _direction;
         
         public bool IsDashing => _isDashing;
         public bool IsReady => _cooldownRemaining <= 0f;
         
         [Inject]
-        private void Construct(Rigidbody2D rigidbody2D,  MovementComponent movementComponent)
+        private void Construct(Rigidbody2D rigidbody2D)
         {
 
             _rigidbody = rigidbody2D;
-            _movementComponent = movementComponent;
         }
 
         private void Update()
@@ -49,17 +47,16 @@ namespace DungeonShooter
         /// <summary>
         /// 구르기를 시작합니다.
         /// </summary>
-        public void StartDash()
+        public void StartDash(Vector2 direction)
         {
             if (!IsReady)
             {
                 return;
             }
-
+            _direction = direction;
             _isDashing = true;
             _dashTimer = _dashDuration;
             _cooldownRemaining = _dashCooldown;
-            _moveInput = _movementComponent.LookDirection;
             LogHandler.Log<DashComponent>("구르기!");
         }
 
@@ -75,7 +72,7 @@ namespace DungeonShooter
 
             _dashTimer -= Time.fixedDeltaTime;
             
-            var dashDirection = _moveInput.normalized;
+            var dashDirection = _direction.normalized;
             _rigidbody.linearVelocity = dashDirection * _dashSpeed;
 
             if (_dashTimer <= 0)

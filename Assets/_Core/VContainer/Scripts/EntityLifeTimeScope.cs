@@ -9,6 +9,11 @@ namespace DungeonShooter
     {
         protected override void Configure(IContainerBuilder builder)
         {
+            builder.Register<IdleState>(Lifetime.Scoped).AsSelf();
+            builder.Register<MoveState>(Lifetime.Scoped).AsSelf();
+            builder.Register<SkillState>(Lifetime.Scoped).AsSelf();
+            builder.Register<DashState>(Lifetime.Scoped).AsSelf();
+            
             builder.Register(container => AddComponentAndInject<EntityBase>(), Lifetime.Scoped);
             builder.Register(container => AddComponentAndInject<EntityAnimationHandler>(), Lifetime.Scoped);
             builder.Register(container => AddComponentAndInject<MovementComponent>(), Lifetime.Scoped);
@@ -20,6 +25,8 @@ namespace DungeonShooter
             builder.Register(container => AddComponentAndInject<Animator>(), Lifetime.Scoped);
             builder.Register(container => AddComponentAndInject<Rigidbody2D>(), Lifetime.Scoped);
             builder.Register(container => AddComponentAndInject<SpriteRenderer>(), Lifetime.Scoped);
+            builder.Register(container => AddComponentAndInject<EntityStateMachineComponent>(), Lifetime.Scoped).AsImplementedInterfaces();
+
             base.Configure(builder);
         }
 
