@@ -71,12 +71,11 @@ namespace DungeonShooter
             foreach (var target in targets)
             {
                 var spawnPosition = (Vector2)target.transform.position + _spawnOffset;
-                var obj = await context.SceneResourceProvider.GetInstanceAsync(SkillObjectAddress, spawnPosition, Quaternion.identity);
+                var skillObj = await context.SkillObjectFactory.CreateSkillObjectAsync<HomingSkillObject>(SkillObjectAddress, spawnPosition, Quaternion.identity);
 
-                if (obj == null)
+                if (skillObj == null)
                     return false;
                 
-                var skillObj = obj.AddOrGetComponent<HomingSkillObject>();
                 context = context.WithLastHitTarget(target);
                 skillObj.Initialize(_effects, entry, context, target, _speed, _lifeTime, _hitRadius);
             }

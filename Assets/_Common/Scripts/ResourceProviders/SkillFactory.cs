@@ -18,12 +18,14 @@ namespace DungeonShooter
     {
         private readonly ISceneResourceProvider _resourceProvider;
         private readonly ITableRepository _tableRepository;
+        private readonly ISkillObjectFactory _skillObjectFactory;
 
         [Inject]
-        public SkillFactory(ISceneResourceProvider resourceProvider, ITableRepository tableRepository)
+        public SkillFactory(ISceneResourceProvider resourceProvider, ITableRepository tableRepository,  ISkillObjectFactory skillObjectFactory)
         {
             _resourceProvider = resourceProvider;
             _tableRepository = tableRepository;
+            _skillObjectFactory = skillObjectFactory;
         }
 
         /// <summary>
@@ -37,7 +39,7 @@ namespace DungeonShooter
                 var skillData = await _resourceProvider.GetAssetAsync<SkillData>(skillTableEntry.SkillDataKey);
                 Sprite icon = await _resourceProvider.GetAssetAsync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
 
-                return new Skill(skillTableEntry, skillData, icon, _resourceProvider);
+                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory);
             }
             catch (Exception e)
             {
@@ -54,7 +56,7 @@ namespace DungeonShooter
                 var skillData = _resourceProvider.GetAssetSync<SkillData>(skillTableEntry.SkillDataKey);
                 Sprite icon = _resourceProvider.GetAssetSync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
 
-                return new Skill(skillTableEntry, skillData, icon, _resourceProvider);
+                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory);
             }
             catch (Exception e)
             {

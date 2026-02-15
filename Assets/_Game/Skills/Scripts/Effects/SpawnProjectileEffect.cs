@@ -56,12 +56,11 @@ namespace DungeonShooter
                 rotation = Quaternion.Euler(0f, 0f, angle); 
             }
             
-            var obj = await context.SceneResourceProvider.GetInstanceAsync(SkillObjectAddress, position, rotation);
+            var skillObj = await context.SkillObjectFactory.CreateSkillObjectAsync<ProjectileSkillObject>(SkillObjectAddress, position, rotation);
 
-            if (obj == null)
+            if (skillObj == null)
                 return false;
             
-            var skillObj = obj.AddOrGetComponent<ProjectileSkillObject>();
             skillObj.Initialize(_effects, entry, context, targetCount, speed, lifeTime);
 
             return true;

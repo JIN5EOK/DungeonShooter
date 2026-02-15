@@ -28,16 +28,12 @@ namespace DungeonShooter
                 ? context.LastHitTarget.transform.position
                 : context.Caster.transform.position;
                 
-            var obj = await context.SceneResourceProvider.GetInstanceAsync(ParticlePrefabAddress, position);
+            var skillObj = await context.SkillObjectFactory.CreateSkillObjectAsync<ParticleSkillObject>(ParticlePrefabAddress, position);
 
-            if (obj == null)
+            if (skillObj == null)
                 return false;
                 
-            var particleSystem = obj.GetComponentInChildren<ParticleSystem>();
-            if (particleSystem != null)
-            {
-                particleSystem.Play();
-            }
+            skillObj.Play();
 
             return true;
         }
