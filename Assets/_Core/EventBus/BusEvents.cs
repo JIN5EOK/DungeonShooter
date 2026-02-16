@@ -9,15 +9,21 @@ namespace DungeonShooter
         public Vector2 position;
     }
 
+    public struct PlayerDeadEvent
+    {
+        public PlayerConfigTableEntry playerConfigTableEntry;
+        public EntityBase player;
+        public Vector2 position;
+    }
+    
     public struct PlayerObjectDestroyEvent
     {
         public EntityBase player;
         public Vector2 position;
     }
 
-    public struct EnemyDestroyEvent
+    public struct EnemyDeadEvent
     {
-        
         public EntityBase enemy;
         public EnemyConfigTableEntry enemyConfigTableEntry;
     }

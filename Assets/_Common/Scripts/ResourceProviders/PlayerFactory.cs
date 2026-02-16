@@ -27,7 +27,6 @@ namespace DungeonShooter
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
-        private readonly PlayerInstanceManager _playerInstanceManager;
         private readonly PlayerStatusManager _playerStatusManager;
         private readonly PlayerSkillManager _playerSkillManager;
         private readonly IEventBus _eventBus;
@@ -36,7 +35,6 @@ namespace DungeonShooter
         public PlayerFactory(StageContext context
             , ISceneResourceProvider sceneResourceProvider
             , ITableRepository tableRepository
-            , PlayerInstanceManager playerInstanceManager
             , IEventBus eventBus
             , PlayerStatusManager playerStatusManager
             , PlayerSkillManager playerSkillManager
@@ -45,7 +43,6 @@ namespace DungeonShooter
             _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
             _tableRepository = tableRepository;
-            _playerInstanceManager = playerInstanceManager;
             _eventBus = eventBus;
             _playerStatusManager = playerStatusManager;
             _playerSkillManager = playerSkillManager;
@@ -148,6 +145,11 @@ namespace DungeonShooter
             entity.OnDestroyed += (self) =>
             {
                 _eventBus.Publish(new PlayerObjectDestroyEvent {player = self, position = playerInstance.transform.position});
+            };
+
+            healthComponent.OnDeath += () =>
+            {
+                _eventBus.Publish(new PlayerDeadEvent() {player = entity, position = playerInstance.transform.position, playerConfigTableEntry = config});
             };
             
             entity.SetStatGroup(_playerStatusManager.StatContainer);

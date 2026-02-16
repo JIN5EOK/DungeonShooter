@@ -265,7 +265,7 @@ namespace DungeonShooter
                 {
                     var destroyEffectSpawnPos = entity.transform.position;
                     _skillObjectFactory.CreateSkillObjectAsync<ParticleSkillObject>(CommonAddresses.MonsterDeath_Particle, destroyEffectSpawnPos).Forget();
-                    _eventBus.Publish(new EnemyDestroyEvent { enemy = entity, enemyConfigTableEntry = configTableEntry });
+                    _eventBus.Publish(new EnemyDeadEvent { enemy = entity, enemyConfigTableEntry = configTableEntry });
                     entity.Release();
                 };
             }

@@ -12,7 +12,7 @@ namespace DungeonShooter
         protected override void Configure(IContainerBuilder builder)
         {
             new CommonSceneInstaller().Install(builder);
-            builder.Register<BattleManager>(Lifetime.Scoped).AsSelf();
+            builder.Register<GameManager>(Lifetime.Scoped).AsSelf();
             builder.Register<PlayerLevelManager>(Lifetime.Scoped).AsSelf();
             builder.Register<CoinInventory>(Lifetime.Scoped);
             builder.Register<Inventory>(Lifetime.Scoped);
@@ -26,11 +26,10 @@ namespace DungeonShooter
             builder.Register<ItemFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SkillObjectFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<StageManager>(Lifetime.Scoped);
-            builder.RegisterComponentOnNewGameObject<GameManager>(Lifetime.Scoped);
+            builder.RegisterComponentOnNewGameObject<StageSceneInitializer>(Lifetime.Scoped);
             builder.Register<PlayerStatusManager>(Lifetime.Scoped);
             builder.Register<PlayerSkillManager>(Lifetime.Scoped);
             builder.Register<PlayerInputController>(Lifetime.Scoped);
-            builder.Register<PlayerInstanceManager>(Lifetime.Scoped);
             builder.Register<EntitySkillContainer>(Lifetime.Transient);
             base.Configure(builder);
         }
@@ -38,8 +37,8 @@ namespace DungeonShooter
         protected override void Awake()
         {
             base.Awake();
-            Container.Resolve<BattleManager>();
             Container.Resolve<GameManager>();
+            Container.Resolve<StageSceneInitializer>();
         }
     }
 }
