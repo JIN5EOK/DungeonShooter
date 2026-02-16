@@ -13,7 +13,16 @@ namespace DungeonShooter
         
         public int Level { get; private set; } = 1;
         public int Exp {get; private set; }
-        public int MaxExp => 100; // 일단 경험치통은 레벨 상관없이 100으로 고정
+        private int _maxExp = 100;
+        public int MaxExp
+        {
+            get => _maxExp;
+            private set 
+            {
+                _maxExp = value;
+                OnMaxExpChanged?.Invoke(_maxExp);
+            } 
+        }
         
         private IEventBus _eventBus;
 
@@ -40,6 +49,7 @@ namespace DungeonShooter
                 // 레벨업 이벤트 발행
                 _eventBus.Publish(new PlayerLevelChangeEvent() {level = Level});
                 OnLevelChanged?.Invoke(Level);
+                MaxExp = (int)(MaxExp * 1.25f);
             }
             OnExpChanged?.Invoke(Exp);
         }

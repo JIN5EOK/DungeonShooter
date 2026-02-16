@@ -32,14 +32,14 @@ namespace DungeonShooter
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly IEventBus _eventBus;
         private readonly ISkillFactory _skillFactory;
-        
+        private readonly ISkillObjectFactory _skillObjectFactory;
         private readonly GameObjectPool _pool = new();
         
         private List<int> _enemyIds;
         
         
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory)
+        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
         {
             _tableRepository = tableRepository;
             _stageContext = stageContext;
@@ -47,6 +47,7 @@ namespace DungeonShooter
             _eventBus = eventBus;
             _sceneLifetimeScope = sceneLifeTimeScope;
             _skillFactory = skillFactory;
+            _skillObjectFactory = skillObjectFactory;
             Initialize();
         }
 
@@ -262,8 +263,10 @@ namespace DungeonShooter
                 var moveComponent = entityLifeTimeScope.Container.Resolve<MovementComponent>();
                 healthComponent.OnDeath += () =>
                 {
+                    var destroyEffectSpawnPos = entity.transform.position;
+                    _skillObjectFactory.CreateSkillObjectAsync<ParticleSkillObject>(CommonAddresses.MonsterDeath_Particle, destroyEffectSpawnPos).Forget();
                     _eventBus.Publish(new EnemyDestroyEvent { enemy = entity, enemyConfigTableEntry = configTableEntry });
-                    CoroutineManager.Delay(0.5f, () => entity.Destroy());
+                    entity.Release();
                 };
             }
             var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();

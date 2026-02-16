@@ -39,11 +39,8 @@ namespace DungeonShooter
 
             _animator.SetBool(WalkParamId, isMoving);
 
-            if (isMoving)
-            {
-                var dir = Vector2ToDirection(moveInput.normalized);
-                SetDirection(dir);
-            }
+            var dir = Vector2ToDirection(moveInput.normalized);
+            SetDirection(dir);
         }
 
         /// <summary>

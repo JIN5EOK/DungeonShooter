@@ -259,6 +259,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f773e7a331bf14538aea4a00e3699a58
+    m_Address: MonsterDeath_Particle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: fcdb8e067ff4a47068dd02615bcdb50d
     m_Address: EnemyConfigTable
     m_ReadOnly: 0

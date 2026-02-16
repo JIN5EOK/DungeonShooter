@@ -56,11 +56,8 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 어드레서블 키로 UI 프리팹을 로드해 해당 타입 캔버스에 생성한다.
+        /// 싱글턴으로 UI를 생성해 반환합니다, 이후 다시 요청시 이전에 생성했던 UI를 반환합니다
         /// </summary>
-        /// <param name="addressableKey">어드레서블 키</param>
-        /// <param name="isUnique">true면 싱글턴으로 로드. 이미 로드된 경우 캐시된 인스턴스를 반환한다.</param>
-        /// <returns>생성된 UI. 실패 시 null</returns>
         public async UniTask<T> GetSingletonUIAsync<T>(string addressableKey) where T : UIBase
         {
             if (_uniqueUICache.TryGetValue(addressableKey, out var cached) && cached != null)
@@ -73,11 +70,66 @@ namespace DungeonShooter
             return (T)(await task);
         }
         
+        /// <summary>
+        /// UI를 생성해 반환합니다.
+        /// </summary>
         public async UniTask<T> CreateUIAsync<T>(string addressableKey) where T : UIBase
         {
             return await LoadUIAsync<T>(addressableKey);
         }
-        
+
+        /// <summary>
+        /// 싱글턴으로 UI를 동기 생성해 반환합니다. 이후 다시 요청 시 이전에 생성했던 UI를 반환합니다.
+        /// </summary>
+        public T GetSingletonUISync<T>(string addressableKey) where T : UIBase
+        {
+            if (_uniqueUICache.TryGetValue(addressableKey, out var cached) && cached != null)
+                return (T)cached;
+            return (T)LoadAndRegisterUniqueUISync<T>(addressableKey);
+        }
+
+        /// <summary>
+        /// UI를 동기 생성해 반환합니다.
+        /// </summary>
+        public T CreateUISync<T>(string addressableKey) where T : UIBase
+        {
+            return LoadUISync<T>(addressableKey);
+        }
+
+        private UIBase LoadAndRegisterUniqueUISync<T>(string addressableKey) where T : UIBase
+        {
+            var ui = LoadUISync<T>(addressableKey);
+            if (ui != null)
+            {
+                _uniqueUICache[addressableKey] = ui;
+            }
+            if (ui != null)
+            {
+                ui.OnDestroyEvent += () => _uniqueUICache.Remove(addressableKey);
+            }
+            return ui;
+        }
+
+        private T LoadUISync<T>(string addressableKey) where T : UIBase
+        {
+            var instance = _sceneResourceProvider.GetInstanceSync(addressableKey);
+            if (instance == null)
+                return null;
+
+            var ui = instance.GetComponent<T>();
+            if (ui == null)
+            {
+                LogHandler.LogError<UIManager>($"프리팹에 UIBase가 없음: {addressableKey}");
+                Destroy(instance);
+                return null;
+            }
+
+            var parent = _canvasByType[ui.Type];
+            instance.transform.SetParent(parent, false);
+            _uiList.Add(ui);
+            return ui;
+        }
+
         private async UniTask<UIBase> LoadAndRegisterUniqueUIAsync<T>(string addressableKey) where T : UIBase
         {
             var ui = await LoadUIAsync<T>(addressableKey);

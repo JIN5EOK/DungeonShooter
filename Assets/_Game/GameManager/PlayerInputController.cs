@@ -124,9 +124,12 @@ namespace DungeonShooter
             _entityInputContext.InteractInput = isPressed;
         }
 
-        private async void HandleEscapePressed(bool isPressed)
+        private void HandleEscapePressed(bool isPressed)
         {
-            var inventoryUI = await _uiManager.GetSingletonUIAsync<InventoryUI>(UIAddresses.UI_Inventory);
+            if (isPressed == false)
+                return;
+
+            var inventoryUI = _uiManager.GetSingletonUISync<InventoryUI>(UIAddresses.UI_Inventory);
             if (inventoryUI.gameObject.activeSelf)
                 inventoryUI.Hide();
             else
