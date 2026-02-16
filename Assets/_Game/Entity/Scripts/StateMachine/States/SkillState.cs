@@ -44,8 +44,8 @@ namespace DungeonShooter
             
             _movementComponent?.Move(Vector2.zero);
             _entityAnimationHandler?.SetMoving(false);
-
             ExecuteSkillAsync().Forget();
+            _entityStateMachine.InputContext.SkillInput = null;
         }
 
         private async UniTaskVoid ExecuteSkillAsync()

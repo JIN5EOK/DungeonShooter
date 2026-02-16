@@ -5,22 +5,20 @@ namespace DungeonShooter
 {
     /// <summary>
     /// 씬에서 플레이어를 찾아 컨텍스트 Target에 설정하는 Leaf 노드입니다.
-    /// 검색 간격을 0.5~1.0초 사이 랜덤으로 두어 매 프레임 Find 호출과 부하 스파이크를 피합니다.
     /// </summary>
     public class ActionFindPlayerNode : LeafNode<AiBTContext>
     {
-        private readonly float _searchInterval;
+        // 부하 피하기 위해 랜덤 간격으로 서치
+        private float _searchInterval = Random.Range(0.5f, 1f);
         private float _lastSearchTime = float.MinValue;
         private EntityBase _cachedTarget;
-
-        public ActionFindPlayerNode()
-        {
-            _searchInterval = Random.Range(0.5f, 1f);
-        }
 
         /// <inheritdoc />
         public override BTStatus Execute(AiBTContext context)
         {
+            if (context.Target != null)
+                return BTStatus.Success;
+            
             if (Time.time - _lastSearchTime >= _searchInterval)
             {
                 var playerGo = GameObject.FindWithTag(GameTags.Player);

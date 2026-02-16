@@ -25,21 +25,28 @@ namespace DungeonShooter
     /// </summary>
     public class EnemyFactory : IEnemyFactory
     {
+        private LifetimeScope _sceneLifetimeScope;
+        
         private readonly ITableRepository _tableRepository;
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly IEventBus _eventBus;
+        private readonly ISkillFactory _skillFactory;
+        
         private readonly GameObjectPool _pool = new();
+        
         private List<int> _enemyIds;
-        private LifetimeScope _sceneLifetimeScope;
+        
+        
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope)
+        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory)
         {
             _tableRepository = tableRepository;
             _stageContext = stageContext;
             _sceneResourceProvider = sceneResourceProvider;
             _eventBus = eventBus;
             _sceneLifetimeScope = sceneLifeTimeScope;
+            _skillFactory = skillFactory;
             Initialize();
         }
 
@@ -262,8 +269,20 @@ namespace DungeonShooter
             var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
             healthComponent.ResetState();
 
+            var skillContainer = entityLifeTimeScope.Container.Resolve<EntitySkillContainer>();
+            entity.SetSkillGroup(skillContainer);
+
+            var activeSkills = new List<Skill>();
+            
+            foreach (var skillId in configTableEntry.ActiveSkills)
+            {
+                var skill = _skillFactory.CreateSkillSync(skillId);
+                skillContainer.Regist(skill);
+                activeSkills.Add(skill);
+            }
+
             var aiBT = _sceneResourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
-            entityLifeTimeScope.Container.Resolve<AIComponent>().SetBT(aiBT);
+            entityLifeTimeScope.Container.Resolve<AIComponent>().Initialize(aiBT, activeSkills);
 
             return entity;
         }

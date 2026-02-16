@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace DungeonShooter
 {
@@ -26,6 +27,9 @@ namespace DungeonShooter
 
         /// <summary>처치 시 획득 경험치</summary>
         public int Exp { get; set; }
+
+        /// <summary>활성 스킬 ID 목록</summary>
+        public List<int> ActiveSkills { get; set; } = new();
     }
 }
 

@@ -1,4 +1,4 @@
-using UnityEngine;
+using System.Collections.Generic;
 
 namespace DungeonShooter
 {
@@ -13,8 +13,12 @@ namespace DungeonShooter
         public EntityBase Self { get; set; }
 
         /// <summary>
-        /// 현재 타겟 엔티티(예: 플레이어)
+        /// 현재 타겟 엔티티 (예: 플레이어 추적)
         /// </summary>
         public EntityBase Target { get; set; }
+        /// <summary>
+        /// 사용 가능한 액티브 스킬 리스트
+        /// </summary>
+        public List<Skill> ActiveSkills { get; set; }
     }
 }

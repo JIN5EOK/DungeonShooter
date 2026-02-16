@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Jin5eok;
 using UnityEngine;
 using VContainer;
@@ -19,6 +20,12 @@ namespace DungeonShooter
             _context.Self = entityBase;
         }
 
+        public void Initialize(AiBTBase aiBT, List<Skill> activeSkills)
+        {
+            _rootNode = aiBT.GetTree();
+            _context.ActiveSkills = activeSkills ?? new List<Skill>();
+        }
+        
         private void OnEnable()
         {
             _context.Target = null;
@@ -30,15 +37,6 @@ namespace DungeonShooter
                 return;
 
             _rootNode.Execute(_context);
-        }
-        
-        /// <summary>
-        /// 사용할 행동트리 정의를 설정합니다.
-        /// </summary>
-        /// <param name="aiBT">행동트리 정의(스크립터블 오브젝트)</param>
-        public void SetBT(AiBTBase aiBT)
-        {
-            _rootNode = aiBT.GetTree();
         }
     }
 }

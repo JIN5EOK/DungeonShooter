@@ -11,25 +11,41 @@ namespace DungeonShooter
     public class EnemyBasicAiBT : AiBTBase
     {
         [SerializeField]
-        [Tooltip("적 감지 거리")]
+        [Header("적 감지 거리")]
         private float _detectionRange = 10f;
 
+        [SerializeField]
+        [Header("적 감지 거리")]
+        private float _attackRagne = 1f;
+        
+        [SerializeField]
+        [Header("공격 스킬 인덱스")]
+        private int _skillIndex = 0;
+        
         public override IBehaviourTreeNode<AiBTContext> GetTree()
         {
             var chaseSequence = new SequencerNode<AiBTContext>()
                 .AddChild(new ConditionPlayerInRangeNode(_detectionRange))
                 .AddChild(new ActionChaseNode());
 
+            var attackSequence = new SequencerNode<AiBTContext>()
+                .AddChild(new ConditionPlayerInRangeNode(_attackRagne))
+                .AddChild(new ActionUseActiveSkillNode(_skillIndex));
+
+            var chaseOrMoveSelector = new SelectorNode<AiBTContext>()
+                .AddChild(attackSequence)
+                .AddChild(chaseSequence);
+            
             var mainSelector = new SelectorNode<AiBTContext>()
-                .AddChild(chaseSequence)
+                .AddChild(chaseOrMoveSelector)
                 .AddChild(new ActionIdleNode());
 
-            var withFindPlayer = new SequencerNode<AiBTContext>()
+            var findPlayerSequence = new SequencerNode<AiBTContext>()
                 .AddChild(new ActionFindPlayerNode())
                 .AddChild(mainSelector);
 
             var root = new SelectorNode<AiBTContext>()
-                .AddChild(withFindPlayer)
+                .AddChild(findPlayerSequence)
                 .AddChild(new ActionIdleNode());
 
             return root;
