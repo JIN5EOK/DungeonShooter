@@ -14,11 +14,20 @@ namespace DungeonShooter
         public EntitySkillContainer SkillContainer { get; private set; }
 
         /// <summary>
-        /// 엔티티를 제거합니다. 실제 제거 시점에 OnDestroyed가 호출됩니다.
+        /// 엔티티를 제거합니다. PoolableComponent가 있으면 풀에 반환하고, 없으면 게임오브젝트를 파괴합니다.
+        /// 실제 제거 시점에 OnDestroyed가 호출됩니다.
         /// </summary>
         public void Destroy()
         {
-            UnityEngine.Object.Destroy(gameObject);
+            var poolable = GetComponent<PoolableComponent>();
+            if (poolable != null)
+            {
+                poolable.Release();
+            }
+            else
+            {
+                UnityEngine.Object.Destroy(gameObject);
+            }
         }
 
         /// <summary> StatGroup을 주입합니다. </summary>

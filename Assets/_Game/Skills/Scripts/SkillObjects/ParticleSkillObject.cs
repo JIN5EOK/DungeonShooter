@@ -6,20 +6,31 @@ namespace DungeonShooter
     public class ParticleSkillObject : SkillObjectBase
     {
         private ParticleSystem _particle;
-
-        private void Awake()
+        
+        private void OnEnable()
         {
             _particle = GetComponent<ParticleSystem>();
+            _particle.Play();
         }
 
-        public void Play()
+        private void Update()
         {
-            _particle?.Play();
+            if (_particle.isPlaying == false)
+            {
+                Release();
+            }
         }
 
-        public void Stop()
+        public void Release()
         {
-            _particle?.Stop();
+            if (TryGetComponent(out PoolableComponent poolable))
+            {
+                poolable.Release();
+            }
+            else
+            {
+                Destroy(gameObject);    
+            }
         }
         
         private void OnDisable()

@@ -37,13 +37,13 @@ namespace DungeonShooter
 
             if (_elapsedTime >= _lifeTime)
             {
-                Destroy(gameObject);
+                Release();
                 return;
             }
 
             if (_target == null)
             {
-                Destroy(gameObject);
+                Release();
                 return;
             }
 
@@ -100,8 +100,7 @@ namespace DungeonShooter
                 RunEffectsAsync(newContext).Forget();
             }
 
-            // 풀링 로직 적용 필요
-            Destroy(gameObject);
+            Release();
         }
     }
 }

@@ -42,9 +42,8 @@ namespace DungeonShooter
                 var finalDamage = EntityStatsHelper.CalculatePercentDamage(casterAtk, targetDef, skillDamagePercent);
 
                 health.TakeDamage(finalDamage);
-
-                // TODO: 데미지 텍스트는 아주 많이 사용되는 객체라 풀링 및 최적화 적용 반드시 필요
-                var damageTextGo = await context.SceneResourceProvider.GetInstanceAsync(DamageTextAddress);
+                
+                var damageTextGo = await context.SkillObjectFactory.CreateSkillObjectAsync<ParticleSkillObject>(DamageTextAddress);
                 if (damageTextGo != null && context.LastHitTarget != null)
                 {
                     var hitPosition = context.LastHitTarget.transform.position;

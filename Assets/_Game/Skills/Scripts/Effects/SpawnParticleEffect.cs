@@ -32,8 +32,6 @@ namespace DungeonShooter
 
             if (skillObj == null)
                 return false;
-                
-            skillObj.Play();
 
             return true;
         }

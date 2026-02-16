@@ -29,6 +29,7 @@ namespace DungeonShooter
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly IEventBus _eventBus;
+        private readonly GameObjectPool _pool = new();
         private List<int> _enemyIds;
         private LifetimeScope _sceneLifetimeScope;
         [Inject]
@@ -66,13 +67,16 @@ namespace DungeonShooter
         public async UniTask<EntityBase> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var enemyConfig = GetRandomEnemyTableConfig();
+            
             if (enemyConfig == null)
-            {
                 return null;
-            }
+            
+            var entity = GetFromPool(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
+            
+            if (entity == null)
+                entity = await CreateAsync(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
 
-            var enemyInstance = await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
-            return InitializeEnemyInstance(enemyInstance, enemyConfig);
+            return entity;
         }
 
         /// <summary>
@@ -81,13 +85,16 @@ namespace DungeonShooter
         public EntityBase GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var enemyConfig = GetRandomEnemyTableConfig();
+            
             if (enemyConfig == null)
-            {
                 return null;
-            }
+            
+            var entity = GetFromPool(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
+            
+            if (entity == null)
+                entity = CreateSync(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
 
-            var enemyInstance = _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey,  position, rotation, parent, instantiateInWorldSpace);
-            return InitializeEnemyInstance(enemyInstance, enemyConfig);
+            return entity;
         }
 
         /// <summary>
@@ -96,14 +103,16 @@ namespace DungeonShooter
         public async UniTask<EntityBase> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(configId);
+            
             if (enemyConfig == null)
-            {
-                LogHandler.LogWarning<EnemyFactory>($"EnemyConfigTableEntry를 찾을 수 없습니다. ID: {configId}");
                 return null;
-            }
+            
+            var entity = GetFromPool(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
+            
+            if (entity == null)
+                entity = await CreateAsync(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
 
-            var enemyInstance = await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey,  position, rotation, parent, instantiateInWorldSpace);
-            return InitializeEnemyInstance(enemyInstance, enemyConfig);
+            return entity;
         }
 
         /// <summary>
@@ -112,16 +121,51 @@ namespace DungeonShooter
         public EntityBase GetEnemyByConfigIdSync(int configId,  Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
         {
             var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(configId);
+            
             if (enemyConfig == null)
-            {
-                LogHandler.LogWarning<EnemyFactory>($"EnemyConfigTableEntry를 찾을 수 없습니다. ID: {configId}");
                 return null;
-            }
+            
+            var entity = GetFromPool(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
+            
+            if (entity == null)
+                entity = CreateSync(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
 
-            var enemyInstance = _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
-            return InitializeEnemyInstance(enemyInstance, enemyConfig);
+            return entity;
         }
 
+        private EntityBase GetFromPool(EnemyConfigTableEntry entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
+        {
+            var poolKey = GetPoolKey(entry.GameObjectKey);
+            var go = _pool.Get(poolKey);
+            
+            if (go != null)
+            {
+                ApplyTransform(go.transform, position, rotation, parent, instantiateInWorldSpace);
+                go.SetActive(true);
+                return InitializeEnemyInstance(go, entry,false);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private EntityBase CreateSync(EnemyConfigTableEntry entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
+        {
+            var go = _sceneResourceProvider.GetInstanceSync(entry.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
+            var poolKey = GetPoolKey(entry.GameObjectKey);
+            EnsurePoolable(go, poolKey);
+            return InitializeEnemyInstance(go, entry, true);
+        }
+        
+        private async UniTask<EntityBase> CreateAsync(EnemyConfigTableEntry entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
+        {
+            var go = await _sceneResourceProvider.GetInstanceAsync(entry.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
+            var poolKey = GetPoolKey(entry.GameObjectKey);
+            EnsurePoolable(go, poolKey);
+            return InitializeEnemyInstance(go, entry,true);
+        }
+        
         /// <summary>
         /// EnemyKeys에서 랜덤 ID를 선택하고, 해당 EnemyConfigTableEntry의 GameObjectKey(어드레스)를 반환합니다.
         /// </summary>
@@ -141,19 +185,44 @@ namespace DungeonShooter
                 return null;
             }
 
-            if (string.IsNullOrEmpty(enemyEntry.GameObjectKey))
+            return enemyEntry;
+        }
+
+        private static string GetPoolKey(string key)
+        {
+            return $"{nameof(EntityBase)}:{key}";
+        }
+
+        private void EnsurePoolable(GameObject go, string poolKey)
+        {
+            var poolable = go.AddOrGetComponent<PoolableComponent>();
+            poolable.PoolKey = poolKey;
+            poolable.OnRelease -= ReturnEnemyToPool;
+            poolable.OnRelease += ReturnEnemyToPool;
+        }
+
+        private static void ApplyTransform(Transform transform, Vector3 position, Quaternion rotation, Transform parent, bool instantiateInWorldSpace)
+        {
+            if (parent != null)
             {
-                Debug.LogWarning($"[{nameof(EnemyFactory)}] EnemyConfigTableEntry에 GameObjectKey가 없습니다. ID: {enemyId}");
-                return null;
+                transform.SetParent(parent, instantiateInWorldSpace);
             }
 
-            return enemyEntry;
+            if (instantiateInWorldSpace)
+            {
+                transform.SetPositionAndRotation(position, rotation);
+            }
+            else
+            {
+                transform.localPosition = position;
+                transform.localRotation = rotation;
+            }
         }
 
         /// <summary>
         /// 인스턴스에 필요한 컴포넌트를 붙이고 초기화합니다
         /// </summary>
-        private EntityBase InitializeEnemyInstance(GameObject enemyInstance, EnemyConfigTableEntry configTableEntry)
+        private EntityBase InitializeEnemyInstance(GameObject enemyInstance, EnemyConfigTableEntry configTableEntry, bool isFirstInit)
         {
             if (enemyInstance == null)
             {
@@ -163,38 +232,48 @@ namespace DungeonShooter
 
             enemyInstance.tag = GameTags.Enemy;
             enemyInstance.layer = PhysicalLayers.Enemy.LayerIndex;
-            
-            // 씬 LifeTimeScope를 부모로 삼기
+
             EntityLifeTimeScope entityLifeTimeScope = null;
             using (LifetimeScope.EnqueueParent(_sceneLifetimeScope))
             {
-                entityLifeTimeScope = enemyInstance.AddOrGetComponent<EntityLifeTimeScope>();    
+                entityLifeTimeScope = enemyInstance.AddOrGetComponent<EntityLifeTimeScope>();
             }
-            
+
             var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
             var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(configTableEntry.StatsId);
+            
             if (statsEntry != null)
             {
                 var statGroup = new EntityStatContainer();
                 statGroup.Initialize(statsEntry);
                 entity.SetStatGroup(statGroup);
             }
-
-            var movementCompoent = entityLifeTimeScope.Container.Resolve<MovementComponent>();
-            var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();
             
-            // 체력이 0이되어 사망시 이벤트 등록
-            healthComponent.OnDeath += () =>
+            var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();    
+            if (isFirstInit == true)
             {
-                _eventBus.Publish(new EnemyDestroyEvent { enemy = entity, enemyConfigTableEntry = configTableEntry });
-                CoroutineManager.Delay(0.5f, () => entity.Destroy());
-            };
+                var moveComponent = entityLifeTimeScope.Container.Resolve<MovementComponent>();
+                healthComponent.OnDeath += () =>
+                {
+                    _eventBus.Publish(new EnemyDestroyEvent { enemy = entity, enemyConfigTableEntry = configTableEntry });
+                    CoroutineManager.Delay(0.5f, () => entity.Destroy());
+                };
+            }
+            var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
+            healthComponent.ResetState();
 
             var aiBT = _sceneResourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
-            var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
             entityLifeTimeScope.Container.Resolve<AIComponent>().SetBT(aiBT);
 
             return entity;
+        }
+
+        private void ReturnEnemyToPool(PoolableComponent poolable)
+        {
+            if (poolable != null && !string.IsNullOrEmpty(poolable.PoolKey))
+            {
+                _pool.Return(poolable.PoolKey, poolable.gameObject);
+            }
         }
     }
 }

@@ -98,7 +98,6 @@ namespace DungeonShooter
         private void Die()
         {
             OnDeath?.Invoke();
-            // 사망 효과 실행
             ApplyDeathEffects();
         }
 
@@ -135,6 +134,16 @@ namespace DungeonShooter
         public void SetCurrentHealth(int value)
         {
             CurrentHealth = Mathf.Clamp(value, 0, MaxHealth);
+        }
+
+        public void ResetState()
+        {
+            if (_spriteRenderer != null)
+            {
+                _spriteRenderer.color = _originalColor;
+            }
+
+            FullHeal();
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
+using System;
 using Jin5eok;
 using UnityEngine;
 using VContainer;
@@ -17,7 +18,12 @@ namespace DungeonShooter
         {
             _context.Self = entityBase;
         }
- 
+
+        private void OnEnable()
+        {
+            _context.Target = null;
+        }
+
         private void Update()
         {
             if (_rootNode == null || _context == null)

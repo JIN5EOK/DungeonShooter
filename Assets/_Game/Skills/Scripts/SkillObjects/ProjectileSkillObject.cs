@@ -21,6 +21,8 @@ namespace DungeonShooter
         {
             base.Initialize(effects, skillTableEntry, context);
 
+            _elapsedTime = 0f;
+            _appliedTargets.Clear();
             _speed = speed;
             _lifeTime = lifeTime;
             _targetCount = targetCount;
@@ -33,7 +35,7 @@ namespace DungeonShooter
             // 생명주기 체크
             if (_elapsedTime >= _lifeTime)
             {
-                Destroy(gameObject);
+                Release();
                 return;
             }
             
@@ -69,8 +71,7 @@ namespace DungeonShooter
 
             if (_appliedTargets.Count >= _targetCount)
             {
-                // 풀링 로직 적용 필요
-                Destroy(gameObject);
+                Release();
             }
         }
     }

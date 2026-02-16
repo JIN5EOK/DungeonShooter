@@ -9,16 +9,19 @@ namespace DungeonShooter
     /// </summary>
     public abstract class SkillObjectBase : MonoBehaviour
     {
+        protected PoolableComponent poolable;
         protected SkillExecutionContext context;
         protected List<EffectBase> effects;
         protected SkillTableEntry skillTableEntry;
 
+        protected virtual void Start()
+        {
+            poolable = GetComponent<PoolableComponent>();
+        }
+        
         /// <summary>
         /// 스킬 오브젝트를 초기화합니다.
         /// </summary>
-        /// <param name="effects">적중 시 실행할 이펙트 목록</param>
-        /// <param name="skillTableEntry">스킬 수치 테이블 엔트리</param>
-        /// <param name="context">시전 컨텍스트 (초기 위치 산출용)</param>
         protected void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
             SkillExecutionContext context)
         {
@@ -38,6 +41,21 @@ namespace DungeonShooter
                 {
                     await effect.Execute(context, skillTableEntry);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 스킬 오브젝트를 해제합니다. PoolableComponent가 있으면 풀에 반환하고, 없으면 게임오브젝트를 파괴합니다.
+        /// </summary>
+        public void Release()
+        {
+            if (poolable != null)
+            {
+                poolable.Release();
+            }
+            else
+            {
+                Destroy(gameObject);
             }
         }
     }
