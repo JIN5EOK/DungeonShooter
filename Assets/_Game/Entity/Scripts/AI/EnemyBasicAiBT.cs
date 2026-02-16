@@ -15,7 +15,7 @@ namespace DungeonShooter
         private float _detectionRange = 10f;
 
         [SerializeField]
-        [Header("적 감지 거리")]
+        [Header("적 공격 거리")]
         private float _attackRagne = 1f;
         
         [SerializeField]

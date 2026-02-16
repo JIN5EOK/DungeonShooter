@@ -32,12 +32,11 @@ namespace DungeonShooter
         /// <summary>
         /// 이동 입력에 따라 IsWalk와 Direction 파라미터를 한 번에 설정한다.
         /// </summary>
-        public void SetMovementFromInput(Vector2 moveInput)
+        public void SetMovementFromInput(Vector2 moveInput, bool isMoving = true)
         {
             if (_animator == null || !_animator.isActiveAndEnabled)
                 return;
 
-            var isMoving = !moveInput.ApproximatelyEquals(Vector2.zero, 0.01f);
             _animator.SetBool(WalkParamId, isMoving);
 
             if (isMoving)

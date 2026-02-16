@@ -33,12 +33,15 @@ namespace DungeonShooter
         {
             _movementComponent?.Move(Vector2.zero);
             _entityAnimationHandler?.SetMoving(false);
+            ApplyFacingDirection();
         }
 
         public void OnExit() { }
 
         public void OnUpdate()
         {
+            ApplyFacingDirection();
+
             var input = _entityStateMachine.InputContext;
 
             if (input.DashInput && _dashComponent != null && _dashComponent.IsReady)
@@ -57,6 +60,15 @@ namespace DungeonShooter
             {
                 _entityStateMachine.RequestChangeState(EntityStates.Move);
             }
+        }
+
+        private void ApplyFacingDirection()
+        {
+            var lastDir = _entityStateMachine.InputContext.LastMoveDirection;
+            if (lastDir.ApproximatelyEquals(Vector2.zero, 0.01f))
+                return;
+
+            _entityAnimationHandler?.SetMovementFromInput(lastDir, false);
         }
     }
 }

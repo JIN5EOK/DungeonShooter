@@ -21,7 +21,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0161f133fe6fc45f7b9fddbcd8b7a6e6
-    m_Address: Goblin
+    m_Address: Skeleton
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -30,6 +30,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - Stage001_NormalRoom
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0c1d859843cb34cf7abd178836d0ce67
+    m_Address: DefaultCharacterSpriteLibrary
+    m_ReadOnly: 0
+    m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0fb156dbd3e134da988e9aa7ce7b2391
     m_Address: RandomEnemySpawn
@@ -41,11 +46,21 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 242add0a9697f466faebf2f5e725c013
+    m_Address: CasterEnemyAI
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2a13c0d69cf8e498e9ab111bc29d5ee1
     m_Address: Stage001_StartRoom
     m_ReadOnly: 0
     m_SerializedLabels:
     - Stage001_StartRoom
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2af81c5d98efb425f86281073a0858c6
+    m_Address: Human_001
+    m_ReadOnly: 0
+    m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 36b9e7a8dc77e4b55b3e0302990009d6
     m_Address: Stage001_0002
@@ -179,6 +194,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b6f69ba600bc64e7aaa3c350aa9f18ee
+    m_Address: Ginie_SL
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b7b2923c980b646859420e11e499a920
     m_Address: PlayerChaseCamera
     m_ReadOnly: 0
@@ -186,6 +206,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c2bcd1ebe362d46fb98e01c9c8399e20
     m_Address: UpgradeFireballSkillData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cbf982a5b2d16440cb558c66cac0f5c9
+    m_Address: Skeleton_001
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -236,6 +261,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: fcdb8e067ff4a47068dd02615bcdb50d
     m_Address: EnemyConfigTable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fff10b2218a0f428ab40e2c557927501
+    m_Address: Ginie
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

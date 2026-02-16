@@ -108,7 +108,7 @@ namespace DungeonShooter
             }
         }
 
-        private async UniTask LoadAndShowPreviewAsync(PlayerConfigTableEntry entry)
+        private void LoadAndShowPreview(PlayerConfigTableEntry entry)
         {
             if (entry == null || string.IsNullOrEmpty(entry.GameObjectKey))
             {
@@ -121,7 +121,7 @@ namespace DungeonShooter
 
             DestroyPreviewInstance();
 
-            var go = await _resourceProvider.GetInstanceAsync(entry.GameObjectKey);
+            var go = _resourceProvider.GetInstanceSync(entry.GameObjectKey);
             if (go == null)
                 return;
 
@@ -217,7 +217,7 @@ namespace DungeonShooter
         {
             _selectedEntry = entry;
             RefreshInfoPanel();
-            LoadAndShowPreviewAsync(entry).Forget();
+            LoadAndShowPreview(entry);
             if (_gameStartButton != null)
                 _gameStartButton.interactable = true;
             OnCharacterSelected?.Invoke(entry);
