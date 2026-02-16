@@ -1,45 +1,67 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using VContainer;
 
 namespace DungeonShooter
 {
     /// <summary>
     /// Room 오브젝트 계층구조 및 타일,오브젝트 생성 유틸리티
     /// </summary>
-    public static class RoomCreateHelper
+    public class RoomInstantiator
     {
+        private readonly IPlayerFactory _playerFactory;
+        private readonly IEnemyFactory _enemyFactory;
+        private readonly ISceneResourceProvider _sceneResourceProvider;
+        private readonly ITableRepository _tableRepository;
+
+        /// <summary>
+        /// 구조 전용 메서드(GetOrCreateChild, GetOrCreateTilemap 등)만 사용할 때 사용합니다. (에디터/직렬화)
+        /// </summary>
+        public RoomInstantiator()
+        {
+            _playerFactory = null;
+            _enemyFactory = null;
+            _sceneResourceProvider = null;
+            _tableRepository = null;
+        }
+
+        [Inject]
+        public RoomInstantiator(
+            IPlayerFactory playerFactory,
+            IEnemyFactory enemyFactory,
+            ISceneResourceProvider sceneResourceProvider,
+            ITableRepository tableRepository)
+        {
+            _playerFactory = playerFactory;
+            _enemyFactory = enemyFactory;
+            _sceneResourceProvider = sceneResourceProvider;
+            _tableRepository = tableRepository;
+        }
+
         /// <summary>
         /// Room의 전체 계층 구조를 생성하거나 가져옵니다.
         /// </summary>
-        /// <param name="stageRoot">Room Transform (null이면 새로 생성)</param>
-        /// <param name="roomName">Room 이름</param>
-        /// <returns>(tilemapsParent, objectsParent, baseTilemapsParent)</returns>
-        public static void GetOrCreateRoomStructure(Transform stageRoot = null, string roomName = "Stage")
+        public void GetOrCreateRoomStructure(Transform stageRoot = null, string roomName = "Stage")
         {
-            // Room GameObject 생성 또는 가져오기
             if (stageRoot == null)
             {
                 stageRoot = new GameObject(roomName).transform;
             }
 
-            // Tilemaps 구조 생성 또는 가져오기
             var tilemapsParent = GetOrCreateChild(stageRoot, RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
             tilemapsParent.gameObject.AddOrGetComponent<Grid>();
-            // Tilemap 컴포넌트 생성
             GetOrCreateTilemap(stageRoot, RoomConstants.TILEMAP_GROUND_NAME);
             GetOrCreateTilemap(stageRoot, RoomConstants.TILEMAP_DECO_NAME);
-            // Objects 구조 생성 또는 가져오기
             GetOrCreateChild(stageRoot, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
         }
 
         /// <summary>
         /// 지정된 이름의 자식 GameObject를 찾거나 생성합니다.
         /// </summary>
-        public static Transform GetOrCreateChild(Transform parent, string childName)
+        public Transform GetOrCreateChild(Transform parent, string childName)
         {
             var child = parent.Find(childName);
             if (child == null)
@@ -51,10 +73,7 @@ namespace DungeonShooter
             return child;
         }
 
-        /// <summary>
-        /// 타일맵 이름에 따라 적절한 렌더링 레이어를 반환합니다.
-        /// </summary>
-        private static RenderingLayer GetRenderingLayerForTilemap(string tilemapName)
+        private RenderingLayer GetRenderingLayerForTilemap(string tilemapName)
         {
             return tilemapName.Contains(RenderingLayers.Ground.LayerName) ? RenderingLayers.Ground
                 : tilemapName.Contains(RenderingLayers.Wall.LayerName) ? RenderingLayers.Wall
@@ -65,7 +84,7 @@ namespace DungeonShooter
         /// <summary>
         /// 지정된 이름의 Tilemap을 찾거나 생성합니다.
         /// </summary>
-        public static Tilemap GetOrCreateTilemap(Transform stageRoot, string tilemapName)
+        public Tilemap GetOrCreateTilemap(Transform stageRoot, string tilemapName)
         {
             var tilemapRoot = GetOrCreateChild(stageRoot, RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
             var tilemapObj = GetOrCreateChild(tilemapRoot, tilemapName);
@@ -75,23 +94,19 @@ namespace DungeonShooter
             var rigidBody2D = tilemapObj.gameObject.AddOrGetComponent<Rigidbody2D>();
             rigidBody2D.bodyType = RigidbodyType2D.Kinematic;
             tilemapObj.gameObject.AddOrGetComponent<CompositeCollider2D>();
-            
-            // 타일맵 이름에 따라 적절한 렌더링 레이어 설정
+
             var renderingLayer = GetRenderingLayerForTilemap(tilemapName);
             renderer.sortingLayerName = renderingLayer.LayerName;
-
             collider.compositeOperation = Collider2D.CompositeOperation.Merge;
-            
+
             return tilemap;
         }
-        
+
         /// <summary>
         /// Room의 타일맵과 오브젝트를 모두 제거합니다.
         /// </summary>
-        /// <param name="stageRoot">Room Transform</param>
-        public static void ClearRoomObject(Transform stageRoot)
+        public void ClearRoomObject(Transform stageRoot)
         {
-            // Objects 하위의 모든 오브젝트 제거
             var objectsParent = stageRoot.transform.Find(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
             if (objectsParent != null)
             {
@@ -109,8 +124,8 @@ namespace DungeonShooter
                 }
             }
         }
-        
-        public static void ClearTiles(Transform stageRoot)
+
+        public void ClearTiles(Transform stageRoot)
         {
             var groundTilemap = GetOrCreateTilemap(stageRoot, RoomConstants.TILEMAP_GROUND_NAME);
             var decoTilemap = GetOrCreateTilemap(stageRoot, RoomConstants.TILEMAP_DECO_NAME);
@@ -121,12 +136,12 @@ namespace DungeonShooter
         /// <summary>
         /// 베이스 타일 배치 로직
         /// </summary>
-        public static void PlaceBaseTiles(Transform stageRoot, Vector2 centerPos, RoomData roomData, TileBase groundTile)
+        public void PlaceBaseTiles(Transform stageRoot, Vector2 centerPos, RoomData roomData, TileBase groundTile)
         {
             var roomSizeX = roomData.RoomSizeX;
             var roomSizeY = roomData.RoomSizeY;
 
-            var tilemapsParent = GetOrCreateChild(stageRoot, RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
+            GetOrCreateChild(stageRoot, RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
             var groundTilemap = GetOrCreateTilemap(stageRoot, RoomConstants.TILEMAP_GROUND_NAME);
 
             var centerPosInt = new Vector3Int((int)centerPos.x, (int)centerPos.y, 0);
@@ -147,61 +162,58 @@ namespace DungeonShooter
         /// <summary>
         /// 추가 타일을 비동기적으로 배치합니다.
         /// </summary>
-        public static async Task PlaceAdditionalTilesAsync(Transform stageRoot, Vector2 centerPos, RoomData roomData, ISceneResourceProvider sceneResourceProvider)
+        public async Task PlaceAdditionalTilesAsync(Transform stageRoot, Vector2 centerPos, RoomData roomData)
         {
-            if (!ValidatePlaceAdditionalTiles(stageRoot, roomData, sceneResourceProvider))
+            if (!ValidatePlaceAdditionalTiles(stageRoot, roomData))
                 return;
-            var tileBases = await LoadTileBasesAsync(roomData, sceneResourceProvider);
+            var tileBases = await LoadTileBasesAsync(roomData);
             PlaceAdditionalTilesInternal(stageRoot, centerPos, roomData.Tiles, tileBases);
         }
 
         /// <summary>
         /// 추가 타일을 동기적으로 배치합니다.
         /// </summary>
-        public static void PlaceAdditionalTilesSync(Transform stageRoot, Vector2 centerPos, RoomData roomData, ISceneResourceProvider sceneResourceProvider)
+        public void PlaceAdditionalTilesSync(Transform stageRoot, Vector2 centerPos, RoomData roomData)
         {
-            if (!ValidatePlaceAdditionalTiles(stageRoot, roomData, sceneResourceProvider))
+            if (!ValidatePlaceAdditionalTiles(stageRoot, roomData))
                 return;
-            var tileBases = LoadTileBasesSync(roomData, sceneResourceProvider);
+            var tileBases = LoadTileBasesSync(roomData);
             PlaceAdditionalTilesInternal(stageRoot, centerPos, roomData.Tiles, tileBases);
         }
 
-        private static bool ValidatePlaceAdditionalTiles(Transform stageRoot, RoomData roomData, ISceneResourceProvider sceneResourceProvider)
+        private bool ValidatePlaceAdditionalTiles(Transform stageRoot, RoomData roomData)
         {
-            if (stageRoot == null || roomData == null || sceneResourceProvider == null)
+            if (stageRoot == null || roomData == null || _sceneResourceProvider == null)
             {
-                LogHandler.LogError(nameof(RoomCreateHelper), "파라미터가 올바르지 않습니다.");
+                LogHandler.LogError(nameof(RoomInstantiator), "파라미터가 올바르지 않습니다.");
                 return false;
             }
             return true;
         }
 
-        private static async Task<List<TileBase>> LoadTileBasesAsync(RoomData roomData, ISceneResourceProvider sceneResourceProvider)
+        private async Task<List<TileBase>> LoadTileBasesAsync(RoomData roomData)
         {
             var list = new List<TileBase>();
             foreach (var tileData in roomData.Tiles)
             {
                 var address = roomData.GetAddress(tileData.Index);
-                list.Add(await sceneResourceProvider.GetAssetAsync<TileBase>(address));
+                list.Add(await _sceneResourceProvider.GetAssetAsync<TileBase>(address));
             }
             return list;
         }
 
-        private static List<TileBase> LoadTileBasesSync(RoomData roomData, ISceneResourceProvider sceneResourceProvider)
+        private List<TileBase> LoadTileBasesSync(RoomData roomData)
         {
             var list = new List<TileBase>();
             foreach (var tileData in roomData.Tiles)
             {
                 var address = roomData.GetAddress(tileData.Index);
-                list.Add(sceneResourceProvider.GetAssetSync<TileBase>(address));
+                list.Add(_sceneResourceProvider.GetAssetSync<TileBase>(address));
             }
             return list;
         }
-        
-        /// <summary>
-        /// 추가 타일 배치 로직
-        /// </summary>
-        private static void PlaceAdditionalTilesInternal(Transform stageRoot, Vector3 centerPos, List<TileLayerData> tileDatas, List<TileBase> tileBases)
+
+        private void PlaceAdditionalTilesInternal(Transform stageRoot, Vector3 centerPos, List<TileLayerData> tileDatas, List<TileBase> tileBases)
         {
             var centerPosInt = new Vector3Int((int)centerPos.x, (int)centerPos.y, 0);
 
@@ -218,33 +230,31 @@ namespace DungeonShooter
 
         /// <summary>
         /// 오브젝트를 비동기적으로 배치합니다.
-        /// ObjectData.TableId가 0이 아니면 테이블 ID 기반(팩토리/테이블)으로, 0이면 legacy 어드레스 기반으로 생성합니다.
         /// </summary>
-        public static async Task<List<GameObject>> PlaceObjectsAsync(Transform stageRoot, RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository, Vector3 worldOffset = default)
+        public async Task<List<GameObject>> PlaceObjectsAsync(Transform stageRoot, RoomData roomData, Vector3 worldOffset = default)
         {
-            var instances = await ResolveAndCreateInstancesAsync(roomData, playerFactory, enemyFactory, sceneResourceProvider, tableRepository, worldOffset);
+            var instances = await ResolveAndCreateInstancesAsync(roomData, worldOffset);
             PlaceObjectsInternal(stageRoot, worldOffset, roomData.Objects, instances);
             return instances;
         }
 
         /// <summary>
         /// 오브젝트를 동기적으로 배치합니다.
-        /// ObjectData.TableId가 0이 아니면 테이블 ID 기반(팩토리/테이블)으로, 0이면 legacy 어드레스 기반으로 생성합니다.
         /// </summary>
-        public static List<GameObject> PlaceObjectsSync(Transform stageRoot, RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository, Vector3 worldOffset = default)
+        public List<GameObject> PlaceObjectsSync(Transform stageRoot, RoomData roomData, Vector3 worldOffset = default)
         {
-            var instances = ResolveAndCreateInstancesSync(roomData, playerFactory, enemyFactory, sceneResourceProvider, tableRepository, worldOffset);
+            var instances = ResolveAndCreateInstancesSync(roomData, worldOffset);
             PlaceObjectsInternal(stageRoot, worldOffset, roomData.Objects, instances);
             return instances;
         }
 
-        private static async Task<List<GameObject>> ResolveAndCreateInstancesAsync(RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository, Vector3 worldOffset)
+        private async Task<List<GameObject>> ResolveAndCreateInstancesAsync(RoomData roomData, Vector3 worldOffset)
         {
             var instances = new List<GameObject>();
             foreach (var objectData in roomData.Objects)
             {
                 var worldPosition = new Vector3(objectData.Position.x, objectData.Position.y, 0) + worldOffset;
-                var instance = objectData.TableId == 0 ? null : await ResolveByTableIdAsync(objectData.TableId, worldPosition, objectData.Rotation, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
+                var instance = objectData.TableId == 0 ? null : await ResolveByTableIdAsync(objectData.TableId, worldPosition, objectData.Rotation);
                 if (instance != null && objectData.TableId != 0 && Application.isPlaying == false)
                 {
                     var marker = instance.AddOrGetComponent<RoomObjectMarker>();
@@ -255,13 +265,13 @@ namespace DungeonShooter
             return instances;
         }
 
-        private static List<GameObject> ResolveAndCreateInstancesSync(RoomData roomData, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository, Vector3 worldOffset)
+        private List<GameObject> ResolveAndCreateInstancesSync(RoomData roomData, Vector3 worldOffset)
         {
             var instances = new List<GameObject>();
             foreach (var objectData in roomData.Objects)
             {
                 var worldPosition = new Vector3(objectData.Position.x, objectData.Position.y, 0) + worldOffset;
-                var instance = objectData.TableId == 0 ? null : ResolveByTableIdSync(objectData.TableId, worldPosition, objectData.Rotation, playerFactory, enemyFactory, sceneResourceProvider, tableRepository);
+                var instance = objectData.TableId == 0 ? null : ResolveByTableIdSync(objectData.TableId, worldPosition, objectData.Rotation);
                 if (instance != null && objectData.TableId != 0 && Application.isPlaying == false)
                 {
                     var marker = instance.AddOrGetComponent<RoomObjectMarker>();
@@ -272,54 +282,54 @@ namespace DungeonShooter
             return instances;
         }
 
-        private static async Task<GameObject> ResolveByTableIdAsync(int tableId, Vector3 position, Quaternion rotation, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository)
+        private async Task<GameObject> ResolveByTableIdAsync(int tableId, Vector3 position, Quaternion rotation)
         {
-            if (tableRepository == null) return null;
-            
-            var entry = tableRepository.GetTableEntry(tableId);
+            if (_tableRepository == null) return null;
+
+            var entry = _tableRepository.GetTableEntry(tableId);
             if (entry == null) return null;
-            
+
             if (entry is RoomEventTriggerTableEntry eventTriggerEntry)
-                return await ResolveRoomEventTriggerEntryAsync(eventTriggerEntry, position, rotation, playerFactory, enemyFactory, sceneResourceProvider);
+                return await ResolveRoomEventTriggerEntryAsync(eventTriggerEntry, position, rotation);
             if (entry is EnemyConfigTableEntry enemyConfig)
-                return await ResolveEnemyEntryAsync(tableId, enemyConfig, position, rotation, enemyFactory, sceneResourceProvider);
+                return await ResolveEnemyEntryAsync(tableId, enemyConfig, position, rotation);
             return null;
         }
 
-        private static GameObject ResolveByTableIdSync(int tableId, Vector3 position, Quaternion rotation, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider, ITableRepository tableRepository)
+        private GameObject ResolveByTableIdSync(int tableId, Vector3 position, Quaternion rotation)
         {
-            if (tableRepository == null) return null;
-            
-            var entry = tableRepository.GetTableEntry(tableId);
+            if (_tableRepository == null) return null;
+
+            var entry = _tableRepository.GetTableEntry(tableId);
             if (entry == null) return null;
             if (entry is RoomEventTriggerTableEntry eventTriggerEntry)
-                return ResolveRoomEventTriggerEntrySync(eventTriggerEntry, position, rotation, playerFactory, enemyFactory, sceneResourceProvider);
+                return ResolveRoomEventTriggerEntrySync(eventTriggerEntry, position, rotation);
             if (entry is EnemyConfigTableEntry enemyConfig)
-                return ResolveEnemyEntrySync(tableId, enemyConfig, position, rotation, enemyFactory, sceneResourceProvider);
+                return ResolveEnemyEntrySync(tableId, enemyConfig, position, rotation);
             return null;
         }
 
-        private static async Task<GameObject> ResolveEnemyEntryAsync(int tableId, EnemyConfigTableEntry enemyConfig, Vector3 position, Quaternion rotation, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
+        private async Task<GameObject> ResolveEnemyEntryAsync(int tableId, EnemyConfigTableEntry enemyConfig, Vector3 position, Quaternion rotation)
         {
-            if (Application.isPlaying && enemyFactory != null)
+            if (Application.isPlaying && _enemyFactory != null)
             {
-                var enemy = await enemyFactory.GetEnemyByConfigIdAsync(tableId, position, rotation);
+                var enemy = await _enemyFactory.GetEnemyByConfigIdAsync(tableId, position, rotation);
                 return enemy != null ? enemy.gameObject : null;
             }
-            return await sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey, position, rotation);
+            return await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey, position, rotation);
         }
 
-        private static GameObject ResolveEnemyEntrySync(int tableId, EnemyConfigTableEntry enemyConfig, Vector3 position, Quaternion rotation, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
+        private GameObject ResolveEnemyEntrySync(int tableId, EnemyConfigTableEntry enemyConfig, Vector3 position, Quaternion rotation)
         {
-            if (Application.isPlaying && enemyFactory != null)
+            if (Application.isPlaying && _enemyFactory != null)
             {
-                var enemy = enemyFactory.GetEnemyByConfigIdSync(tableId, position, rotation);
+                var enemy = _enemyFactory.GetEnemyByConfigIdSync(tableId, position, rotation);
                 return enemy != null ? enemy.gameObject : null;
             }
-            return sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey, position, rotation);
+            return _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey, position, rotation);
         }
 
-        private static async Task<GameObject> ResolveRoomEventTriggerEntryAsync(RoomEventTriggerTableEntry eventTriggerEntry, Vector3 position, Quaternion rotation, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
+        private async Task<GameObject> ResolveRoomEventTriggerEntryAsync(RoomEventTriggerTableEntry eventTriggerEntry, Vector3 position, Quaternion rotation)
         {
             if (!Application.isPlaying)
             {
@@ -334,14 +344,14 @@ namespace DungeonShooter
             switch (triggerType)
             {
                 case RoomEventTriggerType.PlayerSpawnPoint:
-                    return (await playerFactory.GetPlayerAsync(position, rotation)).gameObject;
+                    return (await _playerFactory.GetPlayerAsync(position, rotation)).gameObject;
                 case RoomEventTriggerType.RandomEnemySpawn:
-                    return (await enemyFactory.GetRandomEnemyAsync(position, rotation)).gameObject;
+                    return (await _enemyFactory.GetRandomEnemyAsync(position, rotation)).gameObject;
             }
             return null;
         }
 
-        private static GameObject ResolveRoomEventTriggerEntrySync(RoomEventTriggerTableEntry eventTriggerEntry, Vector3 position, Quaternion rotation, IPlayerFactory playerFactory, IEnemyFactory enemyFactory, ISceneResourceProvider sceneResourceProvider)
+        private GameObject ResolveRoomEventTriggerEntrySync(RoomEventTriggerTableEntry eventTriggerEntry, Vector3 position, Quaternion rotation)
         {
             if (!Application.isPlaying)
             {
@@ -356,14 +366,14 @@ namespace DungeonShooter
             switch (triggerType)
             {
                 case RoomEventTriggerType.PlayerSpawnPoint:
-                    return playerFactory.GetPlayerSync(position, rotation).gameObject;
+                    return _playerFactory.GetPlayerSync(position, rotation).gameObject;
                 case RoomEventTriggerType.RandomEnemySpawn:
-                    return enemyFactory.GetRandomEnemySync(position, rotation).gameObject;
+                    return _enemyFactory.GetRandomEnemySync(position, rotation).gameObject;
             }
             return null;
         }
 
-        private static void PlaceObjectsInternal(Transform stageRoot, Vector3 worldOffset, List<ObjectData> objectDatas, List<GameObject> createdObjects)
+        private void PlaceObjectsInternal(Transform stageRoot, Vector3 worldOffset, List<ObjectData> objectDatas, List<GameObject> createdObjects)
         {
             var objectsParent = GetOrCreateChild(stageRoot, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
 

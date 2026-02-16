@@ -50,6 +50,7 @@ namespace DungeonShooter
         public int RoomSizeY => _roomSizeY;
 
         private ITableRepository _tableRepository;
+        private RoomInstantiator _roomInstantiator;
 
         public ITableRepository GetOrCreateTableRepository()
         {
@@ -58,6 +59,15 @@ namespace DungeonShooter
                 _tableRepository = new LocalTableRepository();
             }
             return _tableRepository;
+        }
+
+        private RoomInstantiator GetRoomInstantiator()
+        {
+            if (_roomInstantiator == null && _resourceProvider != null)
+            {
+                _roomInstantiator = new RoomInstantiator(null, null, _resourceProvider, GetOrCreateTableRepository());
+            }
+            return _roomInstantiator;
         }
 
         public void SetSavePath(string path) => _savePath = path;
@@ -69,11 +79,11 @@ namespace DungeonShooter
         /// </summary>
         private void EnsureStructure()
         {
-            RoomCreateHelper.ClearRoomObject(transform);
-            RoomCreateHelper.ClearTiles(transform);
+            var helper = new RoomInstantiator();
+            helper.ClearRoomObject(transform);
+            helper.ClearTiles(transform);
             UpdateRoomSizeTiles();
-            // 타일 팔레트로 게임오브젝트 배치하기 위해 에디터 한정으로 Tilemap 컴포넌트 추가  
-            RoomCreateHelper.GetOrCreateChild(transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME).gameObject.AddOrGetComponent<Tilemap>();
+            helper.GetOrCreateChild(transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME).gameObject.AddOrGetComponent<Tilemap>();
         }
 
         public void SaveMap()
@@ -141,19 +151,21 @@ namespace DungeonShooter
                 }
             }
 
-            // Room 구조 생성
-            RoomCreateHelper.GetOrCreateRoomStructure(transform, gameObject.name);
-            
-            // 방 크기 업데이트
+            var roomInstantiator = GetRoomInstantiator();
+            if (roomInstantiator == null)
+            {
+                return;
+            }
+
+            roomInstantiator.GetOrCreateRoomStructure(transform, gameObject.name);
+
             _roomSizeX = roomData.RoomSizeX;
             _roomSizeY = roomData.RoomSizeY;
 
-            var centerPos = Vector2.zero; // Room 레벨에서는 중심이 (0,0)
+            var centerPos = Vector2.zero;
 
-            // 맵 배치
-            RoomCreateHelper.ClearTiles(gameObject.transform);
+            roomInstantiator.ClearTiles(gameObject.transform);
 
-            // Ground 타일 로드
             var groundTile = LoadGroundTile();
             if (groundTile == null)
             {
@@ -161,9 +173,9 @@ namespace DungeonShooter
                 return;
             }
 
-            RoomCreateHelper.PlaceBaseTiles(gameObject.transform, centerPos, roomData, groundTile);
-            RoomCreateHelper.PlaceAdditionalTilesSync(gameObject.transform, centerPos, roomData, _resourceProvider);
-            RoomCreateHelper.PlaceObjectsSync(gameObject.transform, roomData, null, null, _resourceProvider, GetOrCreateTableRepository());
+            roomInstantiator.PlaceBaseTiles(gameObject.transform, centerPos, roomData, groundTile);
+            roomInstantiator.PlaceAdditionalTilesSync(gameObject.transform, centerPos, roomData);
+            roomInstantiator.PlaceObjectsSync(gameObject.transform, roomData);
 
             EditorUtility.SetDirty(this);
             LogHandler.Log<RoomEditor>($"방 불러오기 완료: {_loadFile.name}");
@@ -183,20 +195,23 @@ namespace DungeonShooter
                 return;
             }
 
-            // 임시 RoomData 생성 (방 크기만 설정)
             var tempRoomData = new RoomData
             {
                 RoomSizeX = _roomSizeX,
                 RoomSizeY = _roomSizeY
             };
-            RoomCreateHelper.ClearTiles(transform);
-            // Room 구조 생성
-            RoomCreateHelper.GetOrCreateRoomStructure(transform, gameObject.name);
 
-            // 베이스 타일 배치 (동기적으로 실행)
-            var centerPos = Vector2.zero; // Room 레벨에서는 중심이 (0,0)
-            
-            // Ground 타일 로드
+            var helper = GetRoomInstantiator();
+            if (helper == null)
+            {
+                return;
+            }
+
+            helper.ClearTiles(transform);
+            helper.GetOrCreateRoomStructure(transform, gameObject.name);
+
+            var centerPos = Vector2.zero;
+
             var groundTile = LoadGroundTile();
             if (groundTile == null)
             {
@@ -204,7 +219,7 @@ namespace DungeonShooter
                 return;
             }
 
-            RoomCreateHelper.PlaceBaseTiles(this.transform, centerPos, tempRoomData, groundTile);
+            helper.PlaceBaseTiles(this.transform, centerPos, tempRoomData, groundTile);
 
             EditorUtility.SetDirty(this);
             var tilemapsParent = this.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
@@ -302,7 +317,8 @@ namespace DungeonShooter
             var marker = instance.AddOrGetComponent<RoomObjectMarker>();
             marker.TableId = tableId;
 
-            var objectsParent = RoomCreateHelper.GetOrCreateChild(transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            var helper = new RoomInstantiator();
+            var objectsParent = helper.GetOrCreateChild(transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
             instance.transform.SetParent(objectsParent);
             instance.transform.position = new Vector3(worldPosition.x, worldPosition.y, 0);
             instance.transform.rotation = Quaternion.identity;

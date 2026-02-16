@@ -1,35 +1,44 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Jin5eok;
+using VContainer;
 
 namespace DungeonShooter
 {
     /// <summary>
-    /// RoomData와 Stage를 실제 게임오브젝트로 변환하는 유틸리티 클래스
+    /// Stage 데이터를 실제 씬 게임오브젝트로 변환하는 역할을 정의합니다.
     /// </summary>
-    public static class StageInstantiator
+    public interface IStageInstantiator
     {
         /// <summary>
         /// Stage를 실제 게임오브젝트로 변환합니다.
         /// </summary>
-        /// <param name="stageConfigEntry">스테이지 설정 테이블 엔트리</param>
-        /// <param name="playerFactory">플레이어 팩토리</param>
-        /// <param name="enemyFactory">적 팩토리</param>
-        /// <param name="sceneResourceProvider">씬 리소스 제공자</param>
-        /// <param name="tableRepository">테이블 리포지토리 (방 오브젝트 테이블 ID 해석용)</param>
-        /// <param name="stage">변환할 Stage</param>
-        /// <param name="parent">부모 Transform (null이면 씬 루트)</param>
-        /// <returns>생성된 게임오브젝트를 반환하는 Task</returns>
-        public static async Task<GameObject> InstantiateStage(
+        Task<GameObject> InstantiateStage(StageConfigTableEntry stageConfigEntry, Stage stage, Transform parent = null);
+    }
+
+    /// <summary>
+    /// RoomData와 Stage를 실제 게임오브젝트로 변환하는 클래스
+    /// </summary>
+    public class StageInstantiator : IStageInstantiator
+    {
+        private readonly RoomInstantiator _roomInstantiator;
+        private readonly ISceneResourceProvider _sceneResourceProvider;
+
+        [Inject]
+        public StageInstantiator(RoomInstantiator roomInstantiator, ISceneResourceProvider sceneResourceProvider)
+        {
+            _roomInstantiator = roomInstantiator;
+            _sceneResourceProvider = sceneResourceProvider;
+        }
+
+        /// <summary>
+        /// Stage를 실제 게임오브젝트로 변환합니다.
+        /// </summary>
+        public async Task<GameObject> InstantiateStage(
             StageConfigTableEntry stageConfigEntry,
-            IPlayerFactory playerFactory,
-            IEnemyFactory enemyFactory,
-            ISceneResourceProvider sceneResourceProvider,
-            ITableRepository tableRepository,
             Stage stage,
             Transform parent = null)
         {
@@ -39,7 +48,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            if (stageConfigEntry == null || playerFactory == null || enemyFactory == null || sceneResourceProvider == null || tableRepository == null)
+            if (stageConfigEntry == null || _roomInstantiator == null || _sceneResourceProvider == null)
             {
                 LogHandler.LogError(nameof(StageInstantiator), "리소스 제공자가 null입니다.");
                 return null;
@@ -52,9 +61,9 @@ namespace DungeonShooter
             }
 
             // Stage 레벨 타일맵 구조 생성
-            RoomCreateHelper.GetOrCreateRoomStructure(stageObj.transform);
+            _roomInstantiator.GetOrCreateRoomStructure(stageObj.transform);
 
-            var groundTile = await LoadGroundTileAsync(stageConfigEntry, sceneResourceProvider);
+            var groundTile = await LoadGroundTileAsync(stageConfigEntry, _sceneResourceProvider);
             // 모든 방의 타일과 오브젝트를 Stage 레벨에 배치
             foreach (var room in stage.Rooms.Values)
             {
@@ -68,13 +77,12 @@ namespace DungeonShooter
                 var centerPos = new Vector2(worldPosition.x, worldPosition.y);
 
                 // 방의 타일을 Stage 레벨 타일맵에 배치
-                RoomCreateHelper.PlaceBaseTiles(stageObj.transform, centerPos, room.RoomData, groundTile);
-                await RoomCreateHelper.PlaceAdditionalTilesAsync(stageObj.transform, centerPos, room.RoomData, sceneResourceProvider);
+                _roomInstantiator.PlaceBaseTiles(stageObj.transform, centerPos, room.RoomData, groundTile);
+                await _roomInstantiator.PlaceAdditionalTilesAsync(stageObj.transform, centerPos, room.RoomData);
 
                 // 방의 오브젝트를 Stage 레벨 Objects에 배치
-                var objects = await RoomCreateHelper.PlaceObjectsAsync(stageObj.transform, room.RoomData, playerFactory, enemyFactory, sceneResourceProvider, tableRepository, worldPosition);
+                var objects = await _roomInstantiator.PlaceObjectsAsync(stageObj.transform, room.RoomData, worldPosition);
                 // 생성후 초기화 필요한 객체면 대기
-
                 foreach (var go in objects)
                 {
                     if (go != null && go.TryGetComponent(out IInitializationAwaiter initAwaiter))
@@ -83,11 +91,10 @@ namespace DungeonShooter
                         await initAwaiter.InitializationTask;
                     }
                 }
-
             }
-            
+
             // 복도 생성
-            CreateCorridors(groundTile, stage, RoomCreateHelper.GetOrCreateTilemap(stageObj.transform, RoomConstants.TILEMAP_GROUND_NAME));
+            CreateCorridors(groundTile, stage, _roomInstantiator.GetOrCreateTilemap(stageObj.transform, RoomConstants.TILEMAP_GROUND_NAME));
 
             LogHandler.Log(nameof(StageInstantiator), $"스테이지 생성 완료. 방 개수: {stage.Rooms.Count}");
             return stageObj;
@@ -96,7 +103,7 @@ namespace DungeonShooter
         /// <summary>
         /// Ground 타일을 로드합니다.
         /// </summary>
-        private static async UniTask<TileBase> LoadGroundTileAsync(StageConfigTableEntry stageConfigEntry, ISceneResourceProvider sceneResourceProvider)
+        private async UniTask<TileBase> LoadGroundTileAsync(StageConfigTableEntry stageConfigEntry, ISceneResourceProvider sceneResourceProvider)
         {
             if (stageConfigEntry == null || string.IsNullOrEmpty(stageConfigEntry.GroundTileKey))
             {
@@ -110,7 +117,7 @@ namespace DungeonShooter
         /// <summary>
         /// 방들을 연결하는 복도를 생성합니다.
         /// </summary>
-        private static void CreateCorridors(
+        private void CreateCorridors(
             TileBase groundTile,
             Stage stage,
             Tilemap groundTilemap)

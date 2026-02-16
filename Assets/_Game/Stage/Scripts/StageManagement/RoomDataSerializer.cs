@@ -35,19 +35,18 @@ namespace DungeonShooter
             roomData.RoomSizeX = roomSizeX;
             roomData.RoomSizeY = roomSizeY;
 
-            // 1. Tilemaps 하위의 타일맵 컴포넌트들을 찾아서 TileLayerData로 변환
-            var tilemapsTransform = RoomCreateHelper.GetOrCreateTilemap(room.transform, RoomConstants.TILEMAP_DECO_NAME);
-            if (tilemapsTransform != null)
+            var tilemapsParent = room.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
+            var decoTilemap = tilemapsParent?.Find(RoomConstants.TILEMAP_DECO_NAME)?.GetComponent<Tilemap>();
+            if (decoTilemap != null)
             {
-                SerializeTilemaps(tilemapsTransform, roomData);
+                SerializeTilemaps(decoTilemap, roomData);
             }
             else
             {
                 LogHandler.LogWarning(nameof(RoomDataSerializer), $"'{room.name}'에 '{RoomConstants.TILEMAPS_GAMEOBJECT_NAME}' 자식이 없습니다.");
             }
 
-            // 2. Objects 하위의 오브젝트들을 찾아서 ObjectData로 변환
-            var objectsTransform = RoomCreateHelper.GetOrCreateChild(room.transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            var objectsTransform = room.transform.Find(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
             if (objectsTransform != null)
             {
                 SerializeObjects(objectsTransform, roomData);

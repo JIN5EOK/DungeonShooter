@@ -2,22 +2,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using VContainer;
 
 namespace DungeonShooter
 {
     /// <summary>
-    /// 스테이지 생성 관련 세부 로직을 담당하는 클래스
+    /// 스테이지 구조(방 배치, 연결 등)를 생성하는 역할을 정의합니다.
     /// </summary>
-    public static class StageGenerator
+    public interface IStageGenerator
     {
         /// <summary>
         /// 스테이지를 생성합니다.
         /// </summary>
-        /// <param name="roomDataRepository">방 데이터 저장소</param>
         /// <param name="roomCount">생성할 방의 개수</param>
-        public static async Awaitable<Stage> GenerateStage(IRoomDataRepository roomDataRepository, int roomCount = RoomConstants.DEFAULT_ROOM_COUNT)
+        /// <returns>생성된 Stage</returns>
+        Awaitable<Stage> GenerateStage(int roomCount = RoomConstants.DEFAULT_ROOM_COUNT);
+    }
+
+    /// <summary>
+    /// 스테이지 생성 관련 세부 로직을 담당하는 클래스
+    /// </summary>
+    public class StageGenerator : IStageGenerator
+    {
+        private readonly IRoomDataRepository _roomDataRepository;
+
+        [Inject]
+        public StageGenerator(IRoomDataRepository roomDataRepository)
         {
-            if (roomDataRepository == null)
+            _roomDataRepository = roomDataRepository;
+        }
+
+        /// <summary>
+        /// 스테이지를 생성합니다.
+        /// </summary>
+        /// <param name="roomCount">생성할 방의 개수</param>
+        public async Awaitable<Stage> GenerateStage(int roomCount = RoomConstants.DEFAULT_ROOM_COUNT)
+        {
+            if (_roomDataRepository == null)
             {
                 LogHandler.LogError(nameof(StageGenerator), "방 데이터가 없습니다.");
                 return null;
@@ -41,10 +62,10 @@ namespace DungeonShooter
             AddRandomEdges(stage, roomIds);
 
             // 4. 각 노드를 랜덤 방으로 설정
-            await AssignRoomData(stage, roomIds, roomDataRepository);
+            await AssignRoomData(stage, roomIds);
 
             // 5. 시작 방, 보스방 설정 (특수방)
-            await SetStartAndBossRooms(stage, roomIds, roomDataRepository);
+            await SetStartAndBossRooms(stage, roomIds);
 
             LogHandler.Log(nameof(StageGenerator), $"스테이지 생성 완료. 방 개수: {roomIds.Count}");
             DEBUG_LogStageMap(stage, roomIds);
@@ -55,7 +76,7 @@ namespace DungeonShooter
         /// 방들의 배치,연결관계를 2차원 평면으로 표현합니다.
         /// (0,0) 위치에 루트 노드를 생성하고 이를 시작 방으로 설정합니다.
         /// </summary>
-        private static List<int> PlaceRoomsOnGrid(Stage stage, int roomCount)
+        private List<int> PlaceRoomsOnGrid(Stage stage, int roomCount)
         {
             var roomIds = new List<int>();
             var usedPositions = new HashSet<Vector2Int>();
@@ -125,7 +146,7 @@ namespace DungeonShooter
         /// 방들이 끊어지지 않고 신장 트리 형태를 갖추도록 연결합니다.
         /// BFS 탐색을 통해 연결합니다.
         /// </summary>
-        private static void BuildSpanningTree(Stage stage, List<int> roomIds)
+        private void BuildSpanningTree(Stage stage, List<int> roomIds)
         {
             if (roomIds.Count <= 1)
             {
@@ -198,7 +219,7 @@ namespace DungeonShooter
         /// <summary>
         /// 시작 방을 설정하고 거리상 가장 먼 방을 보스 방으로 설정합니다.
         /// </summary>
-        private static async Awaitable SetStartAndBossRooms(Stage stage, List<int> roomIds, IRoomDataRepository roomDataRepository)
+        private async Awaitable SetStartAndBossRooms(Stage stage, List<int> roomIds)
         {
             if (roomIds.Count < 2)
             {
@@ -210,7 +231,7 @@ namespace DungeonShooter
             var bossRoomId = FindFarthestRoom(stage, startRoomId);
 
             // 시작 방의 RoomData 교체
-            var startRoomData = await roomDataRepository.GetRandomRoom(RoomType.Start);
+            var startRoomData = await _roomDataRepository.GetRandomRoom(RoomType.Start);
             if (startRoomData != null)
             {
                 stage.ReplaceRoomData(startRoomId, startRoomData);
@@ -221,7 +242,7 @@ namespace DungeonShooter
             }
 
             // 보스 방의 RoomData 교체
-            var bossRoomData = await roomDataRepository.GetRandomRoom(RoomType.Boss);
+            var bossRoomData = await _roomDataRepository.GetRandomRoom(RoomType.Boss);
             if (bossRoomData != null)
             {
                 stage.ReplaceRoomData(bossRoomId, bossRoomData);
@@ -235,7 +256,7 @@ namespace DungeonShooter
         /// <summary>
         /// BFS로 가장 먼 방을 찾습니다.
         /// </summary>
-        private static int FindFarthestRoom(Stage stage, int startRoomId)
+        private int FindFarthestRoom(Stage stage, int startRoomId)
         {
             var queue = new Queue<int>();
             var distances = new Dictionary<int, int>();
@@ -279,7 +300,7 @@ namespace DungeonShooter
         /// 자연스러워 보이도록 랜덤 엣지를 추가합니다.
         /// 보스 방 등 특수 방에는 엣지를 추가하지 않습니다.
         /// </summary>
-        private static void AddRandomEdges(Stage stage, List<int> roomIds)
+        private void AddRandomEdges(Stage stage, List<int> roomIds)
         {
             if (roomIds.Count < 2)
             {
@@ -349,7 +370,7 @@ namespace DungeonShooter
         /// <summary>
         /// 시작 방에서 각 방까지의 거리를 계산합니다.
         /// </summary>
-        private static Dictionary<int, int> CalculateDistancesFromStart(Stage stage, int startRoomId)
+        private Dictionary<int, int> CalculateDistancesFromStart(Stage stage, int startRoomId)
         {
             var distances = new Dictionary<int, int>();
             var queue = new Queue<int>();
@@ -384,7 +405,7 @@ namespace DungeonShooter
         /// <summary>
         /// 각 방에 RoomData를 할당합니다.
         /// </summary>
-        private static async Awaitable AssignRoomData(Stage stage, List<int> roomIds, IRoomDataRepository roomDataRepository)
+        private async Awaitable AssignRoomData(Stage stage, List<int> roomIds)
         {
             foreach (int roomId in roomIds)
             {
@@ -392,7 +413,7 @@ namespace DungeonShooter
                 if (room == null) continue;
 
                 // 랜덤하게 RoomData 선택
-                var roomData = await roomDataRepository.GetRandomRoom(RoomType.Normal);
+                var roomData = await _roomDataRepository.GetRandomRoom(RoomType.Normal);
                 if (roomData != null)
                 {
                     LogHandler.Log(nameof(StageGenerator), $"RoomData 할당: {roomId}");
@@ -408,7 +429,7 @@ namespace DungeonShooter
         /// <summary>
         /// 방이 특정 방향으로 실제로 연결되어 있는지 확인합니다.
         /// </summary>
-        private static bool IsConnected(Room room, Direction direction, Dictionary<Vector2Int, Room> roomMap, Dictionary<Direction, Vector2Int> dirToVector)
+        private bool IsConnected(Room room, Direction direction, Dictionary<Vector2Int, Room> roomMap, Dictionary<Direction, Vector2Int> dirToVector)
         {
             if (!room.Connections.ContainsKey(direction))
             {
@@ -425,7 +446,7 @@ namespace DungeonShooter
         /// <summary>
         /// 스테이지 맵을 텍스트로 출력합니다. (디버깅용)
         /// </summary>
-        private static void DEBUG_LogStageMap(Stage stage, List<int> roomIds)
+        private void DEBUG_LogStageMap(Stage stage, List<int> roomIds)
         {
             if (roomIds.Count == 0)
             {
