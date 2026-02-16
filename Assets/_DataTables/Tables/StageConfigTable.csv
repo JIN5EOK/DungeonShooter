@@ -1,3 +1,2 @@
 Memo,Id,Name,GroundTileKey,EnemyKeys,StartRoomsLabel,NormalRoomsLabel,BossRoomsLabel
-고블린의 숲,13000001,고블린의 숲,Tile_Ground_001,18000000/18000001,Stage001_StartRoom,Stage001_NormalRoom,Stage001_NormalRoom
-지니의 숲,13000002,지니의 숲,Tile_Ground_001,18000001,Stage001_StartRoom,Stage001_NormalRoom,Stage001_NormalRoom
+위험한 숲,13000001,고블린의 숲,Tile_Ground_001,18000000/18000001,Stage001_StartRoom,Stage001_NormalRoom,Stage001_NormalRoom

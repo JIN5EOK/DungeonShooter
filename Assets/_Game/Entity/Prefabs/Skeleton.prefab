@@ -8,13 +8,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -1826215569132851174, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
+      propertyPath: m_Radius
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 1471138663655619467, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 1050186068, guid: 29688eb9b8c2f4c4cb4c0ba4a51f8506, type: 3}
     - target: {fileID: 3073406401155221875, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
       propertyPath: m_Name
-      value: Goblin
+      value: Skeleton
       objectReference: {fileID: 0}
     - target: {fileID: 3169616247159687271, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
       propertyPath: m_LocalPosition.x
@@ -68,16 +72,53 @@ PrefabInstance:
       propertyPath: m_SpriteLibraryAsset
       value: 
       objectReference: {fileID: 7108339969198208228, guid: cbf982a5b2d16440cb558c66cac0f5c9, type: 3}
-    - target: {fileID: 7301684499219109624, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
-      propertyPath: m_SpriteTilingProperty.oldSize.x
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7301684499219109624, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
-      propertyPath: m_SpriteTilingProperty.oldSize.y
-      value: 1.5
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3073406401155221875, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4618543675977986091}
   m_SourcePrefab: {fileID: 100100000, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
+--- !u!1 &371949677232595331 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3073406401155221875, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
+  m_PrefabInstance: {fileID: 3427099216047106288}
+  m_PrefabAsset: {fileID: 0}
+--- !u!58 &-4618543675977986091
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 371949677232595331}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.75
