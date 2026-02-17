@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -29,7 +30,7 @@ namespace DungeonShooter
         /// Addressables를 통해 비동기로 씬을 로드한다
         /// 내부적으로 LifetimeScope.Enqueue 블록을 생성하여 이전에 AddContext로 추가한 모든 컨텍스트를 등록한 후 씬을 로드한다
         /// </summary>
-        public async Awaitable LoadScene(string sceneName)
+        public async UniTask LoadScene(string sceneName)
         {
             using (LifetimeScope.Enqueue(builder =>
             {

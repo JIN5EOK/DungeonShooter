@@ -5,8 +5,6 @@ using VContainer;
 
 public class MainMenuSceneInitializer : MonoBehaviour
 {
-    private readonly string StageScene = "StageScene";
-    
     private UIManager _uiManager;
     private GameStartUI _gameStartUI;
 
@@ -19,7 +17,7 @@ public class MainMenuSceneInitializer : MonoBehaviour
     public async UniTaskVoid Start()
     {
         _gameStartUI = await _uiManager.CreateUIAsync<GameStartUI>(UIAddresses.GameStartUIAddress);
-        _gameStartUI.OnGameStartRequested += HandleGameStartRequested;
+        _gameStartUI.OnGameStartRequested += OnGameStartRequested;
     }
 
     private void OnDestroy()
@@ -27,7 +25,7 @@ public class MainMenuSceneInitializer : MonoBehaviour
         _uiManager.RemoveUI(_gameStartUI);
     }
 
-    private async void HandleGameStartRequested()
+    private async void OnGameStartRequested()
     {
         if (_gameStartUI == null)
             return;
@@ -39,6 +37,7 @@ public class MainMenuSceneInitializer : MonoBehaviour
 
         var loader = new SceneLoader();
         var context = new StageContext(playerEntry.Id, stageEntry.Id);
-        await loader.AddContext(context).LoadScene(StageScene);
+        
+        await loader.AddContext(context).LoadScene(SceneNames.StageScene);
     }
 }

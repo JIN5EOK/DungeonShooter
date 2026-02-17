@@ -51,11 +51,11 @@ namespace DungeonShooter
                 stageRoot = new GameObject(roomName).transform;
             }
 
-            var tilemapsParent = GetOrCreateChild(stageRoot, RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
+            var tilemapsParent = GetOrCreateChild(stageRoot, RoomConstants.TilemapGameObjectName);
             tilemapsParent.gameObject.AddOrGetComponent<Grid>();
-            GetOrCreateTilemap(stageRoot, RoomConstants.TILEMAP_GROUND_NAME);
-            GetOrCreateTilemap(stageRoot, RoomConstants.TILEMAP_DECO_NAME);
-            GetOrCreateChild(stageRoot, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            GetOrCreateTilemap(stageRoot, RoomConstants.TilemapGroundName);
+            GetOrCreateTilemap(stageRoot, RoomConstants.TilemapDecoName);
+            GetOrCreateChild(stageRoot, RoomConstants.ObjectsGameObjectName);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace DungeonShooter
         /// </summary>
         public Tilemap GetOrCreateTilemap(Transform stageRoot, string tilemapName)
         {
-            var tilemapRoot = GetOrCreateChild(stageRoot, RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
+            var tilemapRoot = GetOrCreateChild(stageRoot, RoomConstants.TilemapGameObjectName);
             var tilemapObj = GetOrCreateChild(tilemapRoot, tilemapName);
             var tilemap = tilemapObj.gameObject.AddOrGetComponent<Tilemap>();
             var renderer = tilemapObj.gameObject.AddOrGetComponent<TilemapRenderer>();
@@ -107,7 +107,7 @@ namespace DungeonShooter
         /// </summary>
         public void ClearRoomObject(Transform stageRoot)
         {
-            var objectsParent = stageRoot.transform.Find(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            var objectsParent = stageRoot.transform.Find(RoomConstants.ObjectsGameObjectName);
             if (objectsParent != null)
             {
                 for (int i = objectsParent.childCount - 1; i >= 0; i--)
@@ -127,8 +127,8 @@ namespace DungeonShooter
 
         public void ClearTiles(Transform stageRoot)
         {
-            var groundTilemap = GetOrCreateTilemap(stageRoot, RoomConstants.TILEMAP_GROUND_NAME);
-            var decoTilemap = GetOrCreateTilemap(stageRoot, RoomConstants.TILEMAP_DECO_NAME);
+            var groundTilemap = GetOrCreateTilemap(stageRoot, RoomConstants.TilemapGroundName);
+            var decoTilemap = GetOrCreateTilemap(stageRoot, RoomConstants.TilemapDecoName);
             groundTilemap.ClearAllTiles();
             decoTilemap.ClearAllTiles();
         }
@@ -141,8 +141,8 @@ namespace DungeonShooter
             var roomSizeX = roomData.RoomSizeX;
             var roomSizeY = roomData.RoomSizeY;
 
-            GetOrCreateChild(stageRoot, RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
-            var groundTilemap = GetOrCreateTilemap(stageRoot, RoomConstants.TILEMAP_GROUND_NAME);
+            GetOrCreateChild(stageRoot, RoomConstants.TilemapGameObjectName);
+            var groundTilemap = GetOrCreateTilemap(stageRoot, RoomConstants.TilemapGroundName);
 
             var centerPosInt = new Vector3Int((int)centerPos.x, (int)centerPos.y, 0);
             var startX = -roomSizeX / 2;
@@ -220,7 +220,7 @@ namespace DungeonShooter
             for (int i = 0; i < tileDatas.Count; i++)
             {
                 var sortingLayerName = RenderingLayers.GetLayerName(tileDatas[i].Layer);
-                var tilemapName = $"{RoomConstants.TILEMAP_COMPONENT_NAME_BASE}{sortingLayerName}";
+                var tilemapName = $"{RoomConstants.TimemapComponentNameBase}{sortingLayerName}";
                 var tilemap = GetOrCreateTilemap(stageRoot, tilemapName);
                 var localPos = new Vector3Int(tileDatas[i].Position.x, tileDatas[i].Position.y, 0);
                 var worldTilePos = localPos + centerPosInt;
@@ -375,7 +375,7 @@ namespace DungeonShooter
 
         private void PlaceObjectsInternal(Transform stageRoot, Vector3 worldOffset, List<ObjectData> objectDatas, List<GameObject> createdObjects)
         {
-            var objectsParent = GetOrCreateChild(stageRoot, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            var objectsParent = GetOrCreateChild(stageRoot, RoomConstants.ObjectsGameObjectName);
 
             for (int i = 0; i < objectDatas.Count; i++)
             {

@@ -35,25 +35,25 @@ namespace DungeonShooter
             roomData.RoomSizeX = roomSizeX;
             roomData.RoomSizeY = roomSizeY;
 
-            var tilemapsParent = room.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
-            var decoTilemap = tilemapsParent?.Find(RoomConstants.TILEMAP_DECO_NAME)?.GetComponent<Tilemap>();
+            var tilemapsParent = room.transform.Find(RoomConstants.TilemapGameObjectName);
+            var decoTilemap = tilemapsParent?.Find(RoomConstants.TilemapDecoName)?.GetComponent<Tilemap>();
             if (decoTilemap != null)
             {
                 SerializeTilemaps(decoTilemap, roomData);
             }
             else
             {
-                LogHandler.LogWarning(nameof(RoomDataSerializer), $"'{room.name}'에 '{RoomConstants.TILEMAPS_GAMEOBJECT_NAME}' 자식이 없습니다.");
+                LogHandler.LogWarning(nameof(RoomDataSerializer), $"'{room.name}'에 '{RoomConstants.TilemapGameObjectName}' 자식이 없습니다.");
             }
 
-            var objectsTransform = room.transform.Find(RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            var objectsTransform = room.transform.Find(RoomConstants.ObjectsGameObjectName);
             if (objectsTransform != null)
             {
                 SerializeObjects(objectsTransform, roomData);
             }
             else
             {
-                LogHandler.LogWarning(nameof(RoomDataSerializer),$"'{room.name}'에 '{RoomConstants.OBJECTS_GAMEOBJECT_NAME}' 자식이 없습니다.");
+                LogHandler.LogWarning(nameof(RoomDataSerializer),$"'{room.name}'에 '{RoomConstants.ObjectsGameObjectName}' 자식이 없습니다.");
             }
 
             return roomData;

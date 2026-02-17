@@ -1,6 +1,4 @@
 using UnityEngine;
-using Cysharp.Threading.Tasks;
-using DungeonShooter;
 using VContainer;
 
 namespace DungeonShooter

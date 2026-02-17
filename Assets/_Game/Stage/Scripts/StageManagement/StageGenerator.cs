@@ -16,7 +16,7 @@ namespace DungeonShooter
         /// </summary>
         /// <param name="roomCount">생성할 방의 개수</param>
         /// <returns>생성된 Stage</returns>
-        Awaitable<Stage> GenerateStage(int roomCount = RoomConstants.DEFAULT_ROOM_COUNT);
+        Awaitable<Stage> GenerateStage(int roomCount = RoomConstants.DefaultRoomCount);
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ namespace DungeonShooter
         /// 스테이지를 생성합니다.
         /// </summary>
         /// <param name="roomCount">생성할 방의 개수</param>
-        public async Awaitable<Stage> GenerateStage(int roomCount = RoomConstants.DEFAULT_ROOM_COUNT)
+        public async Awaitable<Stage> GenerateStage(int roomCount = RoomConstants.DefaultRoomCount)
         {
             if (_roomDataRepository == null)
             {

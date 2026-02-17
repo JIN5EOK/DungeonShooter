@@ -44,13 +44,13 @@ namespace DungeonShooter
             if (_inputManager == null) 
                 return;
             
-            _inputManager.OnMoveInputChanged += HandleMoveInput;
-            _inputManager.OnDashPressed += HandleDashPressed;
-            _inputManager.OnWeaponAttack += HandleWeaponAttack;
-            _inputManager.OnSkill1Pressed += HandleSkill1Pressed;
-            _inputManager.OnSkill2Pressed += HandleSkill2Pressed;
-            _inputManager.OnInteractPressed += HandleInteractPressed;
-            _inputManager.OnEscapePressed += HandleEscapePressed;
+            _inputManager.OnMoveInputChanged += OnHandleMoveInput;
+            _inputManager.OnDashPressed += OnDashInput;
+            _inputManager.OnWeaponAttack += OnWeaponAttack;
+            _inputManager.OnSkill1Pressed += OnSkill1Input;
+            _inputManager.OnSkill2Pressed += OnSkill2Input;
+            _inputManager.OnInteractPressed += OnInteractInput;
+            _inputManager.OnEscapePressed += OnEscapeInput;
         }
 
         public void UnsubscribeFromInput()
@@ -58,16 +58,16 @@ namespace DungeonShooter
             if (_inputManager == null ) 
                 return;
             
-            _inputManager.OnMoveInputChanged -= HandleMoveInput;
-            _inputManager.OnDashPressed -= HandleDashPressed;
-            _inputManager.OnWeaponAttack -= HandleWeaponAttack;
-            _inputManager.OnSkill1Pressed -= HandleSkill1Pressed;
-            _inputManager.OnSkill2Pressed -= HandleSkill2Pressed;
-            _inputManager.OnInteractPressed -= HandleInteractPressed;
-            _inputManager.OnEscapePressed -= HandleEscapePressed;
+            _inputManager.OnMoveInputChanged -= OnHandleMoveInput;
+            _inputManager.OnDashPressed -= OnDashInput;
+            _inputManager.OnWeaponAttack -= OnWeaponAttack;
+            _inputManager.OnSkill1Pressed -= OnSkill1Input;
+            _inputManager.OnSkill2Pressed -= OnSkill2Input;
+            _inputManager.OnInteractPressed -= OnInteractInput;
+            _inputManager.OnEscapePressed -= OnEscapeInput;
         }
 
-        private void HandleMoveInput(Vector2 input)
+        private void OnHandleMoveInput(Vector2 input)
         {
             if (_entityInputContext == null)
                 return;
@@ -75,36 +75,36 @@ namespace DungeonShooter
             _entityInputContext.MoveInput = input;
         }
 
-        private void HandleDashPressed(bool isPressed)
+        private void OnDashInput(bool isPressed)
         {
             _entityInputContext.DashInput = isPressed;
         }
 
-        private void HandleWeaponAttack(bool isPressed)
+        private void OnWeaponAttack(bool isPressed)
         {
             if (_entityInputContext == null)
                 return;
             
-            HandleSkillInputInternal(_inventory?.EquippedWeapon?.ActiveSkill, isPressed);
+            SkillInputInternal(_inventory?.EquippedWeapon?.ActiveSkill, isPressed);
         }
 
-        private void HandleSkill1Pressed(bool isPressed)
+        private void OnSkill1Input(bool isPressed)
         {
             if (_entityInputContext == null)
                 return;
             
-            HandleSkillInputInternal(_skillManager?.GetActiveSkill(0), isPressed);
+            SkillInputInternal(_skillManager?.GetActiveSkill(0), isPressed);
         }
 
-        private void HandleSkill2Pressed(bool isPressed)
+        private void OnSkill2Input(bool isPressed)
         {
             if (_entityInputContext == null)
                 return;
             
-            HandleSkillInputInternal(_skillManager?.GetActiveSkill(1), isPressed);
+            SkillInputInternal(_skillManager?.GetActiveSkill(1), isPressed);
         }
 
-        private void HandleSkillInputInternal(Skill skill, bool isPressed)
+        private void SkillInputInternal(Skill skill, bool isPressed)
         {
             if (isPressed == true)
             {
@@ -116,7 +116,7 @@ namespace DungeonShooter
             }
         }
         
-        private void HandleInteractPressed(bool isPressed)
+        private void OnInteractInput(bool isPressed)
         {
             if (_entityInputContext == null)
                 return;
@@ -124,7 +124,7 @@ namespace DungeonShooter
             _entityInputContext.InteractInput = isPressed;
         }
 
-        private void HandleEscapePressed(bool isPressed)
+        private void OnEscapeInput(bool isPressed)
         {
             if (isPressed == false)
                 return;

@@ -268,8 +268,9 @@ namespace DungeonShooter
                 textUi.text = value ?? string.Empty;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             DestroyPreviewInstance();
             if (_previewRenderTexture != null)
             {

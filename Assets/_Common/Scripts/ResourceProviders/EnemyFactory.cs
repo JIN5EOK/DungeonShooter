@@ -205,10 +205,18 @@ namespace DungeonShooter
         {
             var poolable = go.AddOrGetComponent<PoolableComponent>();
             poolable.PoolKey = poolKey;
-            poolable.OnRelease -= ReturnEnemyToPool;
-            poolable.OnRelease += ReturnEnemyToPool;
+            poolable.OnReleased -= OnEnemyReleased;
+            poolable.OnReleased += OnEnemyReleased;
         }
-
+        
+        private void OnEnemyReleased(PoolableComponent poolable)
+        {
+            if (poolable != null && !string.IsNullOrEmpty(poolable.PoolKey))
+            {
+                _pool.Return(poolable.PoolKey, poolable.gameObject);
+            }
+        }
+        
         private static void ApplyTransform(Transform transform, Vector3 position, Quaternion rotation, Transform parent, bool instantiateInWorldSpace)
         {
             if (parent != null)
@@ -288,14 +296,6 @@ namespace DungeonShooter
             entityLifeTimeScope.Container.Resolve<AIComponent>().Initialize(aiBT, activeSkills);
 
             return entity;
-        }
-
-        private void ReturnEnemyToPool(PoolableComponent poolable)
-        {
-            if (poolable != null && !string.IsNullOrEmpty(poolable.PoolKey))
-            {
-                _pool.Return(poolable.PoolKey, poolable.gameObject);
-            }
         }
     }
 }

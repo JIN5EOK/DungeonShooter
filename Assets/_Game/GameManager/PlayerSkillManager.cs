@@ -10,10 +10,14 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerSkillManager : IDisposable
     {
+        public const int Count = 2;
+        public const int Skill1Index = 0;
+        public const int Skill2Index = 1;
+        
         [Inject]
         public EntitySkillContainer SkillContainer { get; private set; }
         public EntityBase PlayerInstance { get; private set; }
-        private readonly Skill[] _activeSkills = new Skill[PlayerSkillSlots.Count];
+        private readonly Skill[] _activeSkills = new Skill[Count];
 
         private ISkillFactory _skillFactory;
         private IEventBus _eventBus;
@@ -65,13 +69,13 @@ namespace DungeonShooter
             
             SkillContainer?.Clear();
             
-            _activeSkills[PlayerSkillSlots.Skill1Index] = await _skillFactory.CreateSkillAsync(config.Skill1Id);
-            _activeSkills[PlayerSkillSlots.Skill2Index] = await _skillFactory.CreateSkillAsync(config.Skill2Id);
+            _activeSkills[Skill1Index] = await _skillFactory.CreateSkillAsync(config.Skill1Id);
+            _activeSkills[Skill2Index] = await _skillFactory.CreateSkillAsync(config.Skill2Id);
             
-            if (_activeSkills[PlayerSkillSlots.Skill1Index] != null) 
-                SkillContainer?.Regist(_activeSkills[PlayerSkillSlots.Skill1Index]);
-            if (_activeSkills[PlayerSkillSlots.Skill2Index] != null) 
-                SkillContainer?.Regist(_activeSkills[PlayerSkillSlots.Skill2Index]);
+            if (_activeSkills[Skill1Index] != null) 
+                SkillContainer?.Regist(_activeSkills[Skill1Index]);
+            if (_activeSkills[Skill2Index] != null) 
+                SkillContainer?.Regist(_activeSkills[Skill2Index]);
 
             // 임시코드, 패시브 스킬 등록
             SkillContainer?.Regist(await _skillFactory.CreateSkillAsync(14000301));
@@ -80,7 +84,7 @@ namespace DungeonShooter
         
         public Skill GetActiveSkill(int index)
         {
-            if (index < 0 || index >= PlayerSkillSlots.Count)
+            if (index < 0 || index >= Count)
             {
                 LogHandler.LogWarning<PlayerSkillManager>($"GetActiveSkill: 잘못된 인덱스 입니다. index: {index}");
                 return null;
@@ -97,7 +101,7 @@ namespace DungeonShooter
             if (PlayerInstance == null) 
                 return;
 
-            if (index < 0 || index >= PlayerSkillSlots.Count)
+            if (index < 0 || index >= Count)
                 return;
             
             _activeSkills[index]?.Execute(PlayerInstance).Forget();

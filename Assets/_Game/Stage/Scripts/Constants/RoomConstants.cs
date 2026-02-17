@@ -5,20 +5,18 @@ namespace DungeonShooter
     /// </summary>
     public static class RoomConstants
     {
-        public const string RANDOM_ENEMY_SPAWN_ADDRESS = "RandomEnemySpawn";
-        public const string PLAYER_SPAWN_ADDRESS = "PlayerSpawn";
-        public const string TILEMAPS_GAMEOBJECT_NAME = "Tilemaps";
-        public const string OBJECTS_GAMEOBJECT_NAME = "Objects";
-        public const string TILEMAP_COMPONENT_NAME_BASE = "Tilemap_";
-        public const string TILEMAP_DECO_NAME = TILEMAP_COMPONENT_NAME_BASE + "Deco";
-        public const string TILEMAP_GROUND_NAME = TILEMAP_COMPONENT_NAME_BASE + "Ground";
-        public const int ROOM_SPACING = 28;
-        public const int ROOM_SIZE_MIN_X = 7;
-        public const int ROOM_SIZE_MIN_Y = 7;
-        public const int ROOM_SIZE_MAX_X = 24;
-        public const int ROOM_SIZE_MAX_Y = 24;
-        public const int ROOM_CORRIDOR_SIZE = 5;
-        public const int DEFAULT_ROOM_COUNT = 15;
+        public const string TilemapGameObjectName = "Tilemaps";
+        public const string ObjectsGameObjectName = "Objects";
+        public const string TimemapComponentNameBase = "Tilemap_";
+        public const string TilemapDecoName = TimemapComponentNameBase + "Deco";
+        public const string TilemapGroundName = TimemapComponentNameBase + "Ground";
+        public const int RoomSpacing = 28;
+        public const int RoomSizeMinX = 7;
+        public const int RoomSizeMinY = 7;
+        public const int RoomSizeMaxX = 24;
+        public const int RoomSizeMaxY = 24;
+        public const int RoomCorridorSize = 5;
+        public const int DefaultRoomCount = 15;
     }
 }
 

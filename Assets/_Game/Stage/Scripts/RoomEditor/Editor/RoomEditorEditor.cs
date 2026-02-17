@@ -106,8 +106,8 @@ namespace DungeonShooter
             
             EditorGUILayout.PropertyField(_resourceProvider);
             EditorGUILayout.PropertyField(_groundTileProperty);
-            EditorGUILayout.IntSlider(_roomSizeXProperty, RoomConstants.ROOM_SIZE_MIN_X, RoomConstants.ROOM_SIZE_MAX_X, "방 크기 X");
-            EditorGUILayout.IntSlider(_roomSizeYProperty, RoomConstants.ROOM_SIZE_MIN_Y, RoomConstants.ROOM_SIZE_MAX_Y, "방 크기 Y");
+            EditorGUILayout.IntSlider(_roomSizeXProperty, RoomConstants.RoomSizeMinX, RoomConstants.RoomSizeMaxX, "방 크기 X");
+            EditorGUILayout.IntSlider(_roomSizeYProperty, RoomConstants.RoomSizeMinY, RoomConstants.RoomSizeMaxY, "방 크기 Y");
             
             serializedObject.ApplyModifiedProperties();
             

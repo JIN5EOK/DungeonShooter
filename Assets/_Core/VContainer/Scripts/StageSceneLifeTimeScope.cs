@@ -14,7 +14,6 @@ namespace DungeonShooter
             new CommonSceneInstaller().Install(builder);
             builder.Register<GameManager>(Lifetime.Scoped).AsSelf();
             builder.Register<PlayerLevelManager>(Lifetime.Scoped).AsSelf();
-            builder.Register<CoinInventory>(Lifetime.Scoped);
             builder.Register<Inventory>(Lifetime.Scoped);
             builder.Register<PlayerFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<EnemyFactory>(Lifetime.Scoped).AsImplementedInterfaces();

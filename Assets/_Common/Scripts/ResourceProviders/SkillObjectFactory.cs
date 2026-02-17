@@ -68,11 +68,11 @@ namespace DungeonShooter
         {
             var poolable = go.AddOrGetComponent<PoolableComponent>();
             poolable.PoolKey = poolKey;
-            poolable.OnRelease -= ReturnToPool;
-            poolable.OnRelease += ReturnToPool;
+            poolable.OnReleased -= OnSkillReleased;
+            poolable.OnReleased += OnSkillReleased;
         }
 
-        private void ReturnToPool(PoolableComponent poolable)
+        private void OnSkillReleased(PoolableComponent poolable)
         {
             if (poolable != null && !string.IsNullOrEmpty(poolable.PoolKey))
             {

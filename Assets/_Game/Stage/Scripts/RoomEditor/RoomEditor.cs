@@ -83,7 +83,7 @@ namespace DungeonShooter
             helper.ClearRoomObject(transform);
             helper.ClearTiles(transform);
             UpdateRoomSizeTiles();
-            helper.GetOrCreateChild(transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME).gameObject.AddOrGetComponent<Tilemap>();
+            helper.GetOrCreateChild(transform, RoomConstants.ObjectsGameObjectName).gameObject.AddOrGetComponent<Tilemap>();
         }
 
         public void SaveMap()
@@ -222,7 +222,7 @@ namespace DungeonShooter
             helper.PlaceBaseTiles(this.transform, centerPos, tempRoomData, groundTile);
 
             EditorUtility.SetDirty(this);
-            var tilemapsParent = this.transform.Find(RoomConstants.TILEMAPS_GAMEOBJECT_NAME);
+            var tilemapsParent = this.transform.Find(RoomConstants.TilemapGameObjectName);
             if (tilemapsParent != null)
             {
                 EditorUtility.SetDirty(tilemapsParent);
@@ -318,7 +318,7 @@ namespace DungeonShooter
             marker.TableId = tableId;
 
             var helper = new RoomInstantiator();
-            var objectsParent = helper.GetOrCreateChild(transform, RoomConstants.OBJECTS_GAMEOBJECT_NAME);
+            var objectsParent = helper.GetOrCreateChild(transform, RoomConstants.ObjectsGameObjectName);
             instance.transform.SetParent(objectsParent);
             instance.transform.position = new Vector3(worldPosition.x, worldPosition.y, 0);
             instance.transform.rotation = Quaternion.identity;

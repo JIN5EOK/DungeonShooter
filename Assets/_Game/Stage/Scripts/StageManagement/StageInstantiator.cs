@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Jin5eok;
 using VContainer;
 
 namespace DungeonShooter
@@ -73,7 +72,7 @@ namespace DungeonShooter
                     continue;
                 }
 
-                var worldPosition = new Vector3(room.Position.x * RoomConstants.ROOM_SPACING, room.Position.y * RoomConstants.ROOM_SPACING, 0);
+                var worldPosition = new Vector3(room.Position.x * RoomConstants.RoomSpacing, room.Position.y * RoomConstants.RoomSpacing, 0);
                 var centerPos = new Vector2(worldPosition.x, worldPosition.y);
 
                 // 방의 타일을 Stage 레벨 타일맵에 배치
@@ -94,7 +93,7 @@ namespace DungeonShooter
             }
 
             // 복도 생성
-            CreateCorridors(groundTile, stage, _roomInstantiator.GetOrCreateTilemap(stageObj.transform, RoomConstants.TILEMAP_GROUND_NAME));
+            CreateCorridors(groundTile, stage, _roomInstantiator.GetOrCreateTilemap(stageObj.transform, RoomConstants.TilemapGroundName));
 
             LogHandler.Log(nameof(StageInstantiator), $"스테이지 생성 완료. 방 개수: {stage.Rooms.Count}");
             return stageObj;
@@ -128,7 +127,7 @@ namespace DungeonShooter
             }
 
             // 각 방의 연결을 따라 복도 생성
-            var corridorHalfWidth = RoomConstants.ROOM_CORRIDOR_SIZE / 2;
+            var corridorHalfWidth = RoomConstants.RoomCorridorSize / 2;
             var processedConnections = new HashSet<(int, int)>();
 
             foreach (var room in stage.Rooms.Values)
@@ -138,7 +137,7 @@ namespace DungeonShooter
                     continue;
                 }
 
-                var worldPosition = new Vector3(room.Position.x * RoomConstants.ROOM_SPACING, room.Position.y * RoomConstants.ROOM_SPACING, 0);
+                var worldPosition = new Vector3(room.Position.x * RoomConstants.RoomSpacing, room.Position.y * RoomConstants.RoomSpacing, 0);
                 var roomData = room.RoomData;
                 var roomSizeX = roomData.RoomSizeX;
                 var roomSizeY = roomData.RoomSizeY;
@@ -165,7 +164,7 @@ namespace DungeonShooter
                         continue;
                     }
 
-                    var targetWorldPosition = new Vector3(targetRoom.Position.x * RoomConstants.ROOM_SPACING, targetRoom.Position.y * RoomConstants.ROOM_SPACING, 0);
+                    var targetWorldPosition = new Vector3(targetRoom.Position.x * RoomConstants.RoomSpacing, targetRoom.Position.y * RoomConstants.RoomSpacing, 0);
                     var targetRoomData = targetRoom.RoomData;
                     var targetRoomSizeX = targetRoomData.RoomSizeX;
                     var targetRoomSizeY = targetRoomData.RoomSizeY;
@@ -209,7 +208,7 @@ namespace DungeonShooter
                         var y = Mathf.RoundToInt(corridorStart.y + dy * t);
 
                         // 복도 너비만큼 타일 배치
-                        for (int w = 0; w < RoomConstants.ROOM_CORRIDOR_SIZE; w++)
+                        for (int w = 0; w < RoomConstants.RoomCorridorSize; w++)
                         {
                             Vector3Int tilePos;
                             if (direction == Direction.Up || direction == Direction.Down)
