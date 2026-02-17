@@ -24,17 +24,17 @@ namespace DungeonShooter
             _inventory = inventory;
             _skillManager = playerSkillManager;
             _uiManager = uiManager;
-            _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
-            _eventBus.Subscribe<PlayerObjectDestroyEvent>(PlayerObjectDestroyed);
+            _eventBus.Subscribe<PlayerObjectSpawnEvent>(OnPlayerObjectSpawned);
+            _eventBus.Subscribe<PlayerObjectDestroyEvent>(OnPlayerObjectDestroyed);
             SubscribeToInput();
         }
 
-        private void PlayerObjectSpawned(PlayerObjectSpawnEvent playerObjectSpawnEvent)
+        private void OnPlayerObjectSpawned(PlayerObjectSpawnEvent playerObjectSpawnEvent)
         {
             _entityInputContext = playerObjectSpawnEvent.player.EntityInputContext;
         }
         
-        private void PlayerObjectDestroyed(PlayerObjectDestroyEvent playerObjectDestroyEvent)
+        private void OnPlayerObjectDestroyed(PlayerObjectDestroyEvent playerObjectDestroyEvent)
         {
             _entityInputContext = null;
         }
@@ -77,6 +77,9 @@ namespace DungeonShooter
 
         private void OnDashInput(bool isPressed)
         {
+            if (_entityInputContext == null)
+                return;
+            
             _entityInputContext.DashInput = isPressed;
         }
 

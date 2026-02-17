@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using UnityEngine.InputSystem;
 using VContainer;
 using VContainer.Unity;
 
@@ -37,6 +38,7 @@ namespace DungeonShooter
         {
             base.Awake();
             Container.Resolve<GameManager>();
+            Container.Resolve<PlayerInputController>();
             Container.Resolve<StageSceneInitializer>();
         }
     }
