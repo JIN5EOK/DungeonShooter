@@ -1,59 +1,58 @@
 using System;
 using Cysharp.Threading.Tasks;
-using Jin5eok;
 using VContainer;
 
 namespace DungeonShooter
 {
+    public interface IActiveSkillSlotGroup
+    {
+        public event Action<int, Skill> OnActiveSkillSlotChanged;
+        public Skill GetActiveSkill(int index);
+    }
+    
+    public interface IPlayerSkillManager : IActiveSkillSlotGroup
+    {
+        public UniTask InitializeAsync(PlayerConfigTableEntry config);
+        public EntitySkillContainer SkillContainer { get; }
+    }
+    
     /// <summary>
     /// 플레이어 고유 스킬을 담당합니다.
     /// </summary>
-    public class PlayerSkillManager : IDisposable
+    public class PlayerSkillManager : IPlayerSkillManager, IDisposable
     {
-        public const int Count = 2;
-        public const int Skill1Index = 0;
-        public const int Skill2Index = 1;
+        public event Action<int, Skill> OnActiveSkillSlotChanged;
+        private readonly Skill[] _activeSkillSlots = new Skill[Constants.SkillSlotMaxCount];
         
-        [Inject]
         public EntitySkillContainer SkillContainer { get; private set; }
-        public EntityBase PlayerInstance { get; private set; }
-        private readonly Skill[] _activeSkills = new Skill[Count];
-
+        private EntityBase PlayerInstance { get; set; }
+        
         private ISkillFactory _skillFactory;
         private IEventBus _eventBus;
         [Inject]
-        private void Construct(ISkillFactory skillFactory, IEventBus eventBus)
+        private void Construct(ISkillFactory skillFactory, IEventBus eventBus, EntitySkillContainer skillContainer)
         {
             _skillFactory = skillFactory;
             _eventBus = eventBus;
-            _eventBus.Subscribe<PlayerObjectSpawnEvent>(OnPlayerObjectSpawned);
-            _eventBus.Subscribe<PlayerObjectDestroyEvent>(OnPlayerObjectDestroyed);
+            SkillContainer = skillContainer;
             _eventBus.Subscribe<SkillLevelUpEvent>(OnSkillLevelChanged);
         }
 
+        /// <summary>
+        /// 액티브 스킬 슬롯에 등록된 스킬의 레벨 변경처리
+        /// </summary>
         private void OnSkillLevelChanged(SkillLevelUpEvent skillLevelUpEvent)
         {
             // 비효율적.. 개선 필요할듯
-            for (var i = 0; i < _activeSkills.Length; i++)
+            for (var i = 0; i < _activeSkillSlots.Length; i++)
             {
-                var activeSkill = _activeSkills[i];
+                var activeSkill = _activeSkillSlots[i];
                 if (skillLevelUpEvent.beforeSkill == activeSkill)
                 {
-                    _activeSkills[i] = skillLevelUpEvent.afterSkill;
+                    _activeSkillSlots[i] = skillLevelUpEvent.afterSkill;
+                    OnActiveSkillSlotChanged?.Invoke(i, activeSkill);
                 }
             }
-        }
-        
-        /// <summary>플레이어 오브젝트 생성 이벤트 </summary>
-        private void OnPlayerObjectSpawned(PlayerObjectSpawnEvent spawnEvent)
-        {
-            PlayerInstance = spawnEvent.player;
-        }
-
-        /// <summary>플레이어 오브젝트 파괴 이벤트 </summary>
-        private void OnPlayerObjectDestroyed(PlayerObjectDestroyEvent destroyEvent)
-        {
-            PlayerInstance = null;
         }
 
         /// <summary>
@@ -63,20 +62,24 @@ namespace DungeonShooter
         {
             if (config == null)
             {
-                LogHandler.LogWarning<PlayerSkillManager>("PlayerConfigTableEntry가 null입니다.");
+                LogHandler.LogWarning<IPlayerSkillManager>("PlayerConfigTableEntry가 null입니다.");
                 return;
             }
             
             SkillContainer?.Clear();
             
-            _activeSkills[Skill1Index] = await _skillFactory.CreateSkillAsync(config.Skill1Id);
-            _activeSkills[Skill2Index] = await _skillFactory.CreateSkillAsync(config.Skill2Id);
+            // 액티브 슬롯에 액티브 스킬 등록
+            _activeSkillSlots[0] = await _skillFactory.CreateSkillAsync(config.Skill1Id);
+            _activeSkillSlots[1] = await _skillFactory.CreateSkillAsync(config.Skill2Id);
             
-            if (_activeSkills[Skill1Index] != null) 
-                SkillContainer?.Regist(_activeSkills[Skill1Index]);
-            if (_activeSkills[Skill2Index] != null) 
-                SkillContainer?.Regist(_activeSkills[Skill2Index]);
+            if (_activeSkillSlots[0] != null) 
+                SkillContainer?.Regist(_activeSkillSlots[0]);
+            if (_activeSkillSlots[1] != null) 
+                SkillContainer?.Regist(_activeSkillSlots[1]);
 
+            OnActiveSkillSlotChanged?.Invoke(0, _activeSkillSlots[0]);
+            OnActiveSkillSlotChanged?.Invoke(1, _activeSkillSlots[1]);
+            
             // 임시코드, 패시브 스킬 등록
             SkillContainer?.Regist(await _skillFactory.CreateSkillAsync(14000301));
             SkillContainer?.Regist(await _skillFactory.CreateSkillAsync(14000401));
@@ -84,33 +87,17 @@ namespace DungeonShooter
         
         public Skill GetActiveSkill(int index)
         {
-            if (index < 0 || index >= Count)
+            if (index < 0 || index >= Constants.SkillSlotMaxCount)
             {
-                LogHandler.LogWarning<PlayerSkillManager>($"GetActiveSkill: 잘못된 인덱스 입니다. index: {index}");
+                LogHandler.LogWarning<IPlayerSkillManager>($"GetActiveSkill: 잘못된 인덱스 입니다. index: {index}");
                 return null;
             }
 
-            return _activeSkills[index];
-        }
-        
-        /// <summary>
-        /// 지정한 인덱스의 액티브 스킬을 실행합니다.
-        /// </summary>
-        public void ExecuteActiveSkill(int index)
-        {
-            if (PlayerInstance == null) 
-                return;
-
-            if (index < 0 || index >= Count)
-                return;
-            
-            _activeSkills[index]?.Execute(PlayerInstance).Forget();
+            return _activeSkillSlots[index];
         }
         
         public void Dispose()
         {
-            _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(OnPlayerObjectSpawned);
-            _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(OnPlayerObjectDestroyed);
             _eventBus.Unsubscribe<SkillLevelUpEvent>(OnSkillLevelChanged);
         }
     }

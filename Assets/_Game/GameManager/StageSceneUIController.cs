@@ -15,13 +15,10 @@ namespace DungeonShooter
         private SkillLevelUpUI _skillLevelUpUI;
         private SkillCooldownHudUI _skillCooldownHudUI;
         private InventoryUI _inventoryUI;
-        private PlayerSkillManager _playerSkillManager;
-        
         [Inject]
-        public StageSceneUIController(UIManager uiManager, PlayerSkillManager playerSkillManager)
+        public StageSceneUIController(UIManager uiManager)
         {
             _uiManager = uiManager;
-            _playerSkillManager = playerSkillManager;
         }
 
         public async UniTask InitializeAsync()
@@ -32,10 +29,6 @@ namespace DungeonShooter
             _skillCooldownHudUI = await _uiManager.GetSingletonUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud);
             _inventoryUI = await _uiManager.GetSingletonUIAsync<InventoryUI>(UIAddresses.UI_Inventory);
             _inventoryUI.Hide();
-            
-            _skillCooldownHudUI.AddSkillCooldownSlot(_playerSkillManager.GetActiveSkill(0));
-            _skillCooldownHudUI.AddSkillCooldownSlot(_playerSkillManager.GetActiveSkill(1));
-
             HideHud();
         }
 

@@ -9,5 +9,6 @@ namespace DungeonShooter
         public const string UI_SkillLevelUp = "UI_SkillLevelUp";
         public const string GameStartUIAddress = "CharacterSelectUI";
         public const string UI_GameResult = "UI_GameResult";
+        public const string UI_GamePause = "UI_GamePause";
     }
 }

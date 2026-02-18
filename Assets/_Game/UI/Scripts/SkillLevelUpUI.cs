@@ -20,10 +20,10 @@ namespace DungeonShooter
         
         private EntitySkillContainer _skillContainer;
         private IEventBus _eventBus;
-        private PlayerSkillManager _playerSkillManager;
+        private IPlayerSkillManager _playerSkillManager;
         private IPauseService _pauseService;
         [Inject]
-        public void Construct(ITableRepository tableRepository, ISceneResourceProvider sceneResourceProvider, PlayerSkillManager playerSkillManager, ISkillFactory skillFactory, IEventBus eventBus, IPauseService pauseService)
+        public void Construct(ITableRepository tableRepository, ISceneResourceProvider sceneResourceProvider, IPlayerSkillManager playerSkillManager, ISkillFactory skillFactory, IEventBus eventBus, IPauseService pauseService)
         {
             _tableRepository = tableRepository;
             _sceneResourceProvider = sceneResourceProvider;

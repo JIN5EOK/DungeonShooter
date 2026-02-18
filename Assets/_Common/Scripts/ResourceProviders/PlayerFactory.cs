@@ -28,7 +28,7 @@ namespace DungeonShooter
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
         private readonly PlayerStatusManager _playerStatusManager;
-        private readonly PlayerSkillManager _playerSkillManager;
+        private readonly IPlayerSkillManager _playerSkillManager;
         private readonly IEventBus _eventBus;
         private readonly LifetimeScope _sceneLifetimeScope;
         [Inject]
@@ -37,7 +37,7 @@ namespace DungeonShooter
             , ITableRepository tableRepository
             , IEventBus eventBus
             , PlayerStatusManager playerStatusManager
-            , PlayerSkillManager playerSkillManager
+            , IPlayerSkillManager playerSkillManager
             , LifetimeScope sceneLifetimeScope)
         {
             _stageContext = context;

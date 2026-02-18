@@ -23,7 +23,7 @@ namespace DungeonShooter
         private Item _equippedWeapon;
         
         private PlayerStatusManager _playerStatusManager;
-        private PlayerSkillManager _playerSkillManager;
+        private IPlayerSkillManager _playerSkillManager;
         private IEventBus _eventBus;
         
         private EntityStatContainer StatContainer => _playerStatusManager?.StatContainer;
@@ -32,7 +32,7 @@ namespace DungeonShooter
         private EntityBase _ownerEntity;
 
         [Inject]
-        public Inventory(IEventBus eventBus, PlayerStatusManager playerStatusManager, PlayerSkillManager playerSkillManager)
+        public Inventory(IEventBus eventBus, PlayerStatusManager playerStatusManager, IPlayerSkillManager playerSkillManager)
         {
             _playerStatusManager = playerStatusManager;
             _playerSkillManager = playerSkillManager;

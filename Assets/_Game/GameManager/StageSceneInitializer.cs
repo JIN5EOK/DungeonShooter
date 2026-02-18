@@ -14,7 +14,7 @@ namespace DungeonShooter
         private StageContext _stageContext;
         private ITableRepository _tableRepository;
         private PlayerStatusManager _playerStatusManager;
-        private PlayerSkillManager _playerSkillManager;
+        private IPlayerSkillManager _playerSkillManager;
         private Inventory _inventory;
         private IItemFactory _itemFactory;
         private StageSceneUIController _stageSceneUIController;
@@ -23,7 +23,7 @@ namespace DungeonShooter
             , StageContext stageContext
             , ITableRepository tableRepository
             , PlayerStatusManager playerStatusManager
-            , PlayerSkillManager playerSkillManager
+            , IPlayerSkillManager playerSkillManager
             , Inventory inventory
             , IItemFactory itemFactory
             , StageSceneUIController stageSceneUIController)
@@ -52,14 +52,14 @@ namespace DungeonShooter
                 LogHandler.LogError($"[{nameof(StageSceneInitializer)}] PlayerConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.PlayerConfigTableId}");
                 return;
             }
-
+            
             _playerStatusManager.Initialize(config);
             await _playerSkillManager.InitializeAsync(config);
 
             var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);
             _inventory.AddItem(weapon);
             _inventory.EquipItem(weapon);
-
+            
             await _stageSceneUIController.InitializeAsync();
             _stageSceneUIController.ShowHud();
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,65 +18,55 @@ namespace DungeonShooter
 
         [Header("시각적 설정")]
         [SerializeField] private Color _readyColor = Color.white;
-        [SerializeField] private Color _cooldownColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
 
         [Header("애니메이션")]
         [SerializeField] private bool _enableReadyPulse = true;
         [SerializeField] private float _pulseSpeed = 3f;
         [SerializeField] private float _pulseIntensity = 0.2f;
 
-        private float _remainingTime;
-        private float _totalCooldown;
-
-        private void Update()
+        private Skill _skill;
+        private float _maxCooldown;
+        public void SetSkill(Skill skill)
         {
-            UpdateCooldownVisuals();
-        }
-
-        public void SetCooldown(float remainingTime)
-        {
-            _remainingTime = Mathf.Max(0f, remainingTime);
-        }
-
-        public void SetMaxCooldown(float totalCooldown)
-        {
-            _totalCooldown = Mathf.Max(0f, totalCooldown);
+            if (_skill != null)
+            {
+                _skill.OnCooldownChanged -= UpdateCooldownVisuals;
+            }
+            
+            _skill = skill;
+            _skillIcon.sprite = _skill.Icon;
+            _maxCooldown = skill.MaxCooldown;
+            _skill.OnCooldownChanged += UpdateCooldownVisuals;
+            UpdateCooldownVisuals(skill.Cooldown);
         }
         
-        public void SetSkillIcon(Sprite iconSprite)
+        private void UpdateCooldownVisuals(float cooldown)
         {
-            if (_skillIcon != null && iconSprite != null)
-                _skillIcon.sprite = iconSprite;
-        }
-        
-        private void UpdateCooldownVisuals()
-        {
-            var isReady = _totalCooldown <= 0f || _remainingTime <= 0f;
+            var isReady = _maxCooldown <= 0f || cooldown <= 0f;
 
             if (isReady)
             {
-                if (_enableReadyPulse)
-                {
-                    var pulse = 1f + _pulseIntensity * Mathf.Sin(Time.time * _pulseSpeed);
+                var pulse = 1f + _pulseIntensity * Mathf.Sin(Time.time * _pulseSpeed);
                     _skillIcon.color = _readyColor * pulse;
-                }
-                else
-                {
-                    _skillIcon.color = _readyColor;
-                }
                 _cooldownOverlay.fillAmount = 0f;                    
                 _cooldownText.text = "";
             }
             else
             {
-                if (_totalCooldown > 0f)
-                    _cooldownOverlay.fillAmount = _remainingTime / _totalCooldown;
+                if (_maxCooldown > 0f)
+                    _cooldownOverlay.fillAmount = cooldown / _maxCooldown;
 
-                if (_remainingTime > 1f)
-                    _cooldownText.text = Mathf.Ceil(_remainingTime).ToString("F0");
+                if (cooldown > 1f)
+                    _cooldownText.text = Mathf.Ceil(cooldown).ToString("F0");
                 else
-                    _cooldownText.text = _remainingTime.ToString("F1");
+                    _cooldownText.text = cooldown.ToString("F1");
             }
+        }
+
+        public void OnDestroy()
+        {
+            if(_skill != null)
+                _skill.OnCooldownChanged -= UpdateCooldownVisuals;
         }
     }
 }

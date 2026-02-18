@@ -13,14 +13,14 @@ namespace DungeonShooter
         private InputManager _inputManager;
         private EntityInputContext _entityInputContext;
         private Inventory _inventory;
-        private PlayerSkillManager _skillManager;
+        private IPlayerSkillManager _skillManager;
         private StageSceneUIController _stageSceneUIController;
         [Inject]
         public PlayerInputController(InputManager inputManager, 
             IEventBus eventBus, 
             Inventory inventory,
             StageSceneUIController stageSceneUIController,
-            PlayerSkillManager skillManager)
+            IPlayerSkillManager skillManager)
         {
             _inputManager = inputManager;
             _eventBus = eventBus;
