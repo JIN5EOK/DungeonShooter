@@ -14,16 +14,19 @@ namespace DungeonShooter
         private EntityInputContext _entityInputContext;
         private Inventory _inventory;
         private PlayerSkillManager _skillManager;
-        private UIManager _uiManager;
+        private StageSceneUIController _stageSceneUIController;
         [Inject]
-        public PlayerInputController(InputManager inputManager, IEventBus eventBus, Inventory inventory, PlayerSkillManager playerSkillManager,
-            UIManager uiManager)
+        public PlayerInputController(InputManager inputManager, 
+            IEventBus eventBus, 
+            Inventory inventory,
+            StageSceneUIController stageSceneUIController,
+            PlayerSkillManager skillManager)
         {
             _inputManager = inputManager;
             _eventBus = eventBus;
             _inventory = inventory;
-            _skillManager = playerSkillManager;
-            _uiManager = uiManager;
+            _stageSceneUIController = stageSceneUIController;
+            _skillManager = skillManager;
             _eventBus.Subscribe<PlayerObjectSpawnEvent>(OnPlayerObjectSpawned);
             _eventBus.Subscribe<PlayerObjectDestroyEvent>(OnPlayerObjectDestroyed);
             SubscribeToInput();
@@ -131,12 +134,11 @@ namespace DungeonShooter
         {
             if (isPressed == false)
                 return;
-
-            var inventoryUI = _uiManager.GetSingletonUISync<InventoryUI>(UIAddresses.UI_Inventory);
-            if (inventoryUI.gameObject.activeSelf)
-                inventoryUI.Hide();
+            
+            if (!_stageSceneUIController.IsInventoryActivated())
+                _stageSceneUIController.ShowInventory();
             else
-                inventoryUI.Show();
+                _stageSceneUIController.HideInventory();
         }
 
         public void Dispose()

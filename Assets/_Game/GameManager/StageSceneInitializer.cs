@@ -17,7 +17,7 @@ namespace DungeonShooter
         private PlayerSkillManager _playerSkillManager;
         private Inventory _inventory;
         private IItemFactory _itemFactory;
-        private UIManager _uiManager;
+        private StageSceneUIController _stageSceneUIController;
         [Inject]
         public void Construct(StageManager stageManager
             , StageContext stageContext
@@ -26,8 +26,7 @@ namespace DungeonShooter
             , PlayerSkillManager playerSkillManager
             , Inventory inventory
             , IItemFactory itemFactory
-            , UIManager uiManager
-            , PlayerLevelManager playerLevelManager)
+            , StageSceneUIController stageSceneUIController)
         {
             _stageManager = stageManager;
             _stageContext = stageContext;
@@ -36,7 +35,7 @@ namespace DungeonShooter
             _playerSkillManager = playerSkillManager;
             _inventory = inventory;
             _itemFactory = itemFactory;
-            _uiManager = uiManager;
+            _stageSceneUIController = stageSceneUIController;
         }
 
         private async UniTaskVoid Start()
@@ -60,17 +59,9 @@ namespace DungeonShooter
             var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);
             _inventory.AddItem(weapon);
             _inventory.EquipItem(weapon);
-            
-            var hpUI = await _uiManager.GetSingletonUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud);
-            hpUI.Show();
-            var expUI = await _uiManager.GetSingletonUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud);
-            expUI.Show();
-            var skillLevelUpUI = await _uiManager.GetSingletonUIAsync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp);
-            skillLevelUpUI.Hide();
-            var cooldownHudUI = await _uiManager.GetSingletonUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud);
-            cooldownHudUI.Show();
-            cooldownHudUI.AddSkillCooldownSlot(_playerSkillManager.GetActiveSkill(0));
-            cooldownHudUI.AddSkillCooldownSlot(_playerSkillManager.GetActiveSkill(1));
+
+            await _stageSceneUIController.InitializeAsync();
+            _stageSceneUIController.ShowHud();
         }
     }
 }

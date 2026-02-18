@@ -26,12 +26,12 @@ namespace DungeonShooter
         {
             _skillFactory = skillFactory;
             _eventBus = eventBus;
-            _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
-            _eventBus.Subscribe<PlayerObjectDestroyEvent>(PlayerObjectDestroyed);
-            _eventBus.Subscribe<SkillLevelUpEvent>(SkillLevelUpped);
+            _eventBus.Subscribe<PlayerObjectSpawnEvent>(OnPlayerObjectSpawned);
+            _eventBus.Subscribe<PlayerObjectDestroyEvent>(OnPlayerObjectDestroyed);
+            _eventBus.Subscribe<SkillLevelUpEvent>(OnSkillLevelChanged);
         }
 
-        private void SkillLevelUpped(SkillLevelUpEvent skillLevelUpEvent)
+        private void OnSkillLevelChanged(SkillLevelUpEvent skillLevelUpEvent)
         {
             // 비효율적.. 개선 필요할듯
             for (var i = 0; i < _activeSkills.Length; i++)
@@ -45,13 +45,13 @@ namespace DungeonShooter
         }
         
         /// <summary>플레이어 오브젝트 생성 이벤트 </summary>
-        private void PlayerObjectSpawned(PlayerObjectSpawnEvent spawnEvent)
+        private void OnPlayerObjectSpawned(PlayerObjectSpawnEvent spawnEvent)
         {
             PlayerInstance = spawnEvent.player;
         }
 
         /// <summary>플레이어 오브젝트 파괴 이벤트 </summary>
-        private void PlayerObjectDestroyed(PlayerObjectDestroyEvent destroyEvent)
+        private void OnPlayerObjectDestroyed(PlayerObjectDestroyEvent destroyEvent)
         {
             PlayerInstance = null;
         }
@@ -109,9 +109,9 @@ namespace DungeonShooter
         
         public void Dispose()
         {
-            _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
-            _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(PlayerObjectDestroyed);
-            _eventBus.Unsubscribe<SkillLevelUpEvent>(SkillLevelUpped);
+            _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(OnPlayerObjectSpawned);
+            _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(OnPlayerObjectDestroyed);
+            _eventBus.Unsubscribe<SkillLevelUpEvent>(OnSkillLevelChanged);
         }
     }
 }
