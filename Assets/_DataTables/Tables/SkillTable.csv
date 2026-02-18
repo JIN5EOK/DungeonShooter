@@ -5,7 +5,7 @@ Memo,Id,SkillName,SkillDescription,SkillIconKey,SkillDataKey,FloatAmounts,IntAmo
 파이어볼 레벨3,14000103,파이어볼 LV3,적중시 화염장벽을 설치하는 데미지 250%의 화염구를 발사합니다,FireballSkillIcon,UpgradeFireballSkillData,,,250,0.5,3,14000100
 검 무기 스킬 루트,14000200,검 공격,검으로 공격해 데미지를 입힙니다.,SwordAttackSkillIcon,,,,,,,14000200
 검 무기 스킬,14000201,검 공격 LV1 ,검으로 공격해 데미지 100%를 입힙니다.,SwordAttackSkillIcon,SwordAttackSkillData,,,100,0.5,0.5,14000200
-체력 증가 패시브 루트,14000300,체력 증가,최대 체력이 증가합니다.,FireballSkillIcon,,,,,,,14000300
+체력 증가 패시브 루트,14000300,체력 증가,최대 체력이 증가합니다.,HealthUpSkillIcon,,,,,,,14000300
 체력 증가 패시브 레벨1,14000301,체력 증가 LV1,최대 체력이 50% 증가합니다.,HealthUpSkillIcon,HealthUpSkillData,,,25,,,14000300
 체력 증가 패시브 레벨2,14000302,체력 증가 LV2,최대 체력이 80% 증가합니다.,HealthUpSkillIcon,HealthUpSkillData,,,80,,,14000300
 체력 증가 패시브 레벨3,14000303,체력 증가 LV3,최대 체력이 100% 증가합니다.,HealthUpSkillIcon,HealthUpSkillData,,,100,,,14000300

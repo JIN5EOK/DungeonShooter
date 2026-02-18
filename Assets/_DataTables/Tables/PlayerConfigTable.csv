@@ -1,3 +1,3 @@
-Memo,Id,Name,Description,GameObjectKey,StartWeaponId,Skill1Id,Skill2Id,StatsId
-,12000000,화염 마법사 인간,화염 마법을 다루는 인간입니다.,Human,15000001,14000101,14000501,17000001
-,12000001,스켈레톤 마왕,스켈레톤 마왕입니다. 아주 강력한 능력치와 무기를 가지고 있습니다.,Skeleton,15000002,14000101,14000501,17000004
+Memo,Id,Name,Description,GameObjectKey,StartWeaponId,Skill1Id,Skill2Id,StatsId,AcquirableSkills
+,12000000,화염 마법사 인간,화염 마법을 다루는 인간입니다.,Human,15000001,14000101,14000501,17000001,14000300/14000400
+,12000001,스켈레톤 마왕,스켈레톤 마왕입니다. 아주 강력한 능력치와 무기를 가지고 있습니다.,Skeleton,15000002,14000101,14000501,17000004,14000300/14000400

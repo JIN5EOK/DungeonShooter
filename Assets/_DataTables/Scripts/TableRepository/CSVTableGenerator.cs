@@ -112,7 +112,7 @@ namespace DungeonShooter
                 }
                 else if (tableEntryType == typeof(PlayerConfigTableEntry))
                 {
-                    writer.WriteLine("1,플레이어1,기본 플레이어 캐릭터,Player,1,1,2,1");
+                    writer.WriteLine("1,플레이어1,기본 플레이어 캐릭터,Player,1,1,2,1,14000300/14000400");
                 }
                 else if (tableEntryType == typeof(EntityStatsTableEntry))
                 {

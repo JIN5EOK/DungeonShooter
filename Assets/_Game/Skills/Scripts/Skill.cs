@@ -78,6 +78,9 @@ namespace DungeonShooter
         /// </summary>
         private async UniTask<bool> ExecuteEffectsAsync(SkillExecutionContext context)
         {
+            if (_skillData == null || _skillTableEntry == null)
+                return false;
+            
             bool allSuccess = true;
 
             foreach (var effect in _skillData.ActiveEffects)

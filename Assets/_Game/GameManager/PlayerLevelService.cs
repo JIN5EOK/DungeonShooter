@@ -1,4 +1,5 @@
 using System;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -32,6 +33,14 @@ namespace DungeonShooter
                 OnMaxExpChanged?.Invoke(_maxExp);
             } 
         }
+
+        private IEventBus _eventBus;
+        
+        [Inject]
+        public PlayerLevelService(IEventBus eventBus)
+        {
+            _eventBus = eventBus;
+        }
         
         public void AddExp(int amount)
         {
@@ -44,6 +53,8 @@ namespace DungeonShooter
                 // 레벨업 이벤트 발행
                 OnLevelChanged?.Invoke(Level);
                 MaxExp = (int)(MaxExp * 1.25f);
+                
+                _eventBus.Publish(new PlayerLevelChangeEvent() {level = Level});
             }
             OnExpChanged?.Invoke(Exp);
         }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace DungeonShooter
 {
@@ -23,13 +24,16 @@ namespace DungeonShooter
         /// <summary> 시작 무기 ItemTableEntry.Id </summary>
         public int StartWeaponId { get; set; }
         
-        /// <summary> 1번 스킬 SkillTableEntry.Id </summary>
+        /// <summary> 1번 액티브 스킬 SkillTableEntry.Id </summary>
         public int Skill1Id { get; set; }
         
-        /// <summary> 2번 스킬 SkillTableEntry.Id </summary>
+        /// <summary> 2번 액티브 스킬 SkillTableEntry.Id </summary>
         public int Skill2Id { get; set; }
         
         /// <summary> 기본 스탯 EntityStatsTableEntry.Id </summary>
         public int StatsId { get; set; }
+
+        /// <summary> 기본적으로 지닐 SkillTableEntry.Id 리스트</summary>
+        public List<int> AcquirableSkills { get; set; } = new();
     }
 }

@@ -25,7 +25,6 @@ namespace DungeonShooter
         private readonly Skill[] _activeSkillSlots = new Skill[Constants.SkillSlotMaxCount];
         
         public EntitySkillContainer SkillContainer { get; private set; }
-        private EntityBase PlayerInstance { get; set; }
         
         private ISkillFactory _skillFactory;
         private IEventBus _eventBus;
@@ -79,10 +78,12 @@ namespace DungeonShooter
 
             OnActiveSkillSlotChanged?.Invoke(0, _activeSkillSlots[0]);
             OnActiveSkillSlotChanged?.Invoke(1, _activeSkillSlots[1]);
-            
-            // 임시코드, 패시브 스킬 등록
-            SkillContainer?.Regist(await _skillFactory.CreateSkillAsync(14000301));
-            SkillContainer?.Regist(await _skillFactory.CreateSkillAsync(14000401));
+
+            // 그 외 스킬 등록
+            foreach (var acquirableSkillId in config.AcquirableSkills)
+            {
+                SkillContainer?.Regist(await _skillFactory.CreateSkillAsync(acquirableSkillId));
+            }
         }
         
         public Skill GetActiveSkill(int index)
