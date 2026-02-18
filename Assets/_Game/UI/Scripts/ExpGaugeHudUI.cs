@@ -17,18 +17,18 @@ namespace DungeonShooter
         [SerializeField] private Image _expFillImage;
         [SerializeField] private TextMeshProUGUI _levelText;
         
-        private PlayerLevelManager _levelManager;
+        private IPlayerLevelService _levelService;
         
         [Inject]
-        public void Construct(PlayerLevelManager levelManager)
+        public void Construct(IPlayerLevelService levelService)
         {
-            _levelManager = levelManager;
-            _levelManager.OnLevelChanged += SetLevel;
-            _levelManager.OnExpChanged += SetExp;
-            _levelManager.OnMaxExpChanged += SetMaxExp;
-            SetLevel(_levelManager.Level);
-            SetExp(_levelManager.Exp);
-            SetMaxExp(_levelManager.MaxExp);
+            _levelService = levelService;
+            _levelService.OnLevelChanged += SetLevel;
+            _levelService.OnExpChanged += SetExp;
+            _levelService.OnMaxExpChanged += SetMaxExp;
+            SetLevel(_levelService.Level);
+            SetExp(_levelService.Exp);
+            SetMaxExp(_levelService.MaxExp);
         }
         
         public void SetLevel(int level)
@@ -53,9 +53,9 @@ namespace DungeonShooter
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            _levelManager.OnExpChanged -= SetExp;
-            _levelManager.OnMaxExpChanged -= SetMaxExp;
-            _levelManager.OnLevelChanged -= SetLevel;
+            _levelService.OnExpChanged -= SetExp;
+            _levelService.OnMaxExpChanged -= SetMaxExp;
+            _levelService.OnLevelChanged -= SetLevel;
         }
     }
 }

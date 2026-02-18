@@ -33,11 +33,6 @@ namespace DungeonShooter
         public int level;
     }
     
-    public struct ExpUpEvent
-    {
-        public int exp;
-    }
-    
     public struct SkillLevelUpEvent
     {
         public Skill beforeSkill;

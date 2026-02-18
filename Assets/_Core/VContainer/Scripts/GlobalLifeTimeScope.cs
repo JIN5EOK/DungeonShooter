@@ -12,7 +12,7 @@ namespace DungeonShooter
         protected override void Configure(IContainerBuilder builder)
         {
             base.Configure(builder);
-            builder.Register<PauseService>(Lifetime.Scoped);
+            builder.Register<PauseService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<InputManager>(Lifetime.Singleton);
             builder.Register<LocalTableRepository>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<EventBus>(Lifetime.Singleton).AsImplementedInterfaces();

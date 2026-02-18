@@ -5,25 +5,17 @@ using VContainer;
 
 namespace DungeonShooter
 {
-    public class GameResultData
-    {
-        public bool isClear { get; set; }
-        public int killCount { get; set; }
-    }
-    
     public class GameManager : IDisposable 
     {
-        private GameResultData _gameResult = new ();
         private IEventBus _eventBus;
-        private UIManager _uiManager;
+        private IPlayerLevelService _playerLevelService;
         [Inject]
-        public GameManager(IEventBus eventBus, UIManager uiManager)
+        public GameManager(IEventBus eventBus, IPlayerLevelService playerLevelService)
         {
             _eventBus = eventBus;
             _eventBus.Subscribe<EnemyDeadEvent>(OnEnemyDestroyed);
             _eventBus.Subscribe<PlayerDeadEvent>(OnPlayerDead);
-            
-            _uiManager = uiManager;
+            _playerLevelService = playerLevelService;
         }
         
         private void OnPlayerDead(PlayerDeadEvent ev)
@@ -32,19 +24,8 @@ namespace DungeonShooter
         }
         
         private void OnEnemyDestroyed(EnemyDeadEvent ev)
-        {
-            _gameResult.killCount++;            
-            _eventBus.Publish(new ExpUpEvent {exp = ev.enemyConfigTableEntry.Exp});
-        }
-
-        public void ExitGame()
-        {
-            
-        }
-        
-        public void RestartGame()
-        {
-            
+        {         
+            _playerLevelService?.AddExp(ev.enemyConfigTableEntry.Exp);
         }
         
         public void Dispose()

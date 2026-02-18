@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VContainer;
 
 namespace DungeonShooter
 {
@@ -19,20 +18,6 @@ namespace DungeonShooter
         private readonly HashSet<object> _pauseOwners = new();
         private const float DefaultTimeScale = 1f;
         public bool IsPaused => _pauseOwners.Count > 0;
-        
-        private void OnPauseRequested(PauseRequestEvent evt)
-        {
-            if (evt.requester == null)
-            {
-                LogHandler.LogError<PauseService>("파라미터가 올바르지 않음");
-                return;
-            }
-
-            if (evt.isPause)
-                PauseRequest(evt.requester);
-            else
-                ResumeRequest(evt.requester);
-        }
         
         public void PauseRequest(object requester)
         {
