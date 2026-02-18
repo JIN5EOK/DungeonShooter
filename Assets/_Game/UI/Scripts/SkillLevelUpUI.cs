@@ -21,9 +21,9 @@ namespace DungeonShooter
         private EntitySkillContainer _skillContainer;
         private IEventBus _eventBus;
         private PlayerSkillManager _playerSkillManager;
-        
+        private IPauseService _pauseService;
         [Inject]
-        public void Construct(ITableRepository tableRepository, ISceneResourceProvider sceneResourceProvider, PlayerSkillManager playerSkillManager, ISkillFactory skillFactory, IEventBus eventBus)
+        public void Construct(ITableRepository tableRepository, ISceneResourceProvider sceneResourceProvider, PlayerSkillManager playerSkillManager, ISkillFactory skillFactory, IEventBus eventBus, IPauseService pauseService)
         {
             _tableRepository = tableRepository;
             _sceneResourceProvider = sceneResourceProvider;
@@ -31,6 +31,7 @@ namespace DungeonShooter
             _eventBus = eventBus;
             _playerSkillManager = playerSkillManager;
             _skillContainer = playerSkillManager.SkillContainer;
+            _pauseService = pauseService;
             _eventBus.Subscribe<PlayerLevelChangeEvent>(PlayerLevelChanged);
         }
         
@@ -87,18 +88,16 @@ namespace DungeonShooter
             if (slotIndex > 0)
             {
                 base.Show();
-                Time.timeScale = 0f; // TODO: 임시코드, 타임스케일 조정은 별도의 시간 매니저로 분리 필요
+                _pauseService?.PauseRequest(this);
             }
         }
-        
+
         public override void Hide()
         {
             foreach (var slot in _slots)
                 slot.gameObject.SetActive(false);
             
-            // TODO: 임시코드, 타임스케일 조정은 별도의 시간 매니저로 분리 필요
-            Time.timeScale = 1f;
-            
+            _pauseService?.ResumeRequest(this);
             base.Hide();
         }
     }

@@ -37,6 +37,16 @@ namespace DungeonShooter
             _eventBus.Publish(new ExpUpEvent {exp = ev.enemyConfigTableEntry.Exp});
         }
 
+        public void ExitGame()
+        {
+            
+        }
+        
+        public void RestartGame()
+        {
+            
+        }
+        
         public void Dispose()
         {
             _eventBus.Unsubscribe<EnemyDeadEvent>(OnEnemyDestroyed);

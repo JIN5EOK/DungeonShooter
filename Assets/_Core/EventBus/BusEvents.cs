@@ -15,7 +15,7 @@ namespace DungeonShooter
         public EntityBase player;
         public Vector2 position;
     }
-    
+
     public struct PlayerObjectDestroyEvent
     {
         public EntityBase player;
@@ -42,15 +42,5 @@ namespace DungeonShooter
     {
         public Skill beforeSkill;
         public Skill afterSkill;
-    }
-    
-    public struct ItemEquipEvent
-    {
-        private Item item;
-    }
-    
-    public struct ItemUnequipEvent
-    {
-        private Item item;
     }
 }
