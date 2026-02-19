@@ -21,9 +21,9 @@ namespace DungeonShooter
         private EntitySkillContainer _skillContainer;
         private IEventBus _eventBus;
         private IPlayerSkillManager _playerSkillManager;
-        private IPauseService _pauseService;
+        private IPauseManager _pauseManager;
         [Inject]
-        public void Construct(ITableRepository tableRepository, ISceneResourceProvider sceneResourceProvider, IPlayerSkillManager playerSkillManager, ISkillFactory skillFactory, IEventBus eventBus, IPauseService pauseService)
+        public void Construct(ITableRepository tableRepository, ISceneResourceProvider sceneResourceProvider, IPlayerSkillManager playerSkillManager, ISkillFactory skillFactory, IEventBus eventBus, IPauseManager pauseManager)
         {
             _tableRepository = tableRepository;
             _sceneResourceProvider = sceneResourceProvider;
@@ -31,7 +31,7 @@ namespace DungeonShooter
             _eventBus = eventBus;
             _playerSkillManager = playerSkillManager;
             _skillContainer = playerSkillManager.SkillContainer;
-            _pauseService = pauseService;
+            _pauseManager = pauseManager;
             _eventBus.Subscribe<PlayerLevelChangeEvent>(PlayerLevelChanged);
         }
         
@@ -88,7 +88,7 @@ namespace DungeonShooter
             if (slotIndex > 0)
             {
                 base.Show();
-                _pauseService?.PauseRequest(this);
+                _pauseManager?.PauseRequest(this);
             }
         }
 
@@ -97,7 +97,7 @@ namespace DungeonShooter
             foreach (var slot in _slots)
                 slot.gameObject.SetActive(false);
             
-            _pauseService?.ResumeRequest(this);
+            _pauseManager?.ResumeRequest(this);
             base.Hide();
         }
     }

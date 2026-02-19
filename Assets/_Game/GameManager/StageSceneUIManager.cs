@@ -7,7 +7,7 @@ namespace DungeonShooter
     /// <summary>
     /// 스테이지 씬 Hud 및 팝업 UI들을 관리하는 클래스
     /// </summary>
-    public class StageSceneUIController
+    public class StageSceneUIManager
     {
         private UIManager _uiManager;
         private HealthBarHudUI _healthBarHudUI;
@@ -16,7 +16,7 @@ namespace DungeonShooter
         private SkillCooldownHudUI _skillCooldownHudUI;
         private InventoryUI _inventoryUI;
         [Inject]
-        public StageSceneUIController(UIManager uiManager)
+        public StageSceneUIManager(UIManager uiManager)
         {
             _uiManager = uiManager;
         }

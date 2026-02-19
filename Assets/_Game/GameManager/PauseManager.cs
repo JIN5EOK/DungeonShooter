@@ -4,8 +4,9 @@ using UnityEngine;
 
 namespace DungeonShooter
 {
-    public interface IPauseService
+    public interface IPauseManager
     {
+        public bool IsPaused { get; }
         public void PauseRequest(object requester);
         public void ResumeRequest(object requester);
     }
@@ -13,7 +14,7 @@ namespace DungeonShooter
     /// <summary>
     /// 일시정지 요청을 관리 및 실제로 일시정지를 처리 담당
     /// </summary>
-    public class PauseService : IPauseService, IDisposable
+    public class PauseManager : IPauseManager, IDisposable
     {
         private readonly HashSet<object> _pauseOwners = new();
         private const float DefaultTimeScale = 1f;

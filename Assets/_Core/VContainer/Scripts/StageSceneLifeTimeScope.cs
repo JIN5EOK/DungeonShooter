@@ -16,7 +16,7 @@ namespace DungeonShooter
             
             builder.Register<GameManager>(Lifetime.Scoped);
             builder.Register<PlayerStatusManager>(Lifetime.Scoped);
-            builder.Register<PlayerInputController>(Lifetime.Scoped);
+            builder.Register<PlayerInputManager>(Lifetime.Scoped);
             builder.Register<PlayerSkillManager>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<PlayerLevelService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<Inventory>(Lifetime.Scoped);
@@ -33,7 +33,7 @@ namespace DungeonShooter
             builder.Register<StageInstantiator>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<RoomInstantiator>(Lifetime.Scoped);
             
-            builder.Register<StageSceneUIController>(Lifetime.Scoped);
+            builder.Register<StageSceneUIManager>(Lifetime.Scoped);
             
             builder.Register<EntitySkillContainer>(Lifetime.Transient);
             
@@ -46,7 +46,7 @@ namespace DungeonShooter
         {
             base.Awake();
             Container.Resolve<GameManager>();
-            Container.Resolve<PlayerInputController>();
+            Container.Resolve<PlayerInputManager>();
             Container.Resolve<StageSceneInitializer>();
         }
     }

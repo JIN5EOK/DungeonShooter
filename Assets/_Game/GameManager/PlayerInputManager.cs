@@ -7,25 +7,25 @@ namespace DungeonShooter
     /// <summary>
     /// 플레이어 조작 관련 입력 세션입니다.
     /// </summary>
-    public class PlayerInputController : IDisposable
+    public class PlayerInputManager : IDisposable
     {
         private IEventBus _eventBus;
         private InputManager _inputManager;
         private EntityInputContext _entityInputContext;
         private Inventory _inventory;
         private IPlayerSkillManager _skillManager;
-        private StageSceneUIController _stageSceneUIController;
+        private StageSceneUIManager _stageSceneUIManager;
         [Inject]
-        public PlayerInputController(InputManager inputManager, 
+        public PlayerInputManager(InputManager inputManager, 
             IEventBus eventBus, 
             Inventory inventory,
-            StageSceneUIController stageSceneUIController,
+            StageSceneUIManager stageSceneUIManager,
             IPlayerSkillManager skillManager)
         {
             _inputManager = inputManager;
             _eventBus = eventBus;
             _inventory = inventory;
-            _stageSceneUIController = stageSceneUIController;
+            _stageSceneUIManager = stageSceneUIManager;
             _skillManager = skillManager;
             _eventBus.Subscribe<PlayerObjectSpawnEvent>(OnPlayerObjectSpawned);
             _eventBus.Subscribe<PlayerObjectDestroyEvent>(OnPlayerObjectDestroyed);
@@ -135,10 +135,10 @@ namespace DungeonShooter
             if (isPressed == false)
                 return;
             
-            if (!_stageSceneUIController.IsInventoryActivated())
-                _stageSceneUIController.ShowInventory();
+            if (!_stageSceneUIManager.IsInventoryActivated())
+                _stageSceneUIManager.ShowInventory();
             else
-                _stageSceneUIController.HideInventory();
+                _stageSceneUIManager.HideInventory();
         }
 
         public void Dispose()
