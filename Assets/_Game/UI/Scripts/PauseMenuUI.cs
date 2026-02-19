@@ -1,198 +1,89 @@
-using System;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-
-namespace DungeonShooter
-{
-    /// <summary>
-    /// ESC 입력 또는 버튼을 통해 게임 일시정지 상태를 토글하는 UI 컨트롤러
-    /// </summary>
-    public class PauseMenuUI : MonoBehaviour
-    {
-        [Header("UI 참조")]
-        [SerializeField] private CanvasGroup canvasGroup;
-        [SerializeField] private RectTransform windowRoot;
-
-        [Header("버튼 참조 (비워두면 자동 검색)")]
-        [SerializeField] private Button resumeButton;
-        [SerializeField] private Button restartButton;
-        [SerializeField] private Button quitButton;
-
-        [Header("입력 설정")]
-        [SerializeField] private KeyCode toggleKey = KeyCode.Escape;
-
-        private bool _isPaused;
-        private float _cachedTimeScale = 1f;
-
-        private void Awake()
-        {
-            CacheReferences();
-            RegisterButtonEvents();
-            HideImmediate();
-        }
-
-        private void OnDestroy()
-        {
-            UnregisterButtonEvents();
-            RestoreTimeScale();
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(toggleKey))
-            {
-                TogglePause();
-            }
-        }
-
-        public void TogglePause()
-        {
-            if (_isPaused)
-            {
-                ResumeGame();
-            }
-            else
-            {
-                PauseGame();
-            }
-        }
-
-        public void PauseGame()
-        {
-            if (_isPaused) return;
-
-            _cachedTimeScale = Time.timeScale;
-            SetTimeScale(0f);
-            _isPaused = true;
-            ApplyCanvasVisibility(1f, true);
-        }
-
-        public void ResumeGame()
-        {
-            if (!_isPaused) return;
-
-            _isPaused = false;
-            SetTimeScale(Mathf.Approximately(_cachedTimeScale, 0f) ? 1f : _cachedTimeScale);
-            ApplyCanvasVisibility(0f, false);
-        }
-
-        private void RestartGame()
-        {
-            ResumeGame();
-            var activeScene = SceneManager.GetActiveScene();
-            SceneManager.LoadScene(activeScene.buildIndex);
-        }
-
-        private void QuitGame()
-        {
-            ResumeGame();
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
-        }
-
-        private void CacheReferences()
-        {
-            if (canvasGroup == null)
-            {
-                canvasGroup = GetComponent<CanvasGroup>();
-            }
-
-            if (windowRoot == null && transform.childCount > 0)
-            {
-                windowRoot = transform.GetChild(0) as RectTransform;
-            }
-
-            var buttons = GetComponentsInChildren<Button>(true);
-            if (resumeButton == null)
-            {
-                resumeButton = Array.Find(buttons, b => b.name.IndexOf("Resume", StringComparison.OrdinalIgnoreCase) >= 0);
-            }
-            if (restartButton == null)
-            {
-                restartButton = Array.Find(buttons, b => b.name.IndexOf("Restart", StringComparison.OrdinalIgnoreCase) >= 0);
-            }
-            if (quitButton == null)
-            {
-                quitButton = Array.Find(buttons, b => b.name.IndexOf("Quit", StringComparison.OrdinalIgnoreCase) >= 0
-                                                       || b.name.IndexOf("Exit", StringComparison.OrdinalIgnoreCase) >= 0
-                                                       || b.name.IndexOf("Leave", StringComparison.OrdinalIgnoreCase) >= 0);
-            }
-        }
-
-        private void RegisterButtonEvents()
-        {
-            if (resumeButton != null)
-            {
-                resumeButton.onClick.AddListener(ResumeGame);
-            }
-
-            if (restartButton != null)
-            {
-                restartButton.onClick.AddListener(RestartGame);
-            }
-
-            if (quitButton != null)
-            {
-                quitButton.onClick.AddListener(QuitGame);
-            }
-        }
-
-        private void UnregisterButtonEvents()
-        {
-            if (resumeButton != null)
-            {
-                resumeButton.onClick.RemoveListener(ResumeGame);
-            }
-
-            if (restartButton != null)
-            {
-                restartButton.onClick.RemoveListener(RestartGame);
-            }
-
-            if (quitButton != null)
-            {
-                quitButton.onClick.RemoveListener(QuitGame);
-            }
-        }
-
-        private void HideImmediate()
-        {
-            _isPaused = false;
-            ApplyCanvasVisibility(0f, false);
-        }
-
-        private void ApplyCanvasVisibility(float alpha, bool enableInteraction)
-        {
-            if (canvasGroup == null) return;
-
-            canvasGroup.alpha = alpha;
-            canvasGroup.blocksRaycasts = enableInteraction;
-            canvasGroup.interactable = enableInteraction;
-
-            if (windowRoot != null)
-            {
-                windowRoot.gameObject.SetActive(enableInteraction);
-            }
-        }
-
-        private void SetTimeScale(float value)
-        {
-            Time.timeScale = value;
-            AudioListener.pause = value == 0f;
-        }
-
-        private void RestoreTimeScale()
-        {
-            if (Mathf.Approximately(Time.timeScale, 0f))
-            {
-                Time.timeScale = 1f;
-                AudioListener.pause = false;
-            }
-        }
-    }
-}
-
+// using System;
+// using Cysharp.Threading.Tasks;
+// using UnityEngine;
+// using UnityEngine.UI;
+// using VContainer;
+//
+// namespace DungeonShooter
+// {
+//     /// <summary>
+//     /// 일시정지 메뉴 UI. 스테이지 재시작, 메인메뉴로 이동을 제공한다.
+//     /// </summary>
+//     public class PauseMenuUI : PopupUI
+//     {
+//         [SerializeField] private RectTransform _windowRoot;
+//
+//         [SerializeField] private Button _resumeButton;
+//         [SerializeField] private Button _restartButton;
+//         [SerializeField] private Button _mainMenuButton;
+//
+//         private StageContext _stageContext;
+//         private IEventBus _eventBus;
+//         
+//         [Inject]
+//         public void Construct(IEventBus eventBus, StageContext stageContext)
+//         {
+//             _stageContext = stageContext;
+//         }
+//
+//         private void Awake()
+//         {
+//             if (_resumeButton != null)
+//                 _resumeButton.gameObject.SetActive(false);
+//             RegisterButtonEvents();
+//             base.Hide();
+//         }
+//
+//         public override void Show()
+//         {
+//             base.Show();
+//             _eventBus.Publish(new PauseRequestEvent(this, true));
+//         }
+//
+//         public override void Hide()
+//         {
+//             _eventBus.Publish(new PauseRequestEvent(this, false));
+//             base.Hide();
+//         }
+//
+//         private void OnRestartClicked()
+//         {
+//             var loader = new SceneLoader();
+//             loader.AddContext(_stageContext).LoadScene(SceneNames.StageScene).Forget();
+//         }
+//
+//         private void OnMainMenuClicked()
+//         {
+//             var loader = new SceneLoader();
+//             loader.LoadScene(SceneNames.MainMenuScene).Forget();
+//         }
+//
+//         private void RegisterButtonEvents()
+//         {
+//             if (_resumeButton != null)
+//                 _resumeButton.onClick.AddListener(() => Hide());
+//             if (_restartButton != null)
+//                 _restartButton.onClick.AddListener(OnRestartClicked);
+//             if (_mainMenuButton != null)
+//                 _mainMenuButton.onClick.AddListener(OnMainMenuClicked);
+//         }
+//
+//         private void UnregisterButtonEvents()
+//         {
+//             if (_resumeButton != null)
+//                 _resumeButton.onClick.RemoveAllListeners();
+//             if (_restartButton != null)
+//                 _restartButton.onClick.RemoveListener(OnRestartClicked);
+//             if (_mainMenuButton != null)
+//                 _mainMenuButton.onClick.RemoveListener(OnMainMenuClicked);
+//         }
+//         
+//         protected override void OnDestroy()
+//         {
+//             base.OnDestroy();
+//             UnregisterButtonEvents();
+//             if (gameObject.activeSelf)
+//                 _eventBus.Publish(new PauseRequestEvent(this, false));
+//         }
+//     }
+// }

@@ -28,6 +28,11 @@ namespace DungeonShooter
         public EnemyConfigTableEntry enemyConfigTableEntry;
     }
 
+    public struct EnemySpawnedEvent
+    {
+        public EntityBase enemy;
+    }
+
     public struct PlayerLevelChangeEvent
     {
         public int level;

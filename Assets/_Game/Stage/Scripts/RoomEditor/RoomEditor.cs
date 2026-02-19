@@ -77,13 +77,13 @@ namespace DungeonShooter
         /// <summary>
         /// Tilemaps와 Objects 게임 오브젝트 자식 구조를 생성합니다.
         /// </summary>
-        private void EnsureStructure()
+        private void InitializeRoom()
         {
-            var helper = new RoomInstantiator();
-            helper.ClearRoomObject(transform);
-            helper.ClearTiles(transform);
-            UpdateRoomSizeTiles();
-            helper.GetOrCreateChild(transform, RoomConstants.ObjectsGameObjectName).gameObject.AddOrGetComponent<Tilemap>();
+            for (int i = transform.childCount - 1; i >= 0; i--)
+            {
+                DestroyImmediate(transform.GetChild(i).gameObject);
+            }
+            UpdateRoom();
         }
 
         public void SaveMap()
@@ -119,7 +119,7 @@ namespace DungeonShooter
                 return;
             }
 
-            EnsureStructure();
+            InitializeRoom();
 
             var roomData = RoomDataSerializer.DeserializeRoom(_loadFile);
             if (roomData == null)
@@ -176,7 +176,7 @@ namespace DungeonShooter
             roomInstantiator.PlaceBaseTiles(gameObject.transform, centerPos, roomData, groundTile);
             roomInstantiator.PlaceAdditionalTilesSync(gameObject.transform, centerPos, roomData);
             roomInstantiator.PlaceObjectsSync(gameObject.transform, roomData);
-
+            roomInstantiator.GetOrCreateChild(transform, RoomConstants.ObjectsGameObjectName).gameObject.AddOrGetComponent<Tilemap>();
             EditorUtility.SetDirty(this);
             LogHandler.Log<RoomEditor>($"방 불러오기 완료: {_loadFile.name}");
         }
@@ -185,7 +185,7 @@ namespace DungeonShooter
         /// <summary>
         /// 방 크기에 맞춰 타일을 배치합니다.
         /// </summary>
-        public void UpdateRoomSizeTiles()
+        public void UpdateRoom()
         {
             if (!ValidateEditorMode()) return;
 
@@ -239,7 +239,7 @@ namespace DungeonShooter
 
 
             // 구조 재생성
-            EnsureStructure();
+            InitializeRoom();
 
             EditorUtility.SetDirty(this);
             LogHandler.Log<RoomEditor>("방이 초기 상태로 리셋되었습니다.");

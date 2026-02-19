@@ -35,6 +35,7 @@ namespace DungeonShooter
             builder.Register<RoomInstantiator>(Lifetime.Scoped);
             
             builder.Register<StageSceneUIManager>(Lifetime.Scoped);
+            builder.RegisterComponentOnNewGameObject<ObjectCullingManager>(Lifetime.Scoped);
             
             builder.Register<EntitySkillContainer>(Lifetime.Transient);
             
@@ -48,6 +49,7 @@ namespace DungeonShooter
             base.Awake();
             Container.Resolve<GameManager>();
             Container.Resolve<PlayerInputManager>();
+            Container.Resolve<ObjectCullingManager>();
             Container.Resolve<StageSceneInitializer>();
         }
     }

@@ -6,9 +6,8 @@ namespace DungeonShooter
 {
     public class StageManager
     {
-        private Stage _stage;
-
         public Stage Stage => _stage;
+        private Stage _stage;
 
         private IStageGenerator _stageGenerator;
         private IStageInstantiator _stageInstantiator;

@@ -113,7 +113,7 @@ namespace DungeonShooter
             
             if (GUILayout.Button("타일 업데이트", GUILayout.Height(25)))
             {
-                roomEditor.UpdateRoomSizeTiles();
+                roomEditor.UpdateRoom();
             }
 
             // 테이블 ID 기반 오브젝트 배치 섹션

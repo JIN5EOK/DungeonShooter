@@ -1,13 +1,9 @@
 # 미해결 이슈
-- StageInstantiator, StageGenerator를 Static 객체가 아닌 일반 객체로 변경하기
-  - https://github.com/JIN5EOK/DungeonShooter/issues/6 
-
-# 남은일들
+- 
 ## 필수 구현
 - [ ] 추가 아이템 및 스킬, 플레이어, 적 추가
   - [ ] 보스몬스터 추가
   - [ ] 플레이어블 캐릭터 1,2 완성
-  - [ ] 몇가지 적 바리에이션 추가
   - [ ] 무기와 패시브 아이템, 사용 아이템 추가
 
 - [ ] 게임 플로우
@@ -41,3 +37,5 @@
   - https://github.com/JIN5EOK/DungeonShooter/issues/4
 - ~~스탯 컴포넌트와 스킬 컴포넌트를 Pure C# 객체로 변경하기~~
   - https://github.com/JIN5EOK/DungeonShooter/issues/5
+- ~~StageInstantiator, StageGenerator를 Static 객체가 아닌 일반 객체로 변경하기~~
+  - https://github.com/JIN5EOK/DungeonShooter/issues/6 

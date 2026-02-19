@@ -295,6 +295,7 @@ namespace DungeonShooter
             var aiBT = _sceneResourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
             entityLifeTimeScope.Container.Resolve<AIComponent>().Initialize(aiBT, activeSkills);
 
+            _eventBus.Publish(new EnemySpawnedEvent { enemy = entity });
             return entity;
         }
     }
