@@ -12,48 +12,25 @@ namespace DungeonShooter
     public class EntitySkillContainer
     {
         private readonly HashSet<Skill> _skills = new();
-        
+
         public event Action<Skill> OnSkillRegisted;
         public event Action<Skill> OnSkillUnregisted;
-        
-        private IEventBus _eventBus;
 
         [Inject]
-        public EntitySkillContainer(IEventBus eventBus)
+        public EntitySkillContainer()
         {
-            _eventBus = eventBus;
         }
-        
+
+        public bool Contains(Skill skill)
+        {
+            return _skills.Contains(skill);
+        }
+
         public IReadOnlyList<Skill> GetRegistedSkills()
         {
             return _skills.ToList();
         }
 
-        /// <summary>
-        /// 스킬을 변경하고 스킬 변경 이벤트를 실행합니다.
-        /// </summary>
-        public bool SkillLevelChange(Skill before, Skill after)
-        {
-            if (!_skills.Contains(before))
-            {
-                LogHandler.LogError<EntitySkillContainer>($"이전 스킬이 존재하지 않습니다");
-                return false;
-            }
-
-            if (_skills.Contains(after))
-            {
-                LogHandler.LogError<EntitySkillContainer>($"변경하려는 스킬이 이미 존재합니다");
-                return false;
-            }
-            
-            _eventBus.Publish(new SkillLevelUpEvent {beforeSkill = before, afterSkill = after});
-            
-            after.StartCooldown(before.Cooldown);
-            Unregist(before);
-            Regist(after);
-            return true;
-        }
-        
         /// <summary>
         /// 스킬을 등록합니다. 등록 후 OnSkillRegisted를 발생시킵니다.
         /// </summary>

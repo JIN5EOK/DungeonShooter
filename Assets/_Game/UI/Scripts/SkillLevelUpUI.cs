@@ -11,52 +11,39 @@ namespace DungeonShooter
     {
         [SerializeField]
         private SkillLevelUpSlot _skillLevelUpSlotPrefab;
+        private List<SkillLevelUpSlot> _slots = new();
         
-        private List<SkillLevelUpSlot> _slots = new ();
-        
-        private ITableRepository _tableRepository;
-        private ISceneResourceProvider _sceneResourceProvider;
-        private ISkillFactory _skillFactory;
-        
-        private EntitySkillContainer _skillContainer;
         private IEventBus _eventBus;
         private IPlayerSkillManager _playerSkillManager;
+        private ISkillService _skillService;
         private IPauseManager _pauseManager;
+
         [Inject]
-        public void Construct(ITableRepository tableRepository, ISceneResourceProvider sceneResourceProvider, IPlayerSkillManager playerSkillManager, ISkillFactory skillFactory, IEventBus eventBus, IPauseManager pauseManager)
+        public void Construct(IPlayerSkillManager playerSkillManager, ISkillService skillService, IEventBus eventBus, IPauseManager pauseManager)
         {
-            _tableRepository = tableRepository;
-            _sceneResourceProvider = sceneResourceProvider;
-            _skillFactory = skillFactory;
+            _skillService = skillService;
             _eventBus = eventBus;
             _playerSkillManager = playerSkillManager;
-            _skillContainer = playerSkillManager.SkillContainer;
             _pauseManager = pauseManager;
             _eventBus.Subscribe<PlayerLevelChangeEvent>(PlayerLevelChanged);
         }
-        
+
         private void PlayerLevelChanged(PlayerLevelChangeEvent playerLevelChangeEvent)
         {
-            Show();
+            SetLevelUpSkillAndShow();
         }
         
         /// <summary>
         /// 지니고 있는 스킬중 레벨업 가능한 스킬을 찾아내어 표시
         /// </summary>
-        public override void Show()
+        public void SetLevelUpSkillAndShow()
         {
-            var skills = _skillContainer.GetRegistedSkills();
-            
+            var skills = _playerSkillManager?.SkillContainer?.GetRegistedSkills();
+            var levelUpableList = _skillService.GetLevelUpableSkills(skills);
+
             var slotIndex = 0;
-            foreach (var skill in skills)
+            foreach (var info in levelUpableList)
             {
-                var nextSkillEntry =
-                    _tableRepository.GetTableEntry<SkillTableEntry>(skill.SkillTableEntry.CalculateNextLevelSkillId());
-
-                // 스킬이 최대 레벨이면 다음 레벨 ID로 반환 안되므로 표시 X
-                if (nextSkillEntry == null)
-                    continue;
-
                 if (_slots.Count <= slotIndex)
                 {
                     var slotInstance = Instantiate(_skillLevelUpSlotPrefab, transform);
@@ -65,38 +52,40 @@ namespace DungeonShooter
 
                 var slot = _slots[slotIndex];
                 slot.gameObject.SetActive(true);
-                
-                slot._currentSkillInfo.SetInfo(skill.SkillTableEntry.SkillName
-                    , skill.SkillTableEntry.SkillDescription
-                    , skill.SkillTableEntry.Cooldown
-                    , _sceneResourceProvider.GetAssetSync<Sprite>(skill.SkillTableEntry.SkillIconKey,SpriteAtlasAddresses.SkillIconAtlas));
-                
-                slot._nextSkillInfo.SetInfo(nextSkillEntry.SkillName
-                    , nextSkillEntry.SkillDescription
-                    , nextSkillEntry.Cooldown
-                    , _sceneResourceProvider.GetAssetSync<Sprite>(nextSkillEntry.SkillIconKey,SpriteAtlasAddresses.SkillIconAtlas));
-                
+
+                var currentEntry = info.CurrentSkill.SkillTableEntry;
+                slot._currentSkillInfo.SetInfo(currentEntry.SkillName, currentEntry.SkillDescription, currentEntry.Cooldown, info.CurrentIcon);
+
+                var nextEntry = info.NextLevelEntry;
+                slot._nextSkillInfo.SetInfo(nextEntry.SkillName, nextEntry.SkillDescription, nextEntry.Cooldown, info.NextLevelIcon);
+
                 slot.SetSelectHandler(() =>
                 {
-                    _playerSkillManager.SkillContainer.SkillLevelChange(skill, _skillFactory.CreateSkillSync(nextSkillEntry.Id));
+                    _skillService.TrySkillLevelUp(_playerSkillManager?.SkillContainer, info.CurrentSkill);
                     Hide();
                 });
-                
+
                 slotIndex++;
             }
 
+            // 레벨업 가능 스킬 슬롯이 1개 이상일때만 UI 표시
             if (slotIndex > 0)
             {
-                base.Show();
-                _pauseManager?.PauseRequest(this);
+                Show();
             }
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            _pauseManager?.PauseRequest(this);
         }
 
         public override void Hide()
         {
             foreach (var slot in _slots)
                 slot.gameObject.SetActive(false);
-            
+
             _pauseManager?.ResumeRequest(this);
             base.Hide();
         }
