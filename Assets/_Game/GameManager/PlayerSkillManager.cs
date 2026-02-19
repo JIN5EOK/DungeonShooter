@@ -45,11 +45,10 @@ namespace DungeonShooter
             // 비효율적.. 개선 필요할듯
             for (var i = 0; i < _activeSkillSlots.Length; i++)
             {
-                var activeSkill = _activeSkillSlots[i];
-                if (skillLevelUpEvent.beforeSkill == activeSkill)
+                if (skillLevelUpEvent.beforeSkill == _activeSkillSlots[i])
                 {
                     _activeSkillSlots[i] = skillLevelUpEvent.afterSkill;
-                    OnActiveSkillSlotChanged?.Invoke(i, activeSkill);
+                    OnActiveSkillSlotChanged?.Invoke(i, skillLevelUpEvent.afterSkill);
                 }
             }
         }
