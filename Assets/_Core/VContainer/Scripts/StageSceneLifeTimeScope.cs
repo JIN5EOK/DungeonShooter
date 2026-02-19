@@ -14,7 +14,7 @@ namespace DungeonShooter
         {
             new CommonSceneInstaller().Install(builder);
             
-            builder.Register<GameManager>(Lifetime.Scoped);
+            builder.Register<EntityManager>(Lifetime.Scoped);
             builder.Register<PlayerStatusManager>(Lifetime.Scoped);
             builder.Register<PlayerInputManager>(Lifetime.Scoped);
             builder.Register<PlayerSkillManager>(Lifetime.Scoped).AsImplementedInterfaces();
@@ -47,7 +47,7 @@ namespace DungeonShooter
         protected override void Awake()
         {
             base.Awake();
-            Container.Resolve<GameManager>();
+            Container.Resolve<EntityManager>();
             Container.Resolve<PlayerInputManager>();
             Container.Resolve<ObjectCullingManager>();
             Container.Resolve<StageSceneInitializer>();
