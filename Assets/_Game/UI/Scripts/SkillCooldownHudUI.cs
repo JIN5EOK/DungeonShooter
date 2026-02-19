@@ -94,6 +94,7 @@ namespace DungeonShooter
         
         protected override void OnDestroy()
         {
+            _activeSkillSlotGroup.OnActiveSkillSlotChanged -= SkillSlotGroupChanged;
             base.OnDestroy();
             Clear();
         }
