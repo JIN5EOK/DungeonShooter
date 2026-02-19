@@ -11,19 +11,23 @@ namespace DungeonShooter
     {
         private IEventBus _eventBus;
         private InputManager _inputManager;
+        private IPauseManager _pauseManager;
         private EntityInputContext _entityInputContext;
         private Inventory _inventory;
         private IPlayerSkillManager _skillManager;
         private StageSceneUIManager _stageSceneUIManager;
+
         [Inject]
-        public PlayerInputManager(InputManager inputManager, 
-            IEventBus eventBus, 
+        public PlayerInputManager(InputManager inputManager,
+            IEventBus eventBus,
+            IPauseManager pauseManager,
             Inventory inventory,
             StageSceneUIManager stageSceneUIManager,
             IPlayerSkillManager skillManager)
         {
             _inputManager = inputManager;
             _eventBus = eventBus;
+            _pauseManager = pauseManager;
             _inventory = inventory;
             _stageSceneUIManager = stageSceneUIManager;
             _skillManager = skillManager;
@@ -58,9 +62,9 @@ namespace DungeonShooter
 
         public void UnsubscribeFromInput()
         {
-            if (_inputManager == null ) 
+            if (_inputManager == null)
                 return;
-            
+
             _inputManager.OnMoveInputChanged -= OnHandleMoveInput;
             _inputManager.OnDashPressed -= OnDashInput;
             _inputManager.OnWeaponAttack -= OnWeaponAttack;
@@ -70,43 +74,53 @@ namespace DungeonShooter
             _inputManager.OnEscapePressed -= OnEscapeInput;
         }
 
+        private bool CanProcessGameInput()
+        {
+            return _entityInputContext != null && !_pauseManager.IsPaused;
+        }
+
+        private bool CanProcessEscapeInput()
+        {
+            return !_pauseManager.IsPaused;
+        }
+
         private void OnHandleMoveInput(Vector2 input)
         {
-            if (_entityInputContext == null)
+            if (!CanProcessGameInput())
                 return;
-            
+
             _entityInputContext.MoveInput = input;
         }
 
         private void OnDashInput(bool isPressed)
         {
-            if (_entityInputContext == null)
+            if (!CanProcessGameInput())
                 return;
-            
+
             _entityInputContext.DashInput = isPressed;
         }
 
         private void OnWeaponAttack(bool isPressed)
         {
-            if (_entityInputContext == null)
+            if (!CanProcessGameInput())
                 return;
-            
+
             SkillInputInternal(_inventory?.EquippedWeapon?.ActiveSkill, isPressed);
         }
 
         private void OnSkill1Input(bool isPressed)
         {
-            if (_entityInputContext == null)
+            if (!CanProcessGameInput())
                 return;
-            
+
             SkillInputInternal(_skillManager?.GetActiveSkill(0), isPressed);
         }
 
         private void OnSkill2Input(bool isPressed)
         {
-            if (_entityInputContext == null)
+            if (!CanProcessGameInput())
                 return;
-            
+
             SkillInputInternal(_skillManager?.GetActiveSkill(1), isPressed);
         }
 
@@ -124,17 +138,17 @@ namespace DungeonShooter
         
         private void OnInteractInput(bool isPressed)
         {
-            if (_entityInputContext == null)
+            if (!CanProcessGameInput())
                 return;
-            
+
             _entityInputContext.InteractInput = isPressed;
         }
 
         private void OnEscapeInput(bool isPressed)
         {
-            if (isPressed == false)
+            if (!isPressed || !CanProcessEscapeInput())
                 return;
-            
+
             if (!_stageSceneUIManager.IsInventoryActivated())
                 _stageSceneUIManager.ShowInventory();
             else
