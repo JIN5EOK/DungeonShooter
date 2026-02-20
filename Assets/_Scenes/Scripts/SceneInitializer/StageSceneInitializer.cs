@@ -7,8 +7,10 @@ namespace DungeonShooter
     /// <summary>
     /// 스테이지 씬 진입 시 플레이어 세션 초기화 및 스테이지 생성을 담당합니다.
     /// </summary>
-    public class StageSceneInitializer : MonoBehaviour
+    public class StageSceneInitializer : MonoBehaviour, ISceneInitializer
     {
+        public bool IsSceneInitialized { get; private set; }
+        
         private StageContext _stageContext;
         private ITableRepository _tableRepository;
         private IStageGenerator _stageGenerator;
@@ -45,6 +47,7 @@ namespace DungeonShooter
         {
             await InitializePlayerData();
             await CreateStageAsync();
+            IsSceneInitialized = true;
         }
 
         /// <summary>
@@ -81,5 +84,7 @@ namespace DungeonShooter
             await _stageSceneUIManager.InitializeAsync();
             _stageSceneUIManager.ShowHud();
         }
+
+        
     }
 }

@@ -17,10 +17,9 @@ namespace DungeonShooter
         EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
 
-    // TODO: 팩토리의 책임이 너무 비대해져서(UI 바인딩 및 컴포넌트까지 들고 있게 됨, 분리가 필요함)
     /// <summary>
     /// 런타임 중 플레이어 캐릭터를 생성하는 팩토리.
-    /// 엔티티 컴포넌트 초기화 및 플레이어 관련 UI 생성·이벤트 연동을 담당합니다.
+    /// 엔티티 컴포넌트 초기화 및 플레이어 관련 UI 생성/이벤트 연동을 담당합니다.
     /// </summary>
     public class PlayerFactory : IPlayerFactory
     {
@@ -135,9 +134,9 @@ namespace DungeonShooter
             var interactComponent = entityLifeTimeScope.Container.Resolve<InteractComponent>();
             var dashComponent = entityLifeTimeScope.Container.Resolve<DashComponent>();
             var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();
-            healthComponent.OnDeath += () => Object.Destroy(entity.gameObject);
             var cameraTrackComponent = entityLifeTimeScope.Container.Resolve<CameraTrackComponent>();
             var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
+            
             await cameraTrackComponent.AttachCameraAsync();
             
             var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
@@ -149,6 +148,7 @@ namespace DungeonShooter
 
             healthComponent.OnDeath += () =>
             {
+                Object.Destroy(entity.gameObject);
                 _eventBus.Publish(new PlayerDeadEvent() {player = entity, position = playerInstance.transform.position, playerConfigTableEntry = config});
             };
             
