@@ -17,13 +17,16 @@ namespace _MainMenu
     public class GameStartService : IGameStartService
     {
         private readonly ITableRepository _tableRepository;
+        private readonly SceneLoader _sceneLoader;
 
         public PlayerConfigTableEntry SelectedPlayer { get; set; }
         public StageConfigTableEntry SelectedStage { get; set; }
 
-        public GameStartService(ITableRepository tableRepository)
+        [Inject]
+        public GameStartService(ITableRepository tableRepository, SceneLoader sceneLoader)
         {
             _tableRepository = tableRepository;
+            _sceneLoader = sceneLoader;
         }
 
         public IReadOnlyList<PlayerConfigTableEntry> GetSelectablePlayers()
@@ -41,9 +44,8 @@ namespace _MainMenu
             if (SelectedPlayer == null || SelectedStage == null)
                 return;
 
-            var loader = new SceneLoader();
             var context = new StageContext(SelectedPlayer.Id, SelectedStage.Id);
-            await loader.AddContext(context).LoadScene(SceneNames.StageScene);
+            await _sceneLoader.LoadScene(SceneNames.StageScene, context);
         }
     }
 }

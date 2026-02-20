@@ -1,5 +1,4 @@
 using UnityEngine;
-using VContainer.Unity;
 
 namespace DungeonShooter
 {

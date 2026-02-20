@@ -1,12 +1,10 @@
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using VContainer;
 
 namespace DungeonShooter
 {
-    public class MainMenuSceneInitializer : MonoBehaviour, ISceneInitializer
+    public class MainMenuSceneInitializer : SceneInitializerBase
     {
-        public bool IsSceneInitialized { get; private set; }
         private UIManager _uiManager;
         private GameStartUI _gameStartUI;
 
@@ -26,8 +24,6 @@ namespace DungeonShooter
         {
             _uiManager.RemoveUI(_gameStartUI);
         }
-
-        
     }
 
 }

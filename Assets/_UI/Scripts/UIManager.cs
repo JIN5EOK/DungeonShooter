@@ -8,7 +8,7 @@ using VContainer;
 namespace DungeonShooter
 {
     /// <summary>
-    /// UI 생성/제거 및 타입별 캔버스·정렬을 담당하는 매니저.
+    /// 씬별 UI 생성/제거 및 타입별 캔버스/정렬을 담당하는 매니저.
     /// </summary>
     public class UIManager : MonoBehaviour
     {

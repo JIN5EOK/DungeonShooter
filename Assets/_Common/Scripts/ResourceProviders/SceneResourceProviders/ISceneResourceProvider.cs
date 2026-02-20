@@ -5,6 +5,9 @@ using Object = UnityEngine.Object;
 
 namespace DungeonShooter
 {
+    /// <summary>
+    /// 씬과 생명주기를 함께하는 에셋이나 인스턴스를 제공
+    /// </summary>
     public interface ISceneResourceProvider : IDisposable
     {
         UniTask<GameObject> GetInstanceAsync(string address, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);

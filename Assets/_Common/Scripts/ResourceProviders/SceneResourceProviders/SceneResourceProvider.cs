@@ -42,7 +42,7 @@ namespace DungeonShooter
         /// </summary>
         public GameObject GetInstanceSync(string address, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
-            var handle = _addressablesScope.InstantiateAsync(address, position,  rotation, parent, instantiateInWorldSpace);
+            var handle = _addressablesScope.InstantiateAsync(address, position, rotation, parent, instantiateInWorldSpace);
             handle.WaitForCompletion();
             return GetInstanceInternal(handle, address);
         }

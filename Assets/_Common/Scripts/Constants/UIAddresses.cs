@@ -11,5 +11,7 @@ namespace DungeonShooter
         public const string GameStartUIAddress = "CharacterSelectUI";
         public const string UI_GameResult = "UI_GameResult";
         public const string UI_GamePause = "UI_GamePause";
+        
+        public const string UI_Loading = "UI_Loading";
     }
 }

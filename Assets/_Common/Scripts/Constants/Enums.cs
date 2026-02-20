@@ -31,7 +31,15 @@ namespace DungeonShooter
     public enum UIType
     {
         HudUI,
-        PopupUI
+        PopupUI,
+        LoadingOverlay
+    }
+
+    /// <summary> 로딩 UI 종류. 묵직한 로딩(윈도우) / 가벼운 로딩(스피너) 구분 </summary>
+    public enum LoadingType
+    {
+        LoadingWindow,
+        LoadingSpinner
     }
     
     public enum SkillOwner
