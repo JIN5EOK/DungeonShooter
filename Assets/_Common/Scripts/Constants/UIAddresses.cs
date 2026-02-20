@@ -3,6 +3,7 @@ namespace DungeonShooter
     public static class UIAddresses
     {
         public const string UI_HpHud = "UI_HpHud";
+        public const string UI_PlayerStatusHud = "UI_PlayerStatusHud";
         public const string UI_SkillCooldownHud = "UI_SkillCooldownHud";
         public const string UI_ExpHud = "UI_ExpHud";
         public const string UI_Inventory = "UI_Inventory";

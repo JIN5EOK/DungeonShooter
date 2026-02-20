@@ -88,6 +88,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a7f2c8e1d4b94f5e8c3a9b0e2d1f6a4c
+    m_Address: UI_PlayerStatusHud
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 550f8ea83664141b3ae95895d662ca51
     m_Address: FireballExplosion_Particle
     m_ReadOnly: 0

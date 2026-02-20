@@ -8,7 +8,7 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerStatusManager : IDisposable
     {
-        public EntityStatContainer StatContainer { get; private set; }
+        public EntityStatContainer StatContainer { get; private set; } = new();
         public event Action<int> OnHpChanged;
 
         public int Hp
@@ -58,7 +58,6 @@ namespace DungeonShooter
                 return;
             }
 
-            StatContainer = new EntityStatContainer();
             StatContainer.Initialize(statsEntry);
             Hp = StatContainer.GetStat(StatType.Hp).GetValue();
         }
