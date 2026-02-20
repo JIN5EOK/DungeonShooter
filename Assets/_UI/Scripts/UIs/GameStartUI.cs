@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using VContainer;
+using _MainMenu;
 
 namespace DungeonShooter
 {
@@ -42,36 +43,35 @@ namespace DungeonShooter
         private readonly List<Button> _characterButtons = new();
         private readonly List<Button> _stageButtons = new();
         private GameObject _previewInstance;
+        private IGameStartService _gameStartService;
         private ITableRepository _tableRepository;
         private ISceneResourceProvider _resourceProvider;
-        private PlayerConfigTableEntry _selectedEntry;
-        private StageConfigTableEntry _selectedStageEntry;
 
         /// <summary> 현재 선택된 플레이어 설정 엔트리 </summary>
-        public PlayerConfigTableEntry SelectedPlayerConfigEntry => _selectedEntry;
+        public PlayerConfigTableEntry SelectedPlayerConfigEntry => _gameStartService?.SelectedPlayer;
         /// <summary> 현재 선택된 스테이지 설정 엔트리 </summary>
-        public StageConfigTableEntry SelectedStageConfigEntry => _selectedStageEntry;
+        public StageConfigTableEntry SelectedStageConfigEntry => _gameStartService?.SelectedStage;
         /// <summary> 캐릭터 선택 시 이벤트 </summary>
         public event Action<PlayerConfigTableEntry> OnCharacterSelected;
         /// <summary> 스테이지 선택 시 이벤트 </summary>
         public event Action<StageConfigTableEntry> OnStageSelected;
-        /// <summary> 게임 시작 버튼 클릭 시 이벤트 (선택된 캐릭터/스테이지로 실제 시작은 구독처에서 처리) </summary>
-        public event Action OnGameStartRequested;
 
         [Inject]
-        public void Construct(ITableRepository tableRepository, ISceneResourceProvider resourceProvider)
+        public void Construct(IGameStartService gameStartService, ITableRepository tableRepository, ISceneResourceProvider resourceProvider)
         {
+            _gameStartService = gameStartService;
             _tableRepository = tableRepository;
             _resourceProvider = resourceProvider;
             SetupPreviewCameraAndTexture();
-            var characterEntries = _tableRepository.GetAllTableEntries<PlayerConfigTableEntry>();
+
+            var characterEntries = _gameStartService.GetSelectablePlayers();
             foreach (var entry in characterEntries)
             {
                 AddCharacterButton(entry);
             }
 
             ClearStageButtons();
-            var stageEntries = _tableRepository.GetAllTableEntries<StageConfigTableEntry>();
+            var stageEntries = _gameStartService.GetSelectableStages();
             foreach (var entry in stageEntries)
             {
                 AddStageButton(entry);
@@ -81,7 +81,7 @@ namespace DungeonShooter
             if (_gameStartButton != null)
                 _gameStartButton.interactable = false;
             if (_gameStartButton != null)
-                _gameStartButton.onClick.AddListener(GameStart);
+                _gameStartButton.onClick.AddListener(OnGameStartButtonClicked);
         }
 
         private void SetupPreviewCameraAndTexture()
@@ -177,7 +177,8 @@ namespace DungeonShooter
 
         private void SelectStage(StageConfigTableEntry entry)
         {
-            _selectedStageEntry = entry;
+            if (_gameStartService != null)
+                _gameStartService.SelectedStage = entry;
             SetCharacterButtonsInteractable(true);
             OnStageSelected?.Invoke(entry);
         }
@@ -215,7 +216,8 @@ namespace DungeonShooter
 
         private void SelectCharacter(PlayerConfigTableEntry entry)
         {
-            _selectedEntry = entry;
+            if (_gameStartService != null)
+                _gameStartService.SelectedPlayer = entry;
             RefreshInfoPanel();
             LoadAndShowPreview(entry);
             if (_gameStartButton != null)
@@ -225,7 +227,8 @@ namespace DungeonShooter
 
         private void RefreshInfoPanel()
         {
-            if (_selectedEntry == null)
+            var selectedEntry = _gameStartService?.SelectedPlayer;
+            if (selectedEntry == null)
             {
                 SetInfoText(_infoName, string.Empty);
                 SetInfoText(_infoDescription, string.Empty);
@@ -235,14 +238,14 @@ namespace DungeonShooter
                 return;
             }
 
-            SetInfoText(_infoName, _selectedEntry.Name);
-            SetInfoText(_infoDescription, _selectedEntry.Description);
+            SetInfoText(_infoName, selectedEntry.Name);
+            SetInfoText(_infoDescription, selectedEntry.Description);
 
-            var weaponEntry = _tableRepository?.GetTableEntry<ItemTableEntry>(_selectedEntry.StartWeaponId);
+            var weaponEntry = _tableRepository?.GetTableEntry<ItemTableEntry>(selectedEntry.StartWeaponId);
             SetInfoText(_infoStartWeapon, weaponEntry?.ItemName ?? string.Empty);
 
-            var skill1 = _tableRepository?.GetTableEntry<SkillTableEntry>(_selectedEntry.Skill1Id);
-            var skill2 = _tableRepository?.GetTableEntry<SkillTableEntry>(_selectedEntry.Skill2Id);
+            var skill1 = _tableRepository?.GetTableEntry<SkillTableEntry>(selectedEntry.Skill1Id);
+            var skill2 = _tableRepository?.GetTableEntry<SkillTableEntry>(selectedEntry.Skill2Id);
             var skillNames = new List<string>();
             if (!string.IsNullOrEmpty(skill1?.SkillName))
                 skillNames.Add(skill1.SkillName);
@@ -250,7 +253,7 @@ namespace DungeonShooter
                 skillNames.Add(skill2.SkillName);
             SetInfoText(_infoSkills, string.Join(", ", skillNames));
 
-            var statsEntry = _tableRepository?.GetTableEntry<EntityStatsTableEntry>(_selectedEntry.StatsId);
+            var statsEntry = _tableRepository?.GetTableEntry<EntityStatsTableEntry>(selectedEntry.StatsId);
             if (statsEntry != null)
             {
                 var statsText = $"체력: {statsEntry.MaxHp}  공격력: {statsEntry.Attack}  방어력: {statsEntry.Defense}  이동속도: {statsEntry.MoveSpeed}";
@@ -279,11 +282,11 @@ namespace DungeonShooter
             }
         }
 
-        private void GameStart()
+        private void OnGameStartButtonClicked()
         {
-            if (_selectedEntry == null || _selectedStageEntry == null)
+            if (_gameStartService == null)
                 return;
-            OnGameStartRequested?.Invoke();
+            _gameStartService.GameStart().Forget();
         }
     }
 }
