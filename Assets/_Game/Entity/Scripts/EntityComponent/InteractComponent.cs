@@ -9,10 +9,24 @@ namespace DungeonShooter
     /// </summary>
     public class InteractComponent : MonoBehaviour
     {
+        private const float NoticeOffsetY = 1.2f;
+
         [Header("감지할 트리거")]
         [SerializeField]
         private TriggerDetector2D _triggerDetector2D;
         private HashSet<IInteractable> _nearbyInteractables = new HashSet<IInteractable>();
+        private Transform _currentTarget;
+        private GameObject _interactNotice;
+
+        /// <summary>
+        /// 상호작용 노티스 게임오브젝트를 설정합니다. (플레이어 팩토리 등에서 생성해 주입)
+        /// </summary>
+        public void SetInteractNotice(GameObject notice)
+        {
+            _interactNotice = notice;
+            if (_interactNotice != null)
+                _interactNotice.SetActive(false);
+        }
 
         private void Start()
         {
@@ -28,77 +42,78 @@ namespace DungeonShooter
                 triggerGo.transform.localRotation = Quaternion.identity;
                 triggerGo.transform.localScale = Vector3.one;
             }
-            // 상호작용 객체만 찾도록 타입 설정
             _triggerDetector2D.TargetType = typeof(IInteractable);
             _triggerDetector2D.OnTargetEntered += RegisterInteractable;
             _triggerDetector2D.OnTargetExited += UnregisterInteractable;
         }
 
         /// <summary>
-        /// 상호작용 가능한 오브젝트를 등록합니다.
+        /// 타겟이 없으면 컬렉션에서 첫 번째 유효 대상을 타겟으로 정한 뒤, 노티스 표시/위치를 갱신합니다.
+        /// </summary>
+        private void RefreshTarget()
+        {
+            if (_interactNotice == null)
+                return;
+            if (_currentTarget == null)
+            {
+                foreach (var interactable in _nearbyInteractables)
+                {
+                    if (interactable == null || !interactable.CanInteract)
+                        continue;
+                    if (interactable is MonoBehaviour mb)
+                    {
+                        _currentTarget = mb.transform;
+                        break;
+                    }
+                }
+            }
+            if (_currentTarget == null)
+            {
+                _interactNotice.SetActive(false);
+                return;
+            }
+            _interactNotice.SetActive(true);
+            _interactNotice.transform.position = _currentTarget.position + Vector3.up * NoticeOffsetY;
+        }
+
+        /// <summary>
+        /// 상호작용 가능한 오브젝트를 등록합니다. 새로 들어온 대상을 타겟으로 설정합니다.
         /// </summary>
         private void RegisterInteractable(Component component)
         {
             var interactable = component as IInteractable;
             if (interactable == null)
-            {
                 return;
-            }
-            LogHandler.Log<InteractComponent>($"Registering interactable {interactable})]");
             _nearbyInteractables.Add(interactable);
+            _currentTarget = component.transform;
+            RefreshTarget();
         }
 
         /// <summary>
-        /// 상호작용 가능한 오브젝트를 제거합니다.
+        /// 상호작용 가능한 오브젝트를 제거합니다. 타겟이 빠져나가면 컬렉션에서 첫 번째를 타겟으로 설정합니다.
         /// </summary>
         private void UnregisterInteractable(Component component)
         {
             var interactable = component as IInteractable;
             if (interactable == null)
-            {
                 return;
-            }
-            LogHandler.Log<InteractComponent>($"UnRegistering interactable {interactable})]");
+            var wasCurrent = _currentTarget == component.transform;
             _nearbyInteractables.Remove(interactable);
+            if (wasCurrent)
+                _currentTarget = null;
+            RefreshTarget();
         }
 
         /// <summary>
-        /// 상호작용을 시도합니다.
+        /// 상호작용을 시도합니다. 현재 타겟과 상호작용합니다.
         /// </summary>
         public void TryInteract()
         {
-            // 가장 가까운 상호작용 가능한 오브젝트 찾기
-            IInteractable closestInteractable = null;
-            var closestDistance = float.MaxValue;
-
-            foreach (IInteractable interactable in _nearbyInteractables)
-            {
-                if (interactable != null && interactable.CanInteract)
-                {
-                    // MonoBehaviour인 경우 거리 계산
-                    if (interactable is MonoBehaviour mb)
-                    {
-                        var distance = Vector2.Distance(transform.position, mb.transform.position);
-                        if (distance < closestDistance)
-                        {
-                            closestDistance = distance;
-                            closestInteractable = interactable;
-                        }
-                    }
-                    else
-                    {
-                        // MonoBehaviour가 아닌 경우 첫 번째로 발견된 것 사용
-                        closestInteractable = interactable;
-                        break;
-                    }
-                }
-            }
-
-            // 상호작용 수행
-            if (closestInteractable != null)
-            {
-                closestInteractable.Interact();
-            }
+            RefreshTarget();
+            if (_currentTarget == null)
+                return;
+            if (_currentTarget.TryGetComponent<IInteractable>(out var interactable))
+                interactable.Interact();
         }
     }
 }

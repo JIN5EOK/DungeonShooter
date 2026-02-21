@@ -65,8 +65,6 @@ namespace DungeonShooter
                 (Vector2)context.Caster.transform.position;
 
             var targets = FindTargetsInRange(center, context);
-
-            var isSucceed = true;
             
             foreach (var target in targets)
             {

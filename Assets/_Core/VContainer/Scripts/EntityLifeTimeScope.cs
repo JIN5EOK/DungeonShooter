@@ -13,6 +13,7 @@ namespace DungeonShooter
             builder.Register<MoveState>(Lifetime.Scoped).AsSelf();
             builder.Register<SkillState>(Lifetime.Scoped).AsSelf();
             builder.Register<DashState>(Lifetime.Scoped).AsSelf();
+            builder.Register<InteractState>(Lifetime.Scoped).AsSelf();
             
             builder.Register(container => AddComponentAndInject<EntityBase>(), Lifetime.Scoped);
             builder.Register(container => AddComponentAndInject<EntityAnimationHandler>(), Lifetime.Scoped);

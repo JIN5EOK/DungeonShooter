@@ -11,18 +11,14 @@ namespace DungeonShooter
     /// </summary>
     public class SkillCooldownSlot : MonoBehaviour
     {
-        [Header("UI 요소")]
         [SerializeField] private Image _skillIcon;
         [SerializeField] private Image _cooldownOverlay;
         [SerializeField] private TextMeshProUGUI _cooldownText;
-
-        [Header("시각적 설정")]
-        [SerializeField] private Color _readyColor = Color.white;
-
-        [Header("애니메이션")]
-        [SerializeField] private bool _enableReadyPulse = true;
-        [SerializeField] private float _pulseSpeed = 3f;
-        [SerializeField] private float _pulseIntensity = 0.2f;
+        
+        private Color _readyColor = Color.white;
+        
+        private float _pulseSpeed = 3f;
+        private float _pulseIntensity = 0.2f;
 
         private Skill _skill;
         private float _maxCooldown;

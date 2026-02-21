@@ -93,10 +93,11 @@ namespace DungeonShooter
 
                 var sqrDist = ((Vector2)entity.transform.position - playerPos).sqrMagnitude;
                 var shouldBeActive = sqrDist <= _activationDistance * _activationDistance;
+                var shouldBeDeactive = sqrDist >= _deactivationDistance * _deactivationDistance;
 
                 if (shouldBeActive && !entity.gameObject.activeSelf)
                     entity.gameObject.SetActive(true);
-                else if (!shouldBeActive && entity.gameObject.activeSelf)
+                else if (shouldBeDeactive && entity.gameObject.activeSelf)
                     entity.gameObject.SetActive(false);
             }
 

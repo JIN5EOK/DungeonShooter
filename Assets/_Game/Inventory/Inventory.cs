@@ -71,9 +71,8 @@ namespace DungeonShooter
                 var remaining = item.StackCount - existingItem.AddStack(item.StackCount);
                 if (remaining > 0)
                 {
-                    // 받은 아이템의 스택 개수를 남은 개수로 설정하고 사용
+                    // 받은 아이템의 스택 개수를 남은 개수로 설정
                     item.StackCount = remaining;
-                    _items.Add(item);
                 }
             }
             else // 없는 경우 새 아이템 추가

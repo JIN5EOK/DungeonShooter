@@ -1,3 +1,5 @@
+using System.Collections;
+using Jin5eok;
 using UnityEngine;
 using VContainer;
 
@@ -9,14 +11,17 @@ namespace DungeonShooter
     [RequireComponent(typeof(Collider2D))]
     public class FieldItem : MonoBehaviour, IInteractable
     {
+        private const float DespawnSeconds = 15f;
+
         private Item item;
         private Inventory _inventory;
-        
+        private Coroutine _despawnCoroutine;
+
         public bool CanInteract => _canInteract;
         private bool _canInteract = true;
-        
+        private SpriteRenderer _spriteRenderer;
         public Item Item => item;
-        
+
         [Inject]
         public void Construct(Inventory inventory)
         {
@@ -39,15 +44,19 @@ namespace DungeonShooter
         {
             item = itemToSet;
             ApplyItemIcon();
+            StartDespawnTimer();
         }
 
         private void ApplyItemIcon()
         {
-            var spriteRenderer = GetComponent<SpriteRenderer>();
-            if (spriteRenderer == null)
-                spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
-
-            spriteRenderer.sprite = item != null ? item.Icon : null;
+            if (_spriteRenderer == null)
+            {
+                _spriteRenderer = gameObject.AddOrGetComponent<SpriteRenderer>();
+                if (_spriteRenderer == null)
+                    return;
+            }
+            
+            _spriteRenderer.sprite = item != null ? item.Icon : null;
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -96,6 +105,34 @@ namespace DungeonShooter
         /// </summary>
         private void OnCollected()
         {
+            Despawn();
+        }
+
+        private void StartDespawnTimer()
+        {
+            StopDespawnTimer();
+            _despawnCoroutine = StartCoroutine(DespawnAfterSeconds(DespawnSeconds));
+        }
+
+        private void StopDespawnTimer()
+        {
+            if (_despawnCoroutine != null)
+            {
+                StopCoroutine(_despawnCoroutine);
+                _despawnCoroutine = null;
+            }
+        }
+
+        private IEnumerator DespawnAfterSeconds(float seconds)
+        {
+            yield return new WaitForSeconds(seconds);
+            _despawnCoroutine = null;
+            Despawn();
+        }
+
+        private void Despawn()
+        {
+            StopDespawnTimer();
             var poolable = GetComponent<PoolableComponent>();
             if (poolable != null)
                 poolable.Release();

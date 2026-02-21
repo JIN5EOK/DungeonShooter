@@ -50,6 +50,12 @@ namespace DungeonShooter
                 return;
             }
 
+            if (input.InteractInput)
+            {
+                _entityStateMachine.RequestChangeState(EntityStates.Interact);
+                return;
+            }
+
             if (input.SkillInput != null)
             {
                 _entityStateMachine.RequestChangeState(EntityStates.Skill);

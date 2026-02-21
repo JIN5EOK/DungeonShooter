@@ -24,7 +24,8 @@ namespace DungeonShooter
             IdleState idleState,
             MoveState moveState,
             SkillState skillState,
-            DashState dashState)
+            DashState dashState,
+            InteractState interactState)
         {
             Entity =  entityBase;
             _states = new Dictionary<EntityStates, IEntityState>
@@ -32,7 +33,8 @@ namespace DungeonShooter
                 { EntityStates.Idle, idleState },
                 { EntityStates.Move, moveState },
                 { EntityStates.Skill, skillState },
-                { EntityStates.Dash, dashState }
+                { EntityStates.Dash, dashState },
+                { EntityStates.Interact, interactState }
             };
 
             foreach (var state in _states.Values)
