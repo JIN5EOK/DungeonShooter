@@ -30,6 +30,9 @@ namespace DungeonShooter
 
         /// <summary>활성 스킬 ID 목록</summary>
         public List<int> ActiveSkills { get; set; } = new();
+
+        /// <summary>드랍 아이템 가중치 (아이템 ID -> 가중치). 예: "1001:10/1002:5"</summary>
+        public Dictionary<int, int> DropItemWeights { get; set; } = new();
     }
 }
 
