@@ -1,4 +1,4 @@
 Memo,Id,ItemName,ItemDescription,ItemType,MaxStackCount,UseSkillId,PassiveSkillId,EquipSkillId,ActiveSkillId,ItemIcon,HpAdd,HpMultiply,AttackAdd,AttackMultiply,DefenseAdd,DefenseMultiply,MoveSpeedAdd,MoveSpeedMultiply
 ,15000001,숏소드,짧은 철제 검입니다.,Weapon,1,,,,14000201,Sword_Icon,0,100,50,100,0,100,0,100
 ,15000002,마왕의 검,아주 강력한 검입니다.,Weapon,1,,,,14000201,Sword_Icon,0,100,100,100,0,100,0,100
-,15000003,체력 포션,체력을 회복하는 포션입니다.,Consume,5,,,,,Sword_Icon
+,15000003,체력 포션,체력을 회복하는 포션입니다.,Consume,5,,,,,Sword_Icon,0,100,100,100,0,100,0,100

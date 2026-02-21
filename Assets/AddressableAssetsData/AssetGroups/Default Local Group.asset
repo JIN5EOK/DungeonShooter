@@ -164,6 +164,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 90e7fdc4e6fd94340a5d599ac37466e5
+    m_Address: FieldItem
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 917cb0225d5d74cc39b774de44c36d2b
     m_Address: CharacterSelectUI
     m_ReadOnly: 0
