@@ -121,27 +121,19 @@ namespace DungeonShooter
         {
             var propertyType = property.PropertyType;
 
-            // Dictionary<string, float> 처리 (SkillTableEntry.FloatAmounts)
-            if (propertyType == typeof(Dictionary<string, float>))
+            // Dictionary<K,V> 일괄 처리 (예: "key:value/key:value")
+            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                var floatAmountsDict = ParseAmountsDictionary<float>(value);
-                property.SetValue(entry, floatAmountsDict);
+                var args = propertyType.GetGenericArguments();
+                property.SetValue(entry, ParseDictionary(value, args[0], args[1]));
                 return;
             }
 
-            // Dictionary<string, int> 처리 (SkillTableEntry.IntAmounts)
-            if (propertyType == typeof(Dictionary<string, int>))
+            // List<T> 일괄 처리 (예: "18000000/18000001" 또는 "a/b/c")
+            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
             {
-                var intAmountsDict = ParseAmountsDictionary<int>(value);
-                property.SetValue(entry, intAmountsDict);
-                return;
-            }
-
-            // List<int> 처리 (예: StageConfigTableEntry.EnemyKeys - "18000000/18000001")
-            if (propertyType == typeof(List<int>))
-            {
-                var intList = ParseIntList(value);
-                property.SetValue(entry, intList);
+                var elementType = propertyType.GetGenericArguments()[0];
+                property.SetValue(entry, ParseList(value, elementType));
                 return;
             }
 
@@ -159,59 +151,64 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 커스텀 형식의 Amounts 문자열을 Dictionary<string, T>로 파싱합니다.
-        /// 예: "damage:30/heal:10" 또는 "range:5.0/speed:2.5"
+        /// "key:value/key:value" 형식 문자열을 Dictionary로 파싱합니다.
+        /// 예: "damage:30/heal:10", "1:10/2:20/3:30"
         /// </summary>
-        private static Dictionary<string, T> ParseAmountsDictionary<T>(string data) where T : struct
+        /// <param name="data">파싱할 문자열 ('/'로 쌍 구분, ':'로 키·값 구분)</param>
+        /// <param name="keyType">딕셔너리 키 타입 (string, int 등)</param>
+        /// <param name="valueType">딕셔너리 값 타입</param>
+        private static object ParseDictionary(string data, Type keyType, Type valueType)
         {
-            var result = new Dictionary<string, T>();
-            
+            var dictType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
+            var result = Activator.CreateInstance(dictType);
+            var dict = (System.Collections.IDictionary)result;
+
             if (string.IsNullOrEmpty(data))
                 return result;
 
             try
             {
-                // '/' 구분자로 각 키-값 쌍 분리
                 var pairs = data.Split('/');
-                
                 foreach (var pair in pairs)
                 {
                     var trimmedPair = pair.Trim();
                     if (string.IsNullOrEmpty(trimmedPair))
                         continue;
-                    
-                    // ':' 구분자로 키와 값 분리
+
                     var parts = trimmedPair.Split(':');
                     if (parts.Length != 2)
                         continue;
-                    
-                    var key = parts[0].Trim();
+
+                    var keyString = parts[0].Trim();
                     var valueString = parts[1].Trim();
-                    
-                    if (string.IsNullOrEmpty(key))
+                    if (string.IsNullOrEmpty(keyString) || string.IsNullOrEmpty(valueString))
                         continue;
-                    
-                    // 타입 변환
-                    var value = (T)Convert.ChangeType(valueString, typeof(T));
-                    result[key] = value;
+
+                    var key = keyType == typeof(string) ? keyString : Convert.ChangeType(keyString, keyType);
+                    var value = Convert.ChangeType(valueString, valueType);
+                    dict.Add(key, value);
                 }
             }
             catch (Exception ex)
             {
-                var typeName = typeof(T).Name;
-                LogHandler.LogError(nameof(CSVTableParser), $"{typeName} 커스텀 파싱 실패: {data}, 에러: {ex.Message}");
+                LogHandler.LogError(nameof(CSVTableParser), $"Dictionary 파싱 실패: {data}, 에러: {ex.Message}");
             }
 
             return result;
         }
 
         /// <summary>
-        /// '/' 구분 문자열을 List&lt;int&gt;로 파싱합니다.
-        /// 예: "18000000/18000001/18000002"
+        /// '/' 구분 문자열을 List로 파싱합니다.
+        /// 예: "18000000/18000001/18000002", "a/b/c"
         /// </summary>
-        private static List<int> ParseIntList(string data)
+        /// <param name="data">파싱할 문자열 ('/'로 요소 구분)</param>
+        /// <param name="elementType">리스트 요소 타입</param>
+        private static object ParseList(string data, Type elementType)
         {
-            var result = new List<int>();
+            var listType = typeof(List<>).MakeGenericType(elementType);
+            var result = Activator.CreateInstance(listType);
+            var list = (System.Collections.IList)result;
+
             if (string.IsNullOrEmpty(data))
                 return result;
 
@@ -223,13 +220,14 @@ namespace DungeonShooter
                     var trimmed = part.Trim();
                     if (string.IsNullOrEmpty(trimmed))
                         continue;
-                    if (int.TryParse(trimmed, out var id))
-                        result.Add(id);
+
+                    var item = elementType == typeof(string) ? trimmed : Convert.ChangeType(trimmed, elementType);
+                    list.Add(item);
                 }
             }
             catch (Exception ex)
             {
-                LogHandler.LogError(nameof(CSVTableParser), $"EnemyKeys 파싱 실패: {data}, 에러: {ex.Message}");
+                LogHandler.LogError(nameof(CSVTableParser), $"List 파싱 실패: {data}, 에러: {ex.Message}");
             }
 
             return result;
