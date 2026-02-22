@@ -4,17 +4,15 @@ using VContainer;
 
 namespace DungeonShooter
 {
-    // 스킬 쿨다운 UI에서 사용할 뷰모델
-    public interface ISkillSlotViewModel
+    /// <summary>
+    /// 플레이어 스킬 상태를 소유하고, 슬롯 변경 시 OnSkillSlotChanged를 발생시킨다.
+    /// </summary>
+    public interface IPlayerSkillManager
     {
-        public event Action<int, Skill> OnSkillSlotChanged;
-        public Skill GetActiveSkill(int index);
-    }
-    
-    public interface IPlayerSkillManager : ISkillSlotViewModel
-    {
-        public UniTask InitializeAsync(PlayerConfigTableEntry config);
-        public EntitySkillContainer SkillContainer { get; }
+        event Action<int, Skill> OnSkillSlotChanged;
+        Skill GetActiveSkill(int index);
+        UniTask InitializeAsync(PlayerConfigTableEntry config);
+        EntitySkillContainer SkillContainer { get; }
     }
     
     /// <summary>
@@ -23,10 +21,9 @@ namespace DungeonShooter
     public class PlayerSkillManager : IPlayerSkillManager, IDisposable
     {
         public event Action<int, Skill> OnSkillSlotChanged;
-        private readonly Skill[] _activeSkillSlots = new Skill[Constants.SkillSlotMaxCount];
-        
         public EntitySkillContainer SkillContainer { get; private set; }
         
+        private readonly Skill[] _activeSkillSlots = new Skill[Constants.SkillSlotMaxCount];
         private ISkillFactory _skillFactory;
         private IEventBus _eventBus;
         [Inject]
