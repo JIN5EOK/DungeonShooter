@@ -4,13 +4,14 @@ using VContainer;
 
 namespace DungeonShooter
 {
-    public interface IActiveSkillSlotGroup
+    // 스킬 쿨다운 UI에서 사용할 뷰모델
+    public interface ISkillSlotViewModel
     {
-        public event Action<int, Skill> OnActiveSkillSlotChanged;
+        public event Action<int, Skill> OnSkillSlotChanged;
         public Skill GetActiveSkill(int index);
     }
     
-    public interface IPlayerSkillManager : IActiveSkillSlotGroup
+    public interface IPlayerSkillManager : ISkillSlotViewModel
     {
         public UniTask InitializeAsync(PlayerConfigTableEntry config);
         public EntitySkillContainer SkillContainer { get; }
@@ -21,7 +22,7 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerSkillManager : IPlayerSkillManager, IDisposable
     {
-        public event Action<int, Skill> OnActiveSkillSlotChanged;
+        public event Action<int, Skill> OnSkillSlotChanged;
         private readonly Skill[] _activeSkillSlots = new Skill[Constants.SkillSlotMaxCount];
         
         public EntitySkillContainer SkillContainer { get; private set; }
@@ -48,7 +49,7 @@ namespace DungeonShooter
                 if (skillLevelUpEvent.beforeSkill == _activeSkillSlots[i])
                 {
                     _activeSkillSlots[i] = skillLevelUpEvent.afterSkill;
-                    OnActiveSkillSlotChanged?.Invoke(i, skillLevelUpEvent.afterSkill);
+                    OnSkillSlotChanged?.Invoke(i, skillLevelUpEvent.afterSkill);
                 }
             }
         }
@@ -75,8 +76,8 @@ namespace DungeonShooter
             if (_activeSkillSlots[1] != null) 
                 SkillContainer?.Regist(_activeSkillSlots[1]);
 
-            OnActiveSkillSlotChanged?.Invoke(0, _activeSkillSlots[0]);
-            OnActiveSkillSlotChanged?.Invoke(1, _activeSkillSlots[1]);
+            OnSkillSlotChanged?.Invoke(0, _activeSkillSlots[0]);
+            OnSkillSlotChanged?.Invoke(1, _activeSkillSlots[1]);
 
             // 그 외 스킬 등록
             foreach (var acquirableSkillId in config.AcquirableSkills)

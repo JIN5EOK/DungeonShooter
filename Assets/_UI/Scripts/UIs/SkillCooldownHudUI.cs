@@ -13,13 +13,13 @@ namespace DungeonShooter
         [SerializeField] private SkillCooldownSlot _skillCooldownSlotPrefab;
 
         private readonly SkillCooldownSlot[] _idxToSlots = new SkillCooldownSlot[Constants.SkillSlotMaxCount];
-        private IActiveSkillSlotGroup _activeSkillSlotGroup;
+        private ISkillSlotViewModel _skillSlotViewModel;
         
         [Inject]
-        public void Construct(IActiveSkillSlotGroup activeSkillSlotGroup)
+        public void Construct(ISkillSlotViewModel skillSlotViewModel)
         {
-            _activeSkillSlotGroup = activeSkillSlotGroup;
-            _activeSkillSlotGroup.OnActiveSkillSlotChanged += SkillSlotGroupChanged;
+            _skillSlotViewModel = skillSlotViewModel;
+            _skillSlotViewModel.OnSkillSlotChanged += SkillSlotViewModelChanged;
         }
         
         public override void Show()
@@ -27,7 +27,7 @@ namespace DungeonShooter
             base.Show();
             for (int i = 0; i < Constants.SkillSlotMaxCount; i++)
             {
-                var skill = _activeSkillSlotGroup.GetActiveSkill(i);
+                var skill = _skillSlotViewModel.GetActiveSkill(i);
 
                 if (skill == null)
                     RemoveSkillCooldownSlot(i);
@@ -46,7 +46,7 @@ namespace DungeonShooter
             return _idxToSlots[idx];
         }
         
-        private void SkillSlotGroupChanged(int idx, Skill skill)
+        private void SkillSlotViewModelChanged(int idx, Skill skill)
         {
             if (idx < 0 || idx > _idxToSlots.Length)
             {
@@ -94,7 +94,7 @@ namespace DungeonShooter
         
         protected override void OnDestroy()
         {
-            _activeSkillSlotGroup.OnActiveSkillSlotChanged -= SkillSlotGroupChanged;
+            _skillSlotViewModel.OnSkillSlotChanged -= SkillSlotViewModelChanged;
             base.OnDestroy();
             Clear();
         }

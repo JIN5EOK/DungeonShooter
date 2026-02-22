@@ -16,11 +16,6 @@ namespace DungeonShooter
         public event Action<Skill> OnSkillRegisted;
         public event Action<Skill> OnSkillUnregisted;
 
-        [Inject]
-        public EntitySkillContainer()
-        {
-        }
-
         public bool Contains(Skill skill)
         {
             return _skills.Contains(skill);
