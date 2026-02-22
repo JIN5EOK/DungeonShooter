@@ -16,8 +16,8 @@ namespace DungeonShooter
             builder.Register<InputManager>(Lifetime.Singleton);
             builder.Register<LocalTableRepository>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<EventBus>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<LoadingViewModel>(Lifetime.Singleton);
             builder.Register<LoadingService>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<LoadingViewModel>(Lifetime.Singleton);
             builder.Register<SceneLoader>(Lifetime.Singleton);
             builder.RegisterEntryPoint<GlobalUIBootstrap>();
         }

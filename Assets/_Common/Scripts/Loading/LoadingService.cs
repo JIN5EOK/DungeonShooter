@@ -1,22 +1,23 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 
 namespace DungeonShooter
 {
     /// <summary>
-    /// 로딩 태스크 큐를 관리하고 로딩 처리 시 ViewModel에 윈도우/스피너 표시 상태를 반영한다.
+    /// 로딩 태스크 큐를 관리하고, 로딩 처리 시 윈도우/스피너 표시 상태를 보유하며 OnStateChanged로 알린다.
     /// </summary>
     public class LoadingService : ILoadingService
     {
-        private readonly LoadingViewModel _viewModel;
+        public event Action OnStateChanged;
+
         private readonly Queue<LoadingTask> _windowTasks = new();
         private readonly Queue<LoadingTask> _spinnerTasks = new();
+
         private bool _isProcessing;
 
-        public LoadingService(LoadingViewModel viewModel)
-        {
-            _viewModel = viewModel;
-        }
+        public bool IsWindowLoadingRunning { get; private set; }
+        public bool IsSpinnerLoadingRunning { get; private set; }
 
         public void EnqueueTask(LoadingTask loadingTask)
         {
@@ -29,6 +30,22 @@ namespace DungeonShooter
                 ProcessQueueAsync().Forget();
         }
 
+        private void SetWindowVisible(bool visible)
+        {
+            if (IsWindowLoadingRunning == visible)
+                return;
+            IsWindowLoadingRunning = visible;
+            OnStateChanged?.Invoke();
+        }
+
+        private void SetSpinnerVisible(bool visible)
+        {
+            if (IsSpinnerLoadingRunning == visible)
+                return;
+            IsSpinnerLoadingRunning = visible;
+            OnStateChanged?.Invoke();
+        }
+
         private async UniTaskVoid ProcessQueueAsync()
         {
             _isProcessing = true;
@@ -37,28 +54,28 @@ namespace DungeonShooter
                 while (_windowTasks.Count > 0)
                 {
                     var task = _windowTasks.Dequeue();
-                    _viewModel.SetWindowVisible(true);
+                    SetWindowVisible(true);
                     try
                     {
                         await task.Run();
                     }
                     finally
                     {
-                        _viewModel.SetWindowVisible(false);
+                        SetWindowVisible(false);
                     }
                 }
 
                 while (_spinnerTasks.Count > 0)
                 {
                     var task = _spinnerTasks.Dequeue();
-                    _viewModel.SetSpinnerVisible(true);
+                    SetSpinnerVisible(true);
                     try
                     {
                         await task.Run();
                     }
                     finally
                     {
-                        _viewModel.SetSpinnerVisible(false);
+                        SetSpinnerVisible(false);
                     }
                 }
             }
