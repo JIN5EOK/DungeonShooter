@@ -1,5 +1,5 @@
 # 개요
-플레이어, 적 등 게임 내의 Entity 개체들에 대한 설계 문서입니다.
+> 플레이어, 적 등 게임 내의 Entity 개체들에 대한 설계 문서입니다.
 
 ---
 ## 컴포넌트 조합 기반 설계
@@ -11,7 +11,33 @@
       * AI를 담당하는 `AIComponent`
 * Entity들의 프리팹 자체에는 기능 컴포넌트를 달아두지 않음, 런타임 조합이나 로직에 따라 어떤 프리팹이라도 플레이어, 적으로 만들 수 있도록 함
   * Player / Enemy에 필요한 컴포넌트와 초기화, 레이어,태그 설정은 `PlayerFactory`/`EnemyFactory`에서 캐릭터를 생성하며 수행
-* 각 컴포넌트간 참조관계는 `EntityLifeTimeScope`를 통한 의존성 주입으로 해결
+* 각 컴포넌트간 참조관계는 `EntityLifeTimeScope`를 통한 의존성 주입을 통해 해결한다
+
+## 스탯, 스킬 등 데이터 관리, 주입구조
+```mermaid
+classDiagram
+	class EntityBase{
+		+EntityContext : IEntityContext
+	}
+	
+	class IEntityContext{
+		+InputContext : IEntityInputContext // 이동, 공격 등 행동을 결정하기 위한 정보
+		+StatService : IEntityStatService // 최대 체력 등 스탯 수치 관련 서비스
+		+StatusService : IEntityStatusService // 현재 체력 등 현재 상태 수치 관련 서비스
+		+SkillService : ISkillService // 지닌 스킬 관련 서비스
+		+InventoryService : IInventoryService // 인벤토리 관련 서비스
+	}
+	
+	IEntityContext <-- EntityBase
+	EntityBase <-- PlayerFactory : 생성시 적절한 구체 EntityContext 생성하여 주입
+	EntityBase <-- EnemyFactory : 생성시 적절한 구체 EntityContext 생성하여 주입
+	
+```
+- 플레이어, 적들의 스탯과 스킬 관리 로직이 다르므로 서비스 인터페이스로 감추고 팩토리에서 구체타입 서비스를 생성하여 삽입한다
+	- 플레이어의 경우 플레이어 오브젝트에 종속되지 않는 전용 싱글턴 서비스 사용
+	- 적의 경우 오브젝트와 생명주기를 함께하는 서비스 생성후 주입
 ### 관련 문서
 - [스탯시스템_설계.md](%EC%8A%A4%ED%83%AF%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%84%A4%EA%B3%84.md)
 - [스킬시스템_설계.md](%EC%8A%A4%ED%82%AC%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%84%A4%EA%B3%84.md)
+
+---
