@@ -39,7 +39,7 @@ namespace DungeonShooter
             builder.Register<StageSceneUIManager>(Lifetime.Scoped);
             builder.RegisterComponentOnNewGameObject<ObjectCullingManager>(Lifetime.Scoped);
             
-            builder.Register<EntitySkillContainer>(Lifetime.Transient);
+            builder.Register<EntitySkills>(Lifetime.Transient);
             
             builder.RegisterComponentOnNewGameObject<StageSceneInitializer>(Lifetime.Scoped);
             base.Configure(builder);

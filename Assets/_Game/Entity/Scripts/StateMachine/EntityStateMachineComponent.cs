@@ -11,12 +11,10 @@ namespace DungeonShooter
     public class EntityStateMachineComponent : MonoBehaviour, IEntityStateMachine
     {
         public EntityStates CurrentState => _currentState?.States ?? EntityStates.Idle;
-        
         private IEntityState _currentState;
-        
         private Dictionary<EntityStates, IEntityState> _states;
         public EntityBase Entity { get; private set; }
-        public EntityInputContext InputContext => Entity.EntityInputContext;
+        public IEntityInputContext InputContext => Entity?.EntityContext?.InputContext;
 
         [Inject]
         private void Construct(
@@ -47,6 +45,8 @@ namespace DungeonShooter
 
         private void Update()
         {
+            if (Entity?.EntityContext?.InputContext == null)
+                return;
             _currentState?.OnUpdate();
         }
         

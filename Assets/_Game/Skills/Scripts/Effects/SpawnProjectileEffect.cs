@@ -51,7 +51,7 @@ namespace DungeonShooter
             
             if (_rotateToCastDirection)
             {
-                var direction = context.Caster.EntityInputContext.LastMoveDirection;
+                var direction = context.Caster.EntityContext.InputContext.LastMoveDirection;
                 var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                 rotation = Quaternion.Euler(0f, 0f, angle); 
             }

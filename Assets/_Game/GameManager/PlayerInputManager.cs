@@ -12,7 +12,7 @@ namespace DungeonShooter
         private IEventBus _eventBus;
         private InputManager _inputManager;
         private IPauseManager _pauseManager;
-        private EntityInputContext _entityInputContext;
+        private IEntityInputContext _entityInputContext;
         private Inventory _inventory;
         private IPlayerSkillManager _skillManager;
         private StageSceneUIManager _stageSceneUIManager;
@@ -38,7 +38,7 @@ namespace DungeonShooter
 
         private void OnPlayerObjectSpawned(PlayerObjectSpawnEvent playerObjectSpawnEvent)
         {
-            _entityInputContext = playerObjectSpawnEvent.player.EntityInputContext;
+            _entityInputContext = playerObjectSpawnEvent.player.EntityContext.InputContext;
         }
         
         private void OnPlayerObjectDestroyed(PlayerObjectDestroyEvent playerObjectDestroyEvent)

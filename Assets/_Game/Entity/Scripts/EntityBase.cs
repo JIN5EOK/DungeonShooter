@@ -1,5 +1,4 @@
 using System;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Jin5eok;
 
@@ -8,10 +7,10 @@ namespace DungeonShooter
     public class EntityBase : MonoBehaviour
     {
         public event Action<EntityBase> OnDestroyed;
-        
-        public EntityInputContext EntityInputContext { get; private set; } = new EntityInputContext();
-        public EntityStatContainer StatContainer { get; private set; }
-        public EntitySkillContainer SkillContainer { get; private set; }
+
+        private EntityContext _entityContext;
+
+        public IEntityContext EntityContext => _entityContext;
 
         /// <summary>
         /// 엔티티를 해제 혹은 제거합니다. PoolableComponent가 있으면 풀에 반환하고, 없으면 게임오브젝트를 파괴합니다.
@@ -29,43 +28,36 @@ namespace DungeonShooter
             }
         }
 
-        /// <summary> StatGroup을 주입합니다. </summary>
-        public void SetStatGroup(EntityStatContainer statContainer)
-        {
-            StatContainer = statContainer;
-        }
-
         /// <summary>
-        /// SkillGroup을 주입합니다.
-        /// 기존 그룹의 스킬은 모두 적용 해제하고, 새 그룹의 스킬은 순회하여 적용합니다.
+        /// 팩토리에서 생성한 EntityContext를 주입합니다.
         /// </summary>
-        public void SetSkillGroup(EntitySkillContainer skillContainer)
+        public void SetContext(EntityContext context)
         {
-            if (SkillContainer != null)
+            if (_entityContext?.Skill != null)
             {
-                foreach (var s in SkillContainer.GetRegistedSkills())
+                foreach (var s in _entityContext.Skill.GetRegistedSkills())
                 {
                     UnapplySkill(s);
                 }
 
-                SkillContainer.OnSkillRegisted -= ApplySkill;
-                SkillContainer.OnSkillUnregisted -= UnapplySkill;
+                _entityContext.Skill.OnSkillRegisted -= ApplySkill;
+                _entityContext.Skill.OnSkillUnregisted -= UnapplySkill;
             }
 
-            SkillContainer = skillContainer;
+            _entityContext = context;
 
-            if (skillContainer != null)
+            if (context?.Skill != null)
             {
-                skillContainer.OnSkillRegisted += ApplySkill;
-                skillContainer.OnSkillUnregisted += UnapplySkill;
+                context.Skill.OnSkillRegisted += ApplySkill;
+                context.Skill.OnSkillUnregisted += UnapplySkill;
 
-                foreach (var s in skillContainer.GetRegistedSkills())
+                foreach (var s in context.Skill.GetRegistedSkills())
                 {
                     ApplySkill(s);
                 }
             }
         }
-        
+
         private void ApplySkill(Skill skill)
         {
             if (skill?.SkillData != null && skill.SkillData.IsPassiveSkill)

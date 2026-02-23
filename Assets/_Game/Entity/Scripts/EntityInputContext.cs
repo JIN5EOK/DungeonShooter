@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace DungeonShooter
 {
-    public class EntityInputContext
+    public class EntityInputContext : IEntityInputContext
     {
         public Vector2 LastMoveDirection { get; private set; }
 

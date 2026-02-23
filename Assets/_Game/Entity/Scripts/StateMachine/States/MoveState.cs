@@ -40,6 +40,11 @@ namespace DungeonShooter
         public void OnUpdate()
         {
             var input = _entityStateMachine.InputContext;
+            if (input == null)
+            {
+                _entityStateMachine.RequestChangeState(EntityStates.Idle);
+                return;
+            }
 
             _movementComponent?.Move(input.MoveInput);
             _entityAnimationHandler?.SetMovementFromInput(input.MoveInput);

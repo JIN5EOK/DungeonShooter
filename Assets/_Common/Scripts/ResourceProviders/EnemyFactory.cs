@@ -257,15 +257,17 @@ namespace DungeonShooter
 
             var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
             var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(configTableEntry.StatsId);
-            
+            var statGroup = new EntityStats();
             if (statsEntry != null)
             {
-                var statGroup = new EntityStatContainer();
                 statGroup.Initialize(statsEntry);
-                entity.SetStatGroup(statGroup);
             }
-            
-            var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();    
+
+            var skillContainer = entityLifeTimeScope.Container.Resolve<EntitySkills>();
+            var context = new EntityContext(new EntityInputContext(), statGroup, null, skillContainer);
+            entity.SetContext(context);
+
+            var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();
             if (isFirstInit == true)
             {
                 var moveComponent = entityLifeTimeScope.Container.Resolve<MovementComponent>();
@@ -279,9 +281,6 @@ namespace DungeonShooter
             }
             var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
             healthComponent.ResetState();
-
-            var skillContainer = entityLifeTimeScope.Container.Resolve<EntitySkillContainer>();
-            entity.SetSkillGroup(skillContainer);
 
             var activeSkills = new List<Skill>();
             

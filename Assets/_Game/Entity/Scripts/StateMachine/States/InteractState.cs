@@ -29,7 +29,13 @@ namespace DungeonShooter
         {
             _interactComponent?.TryInteract();
 
-            if (!_entityStateMachine.InputContext.MoveInput.ApproximatelyEquals(Vector2.zero, 0.01f))
+            var inputContext = _entityStateMachine.InputContext;
+            if (inputContext == null)
+            {
+                _entityStateMachine.RequestChangeState(EntityStates.Idle);
+                return;
+            }
+            if (!inputContext.MoveInput.ApproximatelyEquals(Vector2.zero, 0.01f))
                 _entityStateMachine.RequestChangeState(EntityStates.Move);
             else
                 _entityStateMachine.RequestChangeState(EntityStates.Idle);

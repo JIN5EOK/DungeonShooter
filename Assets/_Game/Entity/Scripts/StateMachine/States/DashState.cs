@@ -27,7 +27,13 @@ namespace DungeonShooter
 
         public void OnEnter()
         {
-            _dashComponent?.StartDash(_entityStateMachine.InputContext.LastMoveDirection);
+            var inputContext = _entityStateMachine.InputContext;
+            if (inputContext == null)
+            {
+                _entityStateMachine.RequestChangeState(EntityStates.Idle);
+                return;
+            }
+            _dashComponent?.StartDash(inputContext.LastMoveDirection);
         }
 
         public void OnExit()
@@ -39,6 +45,11 @@ namespace DungeonShooter
             if (_dashComponent == null || !_dashComponent.IsDashing)
             {
                 var input = _entityStateMachine.InputContext;
+                if (input == null)
+                {
+                    _entityStateMachine.RequestChangeState(EntityStates.Idle);
+                    return;
+                }
                 if (!input.MoveInput.ApproximatelyEquals(Vector2.zero, 0.01f))
                 {
                     _entityStateMachine.RequestChangeState(EntityStates.Move);

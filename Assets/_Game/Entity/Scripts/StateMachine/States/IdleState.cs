@@ -40,10 +40,12 @@ namespace DungeonShooter
 
         public void OnUpdate()
         {
+            var input = _entityStateMachine?.InputContext;
+            if (input == null)
+                return;
+
             ApplyFacingDirection();
-
-            var input = _entityStateMachine.InputContext;
-
+            
             if (input.DashInput && _dashComponent != null && _dashComponent.IsReady)
             {
                 _entityStateMachine?.RequestChangeState(EntityStates.Dash);
@@ -70,7 +72,7 @@ namespace DungeonShooter
 
         private void ApplyFacingDirection()
         {
-            var lastDir = _entityStateMachine.InputContext.LastMoveDirection;
+            var lastDir = _entityStateMachine.InputContext?.LastMoveDirection ?? Vector2.zero;
             if (lastDir.ApproximatelyEquals(Vector2.zero, 0.01f))
                 return;
 

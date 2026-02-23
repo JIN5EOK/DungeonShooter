@@ -6,7 +6,7 @@ namespace DungeonShooter
     /// <summary>
     /// Entity의 스탯을 관리하는 Pure C# 객체.
     /// </summary>
-    public class EntityStatContainer
+    public class EntityStats : IEntityStats
     {
         private readonly Dictionary<StatType, EntityStat> _stats = new Dictionary<StatType, EntityStat>();
         private EntityStatsTableEntry _statsTableEntry;

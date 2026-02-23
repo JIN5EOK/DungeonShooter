@@ -12,8 +12,8 @@ namespace DungeonShooter
     public class MovementComponent : MonoBehaviour
     {
         public float MoveSpeed =>
-            _entityBase != null && _entityBase.StatContainer != null
-                ? _entityBase.StatContainer.GetStat(StatType.MoveSpeed).GetValue()
+            _entityBase?.EntityContext?.Stat != null
+                ? _entityBase.EntityContext.Stat.GetStat(StatType.MoveSpeed).GetValue()
                 : 0;
 
         private Rigidbody2D _rigidbody;

@@ -27,14 +27,14 @@ namespace DungeonShooter
             
             var bonus = new StatBonus(0, 100, 0, attackMultiply, 0, 100, 0, 100);
             
-            owner.StatContainer.ApplyStatBonus(this, bonus);
+            owner.EntityContext.Stat.ApplyStatBonus(this, bonus);
         }
 
         public override void Deactivate(EntityBase owner, SkillTableEntry entry)
         {
             base.Deactivate(owner, entry);
 
-            owner.StatContainer.RemoveStatBonus(this);
+            owner.EntityContext.Stat.RemoveStatBonus(this);
         }
     }
 }

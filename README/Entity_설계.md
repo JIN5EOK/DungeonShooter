@@ -18,6 +18,7 @@
 classDiagram
 	class EntityBase{
 		+EntityContext : IEntityContext
+		+SetContext(EntityContext context)
 	}
 	
 	class EntityContext{
@@ -25,15 +26,14 @@ classDiagram
 		// 이동, 공격 등 행동 결정에 필요한 입력정보, 플레이어의 경우 키입력으로 조작
 		// 적의 경우 인공지능 컴포넌트로 조작
 		+Stat : IEntityStats // 최대 체력 등 스탯 수치 관련 클래스
-		+Status : IEntityStatus // 현재 체력 등 현재 상태 수치 관련 클래스
+		+Status : IEntityStatus // 현재 체력 등 현재 상태 수치
 		+Skill : IEntitySkills // 지닌 스킬 관련 클래스
-		+Inventory : IInventory // 인벤토리 관련 클래스
+		// +Inventory : IInventory // 인벤토리 관련 클래스
 	}
 	
-	EntityContext <-- EntityBase
-	EntityBase <-- PlayerFactory : 생성시 적절한 구체 EntityContext 주입
-	PlayerEntityContext
-	EntityBase <-- EnemyFactory : 생성시 적절한 구체 EntityContext 주입
+	EntityContext <-- EntityBase : 보유
+	EntityBase <-- PlayerFactory : 생성시 EntityContext 주입
+	EntityBase <-- EnemyFactory : 생성시 EntityContext 주입
 ```
 - 플레이어, 적들의 스탯과 스킬 관리 로직이 다르므로 팩토리에서 직접 컨텍스트를 주입한다
 

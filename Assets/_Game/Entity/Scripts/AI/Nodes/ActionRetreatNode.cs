@@ -17,7 +17,7 @@ namespace DungeonShooter
             }
 
             var direction = (context.Self.transform.position - context.Target.transform.position).normalized;
-            context.Self.EntityInputContext.MoveInput = direction;
+            context.Self.EntityContext.InputContext.MoveInput = direction;
             return BTStatus.Success;
         }
     }

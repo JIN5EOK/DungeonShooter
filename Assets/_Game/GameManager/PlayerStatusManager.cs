@@ -8,7 +8,7 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerStatusManager : IDisposable
     {
-        public EntityStatContainer StatContainer { get; private set; } = new();
+        public EntityStats StatContainer { get; private set; } = new();
         public event Action<int> OnHpChanged;
 
         public int Hp

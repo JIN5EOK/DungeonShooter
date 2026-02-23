@@ -34,18 +34,25 @@ namespace DungeonShooter
         public void OnEnter()
         {
             _executeFinished = false;
-            _executingSkill = _entityStateMachine.InputContext.SkillInput;
-            
+            var inputContext = _entityStateMachine.InputContext;
+            if (inputContext == null)
+            {
+                _executeFinished = true;
+                _entityStateMachine.RequestChangeState(EntityStates.Idle);
+                return;
+            }
+
+            _executingSkill = inputContext.SkillInput;
             if (_executingSkill == null || _entityStateMachine.Entity == null || _executingSkill.IsCooldown == true)
             {
                 _executeFinished = true;
                 return;
             }
-            
+
             _movementComponent?.Move(Vector2.zero);
             _entityAnimationHandler?.SetMoving(false);
             ExecuteSkillAsync().Forget();
-            _entityStateMachine.InputContext.SkillInput = null;
+            inputContext.SkillInput = null;
         }
 
         private async UniTaskVoid ExecuteSkillAsync()
@@ -67,6 +74,11 @@ namespace DungeonShooter
             }
 
             var input = _entityStateMachine.InputContext;
+            if (input == null)
+            {
+                _entityStateMachine.RequestChangeState(EntityStates.Idle);
+                return;
+            }
             if (!input.MoveInput.ApproximatelyEquals(Vector2.zero, 0.01f))
             {
                 _entityStateMachine.RequestChangeState(EntityStates.Move);
