@@ -261,7 +261,7 @@ namespace DungeonShooter
             if (statsEntry != null)
                 statGroup.Initialize(statsEntry);
 
-            var skillContainer = entityLifeTimeScope.Container.Resolve<EntitySkills>();
+            var skillContainer = entityLifeTimeScope.Container.Resolve<IEntitySkills>();
             var context = new EntityContext(
                 new EntityInputContext()
                 , statGroup

@@ -26,8 +26,8 @@ namespace DungeonShooter
         private IPlayerSkillManager _playerSkillManager;
         private IEventBus _eventBus;
         
-        private EntityStats StatContainer => _playerStatusManager?.StatContainer;
-        private EntitySkills SkillContainer => _playerSkillManager?.SkillContainer;
+        private IEntityStats StatContainer => _playerStatusManager?.StatContainer;
+        private IEntitySkills SkillContainer => _playerSkillManager?.SkillContainer;
         
         private EntityBase _ownerEntity;
 

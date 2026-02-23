@@ -12,7 +12,7 @@ namespace DungeonShooter
         event Action<int, Skill> OnSkillSlotChanged;
         Skill GetActiveSkill(int index);
         UniTask InitializeAsync(PlayerConfigTableEntry config);
-        EntitySkills SkillContainer { get; }
+        IEntitySkills SkillContainer { get; }
     }
     
     /// <summary>
@@ -21,17 +21,16 @@ namespace DungeonShooter
     public class PlayerSkillManager : IPlayerSkillManager, IDisposable
     {
         public event Action<int, Skill> OnSkillSlotChanged;
-        public EntitySkills SkillContainer { get; private set; }
-        
+        public IEntitySkills SkillContainer => _playerDataService?.EntityContext?.Skill;
+        private IPlayerDataService _playerDataService;
         private readonly Skill[] _activeSkillSlots = new Skill[Constants.SkillSlotMaxCount];
         private ISkillFactory _skillFactory;
         private IEventBus _eventBus;
         [Inject]
-        private void Construct(ISkillFactory skillFactory, IEventBus eventBus, EntitySkills skillContainer)
+        private void Construct(ISkillFactory skillFactory, IEventBus eventBus, IPlayerDataService playerDataService)
         {
             _skillFactory = skillFactory;
             _eventBus = eventBus;
-            SkillContainer = skillContainer;
             _eventBus.Subscribe<SkillLevelUpEvent>(OnSkillLevelChanged);
         }
 

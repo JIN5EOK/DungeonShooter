@@ -26,8 +26,7 @@ namespace DungeonShooter
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
-        private readonly PlayerStatusManager _playerStatusManager;
-        private readonly IPlayerSkillManager _playerSkillManager;
+        private readonly IPlayerDataService _playerDataService;
         private readonly IEventBus _eventBus;
         private readonly LifetimeScope _sceneLifetimeScope;
         [Inject]
@@ -37,14 +36,13 @@ namespace DungeonShooter
             , IEventBus eventBus
             , PlayerStatusManager playerStatusManager
             , IPlayerSkillManager playerSkillManager
-            , LifetimeScope sceneLifetimeScope)
+            , LifetimeScope sceneLifetimeScope
+            , IPlayerDataService playerDataService)
         {
             _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
             _tableRepository = tableRepository;
             _eventBus = eventBus;
-            _playerStatusManager = playerStatusManager;
-            _playerSkillManager = playerSkillManager;
             _sceneLifetimeScope = sceneLifetimeScope;
         }
 
@@ -130,15 +128,8 @@ namespace DungeonShooter
             }
             
             var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
-            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
             
-            var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(config.StatsId);
-            var context = new EntityContext(
-                new EntityInputContext(),
-                _playerStatusManager.StatContainer,
-                new EntityStatuses(statsEntry),
-                _playerSkillManager.SkillContainer);
-            entity.SetContext(context);
+            entity.SetContext(_playerDataService.EntityContext);
             
             var movementComponent = entityLifeTimeScope.Container.Resolve<IMovementComponent>();
             var interactComponent = entityLifeTimeScope.Container.Resolve<IInteractComponent>();
@@ -152,7 +143,7 @@ namespace DungeonShooter
 
             await cameraTrackComponent.AttachCameraAsync();
             
-            
+            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
             
             entity.OnDestroyed += (self) =>
             {

@@ -34,7 +34,7 @@ namespace DungeonShooter
         /// 현재 스킬을 레벨업 적용합니다. 다음 레벨이 없으면 false를 반환합니다.
         /// </summary>
         /// <returns>적용 성공 여부</returns>
-        public bool TrySkillLevelUp(EntitySkills container, Skill currentSkill);
+        public bool TrySkillLevelUp(IEntitySkills container, Skill currentSkill);
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ namespace DungeonShooter
         /// <summary>
         /// 현재 스킬을 레벨업 시도합니다. 다음 레벨이 테이블에 없으면 false를 반환합니다.
         /// </summary>
-        public bool TrySkillLevelUp(EntitySkills container, Skill currentSkill)
+        public bool TrySkillLevelUp(IEntitySkills container, Skill currentSkill)
         {
             if (container == null || currentSkill == null)
             {
