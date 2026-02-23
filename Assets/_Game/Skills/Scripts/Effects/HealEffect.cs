@@ -19,8 +19,12 @@ namespace DungeonShooter
             
             var rawHeal = entry.Amount;
             var heal = Mathf.RoundToInt(rawHeal * _healPercent);
+            
+            var targetEntity = executeTarget == SkillOwner.Caster
+                ? context.Caster 
+                : context.LastHitTarget;
 
-            var health = context.LastHitTarget.GetComponent<IHealthComponent>();
+            var health = targetEntity.GetComponent<IHealthComponent>();
             if (health != null)
             {
                 health.Heal(heal);

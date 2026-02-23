@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b7037c72d2654528a3e09cc840b7a3c, type: 3}
   m_Name: CasterEnemyAI
   m_EditorClassIdentifier: 
-  _detectionRange: 12
+  _detectionRange: 20
   _tooCloseDistance: 6
   _skillUseDistance: 8
   _skillIndex: 0

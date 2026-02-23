@@ -209,6 +209,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a7aff52c3dce245ea801849d3a46900a
+    m_Address: HealSkillData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a7f2c8e1d4b94f5e8c3a9b0e2d1f6a4c
     m_Address: UI_PlayerStatusHud
     m_ReadOnly: 0

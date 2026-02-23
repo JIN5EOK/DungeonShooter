@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3505ee51189e410ca635e12ba110d8b, type: 3}
   m_Name: NoramlEnemyAI
   m_EditorClassIdentifier: 
-  _detectionRange: 10
+  _detectionRange: 20
+  _attackRagne: 1
+  _skillIndex: 0

@@ -17,3 +17,7 @@ Memo,Id,SkillName,SkillDescription,SkillIconKey,SkillDataKey,FloatAmounts,IntAmo
 메테오 레벨1,14000501,메테오 LV1,주변 다수의 적들에게 데미지 150%의 화염구를 떨굽니다.,MeteorSkillIcon,MeteorSkillData,,,150,0.5,10,14000500
 메테오 레벨2,14000502,메테오 LV2,주변 다수의 적들에게 데미지 180%의 화염구를 떨굽니다.,MeteorSkillIcon,MeteorSkillData,,,200,0.5,8,14000500
 메테오 레벨3,14000503,메테오 LV3,주변 다수의 적들에게 데미지 265%의 화염구를 떨굽니다.,MeteorSkillIcon,MeteorSkillData,,,250,0.5,5,14000500
+힐 스킬 루트,14000600,힐,사용자의 체력을 회복합니다.,MeteorSkillIcon,,,,,,,14000600
+힐 레벨1,14000601,힐 LV1,사용자의 체력을 500 회복합니다.,MeteorSkillIcon,HealSkillData,,,500,0.0,0,14000500
+힐 레벨2,14000602,힐 LV2,사용자의 체력을 1000 회복합니다.,MeteorSkillIcon,HealSkillData,,,1000,0.0,0,14000500
+힐 레벨3,14000603,힐 LV3,사용자의 체력을 2500 회복합니다.,MeteorSkillIcon,HealSkillData,,,2500,0.0,0,14000500
