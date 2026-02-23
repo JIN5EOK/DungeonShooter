@@ -194,6 +194,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e6eaab02c7b94dda9c0e05421b3e0ca
+    m_Address: Weird02
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9e907f54a0dbf414c91dbb241d0c338a
     m_Address: FireballSkillData
     m_ReadOnly: 0
@@ -256,6 +261,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d9983502127a842f097974f4901c170e
     m_Address: MeteorSkillData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df100b4288fcd40e09355d5a3083de1e
+    m_Address: Heal_Particle
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

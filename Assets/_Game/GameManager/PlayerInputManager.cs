@@ -86,14 +86,10 @@ namespace DungeonShooter
 
         private void OnHandleMoveInput(Vector2 input)
         {
-            if (!CanProcessGameInput())
+            if (_entityInputContext != null)
             {
-                _entityInputContext.MoveInput = Vector2.zero;
-                return;
+                _entityInputContext.MoveInput = !CanProcessGameInput() ? Vector2.zero : input;    
             }
-                
-
-            _entityInputContext.MoveInput = input;
         }
 
         private void OnDashInput(bool isPressed)

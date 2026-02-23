@@ -81,15 +81,6 @@ namespace DungeonShooter
 
                 // 방의 오브젝트를 Stage 레벨 Objects에 배치
                 var objects = await _roomInstantiator.PlaceObjectsAsync(stageObj.transform, room.RoomData, worldPosition);
-                // 생성후 초기화 필요한 객체면 대기
-                foreach (var go in objects)
-                {
-                    if (go != null && go.TryGetComponent(out IInitializationAwaiter initAwaiter))
-                    {
-                        LogHandler.Log(nameof(StageInstantiator), "초기화 필요한 객체, 대기합니다.");
-                        await initAwaiter.InitializationTask;
-                    }
-                }
             }
 
             // 복도 생성

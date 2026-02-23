@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: NoramlEnemyAI
   m_EditorClassIdentifier: 
   _detectionRange: 20
-  _attackRagne: 1
+  _attackRagne: 2
   _skillIndex: 0

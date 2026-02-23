@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _activeEffects:
   - rid: 2338584748600066146
+  - rid: 2338584748600066148
+  - rid: 2338584748600066149
   _passiveEffects: []
   references:
     version: 2
@@ -23,3 +25,24 @@ MonoBehaviour:
       data:
         executeTarget: 0
         _healPercent: 1
+    - rid: 2338584748600066148
+      type: {class: SpawnParticleEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      data:
+        executeTarget: 0
+        _particlePrefab:
+          m_AssetGUID: df100b4288fcd40e09355d5a3083de1e
+          m_SubObjectName: 
+          m_SubObjectType: 
+          m_SubObjectGUID: 
+          m_EditorAssetChanged: 0
+        _spawnPosition: 0
+    - rid: 2338584748600066149
+      type: {class: PlaySoundEffect, ns: DungeonShooter, asm: Assembly-CSharp}
+      data:
+        executeTarget: 0
+        _audioClipRef:
+          m_AssetGUID: 9e6eaab02c7b94dda9c0e05421b3e0ca
+          m_SubObjectName: 
+          m_SubObjectType: 
+          m_SubObjectGUID: 
+          m_EditorAssetChanged: 0
