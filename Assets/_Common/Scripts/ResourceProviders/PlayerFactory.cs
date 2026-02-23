@@ -130,6 +130,16 @@ namespace DungeonShooter
             }
             
             var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
+            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
+            
+            var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(config.StatsId);
+            var context = new EntityContext(
+                new EntityInputContext(),
+                _playerStatusManager.StatContainer,
+                new EntityStatus(statsEntry),
+                _playerSkillManager.SkillContainer);
+            entity.SetContext(context);
+            
             var movementCompoent = entityLifeTimeScope.Container.Resolve<MovementComponent>();
             var interactComponent = entityLifeTimeScope.Container.Resolve<InteractComponent>();
             var dashComponent = entityLifeTimeScope.Container.Resolve<DashComponent>();
@@ -142,7 +152,7 @@ namespace DungeonShooter
 
             await cameraTrackComponent.AttachCameraAsync();
             
-            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
+            
             
             entity.OnDestroyed += (self) =>
             {
@@ -154,14 +164,6 @@ namespace DungeonShooter
                 Object.Destroy(entity.gameObject);
                 _eventBus.Publish(new PlayerDeadEvent() {player = entity, position = playerInstance.transform.position, playerConfigTableEntry = config});
             };
-            
-            var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(config.StatsId);
-            var context = new EntityContext(
-                new EntityInputContext(),
-                _playerStatusManager.StatContainer,
-                new EntityStatus(statsEntry),
-                _playerSkillManager.SkillContainer);
-            entity.SetContext(context);
 
             _eventBus.Publish(new PlayerObjectSpawnEvent{ player = entity, playerConfigTableEntry = config, position = playerInstance.transform.position});
             return entity;
