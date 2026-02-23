@@ -12,6 +12,7 @@ namespace DungeonShooter
         event Action<Item> OnItemAdded;
         event Action<Item> OnItemRemoved;
         event Action<Item> OnItemStackChanged;
+        event Action<Item> OnItemUse;
         event Action<Item> OnSelectionChanged;
         event Action<Item> OnEquippedWeaponChanged;
 
@@ -37,6 +38,7 @@ namespace DungeonShooter
         public event Action<Item> OnItemAdded;
         public event Action<Item> OnItemRemoved;
         public event Action<Item> OnItemStackChanged;
+        public event Action<Item> OnItemUse;
         public event Action<Item> OnSelectionChanged;
         public event Action<Item> OnEquippedWeaponChanged;
 
@@ -66,8 +68,14 @@ namespace DungeonShooter
             _inventory.OnItemAdded += InventoryOnItemAdded;
             _inventory.OnItemRemoved += InventoryOnItemRemoved;
             _inventory.OnItemStackChanged += InventoryOnItemStackChanged;
+            _inventory.OnItemUse += InventoryOnItemUse;
             _inventory.OnWeaponEquipped += InventoryOnWeaponEquipped;
             _inventory.OnWeaponUnequipped += InventoryOnWeaponUnequipped;
+        }
+
+        private void InventoryOnItemUse(Item item)
+        {
+            OnItemUse?.Invoke(item);
         }
 
         private void InventoryOnItemStackChanged(Item item)

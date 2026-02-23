@@ -36,16 +36,19 @@ namespace DungeonShooter
             _viewModel = viewModel;
 
             _closeButton.onClick.AddListener(Hide);
-            _useButton.onClick.AddListener(() => _viewModel.UseSelected());
-            _equipButton.onClick.AddListener(() => _viewModel.EquipSelected());
-            _removeButton.onClick.AddListener(() => _viewModel.RemoveSelected());
+            _useButton.onClick.AddListener(_viewModel.UseSelected);
+            _equipButton.onClick.AddListener(_viewModel.EquipSelected);
+            _removeButton.onClick.AddListener(_viewModel.RemoveSelected);
 
             _viewModel.OnItemAdded += HandleItemAdded;
             _viewModel.OnItemRemoved += HandleItemRemoved;
             _viewModel.OnItemStackChanged += HandleItemStackChanged;
+            _viewModel.OnItemUse += HandleItemUse;
             _viewModel.OnSelectionChanged += HandleSelectionChanged;
             _viewModel.OnEquippedWeaponChanged += HandleEquippedWeaponChanged;
 
+            HandleSelectionChanged(null);
+            
             RefreshSlots();
             ApplyButtonState();
         }
@@ -64,6 +67,7 @@ namespace DungeonShooter
                 _viewModel.OnItemAdded -= HandleItemAdded;
                 _viewModel.OnItemRemoved -= HandleItemRemoved;
                 _viewModel.OnItemStackChanged -= HandleItemStackChanged;
+                _viewModel.OnItemUse -= HandleItemUse;
                 _viewModel.OnSelectionChanged -= HandleSelectionChanged;
                 _viewModel.OnEquippedWeaponChanged -= HandleEquippedWeaponChanged;
             }
@@ -87,11 +91,19 @@ namespace DungeonShooter
 
         private void HandleSelectionChanged(Item selected)
         {
-            if (selected != null)
-                _itemInfoPanel.SetItem(selected);
-            else
-                _itemInfoPanel.Clear();
+            var isSelected = selected != null;
 
+            _closeButton.gameObject.SetActive(isSelected);;
+            _equipButton.gameObject.SetActive(isSelected);
+            _removeButton.gameObject.SetActive(isSelected);
+            _useButton.gameObject.SetActive(isSelected);
+            _itemInfoPanel.gameObject.SetActive(isSelected);
+            
+            if (isSelected)
+            {
+                _itemInfoPanel.SetItem(selected);
+            }
+            
             ApplyButtonState();
         }
 
@@ -101,14 +113,27 @@ namespace DungeonShooter
                 slot.SetItem(item);
         }
 
+        private void HandleItemUse(Item item)
+        {
+            if (_slotsDict.TryGetValue(item, out var slot))
+                slot.SetItem(item);
+
+            RefreshSlots();
+            ApplyButtonState();
+        }
+
         private void HandleItemRemoved(Item item)
         {
             if (!_slotsDict.TryGetValue(item, out var slot))
                 return;
 
+            if (_viewModel.SelectedItem == item)
+                _viewModel.SelectItem(null);
+
             _slotsDict.Remove(item);
             slot.OnSlotClicked -= OnSlotClicked;
             Destroy(slot.gameObject);
+            RefreshSlots();
         }
 
         private void HandleEquippedWeaponChanged(Item equipped)
@@ -126,7 +151,8 @@ namespace DungeonShooter
 
         private void RefreshSlots()
         {
-            _itemInfoPanel.Clear();
+            _itemInfoPanel.gameObject.SetActive(_viewModel.SelectedItem != null);
+            
             if (_content == null || _slotPrefab == null || _viewModel == null)
             {
                 LogHandler.LogError<InventoryUI>("초기화가 완료되지 않았습니다.");
