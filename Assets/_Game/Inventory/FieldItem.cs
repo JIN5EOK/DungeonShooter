@@ -1,4 +1,5 @@
 using System.Collections;
+using DG.Tweening;
 using Jin5eok;
 using UnityEngine;
 using VContainer;
@@ -12,13 +13,16 @@ namespace DungeonShooter
     public class FieldItem : MonoBehaviour, IInteractable
     {
         private const float DespawnSeconds = 15f;
+        private const float DropJumpDuration = 1f;
+        private const float DropJumpPower = 2f;
+        private const float LandingRandomRadius = 0.25f;
 
         private Item item;
         private IInventory _inventory;
         private Coroutine _despawnCoroutine;
 
         public bool CanInteract => _canInteract;
-        private bool _canInteract = true;
+        private bool _canInteract;
         private SpriteRenderer _spriteRenderer;
         public Item Item => item;
 
@@ -37,14 +41,33 @@ namespace DungeonShooter
             SetItem(itemToSet);
         }
 
-        /// <summary>
-        /// 아이템만 설정합니다. (인벤토리는 이미 주입된 경우) 스프라이트렌더러에는 아이템 아이콘을 적용합니다.
-        /// </summary>
         public void SetItem(Item itemToSet)
         {
             item = itemToSet;
             ApplyItemIcon();
+            _canInteract = false;
+            transform.DOKill();
+            PlayDropJumpAndEnableInteract();
             StartDespawnTimer();
+        }
+
+        private void PlayDropJumpAndEnableInteract()
+        {
+            var startPos = transform.position;
+            var randomOffset = LandingRandomRadius * Random.insideUnitCircle;
+            var landingPos = startPos + new Vector3(randomOffset.x, randomOffset.y, 0f);
+
+            var jumpTween = transform.DOJump(landingPos, DropJumpPower, 1, DropJumpDuration).SetEase(Ease.OutQuad);
+            var rotateTween = transform.DORotate(new Vector3(0f, 0f, 360f), DropJumpDuration / 5f, RotateMode.FastBeyond360).SetEase(Ease.Linear).SetLoops(5);
+            
+            DOTween.Sequence()
+                .Append(jumpTween)
+                .Join(rotateTween)
+                .SetTarget(transform)
+                .OnComplete(() =>
+                {
+                    _canInteract = true;
+                });
         }
 
         private void ApplyItemIcon()
@@ -133,6 +156,7 @@ namespace DungeonShooter
         private void Despawn()
         {
             StopDespawnTimer();
+            transform.DOKill();
             var poolable = GetComponent<PoolableComponent>();
             if (poolable != null)
                 poolable.Release();
