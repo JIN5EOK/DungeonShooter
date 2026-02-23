@@ -5,7 +5,6 @@ namespace DungeonShooter
     public interface IPlayerDataService
     {
         IEntityContext EntityContext { get; }
-        IEntityStats StatContainer { get; }
     }
 
     /// <summary>
@@ -14,15 +13,12 @@ namespace DungeonShooter
     public class PlayerDataService : IPlayerDataService
     {
         public IEntityContext EntityContext { get; private set; }
-        public IEntityStats StatContainer => EntityContext?.Stat;
 
         private StageContext _stageContext;
         private ITableRepository _tableRepository;
 
         [Inject]
-        public void Initialize(
-            StageContext stageContext,
-            ITableRepository tableRepository)
+        public void Initialize(StageContext stageContext, ITableRepository tableRepository)
         {
             _stageContext = stageContext;
             _tableRepository = tableRepository;
