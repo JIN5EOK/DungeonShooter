@@ -14,18 +14,21 @@ namespace DungeonShooter
         [SerializeField] private TextMeshProUGUI _moveSpeedText;
         [SerializeField] private TextMeshProUGUI _remainingEnemyCountText;
 
-        private PlayerStatusManager _playerStatusManager;
+        private IPlayerDataService _playerDataService;
         private EntityManager _entityManager;
 
         [Inject]
-        public void Construct(PlayerStatusManager playerStatusManager, EntityManager entityManager)
+        public void Construct(IPlayerDataService playerDataService, EntityManager entityManager)
         {
-            _playerStatusManager = playerStatusManager;
+            _playerDataService = playerDataService;
             _entityManager = entityManager;
 
-            _playerStatusManager.StatContainer.GetStat(StatType.Attack).OnValueChanged += OnAttackStatChanged;
-            _playerStatusManager.StatContainer.GetStat(StatType.Defense).OnValueChanged += OnDefenseStatChanged;
-            _playerStatusManager.StatContainer.GetStat(StatType.MoveSpeed).OnValueChanged += OnMoveSpeedStatChanged;
+            if (_playerDataService.StatContainer != null)
+            {
+                _playerDataService.StatContainer.GetStat(StatType.Attack).OnValueChanged += OnAttackStatChanged;
+                _playerDataService.StatContainer.GetStat(StatType.Defense).OnValueChanged += OnDefenseStatChanged;
+                _playerDataService.StatContainer.GetStat(StatType.MoveSpeed).OnValueChanged += OnMoveSpeedStatChanged;
+            }
 
             _entityManager.OnRemainingEnemyCountChanged += SetRemainingEnemyCount;
 
@@ -50,9 +53,10 @@ namespace DungeonShooter
 
         private void RefreshAllStatTexts()
         {
-            if (_attackText != null) _attackText.text = _playerStatusManager.StatContainer.GetStat(StatType.Attack).GetValue().ToString();
-            if (_defenseText != null) _defenseText.text = _playerStatusManager.StatContainer.GetStat(StatType.Defense).GetValue().ToString();
-            if (_moveSpeedText != null) _moveSpeedText.text = _playerStatusManager.StatContainer.GetStat(StatType.MoveSpeed).GetValue().ToString();
+            if (_playerDataService.StatContainer == null) return;
+            if (_attackText != null) _attackText.text = _playerDataService.StatContainer.GetStat(StatType.Attack).GetValue().ToString();
+            if (_defenseText != null) _defenseText.text = _playerDataService.StatContainer.GetStat(StatType.Defense).GetValue().ToString();
+            if (_moveSpeedText != null) _moveSpeedText.text = _playerDataService.StatContainer.GetStat(StatType.MoveSpeed).GetValue().ToString();
         }
 
         private void SetRemainingEnemyCount(int count)
@@ -63,10 +67,13 @@ namespace DungeonShooter
 
         protected override void OnDestroy()
         {
-            _playerStatusManager.StatContainer.GetStat(StatType.Attack).OnValueChanged -= OnAttackStatChanged;
-            _playerStatusManager.StatContainer.GetStat(StatType.Defense).OnValueChanged -= OnDefenseStatChanged;
-            _playerStatusManager.StatContainer.GetStat(StatType.MoveSpeed).OnValueChanged -= OnMoveSpeedStatChanged;
-            
+            if (_playerDataService?.StatContainer != null)
+            {
+                _playerDataService.StatContainer.GetStat(StatType.Attack).OnValueChanged -= OnAttackStatChanged;
+                _playerDataService.StatContainer.GetStat(StatType.Defense).OnValueChanged -= OnDefenseStatChanged;
+                _playerDataService.StatContainer.GetStat(StatType.MoveSpeed).OnValueChanged -= OnMoveSpeedStatChanged;
+            }
+
             _entityManager.OnRemainingEnemyCountChanged -= SetRemainingEnemyCount;
         }
     }

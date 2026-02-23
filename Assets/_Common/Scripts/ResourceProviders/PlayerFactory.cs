@@ -34,7 +34,6 @@ namespace DungeonShooter
             , ISceneResourceProvider sceneResourceProvider
             , ITableRepository tableRepository
             , IEventBus eventBus
-            , PlayerStatusManager playerStatusManager
             , IPlayerSkillManager playerSkillManager
             , LifetimeScope sceneLifetimeScope
             , IPlayerDataService playerDataService)
@@ -43,6 +42,7 @@ namespace DungeonShooter
             _sceneResourceProvider = sceneResourceProvider;
             _tableRepository = tableRepository;
             _eventBus = eventBus;
+            _playerDataService = playerDataService;
             _sceneLifetimeScope = sceneLifetimeScope;
         }
 

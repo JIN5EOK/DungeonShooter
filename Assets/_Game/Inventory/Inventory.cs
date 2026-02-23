@@ -22,19 +22,19 @@ namespace DungeonShooter
         private readonly HashSet<Item> _items = new HashSet<Item>();
         private Item _equippedWeapon;
         
-        private PlayerStatusManager _playerStatusManager;
+        private IPlayerDataService _playerDataService;
         private IPlayerSkillManager _playerSkillManager;
         private IEventBus _eventBus;
-        
-        private IEntityStats StatContainer => _playerStatusManager?.StatContainer;
+
+        private IEntityStats StatContainer => _playerDataService?.StatContainer;
         private IEntitySkills SkillContainer => _playerSkillManager?.SkillContainer;
-        
+
         private EntityBase _ownerEntity;
 
         [Inject]
-        public Inventory(IEventBus eventBus, PlayerStatusManager playerStatusManager, IPlayerSkillManager playerSkillManager)
+        public Inventory(IEventBus eventBus, IPlayerDataService playerDataService, IPlayerSkillManager playerSkillManager)
         {
-            _playerStatusManager = playerStatusManager;
+            _playerDataService = playerDataService;
             _playerSkillManager = playerSkillManager;
             _eventBus = eventBus;
             _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);

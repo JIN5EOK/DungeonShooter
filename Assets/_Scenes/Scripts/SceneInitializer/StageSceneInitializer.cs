@@ -13,7 +13,6 @@ namespace DungeonShooter
         private ITableRepository _tableRepository;
         private IStageGenerator _stageGenerator;
         private IStageInstantiator _stageInstantiator;
-        private PlayerStatusManager _playerStatusManager;
         private IPlayerSkillManager _playerSkillManager;
         private Inventory _inventory;
         private IItemFactory _itemFactory;
@@ -24,7 +23,6 @@ namespace DungeonShooter
             , ITableRepository tableRepository
             , IStageGenerator stageGenerator
             , IStageInstantiator stageInstantiator
-            , PlayerStatusManager playerStatusManager
             , IPlayerSkillManager playerSkillManager
             , Inventory inventory
             , IItemFactory itemFactory
@@ -34,7 +32,6 @@ namespace DungeonShooter
             _tableRepository = tableRepository;
             _stageGenerator = stageGenerator;
             _stageInstantiator = stageInstantiator;
-            _playerStatusManager = playerStatusManager;
             _playerSkillManager = playerSkillManager;
             _inventory = inventory;
             _itemFactory = itemFactory;
@@ -72,7 +69,6 @@ namespace DungeonShooter
                 return;
             }
             
-            _playerStatusManager.Initialize(config);
             await _playerSkillManager.InitializeAsync(config);
 
             var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);

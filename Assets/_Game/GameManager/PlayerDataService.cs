@@ -1,34 +1,32 @@
-using Cysharp.Threading.Tasks;
 using VContainer;
 
 namespace DungeonShooter
 {
     public interface IPlayerDataService
     {
-        public IEntityContext EntityContext { get; }
+        IEntityContext EntityContext { get; }
+        IEntityStats StatContainer { get; }
     }
 
+    /// <summary>
+    /// 플레이어의 스탯/현재 스테이터스를 담당하며 EntityContext를 제공합니다.
+    /// </summary>
     public class PlayerDataService : IPlayerDataService
     {
         public IEntityContext EntityContext { get; private set; }
+        public IEntityStats StatContainer => EntityContext?.Stat;
 
         private StageContext _stageContext;
         private ITableRepository _tableRepository;
-        private PlayerStatusManager _playerStatusManager;
-        private IPlayerSkillManager _playerSkillManager;
 
         [Inject]
-        public async UniTask Initialize(
+        public void Initialize(
             StageContext stageContext,
-            ITableRepository tableRepository,
-            PlayerStatusManager playerStatusManager,
-            IPlayerSkillManager playerSkillService)
+            ITableRepository tableRepository)
         {
             _stageContext = stageContext;
             _tableRepository = tableRepository;
-            _playerStatusManager = playerStatusManager;
-            _playerSkillManager = playerSkillService;
-            
+
             var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
             if (config == null)
             {
@@ -40,11 +38,13 @@ namespace DungeonShooter
             IEntityStats entityStats = new EntityStats();
             entityStats.Initialize(statsEntry);
 
+            var statuses = new EntityStatuses(statsEntry);
+            var skillContainer = new EntitySkills();
             EntityContext = new EntityContext(
                 new EntityInputContext(),
                 entityStats,
-                new EntityStatuses(statsEntry),
-                _playerSkillManager.SkillContainer);
+                statuses,
+                skillContainer);
         }
     }
 }

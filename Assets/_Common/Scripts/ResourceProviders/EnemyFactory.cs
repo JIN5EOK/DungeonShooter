@@ -261,12 +261,12 @@ namespace DungeonShooter
             if (statsEntry != null)
                 statGroup.Initialize(statsEntry);
 
-            var skillContainer = entityLifeTimeScope.Container.Resolve<IEntitySkills>();
+            var entitySkills = new EntitySkills();
             var context = new EntityContext(
                 new EntityInputContext()
                 , statGroup
                 , new EntityStatuses(statsEntry)
-                , skillContainer);
+                , entitySkills);
             entity.SetContext(context);
 
             var healthComponent = entityLifeTimeScope.Container.Resolve<IHealthComponent>();
@@ -289,7 +289,7 @@ namespace DungeonShooter
             foreach (var skillId in configTableEntry.ActiveSkills)
             {
                 var skill = _skillFactory.CreateSkillSync(skillId);
-                skillContainer.Regist(skill);
+                entitySkills.Regist(skill);
                 activeSkills.Add(skill);
             }
 

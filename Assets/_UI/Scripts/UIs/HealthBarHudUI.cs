@@ -17,16 +17,25 @@ namespace DungeonShooter
         private int _currentHealth;
         private int _maxHealth;
 
-        private PlayerStatusManager _statusManager;
-        
+        private IPlayerDataService _playerDataService;
+        private IEntityStatus _hpStatus;
+        private IEntityStat _hpStat;
+
         [Inject]
-        public void Construct(PlayerStatusManager statusManager)
+        public void Construct(IPlayerDataService playerDataService)
         {
-            _statusManager = statusManager;
-            _statusManager.OnHpChanged += SetHealth;
-            _statusManager.StatContainer.GetStat(StatType.Hp).OnValueChanged += SetMaxHealth;
-            SetHealth(_statusManager.Hp);
-            SetMaxHealth(_statusManager.StatContainer.GetStat(StatType.Hp).GetValue());
+            _playerDataService = playerDataService;
+            var context = _playerDataService.EntityContext;
+            if (context == null) return;
+
+            _hpStatus = context.Statuses?.GetStatus(StatusType.Hp);
+            _hpStat = context.Stat?.GetStat(StatType.Hp);
+            if (_hpStatus != null)
+                _hpStatus.OnValueChanged += SetHealth;
+            if (_hpStat != null)
+                _hpStat.OnValueChanged += SetMaxHealth;
+            SetHealth(_hpStatus?.GetValue() ?? 0);
+            SetMaxHealth(_hpStat?.GetValue() ?? 0);
         }
 
         public void SetHealth(int current)
@@ -54,8 +63,10 @@ namespace DungeonShooter
         
         protected override void OnDestroy()
         {
-            _statusManager.OnHpChanged -= SetHealth;
-            _statusManager.StatContainer.GetStat(StatType.Hp).OnValueChanged -= SetMaxHealth;
+            if (_hpStatus != null)
+                _hpStatus.OnValueChanged -= SetHealth;
+            if (_hpStat != null)
+                _hpStat.OnValueChanged -= SetMaxHealth;
         }
     }
 }

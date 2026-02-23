@@ -31,6 +31,7 @@ namespace DungeonShooter
         {
             _skillFactory = skillFactory;
             _eventBus = eventBus;
+            _playerDataService = playerDataService;
             _eventBus.Subscribe<SkillLevelUpEvent>(OnSkillLevelChanged);
         }
 

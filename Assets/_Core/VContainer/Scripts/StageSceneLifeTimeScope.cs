@@ -15,7 +15,6 @@ namespace DungeonShooter
             new CommonSceneInstaller().Install(builder);
             
             builder.Register<EntityManager>(Lifetime.Scoped);
-            builder.Register<PlayerStatusManager>(Lifetime.Scoped);
             builder.Register<PlayerInputManager>(Lifetime.Scoped);
             builder.Register<PlayerDataService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<PlayerSkillManager>(Lifetime.Scoped).AsImplementedInterfaces();
