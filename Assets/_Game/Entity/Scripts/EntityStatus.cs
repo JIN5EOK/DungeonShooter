@@ -1,40 +1,37 @@
-using System.Collections.Generic;
+using System;
 
 namespace DungeonShooter
 {
     /// <summary>
-    /// Entity의 현재 상태(현재 체력 등)를 관리하는 Pure C# 객체.
+    /// 개별 상태 수치(현재 체력 등). Modifier 없이 현재값만 보관.
+    /// </summary>
+    public interface IEntityStatus
+    {
+        public int GetValue();
+        public void SetValue(int value);
+        public event Action<int> OnValueChanged;
+    }
+    
+    /// <summary>
+    /// 개별 상태 수치. 현재값만 보관하며 변경 시 OnValueChanged를 발생시킨다.
     /// </summary>
     public class EntityStatus : IEntityStatus
     {
-        private readonly Dictionary<StatusType, EntityStatusValue> _statusValues = new Dictionary<StatusType, EntityStatusValue>();
+        private int _value;
 
-        public EntityStatus(EntityStatsTableEntry entry = null)
+        public event Action<int> OnValueChanged;
+
+        public int GetValue()
         {
-            if (entry != null)
-                GetOrAddStatus(StatusType.Hp).SetValue(entry.MaxHp);
+            return _value;
         }
 
-        public void Initialize(EntityStatsTableEntry entry)
+        public void SetValue(int value)
         {
-            if (entry == null)
+            if (_value == value)
                 return;
-            GetOrAddStatus(StatusType.Hp).SetValue(entry.MaxHp);
-        }
-
-        public IEntityStatusValue GetStatus(StatusType type)
-        {
-            return GetOrAddStatus(type);
-        }
-
-        private EntityStatusValue GetOrAddStatus(StatusType type)
-        {
-            if (_statusValues.TryGetValue(type, out var statusValue))
-                return statusValue;
-
-            var value = new EntityStatusValue();
-            _statusValues[type] = value;
-            return value;
+            _value = value;
+            OnValueChanged?.Invoke(_value);
         }
     }
 }

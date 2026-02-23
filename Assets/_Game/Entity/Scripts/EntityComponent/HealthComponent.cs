@@ -28,7 +28,7 @@ namespace DungeonShooter
         private EntityBase _entityBase;
         private SpriteRenderer _spriteRenderer;
         private Rigidbody2D _rigidbody;
-        private IEntityStatusValue _hpStatus;
+        private IEntityStatus _hpStatus;
 
         [Inject]
         private void Construct(EntityBase entityBase, SpriteRenderer spriteRenderer, Rigidbody2D rigidbody2D)
@@ -38,7 +38,7 @@ namespace DungeonShooter
             _rigidbody = rigidbody2D;
             _originalColor = _spriteRenderer.color;
 
-            _hpStatus = _entityBase.EntityContext?.Status?.GetStatus(StatusType.Hp);
+            _hpStatus = _entityBase.EntityContext?.Statuses?.GetStatus(StatusType.Hp);
             if (_hpStatus != null)
                 _hpStatus.OnValueChanged += OnHpStatusChanged;
         }

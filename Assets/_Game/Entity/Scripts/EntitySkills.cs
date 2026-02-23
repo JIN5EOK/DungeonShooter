@@ -6,6 +6,20 @@ using VContainer;
 namespace DungeonShooter
 {
     /// <summary>
+    /// Entity가 지닌 스킬 관련 인터페이스.
+    /// </summary>
+    public interface IEntitySkills
+    {
+        public event Action<Skill> OnSkillRegisted;
+        public event Action<Skill> OnSkillUnregisted;
+        public bool Contains(Skill skill);
+        public IReadOnlyList<Skill> GetRegistedSkills();
+        public void Regist(Skill skill);
+        public void Unregist(Skill skill);
+        public void Clear();
+    }
+    
+    /// <summary>
     /// Entity의 스킬을 관리하는 Pure C# 객체.
     /// 스킬 등록/해제만 담당하며, 스킬 사용은 Skill 인스턴스를 직접 호출한다.
     /// </summary>

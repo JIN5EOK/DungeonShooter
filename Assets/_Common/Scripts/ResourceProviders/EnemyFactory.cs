@@ -265,7 +265,7 @@ namespace DungeonShooter
             var context = new EntityContext(
                 new EntityInputContext()
                 , statGroup
-                , new EntityStatus(statsEntry)
+                , new EntityStatuses(statsEntry)
                 , skillContainer);
             entity.SetContext(context);
 
