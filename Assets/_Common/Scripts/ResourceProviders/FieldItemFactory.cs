@@ -26,11 +26,11 @@ namespace DungeonShooter
 
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly IItemFactory _itemFactory;
-        private readonly Inventory _inventory;
+        private readonly IInventory _inventory;
         private readonly GameObjectPool _pool = new();
 
         [Inject]
-        public FieldItemFactory(ISceneResourceProvider sceneResourceProvider, IItemFactory itemFactory, Inventory inventory)
+        public FieldItemFactory(ISceneResourceProvider sceneResourceProvider, IItemFactory itemFactory, IInventory inventory)
         {
             _sceneResourceProvider = sceneResourceProvider;
             _itemFactory = itemFactory;

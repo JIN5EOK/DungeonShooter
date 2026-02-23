@@ -27,13 +27,13 @@ namespace DungeonShooter
         [SerializeField]
         private Button _equipButton;
         
-        private Inventory _inventory;
+        private IInventory _inventory;
         private readonly Dictionary<Item, InventorySlotUIElement> _slotsDict = new();
 
         private Item _selectedItem;
 
         [Inject]
-        public void Construct(Inventory inventory)
+        public void Construct(IInventory inventory)
         {
             _inventory = inventory;
             

@@ -14,7 +14,7 @@ namespace DungeonShooter
         private IStageGenerator _stageGenerator;
         private IStageInstantiator _stageInstantiator;
         private IPlayerDataService _playerDataService;
-        private Inventory _inventory;
+        private IInventory _inventory;
         private IItemFactory _itemFactory;
         private StageSceneUIManager _stageSceneUIManager;
 
@@ -24,7 +24,7 @@ namespace DungeonShooter
             , IStageGenerator stageGenerator
             , IStageInstantiator stageInstantiator
             , IPlayerDataService playerDataService
-            , Inventory inventory
+            , IInventory inventory
             , IItemFactory itemFactory
             , StageSceneUIManager stageSceneUIManager)
         {

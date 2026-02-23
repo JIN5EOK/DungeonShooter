@@ -13,7 +13,7 @@ namespace DungeonShooter
         private InputManager _inputManager;
         private IPauseManager _pauseManager;
         private IEntityInputContext _entityInputContext;
-        private Inventory _inventory;
+        private IInventory _inventory;
         private ISkillSlotService _skillSlotService;
         private StageSceneUIManager _stageSceneUIManager;
 
@@ -21,7 +21,7 @@ namespace DungeonShooter
         public PlayerInputManager(InputManager inputManager,
             IEventBus eventBus,
             IPauseManager pauseManager,
-            Inventory inventory,
+            IInventory inventory,
             StageSceneUIManager stageSceneUIManager,
             ISkillSlotService skillSlotService)
         {

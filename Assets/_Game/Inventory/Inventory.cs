@@ -10,7 +10,7 @@ namespace DungeonShooter
     /// <summary>
     /// 아이템 장착/소지 관리 인벤토리
     /// </summary>
-    public class Inventory : IDisposable
+    public class Inventory : IInventory
     {
         public event Action<Item> OnItemAdded;
         public event Action<Item> OnItemRemoved;
@@ -196,7 +196,6 @@ namespace DungeonShooter
         {
             StatContainer?.RemoveStatBonus(item);
         }
-
 
         /// <summary> 소비 아이템 사용후 이벤트 실행, 갯수 차감 /// </summary>
         public void UseItem(Item item)

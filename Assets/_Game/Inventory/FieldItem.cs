@@ -14,7 +14,7 @@ namespace DungeonShooter
         private const float DespawnSeconds = 15f;
 
         private Item item;
-        private Inventory _inventory;
+        private IInventory _inventory;
         private Coroutine _despawnCoroutine;
 
         public bool CanInteract => _canInteract;
@@ -23,7 +23,7 @@ namespace DungeonShooter
         public Item Item => item;
 
         [Inject]
-        public void Construct(Inventory inventory)
+        public void Construct(IInventory inventory)
         {
             _inventory = inventory;
         }
@@ -31,7 +31,7 @@ namespace DungeonShooter
         /// <summary>
         /// 팩토리에서 풀/신규 생성 시 아이템과 인벤토리를 한 번에 설정합니다.
         /// </summary>
-        public void Initialize(Item itemToSet, Inventory inventory)
+        public void Initialize(Item itemToSet, IInventory inventory)
         {
             _inventory = inventory;
             SetItem(itemToSet);
