@@ -42,9 +42,17 @@ namespace DungeonShooter
 
             _viewModel.OnItemAdded += HandleItemAdded;
             _viewModel.OnItemRemoved += HandleItemRemoved;
+            _viewModel.OnItemStackChanged += HandleItemStackChanged;
             _viewModel.OnSelectionChanged += HandleSelectionChanged;
             _viewModel.OnEquippedWeaponChanged += HandleEquippedWeaponChanged;
 
+            RefreshSlots();
+            ApplyButtonState();
+        }
+
+        public override void Show()
+        {
+            base.Show();
             RefreshSlots();
             ApplyButtonState();
         }
@@ -55,6 +63,7 @@ namespace DungeonShooter
             {
                 _viewModel.OnItemAdded -= HandleItemAdded;
                 _viewModel.OnItemRemoved -= HandleItemRemoved;
+                _viewModel.OnItemStackChanged -= HandleItemStackChanged;
                 _viewModel.OnSelectionChanged -= HandleSelectionChanged;
                 _viewModel.OnEquippedWeaponChanged -= HandleEquippedWeaponChanged;
             }
@@ -84,6 +93,12 @@ namespace DungeonShooter
                 _itemInfoPanel.Clear();
 
             ApplyButtonState();
+        }
+
+        private void HandleItemStackChanged(Item item)
+        {
+            if (_slotsDict.TryGetValue(item, out var slot))
+                slot.SetItem(item);
         }
 
         private void HandleItemRemoved(Item item)
@@ -123,6 +138,8 @@ namespace DungeonShooter
             {
                 if (!_slotsDict.ContainsKey(item))
                     HandleItemAdded(item);
+                
+                _slotsDict[item].SetItem(item);
             }
 
             var toRemove = _slotsDict.Keys.Where(item => !items.Contains(item)).ToList();

@@ -15,6 +15,7 @@ namespace DungeonShooter
     {
         public event Action<Item> OnItemAdded;
         public event Action<Item> OnItemRemoved;
+        public event Action<Item> OnItemStackChanged;
         public event Action<Item> OnWeaponEquipped;
         public event Action<Item> OnWeaponUnequipped;
         public event Action<Item> OnItemUse;
@@ -38,6 +39,7 @@ namespace DungeonShooter
             _eventBus = eventBus;
             _model.OnItemAdded += OnItemAdded;
             _model.OnItemRemoved += OnItemRemoved;
+            _model.OnItemStackChanged += OnItemStackChanged;
             _model.OnWeaponEquipped += OnWeaponEquipped;
             _model.OnWeaponUnequipped += OnWeaponUnequipped;
             _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
@@ -197,6 +199,7 @@ namespace DungeonShooter
         {
             _model.OnItemAdded -= OnItemAdded;
             _model.OnItemRemoved -= OnItemRemoved;
+            _model.OnItemStackChanged -= OnItemStackChanged;
             _model.OnWeaponEquipped -= OnWeaponEquipped;
             _model.OnWeaponUnequipped -= OnWeaponUnequipped;
             _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);

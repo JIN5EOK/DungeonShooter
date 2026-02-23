@@ -15,6 +15,7 @@ namespace DungeonShooter
 
         public event Action<Item> OnItemAdded;
         public event Action<Item> OnItemRemoved;
+        public event Action<Item> OnItemStackChanged;
         public event Action<Item> OnWeaponEquipped;
         public event Action<Item> OnWeaponUnequipped;
 
@@ -22,23 +23,27 @@ namespace DungeonShooter
         private Item _equippedWeapon;
 
         /// <summary>
-        /// 아이템을 컨테이너에 추가한다. 스택 가능하면 기존 아이템에 합친다.
+        /// 아이템을 모델에 추가한다. 스택 가능한 기존 슬롯을 가득 채운 뒤, 남은 수량만 새 슬롯으로 넣는다.
         /// </summary>
-        /// <param name="item">추가할 아이템</param>
-        /// <returns>추가 또는 스택 반영 여부</returns>
         public bool AddItem(Item item)
         {
-            if (item == null)
+            if (item == null || item.StackCount <= 0)
                 return false;
 
-            var existingItem = FindStackableItem(item.ItemTableEntry.Id);
-            if (existingItem != null && existingItem.CanAddStack(item.StackCount))
+            var entryId = item.ItemTableEntry.Id;
+            while (item.StackCount > 0)
             {
-                var remaining = item.StackCount - existingItem.AddStack(item.StackCount);
-                if (remaining > 0)
-                    item.StackCount = remaining;
-                return true;
+                var existingItem = FindStackableItem(entryId);
+                if (existingItem == null)
+                    break;
+
+                var added = existingItem.AddStack(item.StackCount);
+                item.StackCount -= added;
+                OnItemStackChanged?.Invoke(existingItem);
             }
+
+            if (item.StackCount <= 0)
+                return true;
 
             _items.Add(item);
             OnItemAdded?.Invoke(item);
@@ -46,7 +51,7 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 컨테이너에서 아이템을 제거한다. 장착 중이었으면 해제한다.
+        /// 모델에서 아이템을 제거한다. 장착 중이었으면 해제한다.
         /// </summary>
         public void RemoveItem(Item item)
         {
@@ -86,7 +91,7 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 소지·장착 중인 모든 아이템을 컨테이너에서 제거한다.
+        /// 소지/장착 중인 모든 아이템을 모델에서 제거한다.
         /// </summary>
         public void Clear()
         {

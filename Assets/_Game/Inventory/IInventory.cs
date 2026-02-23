@@ -10,6 +10,7 @@ namespace DungeonShooter
     {
         event Action<Item> OnItemAdded;
         event Action<Item> OnItemRemoved;
+        event Action<Item> OnItemStackChanged;
         event Action<Item> OnWeaponEquipped;
         event Action<Item> OnWeaponUnequipped;
         event Action<Item> OnItemUse;
