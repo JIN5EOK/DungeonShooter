@@ -14,8 +14,9 @@ namespace DungeonShooter
         event Action<Item> OnWeaponUnequipped;
         event Action<Item> OnItemUse;
 
-        IReadOnlyCollection<Item> Items { get; }
         Item EquippedWeapon { get; }
+
+        IReadOnlyCollection<Item> GetItems();
 
         bool AddItem(Item item);
         bool EquipItem(Item item);

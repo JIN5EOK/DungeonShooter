@@ -120,7 +120,7 @@ namespace DungeonShooter
             }
                 
 
-            var items = _inventory.Items;
+            var items = _inventory.GetItems();
             foreach (var item in items)
             {
                 if (!_slotsDict.ContainsKey(item))
