@@ -120,6 +120,7 @@ namespace DungeonShooter
 
             RefreshSlots();
             ApplyButtonState();
+            Hide();
         }
 
         private void HandleItemRemoved(Item item)

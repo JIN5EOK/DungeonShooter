@@ -57,17 +57,16 @@ namespace DungeonShooter
             var randomOffset = LandingRandomRadius * Random.insideUnitCircle;
             var landingPos = startPos + new Vector3(randomOffset.x, randomOffset.y, 0f);
 
-            var jumpTween = transform.DOJump(landingPos, DropJumpPower, 1, DropJumpDuration).SetEase(Ease.OutQuad);
+            var jumpTween = transform.DOJump(landingPos, DropJumpPower, 1, DropJumpDuration).SetEase(Ease.OutQuad).OnComplete(() =>
+            {
+                _canInteract = true;
+            });
             var rotateTween = transform.DORotate(new Vector3(0f, 0f, 360f), DropJumpDuration / 5f, RotateMode.FastBeyond360).SetEase(Ease.Linear).SetLoops(5);
-            
+
             DOTween.Sequence()
                 .Append(jumpTween)
                 .Join(rotateTween)
-                .SetTarget(transform)
-                .OnComplete(() =>
-                {
-                    _canInteract = true;
-                });
+                .SetTarget(transform);
         }
 
         private void ApplyItemIcon()
