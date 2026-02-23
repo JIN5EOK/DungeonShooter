@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace DungeonShooter
 {
@@ -19,16 +20,20 @@ namespace DungeonShooter
     {
         private readonly Dictionary<StatusType, EntityStatus> _statusValues = new Dictionary<StatusType, EntityStatus>();
 
-        public EntityStatuses(EntityStatsTableEntry entry = null)
+        public EntityStatuses(EntityStatsTableEntry entry)
         {
-            if (entry != null)
-                GetOrAddStatus(StatusType.Hp).SetValue(entry.MaxHp);
+            Initialize(entry);
         }
 
         public void Initialize(EntityStatsTableEntry entry)
         {
             if (entry == null)
+            {
+                LogHandler.LogError<EntityStats>($"{nameof(EntityStatsTableEntry)}가 유효하지 않습니다");
                 return;
+            }
+                
+            
             GetOrAddStatus(StatusType.Hp).SetValue(entry.MaxHp);
         }
 
