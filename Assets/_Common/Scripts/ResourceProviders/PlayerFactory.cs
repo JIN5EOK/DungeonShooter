@@ -34,7 +34,6 @@ namespace DungeonShooter
             , ISceneResourceProvider sceneResourceProvider
             , ITableRepository tableRepository
             , IEventBus eventBus
-            , IPlayerSkillManager playerSkillManager
             , LifetimeScope sceneLifetimeScope
             , IPlayerDataService playerDataService)
         {

@@ -17,7 +17,7 @@ namespace DungeonShooter
             builder.Register<EntityManager>(Lifetime.Scoped);
             builder.Register<PlayerInputManager>(Lifetime.Scoped);
             builder.Register<PlayerDataService>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<PlayerSkillManager>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<SkillSlotService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SkillSlotViewModel>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<PlayerLevelService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SkillService>(Lifetime.Scoped).AsImplementedInterfaces();

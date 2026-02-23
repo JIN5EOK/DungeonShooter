@@ -13,19 +13,19 @@ namespace DungeonShooter
     }
     
     /// <summary>
-    /// IPlayerSkillManager의 상태 변화를 구독하여 스킬 쿨다운 HUD에 노출한다.
+    /// ISkillSlotService의 상태 변화를 구독하여 스킬 쿨다운 HUD에 노출한다.
     /// </summary>
     public class SkillSlotViewModel : ISkillSlotViewModel
     {
-        private readonly IPlayerSkillManager _playerSkillManager;
+        private readonly ISkillSlotService _skillSlotService;
 
         public event Action<int, Skill> OnSkillSlotChanged;
 
         [Inject]
-        public SkillSlotViewModel(IPlayerSkillManager playerSkillManager)
+        public SkillSlotViewModel(ISkillSlotService skillSlotService)
         {
-            _playerSkillManager = playerSkillManager;
-            _playerSkillManager.OnSkillSlotChanged += OnServiceSkillSlotChanged;
+            _skillSlotService = skillSlotService;
+            _skillSlotService.OnSkillSlotChanged += OnServiceSkillSlotChanged;
         }
 
         private void OnServiceSkillSlotChanged(int index, Skill skill)
@@ -35,7 +35,7 @@ namespace DungeonShooter
 
         public Skill GetActiveSkill(int index)
         {
-            return _playerSkillManager.GetActiveSkill(index);
+            return _skillSlotService.GetActiveSkill(index);
         }
     }
 }

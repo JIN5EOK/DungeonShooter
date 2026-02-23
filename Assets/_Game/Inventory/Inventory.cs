@@ -23,19 +23,17 @@ namespace DungeonShooter
         private Item _equippedWeapon;
         
         private IPlayerDataService _playerDataService;
-        private IPlayerSkillManager _playerSkillManager;
         private IEventBus _eventBus;
 
         private IEntityStats StatContainer => _playerDataService?.EntityContext?.Stat;
-        private IEntitySkills SkillContainer => _playerSkillManager?.SkillContainer;
+        private IEntitySkills SkillContainer => _playerDataService?.EntityContext?.Skill;
 
         private EntityBase _ownerEntity;
 
         [Inject]
-        public Inventory(IEventBus eventBus, IPlayerDataService playerDataService, IPlayerSkillManager playerSkillManager)
+        public Inventory(IEventBus eventBus, IPlayerDataService playerDataService)
         {
             _playerDataService = playerDataService;
-            _playerSkillManager = playerSkillManager;
             _eventBus = eventBus;
             _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
             _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(PlayerObjectDespawned);

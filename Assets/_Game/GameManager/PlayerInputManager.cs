@@ -14,7 +14,7 @@ namespace DungeonShooter
         private IPauseManager _pauseManager;
         private IEntityInputContext _entityInputContext;
         private Inventory _inventory;
-        private IPlayerSkillManager _skillManager;
+        private ISkillSlotService _skillSlotService;
         private StageSceneUIManager _stageSceneUIManager;
 
         [Inject]
@@ -23,14 +23,14 @@ namespace DungeonShooter
             IPauseManager pauseManager,
             Inventory inventory,
             StageSceneUIManager stageSceneUIManager,
-            IPlayerSkillManager skillManager)
+            ISkillSlotService skillSlotService)
         {
             _inputManager = inputManager;
             _eventBus = eventBus;
             _pauseManager = pauseManager;
             _inventory = inventory;
             _stageSceneUIManager = stageSceneUIManager;
-            _skillManager = skillManager;
+            _skillSlotService = skillSlotService;
             _eventBus.Subscribe<PlayerObjectSpawnEvent>(OnPlayerObjectSpawned);
             _eventBus.Subscribe<PlayerObjectDestroyEvent>(OnPlayerObjectDestroyed);
             SubscribeToInput();
@@ -87,7 +87,11 @@ namespace DungeonShooter
         private void OnHandleMoveInput(Vector2 input)
         {
             if (!CanProcessGameInput())
+            {
+                _entityInputContext.MoveInput = Vector2.zero;
                 return;
+            }
+                
 
             _entityInputContext.MoveInput = input;
         }
@@ -113,7 +117,7 @@ namespace DungeonShooter
             if (!CanProcessGameInput())
                 return;
 
-            SkillInputInternal(_skillManager?.GetActiveSkill(0), isPressed);
+            SkillInputInternal(_skillSlotService?.GetActiveSkill(0), isPressed);
         }
 
         private void OnSkill2Input(bool isPressed)
@@ -121,7 +125,7 @@ namespace DungeonShooter
             if (!CanProcessGameInput())
                 return;
 
-            SkillInputInternal(_skillManager?.GetActiveSkill(1), isPressed);
+            SkillInputInternal(_skillSlotService?.GetActiveSkill(1), isPressed);
         }
 
         private void SkillInputInternal(Skill skill, bool isPressed)
