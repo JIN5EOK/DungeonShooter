@@ -9,7 +9,7 @@ namespace DungeonShooter
     /// <summary>
     /// 행동트리를 실행하는 AI 컴포넌트입니다.
     /// </summary>
-    public class AIComponent : MonoBehaviour
+    public class AIComponent : MonoBehaviour, IAIComponent
     {
         private AiBTContext _context = new AiBTContext();
         private IBehaviourTreeNode<AiBTContext> _rootNode;

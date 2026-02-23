@@ -35,7 +35,8 @@ namespace DungeonShooter
             var skillDamagePercent = Mathf.RoundToInt(tableDamagePercent * damagePercent);
             
 
-            if (targetEntity.TryGetComponent(out HealthComponent health))
+            var health = targetEntity.GetComponent<IHealthComponent>();
+            if (health != null)
             {
                 var casterAtk = context.Caster.EntityContext.Stat.GetStat(StatType.Attack).GetValue();
                 var targetDef = context.LastHitTarget.EntityContext.Stat.GetStat(StatType.Defense).GetValue();

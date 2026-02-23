@@ -10,10 +10,10 @@ namespace DungeonShooter
     public class InteractState : IEntityState
     {
         private IEntityStateMachine _entityStateMachine;
-        private readonly InteractComponent _interactComponent;
+        private readonly IInteractComponent _interactComponent;
 
         [Inject]
-        public InteractState(InteractComponent interactComponent)
+        public InteractState(IInteractComponent interactComponent)
         {
             _interactComponent = interactComponent;
         }

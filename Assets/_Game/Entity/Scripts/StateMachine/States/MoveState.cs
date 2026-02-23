@@ -10,12 +10,12 @@ namespace DungeonShooter
     public class MoveState : IEntityState
     {
         private IEntityStateMachine _entityStateMachine;
-        private readonly MovementComponent _movementComponent;
+        private readonly IMovementComponent _movementComponent;
         private readonly EntityAnimationHandler _entityAnimationHandler;
-        private readonly DashComponent _dashComponent;
+        private readonly IDashComponent _dashComponent;
 
         [Inject]
-        public MoveState(MovementComponent movementComponent, EntityAnimationHandler entityAnimationHandler, DashComponent dashComponent)
+        public MoveState(IMovementComponent movementComponent, EntityAnimationHandler entityAnimationHandler, IDashComponent dashComponent)
         {
             _movementComponent = movementComponent;
             _entityAnimationHandler = entityAnimationHandler;

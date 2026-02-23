@@ -269,10 +269,10 @@ namespace DungeonShooter
                 , skillContainer);
             entity.SetContext(context);
 
-            var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();
+            var healthComponent = entityLifeTimeScope.Container.Resolve<IHealthComponent>();
             if (isFirstInit == true)
             {
-                var moveComponent = entityLifeTimeScope.Container.Resolve<MovementComponent>();
+                var moveComponent = entityLifeTimeScope.Container.Resolve<IMovementComponent>();
                 healthComponent.OnDeath += () =>
                 {
                     var destroyEffectSpawnPos = entity.transform.position;
@@ -294,7 +294,7 @@ namespace DungeonShooter
             }
 
             var aiBT = _sceneResourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
-            entityLifeTimeScope.Container.Resolve<AIComponent>().Initialize(aiBT, activeSkills);
+            entityLifeTimeScope.Container.Resolve<IAIComponent>().Initialize(aiBT, activeSkills);
 
             _eventBus.Publish(new EnemySpawnedEvent { enemy = entity });
             return entity;

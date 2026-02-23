@@ -7,7 +7,7 @@ namespace DungeonShooter
     /// <summary>
     /// 엔티티의 상호작용 기능을 담당하는 MonoBehaviour 컴포넌트
     /// </summary>
-    public class InteractComponent : MonoBehaviour
+    public class InteractComponent : MonoBehaviour, IInteractComponent
     {
         private const float NoticeOffsetY = 1.2f;
 

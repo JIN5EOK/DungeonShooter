@@ -140,11 +140,11 @@ namespace DungeonShooter
                 _playerSkillManager.SkillContainer);
             entity.SetContext(context);
             
-            var movementCompoent = entityLifeTimeScope.Container.Resolve<MovementComponent>();
-            var interactComponent = entityLifeTimeScope.Container.Resolve<InteractComponent>();
-            var dashComponent = entityLifeTimeScope.Container.Resolve<DashComponent>();
-            var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();
-            var cameraTrackComponent = entityLifeTimeScope.Container.Resolve<CameraTrackComponent>();
+            var movementComponent = entityLifeTimeScope.Container.Resolve<IMovementComponent>();
+            var interactComponent = entityLifeTimeScope.Container.Resolve<IInteractComponent>();
+            var dashComponent = entityLifeTimeScope.Container.Resolve<IDashComponent>();
+            var healthComponent = entityLifeTimeScope.Container.Resolve<IHealthComponent>();
+            var cameraTrackComponent = entityLifeTimeScope.Container.Resolve<ICameraTrackComponent>();
             var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
 
             var interactNotice = await _sceneResourceProvider.GetInstanceAsync(CommonAddresses.InteractNotice);

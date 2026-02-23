@@ -8,7 +8,7 @@ namespace DungeonShooter
     /// <summary>
     /// 엔티티를 추적하는 카메라를 부착하는 MonoBehaviour 컴포넌트
     /// </summary>
-    public class CameraTrackComponent : MonoBehaviour
+    public class CameraTrackComponent : MonoBehaviour, ICameraTrackComponent
     {
         // 나중에 카메라 타입 추가되면 변경 가능하도록 변경, 지금은 타입이 하나라 이렇게
         private CameraTrackType _cameraTrackType = CameraTrackType.PlayerChaseCamera;

@@ -24,7 +24,7 @@ namespace DungeonShooter
         private int _hp;
         
         private EntityBase _playerInstance;
-        private HealthComponent _boundHealthComponent;
+        private IHealthComponent _boundHealthComponent;
         
         private ITableRepository _tableRepository;
         private IEventBus _eventBus;

@@ -7,8 +7,8 @@ namespace DungeonShooter
     /// </summary>
     public interface IEntityStatusValue
     {
-        int GetValue();
-        void SetValue(int value);
-        event Action<int> OnValueChanged;
+        public int GetValue();
+        public void SetValue(int value);
+        public event Action<int> OnValueChanged;
     }
 }

@@ -10,10 +10,10 @@ namespace DungeonShooter
     public class DashState : IEntityState
     {
         private IEntityStateMachine _entityStateMachine;
-        private readonly DashComponent _dashComponent;
+        private readonly IDashComponent _dashComponent;
 
         [Inject]
-        public DashState(DashComponent dashComponent)
+        public DashState(IDashComponent dashComponent)
         {
             _dashComponent = dashComponent;
         }

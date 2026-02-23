@@ -7,7 +7,7 @@ namespace DungeonShooter
     /// 캐릭터 구르기(회피)를 담당하는 MonoBehaviour 컴포넌트
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
-    public class DashComponent : MonoBehaviour
+    public class DashComponent : MonoBehaviour, IDashComponent
     {
         [Header("구르기 설정")]
         private float _dashSpeed = 15f;

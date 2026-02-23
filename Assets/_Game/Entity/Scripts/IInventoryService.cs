@@ -7,9 +7,9 @@ namespace DungeonShooter
     /// </summary>
     public interface IInventoryService
     {
-        IReadOnlyCollection<Item> GetItems();
-        Item GetEquippedWeapon();
-        bool AddItem(Item item);
-        bool RemoveItem(Item item);
+        public IReadOnlyCollection<Item> GetItems();
+        public Item GetEquippedWeapon();
+        public bool AddItem(Item item);
+        public bool RemoveItem(Item item);
     }
 }

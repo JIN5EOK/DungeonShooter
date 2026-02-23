@@ -8,12 +8,11 @@ namespace DungeonShooter
         /// <summary>
         /// 상호작용을 수행합니다.
         /// </summary>
-        void Interact();
-
+        public void Interact();
         /// <summary>
         /// 상호작용 가능한지 여부
         /// </summary>
-        bool CanInteract { get; }
+        public bool CanInteract { get; }
     }
 }
 

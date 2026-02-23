@@ -17,12 +17,12 @@ namespace DungeonShooter
             
             builder.Register(container => AddComponentAndInject<EntityBase>(), Lifetime.Scoped);
             builder.Register(container => AddComponentAndInject<EntityAnimationHandler>(), Lifetime.Scoped);
-            builder.Register(container => AddComponentAndInject<MovementComponent>(), Lifetime.Scoped);
-            builder.Register(container => AddComponentAndInject<HealthComponent>(), Lifetime.Scoped);
-            builder.Register(container => AddComponentAndInject<InteractComponent>(), Lifetime.Scoped);
-            builder.Register(container => AddComponentAndInject<DashComponent>(), Lifetime.Scoped);
-            builder.Register(container => AddComponentAndInject<CameraTrackComponent>(), Lifetime.Scoped);
-            builder.Register(container => AddComponentAndInject<AIComponent>(), Lifetime.Scoped);
+            builder.Register(container => AddComponentAndInject<MovementComponent>(), Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register(container => AddComponentAndInject<HealthComponent>(), Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register(container => AddComponentAndInject<InteractComponent>(), Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register(container => AddComponentAndInject<DashComponent>(), Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register(container => AddComponentAndInject<CameraTrackComponent>(), Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register(container => AddComponentAndInject<AIComponent>(), Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register(container => AddComponentAndInject<Animator>(), Lifetime.Scoped);
             builder.Register(container => AddComponentAndInject<Rigidbody2D>(), Lifetime.Scoped);
             builder.Register(container => AddComponentAndInject<SpriteRenderer>(), Lifetime.Scoped);

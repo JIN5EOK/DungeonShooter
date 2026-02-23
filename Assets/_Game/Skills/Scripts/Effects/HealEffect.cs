@@ -20,7 +20,8 @@ namespace DungeonShooter
             var rawHeal = entry.Amount;
             var heal = Mathf.RoundToInt(rawHeal * _healPercent);
 
-            if (context.LastHitTarget.TryGetComponent(out HealthComponent health))
+            var health = context.LastHitTarget.GetComponent<IHealthComponent>();
+            if (health != null)
             {
                 health.Heal(heal);
                 return UniTask.FromResult(true);

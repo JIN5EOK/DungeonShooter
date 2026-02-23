@@ -2,8 +2,8 @@ namespace DungeonShooter
 {
     public interface IEntityStateMachine
     {
-        EntityBase Entity { get; }
-        IEntityInputContext InputContext { get; }
-        void RequestChangeState(EntityStates nextStates);
+        public EntityBase Entity { get; }
+        public IEntityInputContext InputContext { get; }
+        public void RequestChangeState(EntityStates nextStates);
     }
 }

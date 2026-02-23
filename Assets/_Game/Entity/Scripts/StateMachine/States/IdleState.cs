@@ -10,12 +10,12 @@ namespace DungeonShooter
     public class IdleState : IEntityState
     {
         private IEntityStateMachine _entityStateMachine;
-        private readonly DashComponent _dashComponent;
-        private readonly EntityAnimationHandler _entityAnimationHandler;
-        private readonly MovementComponent _movementComponent;
+        private IDashComponent _dashComponent;
+        private EntityAnimationHandler _entityAnimationHandler;
+        private IMovementComponent _movementComponent;
 
         [Inject]
-        public IdleState(DashComponent dashComponent, EntityAnimationHandler entityAnimationHandler, MovementComponent movementComponent)
+        public IdleState(IDashComponent dashComponent, EntityAnimationHandler entityAnimationHandler, IMovementComponent movementComponent)
         {
             _dashComponent = dashComponent;
             _entityAnimationHandler = entityAnimationHandler;

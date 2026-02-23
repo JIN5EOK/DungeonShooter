@@ -5,8 +5,9 @@ namespace DungeonShooter
     /// </summary>
     public interface IEntityStats
     {
-        IEntityStat GetStat(StatType type);
-        void ApplyStatBonus(object key, StatBonus bonus);
-        void RemoveStatBonus(object key);
+        public void Initialize(EntityStatsTableEntry entry);
+        public IEntityStat GetStat(StatType type);
+        public void ApplyStatBonus(object key, StatBonus bonus);
+        public void RemoveStatBonus(object key);
     }
 }

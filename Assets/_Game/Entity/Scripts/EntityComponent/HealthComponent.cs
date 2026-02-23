@@ -9,7 +9,7 @@ namespace DungeonShooter
     /// HP를 가진 엔티티에 부착하는 독립적인 컴포넌트.
     /// 현재 체력은 EntityContext.Status(EntityStatus)를 참조하며, 자체 보관하지 않는다.
     /// </summary>
-    public class HealthComponent : MonoBehaviour
+    public class HealthComponent : MonoBehaviour, IHealthComponent
     {
         public event Action<int> OnHealthChanged;
         public event Action OnDeath;

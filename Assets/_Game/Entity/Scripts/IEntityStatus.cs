@@ -6,7 +6,7 @@ namespace DungeonShooter
     /// </summary>
     public interface IEntityStatus
     {
-        void Initialize(EntityStatsTableEntry entry);
-        IEntityStatusValue GetStatus(StatusType type);
+        public void Initialize(EntityStatsTableEntry entry);
+        public IEntityStatusValue GetStatus(StatusType type);
     }
 }

@@ -9,7 +9,7 @@ namespace DungeonShooter
     /// 상태에서 Move(Vector2 input)를 호출하여 이동을 적용합니다.
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
-    public class MovementComponent : MonoBehaviour
+    public class MovementComponent : MonoBehaviour, IMovementComponent
     {
         public float MoveSpeed =>
             _entityBase?.EntityContext?.Stat != null

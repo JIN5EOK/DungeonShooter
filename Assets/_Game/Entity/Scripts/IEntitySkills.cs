@@ -8,12 +8,12 @@ namespace DungeonShooter
     /// </summary>
     public interface IEntitySkills
     {
-        event Action<Skill> OnSkillRegisted;
-        event Action<Skill> OnSkillUnregisted;
-        bool Contains(Skill skill);
-        IReadOnlyList<Skill> GetRegistedSkills();
-        void Regist(Skill skill);
-        void Unregist(Skill skill);
-        void Clear();
+        public event Action<Skill> OnSkillRegisted;
+        public event Action<Skill> OnSkillUnregisted;
+        public bool Contains(Skill skill);
+        public IReadOnlyList<Skill> GetRegistedSkills();
+        public void Regist(Skill skill);
+        public void Unregist(Skill skill);
+        public void Clear();
     }
 }

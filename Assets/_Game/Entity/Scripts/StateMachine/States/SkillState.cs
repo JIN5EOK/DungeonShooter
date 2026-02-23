@@ -11,14 +11,14 @@ namespace DungeonShooter
     public class SkillState : IEntityState
     {
         private IEntityStateMachine _entityStateMachine;
-        private readonly MovementComponent _movementComponent;
+        private readonly IMovementComponent _movementComponent;
         private readonly EntityAnimationHandler _entityAnimationHandler;
 
         private Skill _executingSkill;
         private bool _executeFinished;
 
         [Inject]
-        public SkillState(MovementComponent movementComponent, EntityAnimationHandler entityAnimationHandler)
+        public SkillState(IMovementComponent movementComponent, EntityAnimationHandler entityAnimationHandler)
         {
             _movementComponent = movementComponent;
             _entityAnimationHandler = entityAnimationHandler;
