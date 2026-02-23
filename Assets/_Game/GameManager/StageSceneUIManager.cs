@@ -16,6 +16,7 @@ namespace DungeonShooter
         private PlayerStatusHudUI _playerStatusHudUI;
         private SkillLevelUpUI _skillLevelUpUI;
         private SkillCooldownHudUI _skillCooldownHudUI;
+        private GameButtonHudUI _gameButtonHudUI;
         private InventoryUI _inventoryUI;
 
         [Inject]
@@ -32,6 +33,8 @@ namespace DungeonShooter
             _playerStatusHudUI = await _uiManager.GetSingletonUIAsync<PlayerStatusHudUI>(UIAddresses.UI_PlayerStatusHud);
             _skillLevelUpUI = await _uiManager.GetSingletonUIAsync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp);
             _skillCooldownHudUI = await _uiManager.GetSingletonUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud);
+            _gameButtonHudUI = await _uiManager.GetSingletonUIAsync<GameButtonHudUI>(UIAddresses.UI_GameButtonHud);
+            _gameButtonHudUI.OnInventoryButtonClicked += ShowInventory;
             _inventoryUI = await _uiManager.GetSingletonUIAsync<InventoryUI>(UIAddresses.UI_Inventory);
             _inventoryUI.OnShow += OnInventoryShow;
             _inventoryUI.OnHide += OnInventoryHide;
@@ -58,6 +61,7 @@ namespace DungeonShooter
             _expGaugeHudUI.Show();
             _playerStatusHudUI.Show();
             _skillCooldownHudUI.Show();
+            _gameButtonHudUI.Show();
             _skillLevelUpUI.Hide();
         }
 
@@ -67,6 +71,7 @@ namespace DungeonShooter
             _expGaugeHudUI.Hide();
             _playerStatusHudUI.Hide();
             _skillCooldownHudUI.Hide();
+            _gameButtonHudUI.Hide();
             _skillLevelUpUI.Hide();
         }
         

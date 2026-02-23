@@ -259,6 +259,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d41533dbe7cb940329a712549290a4a8
+    m_Address: UI_GameButtonHud
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d9983502127a842f097974f4901c170e
     m_Address: MeteorSkillData
     m_ReadOnly: 0

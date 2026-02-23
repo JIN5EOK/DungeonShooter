@@ -93,7 +93,6 @@ namespace DungeonShooter
         {
             var isSelected = selected != null;
 
-            _closeButton.gameObject.SetActive(isSelected);;
             _equipButton.gameObject.SetActive(isSelected);
             _removeButton.gameObject.SetActive(isSelected);
             _useButton.gameObject.SetActive(isSelected);

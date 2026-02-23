@@ -15,21 +15,18 @@ namespace DungeonShooter
         private IEntityInputContext _entityInputContext;
         private IInventory _inventory;
         private ISkillSlotService _skillSlotService;
-        private StageSceneUIManager _stageSceneUIManager;
 
         [Inject]
         public PlayerInputManager(InputManager inputManager,
             IEventBus eventBus,
             IPauseManager pauseManager,
             IInventory inventory,
-            StageSceneUIManager stageSceneUIManager,
             ISkillSlotService skillSlotService)
         {
             _inputManager = inputManager;
             _eventBus = eventBus;
             _pauseManager = pauseManager;
             _inventory = inventory;
-            _stageSceneUIManager = stageSceneUIManager;
             _skillSlotService = skillSlotService;
             _eventBus.Subscribe<PlayerObjectSpawnEvent>(OnPlayerObjectSpawned);
             _eventBus.Subscribe<PlayerObjectDestroyEvent>(OnPlayerObjectDestroyed);
@@ -57,7 +54,6 @@ namespace DungeonShooter
             _inputManager.OnSkill1Pressed += OnSkill1Input;
             _inputManager.OnSkill2Pressed += OnSkill2Input;
             _inputManager.OnInteractPressed += OnInteractInput;
-            _inputManager.OnEscapePressed += OnEscapeInput;
         }
 
         public void UnsubscribeFromInput()
@@ -71,17 +67,11 @@ namespace DungeonShooter
             _inputManager.OnSkill1Pressed -= OnSkill1Input;
             _inputManager.OnSkill2Pressed -= OnSkill2Input;
             _inputManager.OnInteractPressed -= OnInteractInput;
-            _inputManager.OnEscapePressed -= OnEscapeInput;
         }
 
         private bool CanProcessGameInput()
         {
             return _entityInputContext != null && !_pauseManager.IsPaused;
-        }
-
-        private bool CanProcessEscapeInput()
-        {
-            return !_pauseManager.IsPaused;
         }
 
         private void OnHandleMoveInput(Vector2 input)
@@ -142,17 +132,6 @@ namespace DungeonShooter
                 return;
 
             _entityInputContext.InteractInput = isPressed;
-        }
-
-        private void OnEscapeInput(bool isPressed)
-        {
-            if (!isPressed || !CanProcessEscapeInput())
-                return;
-
-            if (!_stageSceneUIManager.IsInventoryActivated())
-                _stageSceneUIManager.ShowInventory();
-            else
-                _stageSceneUIManager.HideInventory();
         }
 
         public void Dispose()
