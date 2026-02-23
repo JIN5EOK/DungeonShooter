@@ -155,10 +155,11 @@ namespace DungeonShooter
                 _eventBus.Publish(new PlayerDeadEvent() {player = entity, position = playerInstance.transform.position, playerConfigTableEntry = config});
             };
             
+            var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(config.StatsId);
             var context = new EntityContext(
                 new EntityInputContext(),
                 _playerStatusManager.StatContainer,
-                null,
+                new EntityStatus(statsEntry),
                 _playerSkillManager.SkillContainer);
             entity.SetContext(context);
 

@@ -259,12 +259,10 @@ namespace DungeonShooter
             var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(configTableEntry.StatsId);
             var statGroup = new EntityStats();
             if (statsEntry != null)
-            {
                 statGroup.Initialize(statsEntry);
-            }
 
             var skillContainer = entityLifeTimeScope.Container.Resolve<EntitySkills>();
-            var context = new EntityContext(new EntityInputContext(), statGroup, null, skillContainer);
+            var context = new EntityContext(new EntityInputContext(), statGroup, new EntityStatus(statsEntry), skillContainer);
             entity.SetContext(context);
 
             var healthComponent = entityLifeTimeScope.Container.Resolve<HealthComponent>();
