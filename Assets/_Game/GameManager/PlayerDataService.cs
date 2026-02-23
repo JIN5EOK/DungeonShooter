@@ -6,6 +6,7 @@ namespace DungeonShooter
     public interface IPlayerDataService
     {
         IEntityContext EntityContext { get; }
+        InventoryModel InventoryModel { get; }
         UniTask InitializeSkillsAsync();
     }
 
@@ -16,6 +17,8 @@ namespace DungeonShooter
     public class PlayerDataService : IPlayerDataService
     {
         public IEntityContext EntityContext { get; private set; }
+        public InventoryModel InventoryModel { get; } = new InventoryModel();
+
         private StageContext _stageContext;
         private ITableRepository _tableRepository;
         private ISkillFactory _skillFactory;

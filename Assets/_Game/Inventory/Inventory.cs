@@ -33,13 +33,13 @@ namespace DungeonShooter
         [Inject]
         public Inventory(IEventBus eventBus, IPlayerDataService playerDataService)
         {
-            _model = new InventoryModel();
+            _model = playerDataService.InventoryModel;
             _playerDataService = playerDataService;
             _eventBus = eventBus;
-            _model.OnItemAdded += (item) => OnItemAdded?.Invoke(item);
-            _model.OnItemRemoved += (item) => OnItemRemoved?.Invoke(item);
-            _model.OnWeaponEquipped += (item) => OnWeaponEquipped?.Invoke(item);
-            _model.OnWeaponUnequipped += (item) => OnWeaponUnequipped?.Invoke(item);
+            _model.OnItemAdded += OnItemAdded;
+            _model.OnItemRemoved += OnItemRemoved;
+            _model.OnWeaponEquipped += OnWeaponEquipped;
+            _model.OnWeaponUnequipped += OnWeaponUnequipped;
             _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
             _eventBus.Subscribe<PlayerObjectDestroyEvent>(PlayerObjectDespawned);
         }
@@ -195,6 +195,10 @@ namespace DungeonShooter
 
         public void Dispose()
         {
+            _model.OnItemAdded -= OnItemAdded;
+            _model.OnItemRemoved -= OnItemRemoved;
+            _model.OnWeaponEquipped -= OnWeaponEquipped;
+            _model.OnWeaponUnequipped -= OnWeaponUnequipped;
             _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
             _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(PlayerObjectDespawned);
         }
