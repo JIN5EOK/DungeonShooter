@@ -20,22 +20,44 @@ classDiagram
 		+EntityContext : IEntityContext
 	}
 	
-	class IEntityContext{
-		+InputContext : IEntityInputContext // 이동, 공격 등 행동을 결정하기 위한 정보
-		+StatService : IEntityStatService // 최대 체력 등 스탯 수치 관련 서비스
-		+StatusService : IEntityStatusService // 현재 체력 등 현재 상태 수치 관련 서비스
-		+SkillService : ISkillService // 지닌 스킬 관련 서비스
-		+InventoryService : IInventoryService // 인벤토리 관련 서비스
+	class EntityContext{
+		+InputContext : EntityInputContext 
+		// 이동, 공격 등 행동 결정에 필요한 입력정보, 플레이어의 경우 키입력으로 조작
+		// 적의 경우 인공지능 컴포넌트로 조작
+		+Stat : IEntityStats // 최대 체력 등 스탯 수치 관련 클래스
+		+Status : IEntityStatus // 현재 체력 등 현재 상태 수치 관련 클래스
+		+Skill : IEntitySkills // 지닌 스킬 관련 클래스
+		+Inventory : IInventory // 인벤토리 관련 클래스
 	}
 	
-	IEntityContext <-- EntityBase
-	EntityBase <-- PlayerFactory : 생성시 적절한 구체 EntityContext 생성하여 주입
-	EntityBase <-- EnemyFactory : 생성시 적절한 구체 EntityContext 생성하여 주입
+	EntityContext <-- EntityBase
+	EntityBase <-- PlayerFactory : 생성시 적절한 구체 EntityContext 주입
+	PlayerEntityContext
+	EntityBase <-- EnemyFactory : 생성시 적절한 구체 EntityContext 주입
+```
+- 플레이어, 적들의 스탯과 스킬 관리 로직이 다르므로 팩토리에서 직접 컨텍스트를 주입한다
+
+### 인벤토리 동작 구조
+``` mermaid
+classDiagram
+	class Inventory["Inventory<br> 아이템 장착, 조건판단, 아이템 장착시 스탯 반영등 기능적인 부분 담당"]{
+		-status : IEntityStatus
+		-skill : IEntitySkills
+		+Items : IReadOnlyCollection<Item>
+		+bool AddItem(Item item)
+		+void RemoveItem(Item item)
+		+bool EquipItem(Item item)
+	}
+	
+	class InventoryModel["InventoryModel<br> 아이템,추가,삭제 등 데이터 컬렉션의 기능 담당"]{
+		+Items : IReadOnlyCollection<Item>
+		+bool AddItem(Item item)
+		+void RemoveItem(Item item)
+	}
+	IInventory <|.. Inventory
+	Inventory --> InventoryModel : 인벤토리 모델에 반영
 	
 ```
-- 플레이어, 적들의 스탯과 스킬 관리 로직이 다르므로 서비스 인터페이스로 감추고 팩토리에서 구체타입 서비스를 생성하여 삽입한다
-	- 플레이어의 경우 플레이어 오브젝트에 종속되지 않는 전용 싱글턴 서비스 사용
-	- 적의 경우 오브젝트와 생명주기를 함께하는 서비스 생성후 주입
 ### 관련 문서
 - [스탯시스템_설계.md](%EC%8A%A4%ED%83%AF%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%84%A4%EA%B3%84.md)
 - [스킬시스템_설계.md](%EC%8A%A4%ED%82%AC%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%84%A4%EA%B3%84.md)
