@@ -20,11 +20,12 @@ namespace DungeonShooter
         [SerializeField] private TextMeshProUGUI _textStats;
         
         private ISceneResourceProvider _resourceProvider;
-        
+        private ITableRepository _tableRepository;
         [Inject]
-        public void Construct(ISceneResourceProvider resourceProvider)
+        public void Construct(ISceneResourceProvider resourceProvider, ITableRepository tableRepository)
         {
             _resourceProvider = resourceProvider;
+            _tableRepository = tableRepository;
         }
         
         /// <summary>
@@ -74,24 +75,24 @@ namespace DungeonShooter
             _iconImage.sprite = null;
         }
 
-        private static void SetText(TextMeshProUGUI textUi, string value)
+        private void SetText(TextMeshProUGUI textUi, string value)
         {
             textUi.text = value ?? string.Empty;
         }
 
-        private static string GetItemTypeString(ItemType type)
+        private string GetItemTypeString(ItemType type)
         {
             // TODO: 하드코딩된 텍스트 추후 분리 필요
             return type switch
             {
-                ItemType.Weapon => "무기",
-                ItemType.Passive => "패시브",
-                ItemType.Consume => "소비",
+                ItemType.Weapon => _tableRepository.GetTableEntry<StringTextTableEntry>(19000001).Text,
+                ItemType.Passive => _tableRepository.GetTableEntry<StringTextTableEntry>(19000002).Text,
+                ItemType.Consume => _tableRepository.GetTableEntry<StringTextTableEntry>(19000003).Text,
                 _ => type.ToString()
             };
         }
 
-        private static string BuildStatsString(ItemTableEntry entry)
+        private string BuildStatsString(ItemTableEntry entry)
         {
             // TODO: 하드코딩된 텍스트 추후 분리 필요
             if (entry == null)
@@ -99,25 +100,30 @@ namespace DungeonShooter
 
             var parts = new List<string>();
 
+            var hpText = _tableRepository.GetTableEntry<StringTextTableEntry>(19000004).Text;
+            var atkText = _tableRepository.GetTableEntry<StringTextTableEntry>(19000005).Text;
+            var defText = _tableRepository.GetTableEntry<StringTextTableEntry>(19000006).Text;
+            var moveSpeedText = _tableRepository.GetTableEntry<StringTextTableEntry>(19000007).Text;
+            
             if (entry.HpAdd != 0)
-                parts.Add($"체력 +{entry.HpAdd}");
+                parts.Add($"{hpText} +{entry.HpAdd}");
             if (entry.HpMultiply != 100)
-                parts.Add($"체력 {entry.HpMultiply}%");
+                parts.Add($"{hpText} {entry.HpMultiply}%");
 
             if (entry.AttackAdd != 0)
-                parts.Add($"공격력 +{entry.AttackAdd}");
+                parts.Add($"{atkText} +{entry.AttackAdd}");
             if (entry.AttackMultiply != 100)
-                parts.Add($"공격력 {entry.AttackMultiply}%");
+                parts.Add($"{atkText} {entry.AttackMultiply}%");
 
             if (entry.DefenseAdd != 0)
-                parts.Add($"방어력 +{entry.DefenseAdd}");
+                parts.Add($"{defText} +{entry.DefenseAdd}");
             if (entry.DefenseMultiply != 100)
-                parts.Add($"방어력 {entry.DefenseMultiply}%");
+                parts.Add($"{defText} {entry.DefenseMultiply}%");
 
             if (entry.MoveSpeedAdd != 0)
-                parts.Add($"이동속도 +{entry.MoveSpeedAdd}");
+                parts.Add($"{moveSpeedText} +{entry.MoveSpeedAdd}");
             if (entry.MoveSpeedMultiply != 100)
-                parts.Add($"이동속도 {entry.MoveSpeedMultiply}%");
+                parts.Add($"{moveSpeedText} {entry.MoveSpeedMultiply}%");
 
             return parts.Count > 0 ? string.Join("  ", parts) : string.Empty;
         }

@@ -27,6 +27,7 @@ namespace DungeonShooter
             LoadAndCacheTable<EntityStatsTableEntry>("EntityStatsTable");
             LoadAndCacheTable<EnemyConfigTableEntry>("EnemyConfigTable");
             LoadAndCacheTable<RoomEventTriggerTableEntry>("RoomEventTriggerTable");
+            LoadAndCacheTable<StringTextTableEntry>("StringTextTable");
         }
 
         /// <summary>

@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using UnityEngine;
 
 namespace DungeonShooter
 {
     /// <summary>
     /// CSV 파일을 파싱하여 테이블 엔트리로 변환하는 파서
+    /// 큰따옴표(")로 감싼 필드 안의 쉼표는 셀 구분자로 사용하지 않으며, ""는 하나의 "로 이스케이프됩니다.
     /// </summary>
     public static class CSVTableParser
     {
@@ -38,7 +40,7 @@ namespace DungeonShooter
             }
 
             var headerLine = lines[0];
-            var headers = headerLine.Split(',').Select(h => h.Trim()).ToArray();
+            var headers = SplitCsvLine(headerLine).Select(h => h.Trim()).ToArray();
 
             var parseHeaders = headers;
             if (headers.Length > 0 && string.Equals(headers[0], MemoColumnName, StringComparison.Ordinal))
@@ -53,7 +55,7 @@ namespace DungeonShooter
                 if (string.IsNullOrWhiteSpace(lines[i]))
                     continue;
 
-                var values = lines[i].Split(',');
+                var values = SplitCsvLine(lines[i]);
                 if (values.Length != headers.Length)
                 {
                     LogHandler.LogWarning(nameof(CSVTableParser),$"라인 {i + 1}: 헤더와 값의 개수가 맞지 않습니다. 스킵합니다.");
@@ -79,6 +81,58 @@ namespace DungeonShooter
             }
 
             return entries;
+        }
+
+        /// <summary>
+        /// CSV 한 줄을 셀 단위로 분리합니다. 큰따옴표(")로 감싼 부분 안의 쉼표는 구분자로 사용하지 않으며,
+        /// ""는 하나의 "로 치환됩니다.
+        /// </summary>
+        private static string[] SplitCsvLine(string line)
+        {
+            var result = new List<string>();
+            var current = new StringBuilder();
+            var inQuotes = false;
+
+            for (var i = 0; i < line.Length; i++)
+            {
+                var c = line[i];
+
+                if (inQuotes)
+                {
+                    if (c == '"' && i + 1 < line.Length && line[i + 1] == '"')
+                    {
+                        current.Append('"');
+                        i++;
+                    }
+                    else if (c == '"')
+                    {
+                        inQuotes = false;
+                    }
+                    else
+                    {
+                        current.Append(c);
+                    }
+                }
+                else
+                {
+                    if (c == ',')
+                    {
+                        result.Add(current.ToString().Trim());
+                        current.Clear();
+                    }
+                    else if (c == '"')
+                    {
+                        inQuotes = true;
+                    }
+                    else
+                    {
+                        current.Append(c);
+                    }
+                }
+            }
+
+            result.Add(current.ToString().Trim());
+            return result.ToArray();
         }
 
         /// <summary>

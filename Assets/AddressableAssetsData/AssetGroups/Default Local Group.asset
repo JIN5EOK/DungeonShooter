@@ -93,6 +93,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5383222a18b8342799d2d680616e1f81
+    m_Address: StringTextTable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 550f8ea83664141b3ae95895d662ca51
     m_Address: FireballExplosion_Particle
     m_ReadOnly: 0
