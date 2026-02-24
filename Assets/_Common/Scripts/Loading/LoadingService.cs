@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -19,6 +20,13 @@ namespace DungeonShooter
         public bool IsWindowLoadingRunning { get; private set; }
         public bool IsSpinnerLoadingRunning { get; private set; }
 
+        private IPauseManager _pauseManager;
+        [Inject]
+        public LoadingService(IPauseManager pauseManager)
+        {
+            _pauseManager = pauseManager;
+        }
+        
         public void EnqueueTask(LoadingTask loadingTask)
         {
             if (loadingTask.LoadingType == LoadingType.LoadingWindow)
@@ -57,10 +65,13 @@ namespace DungeonShooter
                     SetWindowVisible(true);
                     try
                     {
+                        // 로딩화면시엔 게임 일시정지 처리
+                        _pauseManager.PauseRequest(this);
                         await task.Run();
                     }
                     finally
                     {
+                        _pauseManager.ResumeRequest(this);
                         SetWindowVisible(false);
                     }
                 }
