@@ -14,6 +14,8 @@ namespace DungeonShooter
         private readonly Sprite _icon;
         private readonly ISceneResourceProvider _resourceProvider;
         private readonly ISkillObjectFactory _skillObjectFactory;
+        private readonly ITableRepository _tableRepository;
+
         public SkillData SkillData => _skillData;
         public SkillTableEntry SkillTableEntry => _skillTableEntry;
         public Sprite Icon => _icon;
@@ -23,14 +25,15 @@ namespace DungeonShooter
         public event Action OnExecute;
         public Action<float> OnCooldownChanged { get; set; }
         public Action OnCooldownEnded { get; set; }
-        
-        public Skill(SkillTableEntry skillTableEntry, SkillData skillData, Sprite icon, ISceneResourceProvider resourceProvider, ISkillObjectFactory skillObjectFactory)
+
+        public Skill(SkillTableEntry skillTableEntry, SkillData skillData, Sprite icon, ISceneResourceProvider resourceProvider, ISkillObjectFactory skillObjectFactory, ITableRepository tableRepository = null)
         {
             _skillTableEntry = skillTableEntry;
             _skillData = skillData;
             _skillObjectFactory = skillObjectFactory;
             _icon = icon;
             _resourceProvider = resourceProvider;
+            _tableRepository = tableRepository;
             Cooldown = 0f;
             IsCooldown = false;
         }
@@ -44,7 +47,8 @@ namespace DungeonShooter
         {
             if (IsCooldown)
             {
-                LogHandler.Log<Skill>($"스킬 쿨다운 중: {SkillTableEntry.Id}({_skillTableEntry.SkillName})");
+                var nameText = _tableRepository?.GetStringText(_skillTableEntry.SkillNameId) ?? _skillTableEntry.SkillNameId.ToString();
+                LogHandler.Log<Skill>($"스킬 쿨다운 중: {SkillTableEntry.Id}({nameText})");
                 return false;
             }
 

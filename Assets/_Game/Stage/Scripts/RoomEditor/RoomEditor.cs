@@ -295,7 +295,8 @@ namespace DungeonShooter
             GameObject instance;
             if (entry is RoomEventTriggerTableEntry eventTriggerEntry)
             {
-                instance = new GameObject($"[EventTrigger] {eventTriggerEntry.Name} (ID:{tableId})");
+                var nameText = tableRepo.GetStringText(eventTriggerEntry.NameId);
+                instance = new GameObject($"[EventTrigger] {nameText} (ID:{tableId})");
             }
             else
             {

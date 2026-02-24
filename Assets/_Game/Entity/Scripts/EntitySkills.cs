@@ -26,6 +26,12 @@ namespace DungeonShooter
     public class EntitySkills : IEntitySkills
     {
         private readonly HashSet<Skill> _skills = new();
+        private readonly ITableRepository _tableRepository;
+
+        public EntitySkills(ITableRepository tableRepository = null)
+        {
+            _tableRepository = tableRepository;
+        }
 
         public event Action<Skill> OnSkillRegisted;
         public event Action<Skill> OnSkillUnregisted;
@@ -53,13 +59,15 @@ namespace DungeonShooter
 
             if (_skills.Contains(skill))
             {
-                LogHandler.LogWarning<EntitySkills>($"이미 등록된 스킬입니다: {skill.SkillTableEntry.SkillName}");
+                var nameText = _tableRepository?.GetStringText(skill.SkillTableEntry.SkillNameId) ?? skill.SkillTableEntry.SkillNameId.ToString();
+                LogHandler.LogWarning<EntitySkills>($"이미 등록된 스킬입니다: {nameText}");
                 return;
             }
 
             _skills.Add(skill);
             OnSkillRegisted?.Invoke(skill);
-            LogHandler.Log<EntitySkills>($"스킬 등록 완료: {skill.SkillTableEntry.Id} ({skill.SkillTableEntry.SkillName})");
+            var displayName = _tableRepository?.GetStringText(skill.SkillTableEntry.SkillNameId) ?? skill.SkillTableEntry.SkillNameId.ToString();
+            LogHandler.Log<EntitySkills>($"스킬 등록 완료: {skill.SkillTableEntry.Id} ({displayName})");
         }
 
         /// <summary>
@@ -75,7 +83,8 @@ namespace DungeonShooter
 
             if (!_skills.Remove(skill))
             {
-                LogHandler.LogWarning<EntitySkills>($"스킬해제 실패: 등록되지 않은 스킬입니다: {skill.SkillTableEntry?.SkillName}");
+                var nameText = skill.SkillTableEntry != null ? (_tableRepository?.GetStringText(skill.SkillTableEntry.SkillNameId) ?? skill.SkillTableEntry.SkillNameId.ToString()) : "null";
+                LogHandler.LogWarning<EntitySkills>($"스킬해제 실패: 등록되지 않은 스킬입니다: {nameText}");
                 return;
             }
 

@@ -20,14 +20,16 @@ namespace DungeonShooter
         private IPlayerDataService _playerDataService;
         private ISkillService _skillService;
         private IPauseManager _pauseManager;
+        private ITableRepository _tableRepository;
 
         [Inject]
-        public void Construct(IPlayerDataService playerDataService, ISkillService skillService, IEventBus eventBus, IPauseManager pauseManager)
+        public void Construct(IPlayerDataService playerDataService, ISkillService skillService, IEventBus eventBus, IPauseManager pauseManager, ITableRepository tableRepository)
         {
             _playerDataService = playerDataService;
             _skillService = skillService;
             _eventBus = eventBus;
             _pauseManager = pauseManager;
+            _tableRepository = tableRepository;
             _eventBus.Subscribe<PlayerLevelChangeEvent>(PlayerLevelChanged);
         }
 
@@ -70,10 +72,10 @@ namespace DungeonShooter
                 slot.gameObject.SetActive(true);
 
                 var currentEntry = info.CurrentSkill.SkillTableEntry;
-                slot._currentSkillInfo.SetInfo(currentEntry.SkillName, currentEntry.SkillDescription, currentEntry.Cooldown, info.CurrentIcon);
+                slot._currentSkillInfo.SetInfo(_tableRepository.GetStringText(currentEntry.SkillNameId), _tableRepository.GetStringText(currentEntry.SkillDescriptionId), currentEntry.Cooldown, info.CurrentIcon);
 
                 var nextEntry = info.NextLevelEntry;
-                slot._nextSkillInfo.SetInfo(nextEntry.SkillName, nextEntry.SkillDescription, nextEntry.Cooldown, info.NextLevelIcon);
+                slot._nextSkillInfo.SetInfo(_tableRepository.GetStringText(nextEntry.SkillNameId), _tableRepository.GetStringText(nextEntry.SkillDescriptionId), nextEntry.Cooldown, info.NextLevelIcon);
 
                 slot.SetSelectHandler(() =>
                 {

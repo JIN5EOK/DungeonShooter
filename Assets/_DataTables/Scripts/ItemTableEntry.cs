@@ -10,8 +10,12 @@ namespace DungeonShooter
     public class ItemTableEntry : ITableEntry
     {
         public int Id { get; set; }
-        public string ItemName { get; set; }
-        public string ItemDescription { get; set; }
+
+        /// <summary>아이템 이름 (StringTextTableEntry.Id)</summary>
+        public int ItemNameId { get; set; }
+
+        /// <summary>아이템 설명 (StringTextTableEntry.Id)</summary>
+        public int ItemDescriptionId { get; set; }
         public ItemType ItemType { get; set; }
         public int MaxStackCount { get; set; }
         public int UseSkillId { get; set; }

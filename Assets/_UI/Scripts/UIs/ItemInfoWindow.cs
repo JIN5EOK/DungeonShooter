@@ -60,8 +60,8 @@ namespace DungeonShooter
 
         private void SetItemInternal(ItemTableEntry entry)
         {
-            SetText(_textName, entry.ItemName);
-            SetText(_textDescription, entry.ItemDescription);
+            SetText(_textName, _tableRepository.GetStringText(entry.ItemNameId));
+            SetText(_textDescription, _tableRepository.GetStringText(entry.ItemDescriptionId));
             SetText(_textType, GetItemTypeString(entry.ItemType));
             SetText(_textStats, BuildStatsString(entry));
         }
@@ -82,12 +82,11 @@ namespace DungeonShooter
 
         private string GetItemTypeString(ItemType type)
         {
-            // TODO: 하드코딩된 텍스트 추후 분리 필요
             return type switch
             {
-                ItemType.Weapon => _tableRepository.GetTableEntry<StringTextTableEntry>(19000001).Text,
-                ItemType.Passive => _tableRepository.GetTableEntry<StringTextTableEntry>(19000002).Text,
-                ItemType.Consume => _tableRepository.GetTableEntry<StringTextTableEntry>(19000003).Text,
+                ItemType.Weapon => _tableRepository.GetStringText(19000001),
+                ItemType.Passive => _tableRepository.GetStringText(19000002),
+                ItemType.Consume => _tableRepository.GetStringText(19000003),
                 _ => type.ToString()
             };
         }
@@ -100,10 +99,10 @@ namespace DungeonShooter
 
             var parts = new List<string>();
 
-            var hpText = _tableRepository.GetTableEntry<StringTextTableEntry>(19000004).Text;
-            var atkText = _tableRepository.GetTableEntry<StringTextTableEntry>(19000005).Text;
-            var defText = _tableRepository.GetTableEntry<StringTextTableEntry>(19000006).Text;
-            var moveSpeedText = _tableRepository.GetTableEntry<StringTextTableEntry>(19000007).Text;
+            var hpText = _tableRepository.GetStringText(19000004);
+            var atkText = _tableRepository.GetStringText(19000005);
+            var defText = _tableRepository.GetStringText(19000006);
+            var moveSpeedText = _tableRepository.GetStringText(19000007);
             
             if (entry.HpAdd != 0)
                 parts.Add($"{hpText} +{entry.HpAdd}");

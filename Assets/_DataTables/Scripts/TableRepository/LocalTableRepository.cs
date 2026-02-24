@@ -75,6 +75,15 @@ namespace DungeonShooter
         }
 
         /// <summary>
+        /// StringTextTable에서 ID에 해당하는 표시 문자열을 가져옵니다.
+        /// </summary>
+        public string GetStringText(int stringId)
+        {
+            var entry = GetTableEntry<StringTextTableEntry>(stringId);
+            return entry?.Text ?? string.Empty;
+        }
+
+        /// <summary>
         /// CSV 파일을 로드하고 캐시에 저장합니다.
         /// </summary>
         private void LoadAndCacheTable<T>(string assetPath) where T : class, ITableEntry, new()

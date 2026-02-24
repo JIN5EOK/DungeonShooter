@@ -13,7 +13,7 @@ namespace DungeonShooter
         /// <summary>식별 ID (RoomEventTriggerType enum 값과 동일)</summary>
         public int Id { get; set; }
 
-        /// <summary>표시 이름 (에디터/디버그용)</summary>
-        public string Name { get; set; }
+        /// <summary>표시 이름 (StringTextTableEntry.Id, 에디터/디버그용)</summary>
+        public int NameId { get; set; }
     }
 }

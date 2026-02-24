@@ -37,5 +37,12 @@ namespace DungeonShooter
         /// <typeparam name="T">테이블 엔트리 타입</typeparam>
         /// <returns>해당 타입의 엔트리 목록 (없으면 빈 목록)</returns>
         IReadOnlyList<T> GetAllTableEntries<T>() where T : class, ITableEntry;
+
+        /// <summary>
+        /// StringTextTable에서 ID에 해당하는 표시 문자열을 가져옵니다.
+        /// </summary>
+        /// <param name="stringId">StringTextTableEntry.Id</param>
+        /// <returns>표시 문자열, 없으면 빈 문자열</returns>
+        string GetStringText(int stringId);
     }
 }

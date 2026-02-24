@@ -12,9 +12,12 @@ namespace DungeonShooter
     {
         /// <summary>식별 ID </summary>
         public int Id { get; set; }
-        
-        public string SkillName { get; set; }
-        public string SkillDescription { get; set; }
+
+        /// <summary>스킬 이름 (StringTextTableEntry.Id)</summary>
+        public int SkillNameId { get; set; }
+
+        /// <summary>스킬 설명 (StringTextTableEntry.Id)</summary>
+        public int SkillDescriptionId { get; set; }
 
         /// <summary>스킬 아이콘 주소</summary>
         public string SkillIconKey { get; set; }

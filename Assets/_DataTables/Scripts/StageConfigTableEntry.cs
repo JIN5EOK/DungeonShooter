@@ -12,8 +12,8 @@ namespace DungeonShooter
     {
         public int Id { get; set; }
 
-        /// <summary> 스테이지 이름 </summary>
-        public string Name { get; set; }
+        /// <summary>스테이지 이름 (StringTextTableEntry.Id)</summary>
+        public int NameId { get; set; }
 
         /// <summary> 기본 지형 타일 주소 (Addressable 주소) </summary>
         public string GroundTileKey { get; set; }

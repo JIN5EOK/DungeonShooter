@@ -49,12 +49,12 @@ namespace DungeonShooter
             foreach (var entry in repo.GetAllTableEntries<RoomEventTriggerTableEntry>())
             {
                 _placeableIds.Add(entry.Id);
-                _placeableNames.Add($"[이벤트트리거] {entry.Name} (ID:{entry.Id})");
+                _placeableNames.Add($"[이벤트트리거] {repo.GetStringText(entry.NameId)} (ID:{entry.Id})");
             }
             foreach (var entry in repo.GetAllTableEntries<EnemyConfigTableEntry>())
             {
                 _placeableIds.Add(entry.Id);
-                _placeableNames.Add($"[Enemy] {entry.Name} (ID:{entry.Id})");
+                _placeableNames.Add($"[Enemy] {repo.GetStringText(entry.NameId)} (ID:{entry.Id})");
             }
             if (_placeableIds.Count == 0)
             {

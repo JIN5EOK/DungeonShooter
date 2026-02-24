@@ -319,7 +319,8 @@ namespace DungeonShooter
         {
             if (!Application.isPlaying)
             {
-                var go = new GameObject($"[EventTrigger] {eventTriggerEntry.Name} (ID:{eventTriggerEntry.Id})");
+                var nameText = _tableRepository?.GetStringText(eventTriggerEntry.NameId) ?? eventTriggerEntry.NameId.ToString();
+                var go = new GameObject($"[EventTrigger] {nameText} (ID:{eventTriggerEntry.Id})");
                 var marker = go.AddComponent<RoomObjectMarker>();
                 marker.TableId = eventTriggerEntry.Id;
                 go.transform.SetParent(GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
@@ -342,7 +343,8 @@ namespace DungeonShooter
         {
             if (!Application.isPlaying)
             {
-                var go = new GameObject($"[EventTrigger] {eventTriggerEntry.Name} (ID:{eventTriggerEntry.Id})");
+                var nameText = _tableRepository?.GetStringText(eventTriggerEntry.NameId) ?? eventTriggerEntry.NameId.ToString();
+                var go = new GameObject($"[EventTrigger] {nameText} (ID:{eventTriggerEntry.Id})");
                 go.transform.SetParent(GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
                 var marker = go.AddComponent<RoomObjectMarker>();
                 marker.TableId = eventTriggerEntry.Id;

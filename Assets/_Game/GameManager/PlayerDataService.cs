@@ -48,7 +48,7 @@ namespace DungeonShooter
             entityStats.Initialize(statsEntry);
 
             var statuses = new EntityStatuses(statsEntry);
-            var skillContainer = new EntitySkills();
+            var skillContainer = new EntitySkills(_tableRepository);
             EntityContext = new EntityContext(
                 new EntityInputContext(),
                 entityStats,

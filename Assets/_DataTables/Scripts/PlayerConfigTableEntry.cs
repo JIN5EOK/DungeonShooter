@@ -11,12 +11,12 @@ namespace DungeonShooter
     public class PlayerConfigTableEntry : ITableEntry
     {
         public int Id { get; set; }
-        
-        /// <summary> 플레이어 캐릭터 이름 </summary>
-        public string Name { get; set; }
-        
-        /// <summary> 플레이어 캐릭터 설명 </summary>
-        public string Description { get; set; }
+
+        /// <summary>플레이어 캐릭터 이름 (StringTextTableEntry.Id)</summary>
+        public int NameId { get; set; }
+
+        /// <summary>플레이어 캐릭터 설명 (StringTextTableEntry.Id)</summary>
+        public int DescriptionId { get; set; }
         
         /// <summary> 플레이어 게임오브젝트 어드레서블 주소 </summary>
         public string GameObjectKey { get; set; }

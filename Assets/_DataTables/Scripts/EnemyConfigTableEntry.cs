@@ -13,8 +13,8 @@ namespace DungeonShooter
         /// <summary>식별 ID </summary>
         public int Id { get; set; }
 
-        /// <summary>적 이름</summary>
-        public string Name { get; set; }
+        /// <summary>적 이름 (StringTextTableEntry.Id)</summary>
+        public int NameId { get; set; }
 
         /// <summary>적 프리팹 어드레서블 주소</summary>
         public string GameObjectKey { get; set; }

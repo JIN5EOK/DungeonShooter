@@ -40,7 +40,7 @@ namespace DungeonShooter
                     _resourceProvider.GetAssetSync<SkillData>(skillTableEntry.SkillDataKey) : null;
                 Sprite icon = await _resourceProvider.GetAssetAsync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
 
-                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory);
+                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory, _tableRepository);
             }
             catch (Exception e)
             {
@@ -59,7 +59,7 @@ namespace DungeonShooter
                     _resourceProvider.GetAssetSync<SkillData>(skillTableEntry.SkillDataKey) : null;
                 Sprite icon = _resourceProvider.GetAssetSync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
 
-                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory);
+                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory, _tableRepository);
             }
             catch (Exception e)
             {

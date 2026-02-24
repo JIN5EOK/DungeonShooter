@@ -167,7 +167,7 @@ namespace DungeonShooter
             {
                 var label = go.GetComponentInChildren<TextMeshProUGUI>(true);
                 if (label != null)
-                    label.text = entry?.Name ?? string.Empty;
+                    label.text = entry != null ? _tableRepository.GetStringText(entry.NameId) : string.Empty;
 
                 var captured = entry;
                 button.onClick.AddListener(() => SelectStage(captured));
@@ -206,7 +206,7 @@ namespace DungeonShooter
             {
                 var label = go.GetComponentInChildren<TextMeshProUGUI>(true);
                 if (label != null)
-                    label.text = entry?.Name ?? string.Empty;
+                    label.text = entry != null ? _tableRepository.GetStringText(entry.NameId) : string.Empty;
 
                 var captured = entry;
                 button.onClick.AddListener(() => SelectCharacter(captured));
@@ -238,19 +238,19 @@ namespace DungeonShooter
                 return;
             }
 
-            SetInfoText(_infoName, selectedEntry.Name);
-            SetInfoText(_infoDescription, selectedEntry.Description);
+            SetInfoText(_infoName, _tableRepository.GetStringText(selectedEntry.NameId));
+            SetInfoText(_infoDescription, _tableRepository.GetStringText(selectedEntry.DescriptionId));
 
             var weaponEntry = _tableRepository?.GetTableEntry<ItemTableEntry>(selectedEntry.StartWeaponId);
-            SetInfoText(_infoStartWeapon, weaponEntry?.ItemName ?? string.Empty);
+            SetInfoText(_infoStartWeapon, weaponEntry != null ? _tableRepository.GetStringText(weaponEntry.ItemNameId) : string.Empty);
 
             var skill1 = _tableRepository?.GetTableEntry<SkillTableEntry>(selectedEntry.Skill1Id);
             var skill2 = _tableRepository?.GetTableEntry<SkillTableEntry>(selectedEntry.Skill2Id);
             var skillNames = new List<string>();
-            if (!string.IsNullOrEmpty(skill1?.SkillName))
-                skillNames.Add(skill1.SkillName);
-            if (!string.IsNullOrEmpty(skill2?.SkillName))
-                skillNames.Add(skill2.SkillName);
+            if (skill1 != null)
+                skillNames.Add(_tableRepository.GetStringText(skill1.SkillNameId));
+            if (skill2 != null)
+                skillNames.Add(_tableRepository.GetStringText(skill2.SkillNameId));
             SetInfoText(_infoSkills, string.Join(", ", skillNames));
 
             var statsEntry = _tableRepository?.GetTableEntry<EntityStatsTableEntry>(selectedEntry.StatsId);
