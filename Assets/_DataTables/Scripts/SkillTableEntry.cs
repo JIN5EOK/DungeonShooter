@@ -34,9 +34,6 @@ namespace DungeonShooter
         /// <summary>데미지(%) 또는 회복량 등 스킬 수치 (효과 타입에 따라 의미 상이)</summary>
         public int Amount { get; set; }
 
-        /// <summary> 스킬 사용시 지연 시간 </summary>
-        public float Delay { get; set; }
-
         public float Cooldown { get; set; }
 
         /// <summary>스킬 그룹의 근간이 되는 SkillTableEntry의 ID</summary>

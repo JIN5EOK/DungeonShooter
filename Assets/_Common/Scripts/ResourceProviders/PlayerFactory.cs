@@ -46,7 +46,7 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 플레이어 캐릭터를 가져옵니다. 이미 플레이어가 있으면 파괴한 뒤 새로 생성합니다.
+        /// 플레이어 캐릭터를 생성합니다
         /// </summary>
         public async UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
@@ -65,7 +65,7 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 플레이어 캐릭터를 동기적으로 가져옵니다. 이미 플레이어가 있으면 파괴한 뒤 새로 생성합니다.
+        /// 플레이어 캐릭터를 동기적으로 생성합니다.
         /// </summary>
         public EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {

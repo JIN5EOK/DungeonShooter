@@ -1,23 +1,23 @@
-Memo,Id,SkillNameId,SkillDescriptionId,SkillIconKey,SkillDataKey,FloatAmounts,IntAmounts,Amount,Delay,Cooldown,SkillRootId
-파이어볼 스킬 루트,14000100,19200015,19200016,FireballSkillIcon,,,,,,,14000100
-파이어볼 레벨1,14000101,19200017,19200018,FireballSkillIcon,FireballSkillData,,,150,0.5,7,14000100
-파이어볼 레벨2,14000102,19200019,19200020,FireballSkillIcon,UpgradeFireballSkillData,,,165,0.5,5,14000100
-파이어볼 레벨3,14000103,19200021,19200022,FireballSkillIcon,UpgradeFireballSkillData,,,250,0.5,3,14000100
-검 무기 스킬 루트,14000200,19200023,19200024,SwordAttackSkillIcon,,,,,,,14000200
-검 무기 스킬,14000201,19200025,19200026,SwordAttackSkillIcon,SwordAttackSkillData,,,100,0.5,0.5,14000200
-체력 증가 패시브 루트,14000300,19200027,19200028,HealthUpSkillIcon,,,,,,,14000300
-체력 증가 패시브 레벨1,14000301,19200029,19200030,HealthUpSkillIcon,HealthUpSkillData,,,25,,,14000300
-체력 증가 패시브 레벨2,14000302,19200031,19200032,HealthUpSkillIcon,HealthUpSkillData,,,80,,,14000300
-체력 증가 패시브 레벨3,14000303,19200033,19200034,HealthUpSkillIcon,HealthUpSkillData,,,100,,,14000300
-공격력 증가 패시브 루트,14000400,19200035,19200036,AttackUpSkillIcon,,,,,,,14000400
-공격력 증가 패시브 레벨1,14000401,19200037,19200038,AttackUpSkillIcon,AttackUpSkillData,,,25,,,14000400
-공격력 증가 패시브 레벨2,14000402,19200039,19200040,AttackUpSkillIcon,AttackUpSkillData,,,45,,,14000400
-공격력 증가 패시브 레벨3,14000403,19200041,19200042,AttackUpSkillIcon,AttackUpSkillData,,,50,,,14000400
-메테오 스킬 루트,14000500,19200043,19200044,FireballSkillIcon,,,,,,,14000500
-메테오 레벨1,14000501,19200045,19200046,MeteorSkillIcon,MeteorSkillData,,,150,0.5,10,14000500
-메테오 레벨2,14000502,19200047,19200048,MeteorSkillIcon,MeteorSkillData,,,200,0.5,8,14000500
-메테오 레벨3,14000503,19200049,19200050,MeteorSkillIcon,MeteorSkillData,,,250,0.5,5,14000500
-힐 스킬 루트,14000600,19200051,19200052,MeteorSkillIcon,,,,,,,14000600
-힐 레벨1,14000601,19200053,19200054,MeteorSkillIcon,HealSkillData,,,500,0.0,0,14000500
-힐 레벨2,14000602,19200055,19200056,MeteorSkillIcon,HealSkillData,,,1000,0.0,0,14000500
-힐 레벨3,14000603,19200057,19200058,MeteorSkillIcon,HealSkillData,,,2500,0.0,0,14000500
+Memo,Id,SkillNameId,SkillDescriptionId,SkillIconKey,SkillDataKey,FloatAmounts,IntAmounts,Amount,Cooldown,SkillRootId
+파이어볼 스킬 루트,14000100,19200015,19200016,FireballSkillIcon,,,,,,14000100
+파이어볼 레벨1,14000101,19200017,19200018,FireballSkillIcon,FireballSkillData,,,150,7,14000100
+파이어볼 레벨2,14000102,19200019,19200020,FireballSkillIcon,UpgradeFireballSkillData,,,165,5,14000100
+파이어볼 레벨3,14000103,19200021,19200022,FireballSkillIcon,UpgradeFireballSkillData,,,250,3,14000100
+검 무기 스킬 루트,14000200,19200023,19200024,SwordAttackSkillIcon,,,,,,14000200
+검 무기 스킬,14000201,19200025,19200026,SwordAttackSkillIcon,SwordAttackSkillData,,,100,0.5,14000200
+체력 증가 패시브 루트,14000300,19200027,19200028,HealthUpSkillIcon,,,,,,14000300
+체력 증가 패시브 레벨1,14000301,19200029,19200030,HealthUpSkillIcon,HealthUpSkillData,,,25,,14000300
+체력 증가 패시브 레벨2,14000302,19200031,19200032,HealthUpSkillIcon,HealthUpSkillData,,,80,,14000300
+체력 증가 패시브 레벨3,14000303,19200033,19200034,HealthUpSkillIcon,HealthUpSkillData,,,100,,14000300
+공격력 증가 패시브 루트,14000400,19200035,19200036,AttackUpSkillIcon,,,,,,14000400
+공격력 증가 패시브 레벨1,14000401,19200037,19200038,AttackUpSkillIcon,AttackUpSkillData,,,25,,14000400
+공격력 증가 패시브 레벨2,14000402,19200039,19200040,AttackUpSkillIcon,AttackUpSkillData,,,45,,14000400
+공격력 증가 패시브 레벨3,14000403,19200041,19200042,AttackUpSkillIcon,AttackUpSkillData,,,50,,14000400
+메테오 스킬 루트,14000500,19200043,19200044,FireballSkillIcon,,,,,,14000500
+메테오 레벨1,14000501,19200045,19200046,MeteorSkillIcon,MeteorSkillData,,,150,10,14000500
+메테오 레벨2,14000502,19200047,19200048,MeteorSkillIcon,MeteorSkillData,,,200,8,14000500
+메테오 레벨3,14000503,19200049,19200050,MeteorSkillIcon,MeteorSkillData,,,250,5,14000500
+힐 스킬 루트,14000600,19200051,19200052,MeteorSkillIcon,,,,,,14000600
+힐 레벨1,14000601,19200053,19200054,MeteorSkillIcon,HealSkillData,,,500,0,14000500
+힐 레벨2,14000602,19200055,19200056,MeteorSkillIcon,HealSkillData,,,1000,0,14000500
+힐 레벨3,14000603,19200057,19200058,MeteorSkillIcon,HealSkillData,,,2500,0,14000500
