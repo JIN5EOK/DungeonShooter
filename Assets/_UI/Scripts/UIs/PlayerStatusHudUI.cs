@@ -14,16 +14,16 @@ namespace DungeonShooter
         [SerializeField] private TextMeshProUGUI _moveSpeedText;
         [SerializeField] private TextMeshProUGUI _remainingEnemyCountText;
 
-        private IPlayerDataService _playerDataService;
+        private IPlayerContextManager _playerContextManager;
         private EntityManager _entityManager;
 
         [Inject]
-        public void Construct(IPlayerDataService playerDataService, EntityManager entityManager)
+        public void Construct(IPlayerContextManager playerContextManager, EntityManager entityManager)
         {
-            _playerDataService = playerDataService;
+            _playerContextManager = playerContextManager;
             _entityManager = entityManager;
 
-            var stat = _playerDataService.EntityContext?.Stat;
+            var stat = _playerContextManager.EntityContext?.Stat;
             if (stat != null)
             {
                 stat.GetStat(StatType.Attack).OnValueChanged += OnAttackStatChanged;
@@ -54,7 +54,7 @@ namespace DungeonShooter
 
         private void RefreshAllStatTexts()
         {
-            var stat = _playerDataService.EntityContext?.Stat;
+            var stat = _playerContextManager.EntityContext?.Stat;
             if (stat == null) return;
             if (_attackText != null) _attackText.text = stat.GetStat(StatType.Attack).GetValue().ToString();
             if (_defenseText != null) _defenseText.text = stat.GetStat(StatType.Defense).GetValue().ToString();
@@ -69,7 +69,7 @@ namespace DungeonShooter
 
         protected override void OnDestroy()
         {
-            var stat = _playerDataService?.EntityContext?.Stat;
+            var stat = _playerContextManager?.EntityContext?.Stat;
             if (stat != null)
             {
                 stat.GetStat(StatType.Attack).OnValueChanged -= OnAttackStatChanged;

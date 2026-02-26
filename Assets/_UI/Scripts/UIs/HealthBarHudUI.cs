@@ -17,15 +17,15 @@ namespace DungeonShooter
         private int _currentHealth;
         private int _maxHealth;
 
-        private IPlayerDataService _playerDataService;
+        private IPlayerContextManager _playerContextManager;
         private IEntityStatus _hpStatus;
         private IEntityStat _hpStat;
 
         [Inject]
-        public void Construct(IPlayerDataService playerDataService)
+        public void Construct(IPlayerContextManager playerContextManager)
         {
-            _playerDataService = playerDataService;
-            var context = _playerDataService.EntityContext;
+            _playerContextManager = playerContextManager;
+            var context = _playerContextManager.EntityContext;
             if (context == null) return;
 
             _hpStatus = context.Statuses?.GetStatus(StatusType.Hp);

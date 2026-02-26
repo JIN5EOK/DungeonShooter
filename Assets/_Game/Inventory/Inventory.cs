@@ -23,19 +23,19 @@ namespace DungeonShooter
         public Item EquippedWeapon => _model.EquippedWeapon;
 
         private readonly InventoryModel _model;
-        private IPlayerDataService _playerDataService;
+        private IPlayerContextManager _playerContextManager;
         private IEventBus _eventBus;
 
-        private IEntityStats StatContainer => _playerDataService?.EntityContext?.Stat;
-        private IEntitySkills SkillContainer => _playerDataService?.EntityContext?.Skill;
+        private IEntityStats StatContainer => _playerContextManager?.EntityContext?.Stat;
+        private IEntitySkills SkillContainer => _playerContextManager?.EntityContext?.Skill;
 
         private EntityBase _ownerEntity;
 
         [Inject]
-        public Inventory(IEventBus eventBus, IPlayerDataService playerDataService)
+        public Inventory(IEventBus eventBus, IPlayerContextManager playerContextManager)
         {
-            _model = playerDataService.InventoryModel;
-            _playerDataService = playerDataService;
+            _model = playerContextManager.InventoryModel;
+            _playerContextManager = playerContextManager;
             _eventBus = eventBus;
             _model.OnItemAdded += OnItemAdded;
             _model.OnItemRemoved += OnItemRemoved;

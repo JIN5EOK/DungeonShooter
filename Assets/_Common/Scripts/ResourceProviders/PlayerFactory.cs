@@ -26,7 +26,7 @@ namespace DungeonShooter
         private readonly StageContext _stageContext;
         private readonly ISceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
-        private readonly IPlayerDataService _playerDataService;
+        private readonly IPlayerContextManager _playerContextManager;
         private readonly IEventBus _eventBus;
         private readonly LifetimeScope _sceneLifetimeScope;
         [Inject]
@@ -35,13 +35,13 @@ namespace DungeonShooter
             , ITableRepository tableRepository
             , IEventBus eventBus
             , LifetimeScope sceneLifetimeScope
-            , IPlayerDataService playerDataService)
+            , IPlayerContextManager playerContextManager)
         {
             _stageContext = context;
             _sceneResourceProvider = sceneResourceProvider;
             _tableRepository = tableRepository;
             _eventBus = eventBus;
-            _playerDataService = playerDataService;
+            _playerContextManager = playerContextManager;
             _sceneLifetimeScope = sceneLifetimeScope;
         }
 
@@ -128,7 +128,7 @@ namespace DungeonShooter
             
             var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
             
-            entity.SetContext(_playerDataService.EntityContext);
+            entity.SetContext(_playerContextManager.EntityContext);
             
             var movementComponent = entityLifeTimeScope.Container.Resolve<IMovementComponent>();
             var interactComponent = entityLifeTimeScope.Container.Resolve<IInteractComponent>();

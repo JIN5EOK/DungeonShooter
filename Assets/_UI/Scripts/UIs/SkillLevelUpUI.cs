@@ -17,15 +17,15 @@ namespace DungeonShooter
         private List<SkillLevelUpSlot> _slots = new();
 
         private IEventBus _eventBus;
-        private IPlayerDataService _playerDataService;
+        private IPlayerContextManager _playerContextManager;
         private ISkillService _skillService;
         private IPauseManager _pauseManager;
         private ITableRepository _tableRepository;
 
         [Inject]
-        public void Construct(IPlayerDataService playerDataService, ISkillService skillService, IEventBus eventBus, IPauseManager pauseManager, ITableRepository tableRepository)
+        public void Construct(IPlayerContextManager playerContextManager, ISkillService skillService, IEventBus eventBus, IPauseManager pauseManager, ITableRepository tableRepository)
         {
-            _playerDataService = playerDataService;
+            _playerContextManager = playerContextManager;
             _skillService = skillService;
             _eventBus = eventBus;
             _pauseManager = pauseManager;
@@ -43,7 +43,7 @@ namespace DungeonShooter
         /// </summary>
         public void SetLevelUpSkillAndShow()
         {
-            var skills = _playerDataService?.EntityContext?.Skill?.GetRegistedSkills();
+            var skills = _playerContextManager?.EntityContext?.Skill?.GetRegistedSkills();
             var levelUpableList = _skillService.GetLevelUpableSkills(skills);
 
             IReadOnlyList<LevelUpableSkillInfo> toDisplay = levelUpableList;
@@ -79,7 +79,7 @@ namespace DungeonShooter
 
                 slot.SetSelectHandler(() =>
                 {
-                    _skillService.TrySkillLevelUp(_playerDataService?.EntityContext?.Skill, info.CurrentSkill);
+                    _skillService.TrySkillLevelUp(_playerContextManager?.EntityContext?.Skill, info.CurrentSkill);
                     Hide();
                 });
 
