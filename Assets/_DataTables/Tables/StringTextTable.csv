@@ -70,3 +70,4 @@ Memo,Id,Text
 ,19200061,PlayerSpawnPoint
 ,19200062,RandomEnemySpawnPoint
 ,19200063,위험한 숲
+,19200064,"{0} 아이템을 {1} 개 획득했습니다."

@@ -2,6 +2,7 @@ using System;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
 
 namespace DungeonShooter
@@ -19,7 +20,7 @@ namespace DungeonShooter
     public class AlertMessageUI : HudUI
     {
         [SerializeField]
-        private Transform _messageTransform;
+        private Image _messagePanel;
         [SerializeField]
         private TMP_Text _text;
         private AlertMessageViewModel _viewModel;
@@ -27,22 +28,29 @@ namespace DungeonShooter
         [Inject]
         public void Construct(AlertMessageViewModel viewModel)
         {
+            _viewModel = viewModel;
             _viewModel.OnMessageSet += ShowMessage;
         }
-        
+
         public void ShowMessage(string message)
         {
-            _messageTransform.gameObject.SetActive(true);
+            _text.text = message;
+            _messagePanel.gameObject.SetActive(true);
             _text.DOKill();
-            _text.color = Color.white;
-            _text.DOColor(Color.white, 2.0f);
-            _text.DOColor(Color.clear, 1.0f).OnComplete(() => _messageTransform.gameObject.SetActive(false));
+            _messagePanel.color = Color.white;
+            _messagePanel.DOColor(Color.white, 2.0f).OnComplete(() =>
+            {
+                _messagePanel.DOColor(Color.clear, 1.0f).OnComplete(() => _messagePanel.gameObject.SetActive(false));    
+            });
         }
 
         public override void Destroy()
         {
             base.Destroy();
-            _viewModel.OnMessageSet -= ShowMessage;
+            if (_viewModel != null)
+            {
+                _viewModel.OnMessageSet -= ShowMessage;
+            }
         }
     }
 }

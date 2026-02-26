@@ -13,6 +13,8 @@ namespace DungeonShooter
     /// </summary>
     public class Inventory : IInventory
     {
+        private const int StringIdItemObtainedFormat = 19200064;
+
         public event Action<Item> OnItemAdded;
         public event Action<Item> OnItemRemoved;
         public event Action<Item> OnItemStackChanged;
@@ -25,6 +27,8 @@ namespace DungeonShooter
         private readonly InventoryModel _model;
         private IPlayerContextManager _playerContextManager;
         private IEventBus _eventBus;
+        private ITableRepository _tableRepository;
+        private AlertMessageViewModel _alertMessageViewModel;
 
         private IEntityStats StatContainer => _playerContextManager?.EntityContext?.Stat;
         private IEntitySkills SkillContainer => _playerContextManager?.EntityContext?.Skill;
@@ -32,11 +36,13 @@ namespace DungeonShooter
         private EntityBase _ownerEntity;
 
         [Inject]
-        public Inventory(IEventBus eventBus, IPlayerContextManager playerContextManager)
+        public Inventory(IEventBus eventBus, IPlayerContextManager playerContextManager, ITableRepository tableRepository, AlertMessageViewModel alertMessageViewModel)
         {
             _model = playerContextManager.InventoryModel;
             _playerContextManager = playerContextManager;
             _eventBus = eventBus;
+            _tableRepository = tableRepository;
+            _alertMessageViewModel = alertMessageViewModel;
             _model.OnItemAdded += OnItemAdded;
             _model.OnItemRemoved += OnItemRemoved;
             _model.OnItemStackChanged += OnItemStackChanged;
@@ -69,8 +75,17 @@ namespace DungeonShooter
                 return false;
             }
 
+            var amountAdded = item.StackCount;
             if (!_model.AddItem(item))
                 return false;
+
+            var format = _tableRepository?.GetStringText(StringIdItemObtainedFormat);
+            if (!string.IsNullOrEmpty(format) && _alertMessageViewModel != null)
+            {
+                var itemName = _tableRepository?.GetStringText(item.ItemTableEntry.ItemNameId) ?? item.ItemTableEntry.ItemNameId.ToString();
+                var message = string.Format(format, itemName, amountAdded);
+                _alertMessageViewModel.SetMessage(message);
+            }
 
             if (item.PassiveSkill != null)
                 SkillContainer?.Regist(item.PassiveSkill);

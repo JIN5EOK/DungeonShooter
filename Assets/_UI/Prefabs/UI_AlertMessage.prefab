@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66ba3e3705ba47ab9f0d833eeef3edfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _messageTransform: {fileID: 7537673367605278598}
+  _messagePanel: {fileID: 4954134620072768745}
   _text: {fileID: 6246393885520089678}
 --- !u!1 &4009578749112350446
 GameObject:
@@ -68,7 +68,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7537673367605278598
 RectTransform:
   m_ObjectHideFlags: 0

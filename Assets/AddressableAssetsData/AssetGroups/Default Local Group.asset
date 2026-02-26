@@ -73,6 +73,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ee891e45e77745f7aadcee9ce911ef4
+    m_Address: UI_AlertMessage
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4d3c7f56978504637ab42a4c8f2d4c29
     m_Address: UIAtals
     m_ReadOnly: 0
@@ -276,6 +281,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: df100b4288fcd40e09355d5a3083de1e
     m_Address: Heal_Particle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e3352b3f54b974b2eae0ca6d520e31ce
+    m_Address: coin01
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

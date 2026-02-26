@@ -18,6 +18,7 @@ namespace DungeonShooter
         private SkillCooldownHudUI _skillCooldownHudUI;
         private GameButtonHudUI _gameButtonHudUI;
         private InventoryUI _inventoryUI;
+        private AlertMessageUI _alertMessageUI;
 
         [Inject]
         public StageSceneUIManager(UIManager uiManager, IPauseManager pauseManager)
@@ -35,6 +36,7 @@ namespace DungeonShooter
             _skillCooldownHudUI = await _uiManager.GetSingletonUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud);
             _gameButtonHudUI = await _uiManager.GetSingletonUIAsync<GameButtonHudUI>(UIAddresses.UI_GameButtonHud);
             _gameButtonHudUI.OnInventoryButtonClicked += ShowInventory;
+            _alertMessageUI = await _uiManager.GetSingletonUIAsync<AlertMessageUI>(UIAddresses.UI_AlertMessage);
             _inventoryUI = await _uiManager.GetSingletonUIAsync<InventoryUI>(UIAddresses.UI_Inventory);
             _inventoryUI.OnShow += OnInventoryShow;
             _inventoryUI.OnHide += OnInventoryHide;
