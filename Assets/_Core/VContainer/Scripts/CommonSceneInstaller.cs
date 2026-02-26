@@ -11,6 +11,7 @@ namespace DungeonShooter
         public void Install(IContainerBuilder builder)
         {
             builder.Register<SceneResourceProvider>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<SoundSfxService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.RegisterComponentOnNewGameObject<UIManager>(Lifetime.Scoped);
         }
     }

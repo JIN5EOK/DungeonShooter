@@ -13,8 +13,6 @@ namespace DungeonShooter
     /// </summary>
     public class Inventory : IInventory
     {
-        private const int StringIdItemObtainedFormat = 19200064;
-
         public event Action<Item> OnItemAdded;
         public event Action<Item> OnItemRemoved;
         public event Action<Item> OnItemStackChanged;
@@ -79,7 +77,7 @@ namespace DungeonShooter
             if (!_model.AddItem(item))
                 return false;
 
-            var format = _tableRepository?.GetStringText(StringIdItemObtainedFormat);
+            var format = _tableRepository?.GetStringText(StringMessageTableID.AlertMessageTextId);
             if (!string.IsNullOrEmpty(format) && _alertMessageViewModel != null)
             {
                 var itemName = _tableRepository?.GetStringText(item.ItemTableEntry.ItemNameId) ?? item.ItemTableEntry.ItemNameId.ToString();

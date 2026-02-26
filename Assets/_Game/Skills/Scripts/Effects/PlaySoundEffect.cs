@@ -1,7 +1,5 @@
 using System;
 using Cysharp.Threading.Tasks;
-using DungeonShooter;
-using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Audio;
@@ -9,7 +7,7 @@ using UnityEngine.Audio;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 효과음을 OneShot으로 재생하는 이펙트
+    /// 효과음을 OneShot으로 재생하는 이펙트. 주소 기반으로 SoundSfxService를 통해 재생합니다.
     /// </summary>
     [Serializable]
     public class PlaySoundEffect : EffectBase
@@ -24,19 +22,20 @@ namespace DungeonShooter
         {
             if (!await base.Execute(context, entry))
                 return false;
-                
+
             if (_audioClipRef == null)
             {
                 LogHandler.LogWarning<PlaySoundEffect>("오디오 클립 에셋 레퍼런스가 비어 있습니다.");
                 return false;
             }
 
-            var clip = await context.SceneResourceProvider.GetAssetAsync<AudioClip>(AudioClipAddress);
-            
-            if (clip == null)
+            if (context.SoundSfxService == null)
+            {
+                LogHandler.LogWarning<PlaySoundEffect>("SoundSfxService가 컨텍스트에 없습니다.");
                 return false;
-            
-            AudioPlayer.PlayOneShot(clip);
+            }
+
+            context.SoundSfxService.PlayOneShot(AudioClipAddress);
             return true;
         }
     }

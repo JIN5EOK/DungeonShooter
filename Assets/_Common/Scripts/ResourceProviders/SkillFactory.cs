@@ -19,13 +19,15 @@ namespace DungeonShooter
         private readonly ISceneResourceProvider _resourceProvider;
         private readonly ITableRepository _tableRepository;
         private readonly ISkillObjectFactory _skillObjectFactory;
+        private readonly ISoundSfxService _soundSfxService;
 
         [Inject]
-        public SkillFactory(ISceneResourceProvider resourceProvider, ITableRepository tableRepository,  ISkillObjectFactory skillObjectFactory)
+        public SkillFactory(ISceneResourceProvider resourceProvider, ITableRepository tableRepository, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService)
         {
             _resourceProvider = resourceProvider;
             _tableRepository = tableRepository;
             _skillObjectFactory = skillObjectFactory;
+            _soundSfxService = soundSfxService;
         }
 
         /// <summary>
@@ -40,7 +42,7 @@ namespace DungeonShooter
                     _resourceProvider.GetAssetSync<SkillData>(skillTableEntry.SkillDataKey) : null;
                 Sprite icon = await _resourceProvider.GetAssetAsync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
 
-                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory, _tableRepository);
+                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory, _soundSfxService, _tableRepository);
             }
             catch (Exception e)
             {
@@ -59,7 +61,7 @@ namespace DungeonShooter
                     _resourceProvider.GetAssetSync<SkillData>(skillTableEntry.SkillDataKey) : null;
                 Sprite icon = _resourceProvider.GetAssetSync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
 
-                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory, _tableRepository);
+                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory, _soundSfxService, _tableRepository);
             }
             catch (Exception e)
             {

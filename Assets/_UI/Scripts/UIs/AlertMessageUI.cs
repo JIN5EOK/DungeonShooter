@@ -24,19 +24,22 @@ namespace DungeonShooter
         [SerializeField]
         private TMP_Text _text;
         private AlertMessageViewModel _viewModel;
-        
+        private ISoundSfxService _soundSfxService;
+
         [Inject]
-        public void Construct(AlertMessageViewModel viewModel)
+        public void Construct(AlertMessageViewModel viewModel, ISoundSfxService soundSfxService)
         {
             _viewModel = viewModel;
+            _soundSfxService = soundSfxService;
             _viewModel.OnMessageSet += ShowMessage;
         }
 
         public void ShowMessage(string message)
         {
+            _soundSfxService?.PlayOneShot(AudioAddresses.AlertSound);
             _text.text = message;
             _messagePanel.gameObject.SetActive(true);
-            _text.DOKill();
+            _messagePanel.DOKill();
             _messagePanel.color = Color.white;
             _messagePanel.DOColor(Color.white, 2.0f).OnComplete(() =>
             {
