@@ -22,7 +22,13 @@
 # 프로젝트 실행 방법
 - Unity 6000.0.62f1 설치
 - 게임을 테스트하려면 MainMenuScene 씬에 진입해 플레이 합니다.
-- 맵 에디터를 테스트하려면 RoomEditor 씬에 진입해 RoomEditor 게임오브젝트를 클릭합니다. 
+- 맵 에디터를 테스트하려면 RoomEditor 씬에 진입해 RoomEditor 게임오브젝트를 클릭합니다.
+
+# 조작방법
+이동 : WASD
+구르기 : 스페이스 바 
+무기 공격 : J
+스킬 1, 2 : K,L
 
 # 프로젝트 폴더 구조
 ```
@@ -49,10 +55,11 @@ Assets/
 - 프로젝트 버전
   - 6000.0.62f1
 - 사용 패키지
-  - Addressables
-  - VContainer
-  - Chinemachine
-  - UniTask
-  - 2D Tilemap
-  - Jin5eok_Unity_Library : https://github.com/JIN5EOK/JIN5EOK_Unity_Library
+    - Addressables
+    - VContainer
+    - Chinemachine
+    - UniTask
+    - 2D Tilemap
+    - Dotween
+    - Jin5eok_Unity_Library : https://github.com/JIN5EOK/JIN5EOK_Unity_Library
 
