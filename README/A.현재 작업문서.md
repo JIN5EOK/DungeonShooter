@@ -1,8 +1,57 @@
-## 게임 결과/일시정지 UI 구상
+### 클래스 다이어그램
 
-### 룰
-- UI에 쓰이는 텍스트는 ViewModel 혹은 Presenter에서 지정한다
-  - 텍스트를 가져오는 것 자체가 일종의 기능에 해당하기 때문 (테이블에서 텍스트 가져오기)
+```mermaid
+classDiagram
+    class PauseManager {
+        +일시정지 기능
+    }
+
+    class GameExitService {
+        +씬 이동/게임 종료
+    }
+
+    class GamePauseView {
+        +event OnClickResumeButton
+        +event OnClickExitButton
+    }
+
+    class GamePausePresenter {
+        +PauseGame()
+        +ExitGame()
+    }
+
+    class GameResultView {
+        +ViewModel 참고하여 UI 갱신
+    }
+
+    class GameResultModel {
+        +Result : GameResult // 결과 enum
+        +EnemyKillCount : int
+        +PlayTimeSecond : int
+    }
+
+    class GameResultViewModel {
+        +EnemyKillCountText : string
+        +PlayTimeText : string
+        +MessageText : string
+        +ExitButtonText : string
+        +OnExit : event Action
+    }
+    
+    class GameResultService{
+        +OnGameResult : event Action~GameResultModel~
+        +ExecuteGameResult() void
+    }
+    
+    GamePauseView <-- GamePausePresenter : 참조
+    GamePausePresenter --> PauseManager : UI 활성화시 일시정지 요청
+    GamePausePresenter --> GameExitService : 종료기능 사용
+    GameResultService <-- GameResultViewModel : 구독하여 모델 기반으로 뷰모델 갱신
+    GameResultModel <.. GameResultService : 이벤트 파라미터, 게임 결과 요청시 생성
+    PauseManager <-- GameResultService : 게임 결과 나오면 일시정지 요청
+    GameResultView --> GameResultViewModel : 참조
+    GameExitService <-- GameResultViewModel : 버튼 클릭시 종료 기능 참조
+```
 
 ### 구상
 - 기능 서비스
@@ -12,34 +61,3 @@
     - 씬 이동과 같은 게임 종료 기능 서비스
   - `PlayTimerService` (구현 필요)
     - 게임 시작 후 지난 시간 담당 서비스
-- UI
-  - **게임 일시정지 UI, MVP 패턴 사용**
-    - `GamePauseView`
-      - 필드/함수
-        - event OnClickResumeButton
-          - 재개 버튼 클릭 이벤트
-        - event OnClickExitButton
-          - 종료 버튼 클릭 이벤트
-    - `GamePausePresenter`
-      - 필드/함수
-        - PauseGame()
-          - 일시정지 활성화시 `PauseManager`로 게임 일시정지 요청, 게임 종료 요청시 `GameExitService`로 게임 종료 요청
-        - ExitGame()
-          - 게임 종료
-      - 기능 설명
-        - View를 참고하여 기능 실행
-  - **게임 결과 UI, MVVM 패턴 사용**
-    - `GameResultView`
-      - 기능 설명
-        - ViewModel 참고하여 UI 갱신
-    - `GameResultViewModel`
-    - 필드/함수
-      - string EnemyKillCountText ("102마리")
-      - string PlayTimeText ("25:39")
-      - string MessageText : (게임 오버.. / 게임 클리어!)
-      - string RetryButtonText : (다시하기)
-      - string ExitButtonText : (종료하기)
-      - event OnExit
-      - event OnRetry
-    - 기능 설명
-      - 일시정지 활성화시 `PauseManager`로 게임 일시정지 요청, 게임 종료 요청시 `GameExitService`로 게임 종료 요청
