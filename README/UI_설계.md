@@ -1,7 +1,7 @@
 # 개요
 > UI 관리를 위한 UIManager, UI를 상속받는 UIBase들에 대한 설계입니다
 
-### UI 구조도
+## UI 구조도
 ```mermaid
 classDiagram
     class UIType{
@@ -46,3 +46,15 @@ classDiagram
   * `UIType`별 캔버스 및 계층구조 생성
     * `UIType`별로 캔버스를 생성한다 
     * 캔버스간 정렬 순서는 UIType에 정의된 순서를 따른다 (HudUI < PopupUI)
+
+## UI 아키텍쳐 패턴 관련
+- 수치, 값, 텍스트를 많이 설정해야 하는 UI
+  - MVVM 사용
+- 연출, 버튼 클릭 등 수치 비중이 적은 UI
+  - MVP 사용
+- 기능이 단순한 UI
+  - UI 스크립트 하나만 두고 사용
+
+## 추후 고려사항
+- 캔버스 리빌드를 고려하여 자주 갱신되는 UI들을 다른 캔버스에 둘 수 있도록 하기
+- 현재 프로파일링 결과 UI 렌더링은 비중이 높지 않아 고려사항 아님
