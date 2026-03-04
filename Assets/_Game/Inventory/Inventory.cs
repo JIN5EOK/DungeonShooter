@@ -26,7 +26,7 @@ namespace DungeonShooter
         private IPlayerContextManager _playerContextManager;
         private IEventBus _eventBus;
         private ITableRepository _tableRepository;
-        private AlertMessageViewModel _alertMessageViewModel;
+        private IGameMessageService _gameMessageService;
 
         private IEntityStats StatContainer => _playerContextManager?.EntityContext?.Stat;
         private IEntitySkills SkillContainer => _playerContextManager?.EntityContext?.Skill;
@@ -34,13 +34,14 @@ namespace DungeonShooter
         private EntityBase _ownerEntity;
 
         [Inject]
-        public Inventory(IEventBus eventBus, IPlayerContextManager playerContextManager, ITableRepository tableRepository, AlertMessageViewModel alertMessageViewModel)
+        public Inventory(IEventBus eventBus, IPlayerContextManager playerContextManager,
+            ITableRepository tableRepository, IGameMessageService gameMessageService)
         {
             _model = playerContextManager.InventoryModel;
             _playerContextManager = playerContextManager;
             _eventBus = eventBus;
             _tableRepository = tableRepository;
-            _alertMessageViewModel = alertMessageViewModel;
+            _gameMessageService = gameMessageService;
             _model.OnItemAdded += OnItemAdded;
             _model.OnItemRemoved += OnItemRemoved;
             _model.OnItemStackChanged += OnItemStackChanged;
@@ -78,11 +79,12 @@ namespace DungeonShooter
                 return false;
 
             var format = _tableRepository?.GetStringText(StringMessageTableID.AlertMessageTextId);
-            if (!string.IsNullOrEmpty(format) && _alertMessageViewModel != null)
+            if (!string.IsNullOrEmpty(format) && _gameMessageService != null)
             {
-                var itemName = _tableRepository?.GetStringText(item.ItemTableEntry.ItemNameId) ?? item.ItemTableEntry.ItemNameId.ToString();
+                var itemName = _tableRepository?.GetStringText(item.ItemTableEntry.ItemNameId) ??
+                               item.ItemTableEntry.ItemNameId.ToString();
                 var message = string.Format(format, itemName, amountAdded);
-                _alertMessageViewModel.SetMessage(message);
+                _gameMessageService.ShowAlertMessage(message);
             }
 
             if (item.PassiveSkill != null)
@@ -101,11 +103,13 @@ namespace DungeonShooter
                 LogHandler.LogWarning<Inventory>("아이템이 null입니다.");
                 return false;
             }
+
             if (item.ItemTableEntry.ItemType != ItemType.Weapon)
             {
                 LogHandler.LogWarning<Inventory>("무기 타입의 아이템만 장착할 수 있습니다.");
                 return false;
             }
+
             if (!_model.Contains(item))
             {
                 LogHandler.LogWarning<Inventory>("인벤토리에 없는 아이템입니다.");
@@ -177,11 +181,13 @@ namespace DungeonShooter
                 LogHandler.LogWarning<Inventory>("아이템이 null입니다.");
                 return;
             }
+
             if (item.ItemTableEntry.ItemType != ItemType.Consume)
             {
                 LogHandler.LogWarning<Inventory>("소비 아이템만 사용할 수 있습니다.");
                 return;
             }
+
             if (!_model.Contains(item))
             {
                 LogHandler.LogWarning<Inventory>("인벤토리에 없는 아이템입니다.");

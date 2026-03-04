@@ -13,7 +13,7 @@ namespace DungeonShooter
         protected override void Configure(IContainerBuilder builder)
         {
             new CommonSceneInstaller().Install(builder);
-            
+
             builder.Register<EntityManager>(Lifetime.Scoped);
             builder.Register<PlayerInputManager>(Lifetime.Scoped);
             builder.Register<PlayerContextManager>(Lifetime.Scoped).AsImplementedInterfaces();
@@ -23,6 +23,7 @@ namespace DungeonShooter
             builder.Register<SkillService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<ItemDropService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<AlertMessageViewModel>(Lifetime.Scoped);
+            builder.Register<GameMessageService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<Inventory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<InventoryViewModel>(Lifetime.Scoped).AsImplementedInterfaces();
 
@@ -32,20 +33,19 @@ namespace DungeonShooter
             builder.Register<ItemFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<FieldItemFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SkillObjectFactory>(Lifetime.Scoped).AsImplementedInterfaces();
-            
+
             builder.Register<RoomDataRepository>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<StageGenerator>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<StageInstantiator>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<RoomInstantiator>(Lifetime.Scoped);
-            
+
             builder.Register<StageSceneUIManager>(Lifetime.Scoped);
             builder.RegisterComponentOnNewGameObject<ObjectCullingManager>(Lifetime.Scoped);
-            
+
             builder.Register<EntitySkills>(Lifetime.Transient);
-            
+
             builder.RegisterComponentOnNewGameObject<StageSceneInitializer>(Lifetime.Scoped);
             base.Configure(builder);
-            
         }
 
         protected override void Awake()
