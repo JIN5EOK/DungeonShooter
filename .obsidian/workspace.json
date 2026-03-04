@@ -1,0 +1,228 @@
+{
+  "main": {
+    "id": "41fc424a2d79eba7",
+    "type": "split",
+    "children": [
+      {
+        "id": "9d82a6ae4cb2da2a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e410cf065d7d8a62",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "새 탭"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "70a106b7414fdb1d",
+    "type": "split",
+    "children": [
+      {
+        "id": "a5f0705f645a9caf",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "11ef0d7e338ec35f",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "파일 탐색기"
+            }
+          },
+          {
+            "id": "3a6f599df8c31e45",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "검색"
+            }
+          },
+          {
+            "id": "95b2cbac9ea63551",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "북마크"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "7bb75f9eaf0040de",
+    "type": "split",
+    "children": [
+      {
+        "id": "8684953d8d9fa473",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "25a8f6279017346f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "백링크"
+            }
+          },
+          {
+            "id": "29cc6079aefbe0f0",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "나가는 링크"
+            }
+          },
+          {
+            "id": "be64dd71f99b314c",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "태그"
+            }
+          },
+          {
+            "id": "37c6872677f235d5",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "모든 속성"
+            }
+          },
+          {
+            "id": "f2554219592104c0",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "개요"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:빠른 전환기 열기": false,
+      "graph:그래프 뷰 열기": false,
+      "canvas:새 캔버스 만들기": false,
+      "daily-notes:오늘의 일일 노트 열기": false,
+      "templates:템플릿 삽입": false,
+      "command-palette:명령어 팔레트 열기": false,
+      "bases:새 베이스 생성하기": false
+    }
+  },
+  "active": "e410cf065d7d8a62",
+  "lastOpenFiles": [
+    "Temp/obj/Debug/JIN5EOK/project.packagespec.json",
+    "Temp/obj/Debug/com.IvanMurzak.Unity.MCP.Installer.Tests/project.packagespec.json",
+    "Temp/obj/Debug/Assembly-CSharp-Editor/Assembly-CSharp-Editor.assets.cache",
+    "Temp/obj/Debug/Assembly-CSharp/Assembly-CSharp.assets.cache",
+    "Temp/obj/Debug/JIN5EOK/JIN5EOK.GeneratedMSBuildEditorConfig.editorconfig",
+    "Temp/obj/Debug/JIN5EOK/JIN5EOK.csproj.AssemblyReference.cache",
+    "Temp/obj/Debug/JIN5EOK/JIN5EOK.assets.cache",
+    "Temp/obj/Debug/com.IvanMurzak.Unity.MCP.Installer.Tests/com.IvanMurzak.Unity.MCP.Installer.Tests.GeneratedMSBuildEditorConfig.editorconfig",
+    "Temp/obj/Debug/com.IvanMurzak.Unity.MCP.Installer.Tests/com.IvanMurzak.Unity.MCP.Installer.Tests.csproj.AssemblyReference.cache",
+    "Temp/obj/Debug/com.IvanMurzak.Unity.MCP.Installer.Tests/com.IvanMurzak.Unity.MCP.Installer.Tests.assets.cache",
+    "Temp/obj/Debug/FangAutoTile.Editor/FangAutoTile.Editor.assets.cache",
+    "Library/PackageCache/com.antigravity.editor@31b54b2f6839/README_KO.md",
+    "Library/PackageCache/com.antigravity.editor@31b54b2f6839/README.md",
+    "Library/PackageCache/com.antigravity.editor@31b54b2f6839/QUICK_START.md",
+    "Library/PackageCache/com.antigravity.editor@31b54b2f6839/PROJECT_SUMMARY.md",
+    "Library/PackageCache/com.antigravity.editor@31b54b2f6839/INSTALL.md",
+    "Library/PackageCache/com.antigravity.editor@31b54b2f6839/CLAUDE.md",
+    "Library/PackageCache/com.antigravity.editor@31b54b2f6839/CHANGELOG.md",
+    "Library/PackageCache/org.nuget.microsoft.aspnetcore.http.connections.common@f8a0c918171b/License.md",
+    "Library/PackageCache/org.nuget.microsoft.aspnetcore.connections.abstractions@feefeddaed85/License.md",
+    "Library/PackageCache/org.nuget.microsoft.extensions.features@c39959e905b1/License.md",
+    "Library/PackageCache/org.nuget.system.threading.channels@999c60a196d4/License.md",
+    "Library/PackageCache/org.nuget.microsoft.bcl.timeprovider@aa4d9a6bf320/License.md",
+    "Library/PackageCache/org.nuget.system.net.serversentevents@d4266c93808e/License.md",
+    "Library/PackageCache/org.nuget.system.numerics.vectors@6cbe0e354ad7/License.md",
+    "Library/PackageCache/org.nuget.microsoft.aspnetcore.http.connections.client@812fbeff852f/License.md",
+    "Library/PackageCache/org.nuget.system.buffers@4462a8bca019/License.md",
+    "Library/PackageCache/org.nuget.microsoft.aspnetcore.signalr.client.core@287a6cf12702/License.md",
+    "Library/PackageCache/org.nuget.microsoft.codeanalysis.common@34ebd91b67de/License.md",
+    "Library/PackageCache/org.nuget.system.collections.immutable@1cb871d2ec81/License.md",
+    "Library/PackageCache/org.nuget.system.text.encoding.codepages@cd3f9f70f07b/License.md",
+    "Library/PackageCache/org.nuget.microsoft.aspnetcore.signalr.common@999bc614832a/License.md",
+    "Library/PackageCache/org.nuget.system.reflection.metadata@935d07b34e5e/License.md",
+    "Library/PackageCache/org.nuget.microsoft.codeanalysis.analyzers@bcf103d84432/License.md",
+    "Library/PackageCache/org.nuget.microsoft.extensions.fileproviders.abstractions@6dfc2275c5b9/License.md",
+    "Library/PackageCache/org.nuget.microsoft.extensions.diagnostics.abstractions@070ef718d01b/License.md",
+    "Library/PackageCache/com.ivanmurzak.unity.mcp@db4854588d25/Editor/Gizmos/ai-agents/vs-code-64.png",
+    "Library/PackageCache/com.ivanmurzak.unity.mcp@db4854588d25/Editor/Gizmos/ai-agents/visual-studio-64.png",
+    "Library/PackageCache/com.ivanmurzak.unity.mcp@db4854588d25/Editor/Gizmos/ai-agents/unity-64.png",
+    "Library/PackageCache/com.ivanmurzak.unity.mcp@db4854588d25/Editor/Gizmos/ai-agents/rider-64.png",
+    "Library/PackageCache/com.ivanmurzak.unity.mcp@db4854588d25/Editor/Gizmos/ai-agents/open-code-64.png",
+    "Library/PackageCache/com.ivanmurzak.unity.mcp@db4854588d25/Editor/Gizmos/ai-agents/kilo-code-64.png",
+    "Library/PackageCache/com.ivanmurzak.unity.mcp@db4854588d25/Editor/Gizmos/ai-agents/gemini-64.png",
+    "Library/PackageCache/com.ivanmurzak.unity.mcp@db4854588d25/Editor/Gizmos/ai-agents/github-copilot-64.png",
+    "Library/PackageCache/com.ivanmurzak.unity.mcp@db4854588d25/Editor/Gizmos/ai-agents/cursor-64.png",
+    "Library/PackageCache/com.ivanmurzak.unity.mcp@db4854588d25/Editor/Gizmos/ai-agents/codex-64.png"
+  ]
+}
