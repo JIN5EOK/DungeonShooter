@@ -16,7 +16,7 @@ namespace DungeonShooter
 
         public event Action OnExitClickedEvent;
 
-        public void Start()
+        private void Start()
         {
             if (_exitButton != null)
                 _exitButton.onClick.AddListener(OnExitClicked);
