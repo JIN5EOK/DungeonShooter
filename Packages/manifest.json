@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "com.boxqkrtm.ide.cursor": "2.0.27",
-    "com.coplaydev.unity-mcp": "8.0.0",
+    "com.cysharp.unitask": "2.5.10",
+    "com.ivanmurzak.unity.mcp": "0.51.4",
     "com.jin5eok.jin5eoklibrary": "file:JIN5EOK_Unity_Library/Assets/JIN5EOK",
     "com.unity.addressables": "2.7.6",
     "com.unity.cinemachine": "3.1.5",
@@ -48,8 +49,7 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0",
-    "com.cysharp.unitask": "2.5.10"
+    "com.unity.modules.xr": "1.0.0"
   },
   "scopedRegistries": [
     {
@@ -59,7 +59,13 @@
         "com.boxqkrtm.ide.cursor",
         "com.coplaydev.unity-mcp",
         "com.cysharp.unitask",
-        "jp.hadashikick.vcontainer"
+        "jp.hadashikick.vcontainer",
+        "com.ivanmurzak",
+        "extensions.unity",
+        "org.nuget.com.ivanmurzak",
+        "org.nuget.microsoft",
+        "org.nuget.system",
+        "org.nuget.r3"
       ]
     }
   ]
