@@ -20,16 +20,19 @@ namespace DungeonShooter
         private InventoryUI _inventoryUI;
         private AlertMessageUI _alertMessageUI;
         private GamePausePresenter _gamePausePresenter;
-        
+
         private GamePauseView _gamePauseView;
         private GameResultView _gameResultView;
+        private GameResultPresenter _gameResultPresenter;
+
         [Inject]
         public StageSceneUIManager(UIManager uiManager, IPauseManager pauseManager,
-            GamePausePresenter gamePausePresenter)
+            GamePausePresenter gamePausePresenter, GameResultPresenter gameResultPresenter)
         {
             _uiManager = uiManager;
             _pauseManager = pauseManager;
             _gamePausePresenter = gamePausePresenter;
+            _gameResultPresenter = gameResultPresenter;
         }
 
         public async UniTask InitializeAsync()
@@ -53,9 +56,10 @@ namespace DungeonShooter
             _gamePauseView = await _uiManager.GetSingletonUIAsync<GamePauseView>(UIAddresses.UI_GamePause);
             _gamePausePresenter.BindView(_gamePauseView);
             _gameButtonHudUI.OnPauseButtonClicked += _gamePausePresenter.PauseGame;
-            _gamePauseView.Hide(); 
-            
-            _gameResultView =  await _uiManager.GetSingletonUIAsync<GameResultView>(UIAddresses.UI_GameResult);
+            _gamePauseView.Hide();
+
+            _gameResultView = await _uiManager.GetSingletonUIAsync<GameResultView>(UIAddresses.UI_GameResult);
+            _gameResultPresenter.BindView(_gameResultView);
             _gameResultView.Hide();
             HideHud();
         }

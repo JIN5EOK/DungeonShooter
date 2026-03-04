@@ -3,21 +3,16 @@ using VContainer;
 
 namespace DungeonShooter
 {
-    public class GameResultViewModel : IDisposable
+    public class GameResultPresenter : IDisposable
     {
         private readonly IGameResultService _gameResultService;
         private readonly IGameExitService _gameExitService;
         private readonly ITableRepository _tableRepository;
 
-        public string ResultMessage { get; private set; }
-        public string EnemyKillCountMessage { get; private set; }
-        public string PlayTimeMessage { get; private set; }
-        public string ExitButtonMessage { get; private set; }
-
-        public event Action OnResultUpdated;
+        private GameResultView _view;
 
         [Inject]
-        public GameResultViewModel(IGameResultService gameResultService, IGameExitService gameExitService,
+        public GameResultPresenter(IGameResultService gameResultService, IGameExitService gameExitService,
             ITableRepository tableRepository)
         {
             _gameResultService = gameResultService;
@@ -27,21 +22,36 @@ namespace DungeonShooter
             _gameResultService.OnGameResult += HandleGameResult;
         }
 
+        public void BindView(GameResultView view)
+        {
+            if (_view != null)
+            {
+                _view.OnExitClickedEvent -= ExitGame;
+            }
+
+            _view = view;
+
+            if (_view != null)
+            {
+                _view.OnExitClickedEvent += ExitGame;
+            }
+        }
+
         private void HandleGameResult(GameResultModel model)
         {
-            ResultMessage = _tableRepository.GetStringText(
+            string resultMessage = _tableRepository.GetStringText(
                 model.Result == GameResult.Clear 
                 ? 19200065 : 19200066);
 
             var killCountEntry = _tableRepository.GetTableEntry<StringTextTableEntry>(19200067);
-            EnemyKillCountMessage = killCountEntry.Format(model.EnemyKillCount);
+            string enemyKillCountMessage = killCountEntry.Format(model.EnemyKillCount);
 
             var playTimeEntry = _tableRepository.GetTableEntry<StringTextTableEntry>(19200068);
-            PlayTimeMessage = playTimeEntry.Format(model.PlayTimeSecond);
+            string playTimeMessage = playTimeEntry.Format(model.PlayTimeSecond);
 
-            ExitButtonMessage = _tableRepository.GetStringText(19200069);
+            string exitButtonMessage = _tableRepository.GetStringText(19200069);
 
-            OnResultUpdated?.Invoke();
+            _view?.ShowResult(resultMessage, enemyKillCountMessage, playTimeMessage, exitButtonMessage);
         }
 
         public void ExitGame()
@@ -53,6 +63,11 @@ namespace DungeonShooter
         {
             if (_gameResultService != null)
                 _gameResultService.OnGameResult -= HandleGameResult;
+
+            if (_view != null)
+            {
+                _view.OnExitClickedEvent -= ExitGame;
+            }
         }
     }
 }

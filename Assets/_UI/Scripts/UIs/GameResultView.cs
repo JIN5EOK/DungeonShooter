@@ -14,43 +14,35 @@ namespace DungeonShooter
         [SerializeField] private Button _exitButton;
         [SerializeField] private TMP_Text _exitButtonText;
 
-        private GameResultViewModel _viewModel;
+        public event Action OnExitClickedEvent;
 
-        [Inject]
-        public void Construct(GameResultViewModel viewModel)
+        public void Start()
         {
-            _viewModel = viewModel;
-            _viewModel.OnResultUpdated += UpdateUI;
-
             if (_exitButton != null)
                 _exitButton.onClick.AddListener(OnExitClicked);
-
-            if (_exitButtonText != null)
-                _exitButtonText.text = _viewModel.ExitButtonMessage;
-            if (_exitButtonText != null)
-                _exitButtonText.text = _viewModel.ExitButtonMessage;
         }
 
-        private void UpdateUI()
+        public void ShowResult(string resultMessage, string enemyKillCountMessage, string playTimeMessage,
+            string exitButtonMessage)
         {
             if (_resultText != null)
             {
-                _resultText.text = _viewModel.ResultMessage;
+                _resultText.text = resultMessage;
             }
 
             if (_enemyKillCountText != null)
             {
-                _enemyKillCountText.text = _viewModel.EnemyKillCountMessage;
+                _enemyKillCountText.text = enemyKillCountMessage;
             }
 
             if (_playTimeText != null)
             {
-                _playTimeText.text = _viewModel.PlayTimeMessage;
+                _playTimeText.text = playTimeMessage;
             }
 
             if (_exitButtonText != null)
             {
-                _exitButtonText.text = _viewModel.ExitButtonMessage;
+                _exitButtonText.text = exitButtonMessage;
             }
 
             Show();
@@ -58,16 +50,12 @@ namespace DungeonShooter
 
         private void OnExitClicked()
         {
-            _viewModel?.ExitGame();
+            OnExitClickedEvent?.Invoke();
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (_viewModel != null)
-            {
-                _viewModel.OnResultUpdated -= UpdateUI;
-            }
 
             if (_exitButton != null)
             {
