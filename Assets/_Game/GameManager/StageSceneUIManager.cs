@@ -19,21 +19,26 @@ namespace DungeonShooter
         private GameButtonHudUI _gameButtonHudUI;
         private InventoryUI _inventoryUI;
         private AlertMessageUI _alertMessageUI;
+        private GamePausePresenter _gamePausePresenter;
 
         [Inject]
-        public StageSceneUIManager(UIManager uiManager, IPauseManager pauseManager)
+        public StageSceneUIManager(UIManager uiManager, IPauseManager pauseManager,
+            GamePausePresenter gamePausePresenter)
         {
             _uiManager = uiManager;
             _pauseManager = pauseManager;
+            _gamePausePresenter = gamePausePresenter;
         }
 
         public async UniTask InitializeAsync()
         {
             _healthBarHudUI = await _uiManager.GetSingletonUIAsync<HealthBarHudUI>(UIAddresses.UI_HpHud);
             _expGaugeHudUI = await _uiManager.GetSingletonUIAsync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud);
-            _playerStatusHudUI = await _uiManager.GetSingletonUIAsync<PlayerStatusHudUI>(UIAddresses.UI_PlayerStatusHud);
+            _playerStatusHudUI =
+                await _uiManager.GetSingletonUIAsync<PlayerStatusHudUI>(UIAddresses.UI_PlayerStatusHud);
             _skillLevelUpUI = await _uiManager.GetSingletonUIAsync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp);
-            _skillCooldownHudUI = await _uiManager.GetSingletonUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud);
+            _skillCooldownHudUI =
+                await _uiManager.GetSingletonUIAsync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud);
             _gameButtonHudUI = await _uiManager.GetSingletonUIAsync<GameButtonHudUI>(UIAddresses.UI_GameButtonHud);
             _gameButtonHudUI.OnInventoryButtonClicked += ShowInventory;
             _alertMessageUI = await _uiManager.GetSingletonUIAsync<AlertMessageUI>(UIAddresses.UI_AlertMessage);
@@ -42,6 +47,11 @@ namespace DungeonShooter
             _inventoryUI.OnHide += OnInventoryHide;
             _inventoryUI.OnDestroyEvent += OnInventoryUIDestroyed;
             _inventoryUI.Hide();
+
+            var gamePauseView = await _uiManager.GetSingletonUIAsync<GamePauseView>(UIAddresses.UI_GamePause);
+            _gamePausePresenter.BindView(gamePauseView);
+            gamePauseView.Hide(); 
+
             HideHud();
         }
 
@@ -76,9 +86,9 @@ namespace DungeonShooter
             _gameButtonHudUI.Hide();
             _skillLevelUpUI.Hide();
         }
-        
+
         public void ShowInventory() => _inventoryUI.Show();
-        
+
         public void HideInventory() => _inventoryUI.Hide();
         public bool IsInventoryActivated() => _inventoryUI.gameObject.activeSelf;
     }

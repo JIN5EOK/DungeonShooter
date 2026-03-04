@@ -24,6 +24,10 @@ namespace DungeonShooter
             builder.Register<ItemDropService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<AlertMessageViewModel>(Lifetime.Scoped);
             builder.Register<GameMessageService>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<GameExitService>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<GameResultService>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<GamePausePresenter>(Lifetime.Scoped);
+            builder.Register<GameResultViewModel>(Lifetime.Scoped);
             builder.Register<Inventory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<InventoryViewModel>(Lifetime.Scoped).AsImplementedInterfaces();
 

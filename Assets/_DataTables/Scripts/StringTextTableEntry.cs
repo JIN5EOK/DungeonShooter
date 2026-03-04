@@ -14,5 +14,26 @@ namespace DungeonShooter
 
         /// <summary>표시할 텍스트 (쉼표 포함 시 CSV에서 열 구분에 주의)</summary>
         public string Text { get; set; }
+
+        /// <summary>
+        /// 텍스트에 특정 파라미터들을 포맷팅하여 반환합니다.
+        /// 예: "적 처치 수: {0}" -> Format(enemyKills)
+        /// </summary>
+        public string Format(params object[] args)
+        {
+            if (string.IsNullOrEmpty(Text)) return Text;
+
+            try
+            {
+                // Unescape newlines
+                string unescapedText = Text.Replace("\\n", "\n");
+                return string.Format(unescapedText, args);
+            }
+            catch (FormatException)
+            {
+                // Return original text if formatting fails
+                return Text;
+            }
+        }
     }
 }
