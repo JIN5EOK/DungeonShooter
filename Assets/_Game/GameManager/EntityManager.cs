@@ -9,15 +9,17 @@ namespace DungeonShooter
         public int RemainingEnemyCount => _enemies.Count;
         public event Action<int> OnRemainingEnemyCountChanged;
 
-        private readonly IEventBus _eventBus;
-        private readonly IPlayerLevelService _playerLevelService;
-        private readonly HashSet<EntityBase> _enemies = new HashSet<EntityBase>();
+        private IEventBus _eventBus;
+        private IGameResultService _gameResultService;
+        private IPlayerLevelService _playerLevelService;
+        private HashSet<EntityBase> _enemies = new HashSet<EntityBase>();
 
         [Inject]
-        public EntityManager(IEventBus eventBus, IPlayerLevelService playerLevelService)
+        public EntityManager(IEventBus eventBus, IPlayerLevelService playerLevelService, IGameResultService gameResultService)
         {
             _eventBus = eventBus;
             _playerLevelService = playerLevelService;
+            _gameResultService = gameResultService;
             _eventBus.Subscribe<EnemySpawnedEvent>(OnEnemySpawned);
             _eventBus.Subscribe<EnemyDeadEvent>(OnEnemyDestroyed);
             _eventBus.Subscribe<PlayerDeadEvent>(OnPlayerDead);
@@ -31,7 +33,7 @@ namespace DungeonShooter
 
         private void OnPlayerDead(PlayerDeadEvent ev)
         {
-            LogHandler.Log<EntityManager>("게임이 끝났습니다!");
+            _gameResultService.ExecuteGameResult(GameResult.Dead);
         }
 
         private void OnEnemyDestroyed(EnemyDeadEvent ev)

@@ -736,7 +736,7 @@ GameObject:
   - component: {fileID: 1860278928255398613}
   - component: {fileID: 8111501107310319384}
   m_Layer: 0
-  m_Name: UI_GamePauseView
+  m_Name: UI_GamePause
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

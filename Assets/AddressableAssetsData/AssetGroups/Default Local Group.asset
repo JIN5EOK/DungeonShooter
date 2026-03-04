@@ -234,6 +234,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b528c903ef49b43e0bc62e916c4108bc
+    m_Address: UI_GameResult
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b6f69ba600bc64e7aaa3c350aa9f18ee
     m_Address: Ginie_SL
     m_ReadOnly: 0
@@ -291,6 +296,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e9308fe41d14548d6a969cc61077110b
     m_Address: UI_SkillLevelUp
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eab3a1bd3d33a4812a86edb7c34c9931
+    m_Address: UI_GamePause
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
