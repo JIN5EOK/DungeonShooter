@@ -19,6 +19,8 @@ namespace DungeonShooter
         public event Action<Item> OnWeaponEquipped;
         public event Action<Item> OnWeaponUnequipped;
         public event Action<Item> OnItemUse;
+        public event Action OnOpened;
+        public event Action OnClosed;
 
         public Item EquippedWeapon => _model.EquippedWeapon;
 
@@ -224,5 +226,8 @@ namespace DungeonShooter
             _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
             _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(PlayerObjectDespawned);
         }
+
+        public void Open() => OnOpened?.Invoke();
+        public void Close() => OnClosed?.Invoke();
     }
 }

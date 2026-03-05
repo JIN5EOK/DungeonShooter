@@ -16,7 +16,7 @@ namespace DungeonShooter
         private IPlayerContextManager _playerContextManager;
         private IInventory _inventory;
         private IItemFactory _itemFactory;
-        private StageSceneUIManager _stageSceneUIManager;
+        private GameHudGroupUI _gameHudGroupUI;
 
         [Inject]
         public void Construct( StageContext stageContext
@@ -26,7 +26,7 @@ namespace DungeonShooter
             , IPlayerContextManager playerContextManager
             , IInventory inventory
             , IItemFactory itemFactory
-            , StageSceneUIManager stageSceneUIManager)
+            , GameHudGroupUI gameHudGroupUI)
         {
             _stageContext = stageContext;
             _tableRepository = tableRepository;
@@ -35,7 +35,7 @@ namespace DungeonShooter
             _playerContextManager = playerContextManager;
             _inventory = inventory;
             _itemFactory = itemFactory;
-            _stageSceneUIManager = stageSceneUIManager;
+            _gameHudGroupUI = gameHudGroupUI;
         }
 
         private async UniTaskVoid Start()
@@ -75,8 +75,7 @@ namespace DungeonShooter
             _inventory.AddItem(weapon);
             _inventory.EquipItem(weapon);
             
-            await _stageSceneUIManager.InitializeAsync();
-            _stageSceneUIManager.ShowHud();
+            _gameHudGroupUI.ShowHud();
         }
 
         

@@ -28,14 +28,16 @@ namespace DungeonShooter
         private Button _equipButton;
 
         private IInventoryViewModel _viewModel;
+        private IPauseManager _pauseManager;
         private readonly Dictionary<Item, InventorySlotUIElement> _slotsDict = new();
 
         [Inject]
-        public void Construct(IInventoryViewModel viewModel)
+        public void Construct(IInventoryViewModel viewModel, IPauseManager pauseManager)
         {
             _viewModel = viewModel;
+            _pauseManager = pauseManager;
 
-            _closeButton.onClick.AddListener(Hide);
+            _closeButton.onClick.AddListener(_viewModel.Close);
             _useButton.onClick.AddListener(_viewModel.UseSelected);
             _equipButton.onClick.AddListener(_viewModel.EquipSelected);
             _removeButton.onClick.AddListener(_viewModel.RemoveSelected);
@@ -46,6 +48,9 @@ namespace DungeonShooter
             _viewModel.OnItemUse += HandleItemUse;
             _viewModel.OnSelectionChanged += HandleSelectionChanged;
             _viewModel.OnEquippedWeaponChanged += HandleEquippedWeaponChanged;
+
+            _viewModel.OnOpened += Show;
+            _viewModel.OnClosed += Hide;
 
             HandleSelectionChanged(null);
             
@@ -58,6 +63,13 @@ namespace DungeonShooter
             base.Show();
             RefreshSlots();
             ApplyButtonState();
+            _pauseManager?.PauseRequest(this);
+        }
+
+        public override void Hide()
+        {
+            _pauseManager?.ResumeRequest(this);
+            base.Hide();
         }
 
         protected override void OnDestroy()
@@ -70,6 +82,8 @@ namespace DungeonShooter
                 _viewModel.OnItemUse -= HandleItemUse;
                 _viewModel.OnSelectionChanged -= HandleSelectionChanged;
                 _viewModel.OnEquippedWeaponChanged -= HandleEquippedWeaponChanged;
+                _viewModel.OnOpened -= Show;
+                _viewModel.OnClosed -= Hide;
             }
 
             base.OnDestroy();
@@ -119,7 +133,7 @@ namespace DungeonShooter
 
             RefreshSlots();
             ApplyButtonState();
-            Hide();
+            _viewModel.Close();
         }
 
         private void HandleItemRemoved(Item item)

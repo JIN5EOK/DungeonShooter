@@ -8,23 +8,13 @@ namespace DungeonShooter
         private readonly IPauseManager _pauseManager;
         private readonly IGameExitService _gameExitService;
 
-        private GamePauseView _view;
+        private readonly GamePauseView _view;
 
         [Inject]
-        public GamePausePresenter(IPauseManager pauseManager, IGameExitService gameExitService)
+        public GamePausePresenter(IPauseManager pauseManager, IGameExitService gameExitService, GamePauseView view)
         {
             _pauseManager = pauseManager;
             _gameExitService = gameExitService;
-        }
-
-        public void BindView(GamePauseView view)
-        {
-            if (_view != null)
-            {
-                _view.OnResumeClickedEvent -= ResumeGame;
-                _view.OnExitClickedEvent -= ExitGame;
-            }
-
             _view = view;
 
             if (_view != null)

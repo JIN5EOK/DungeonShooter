@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 namespace DungeonShooter
 {
@@ -13,8 +14,16 @@ namespace DungeonShooter
         private Button _inventoryButton;
         [SerializeField]
         private Button _pauseButton;
-        public event Action OnInventoryButtonClicked;
-        public event Action OnPauseButtonClicked;
+        private IInventoryViewModel _inventory;
+        private GamePausePresenter _gamePausePresenter;
+
+        [Inject]
+        public void Construct(IInventory inventory, GamePausePresenter gamePausePresenter)
+        {
+            _inventory = inventory;
+            _gamePausePresenter = gamePausePresenter;
+        }
+
         private void Awake()
         {
             if (_inventoryButton != null)
@@ -24,20 +33,21 @@ namespace DungeonShooter
                 _pauseButton.onClick.AddListener(HandlePauseButtonClicked);
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             if (_inventoryButton != null)
                 _inventoryButton.onClick.RemoveListener(HandleInventoryButtonClicked);
         }
 
         private void HandleInventoryButtonClicked()
         {
-            OnInventoryButtonClicked?.Invoke();
+            _inventory?.Open();
         }
         
         private void HandlePauseButtonClicked()
         {
-            OnPauseButtonClicked?.Invoke();
+            _gamePausePresenter?.PauseGame();
         }
     }
 }

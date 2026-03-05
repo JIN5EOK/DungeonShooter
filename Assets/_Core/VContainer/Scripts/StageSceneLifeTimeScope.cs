@@ -43,7 +43,7 @@ namespace DungeonShooter
             builder.Register<StageInstantiator>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<RoomInstantiator>(Lifetime.Scoped);
 
-            builder.Register<StageSceneUIManager>(Lifetime.Scoped);
+            new StageSceneUIInstaller().Install(builder);
             builder.RegisterComponentOnNewGameObject<ObjectCullingManager>(Lifetime.Scoped);
 
             builder.Register<EntitySkills>(Lifetime.Transient);

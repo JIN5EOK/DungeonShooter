@@ -1,4 +1,8 @@
 ---
+trigger: always_on
+---
+
+---
 alwaysApply: true
 ---
 ## 전역규칙

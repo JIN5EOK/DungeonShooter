@@ -14,6 +14,8 @@ namespace DungeonShooter
         event Action<Item> OnWeaponEquipped;
         event Action<Item> OnWeaponUnequipped;
         event Action<Item> OnItemUse;
+        event Action OnOpened;
+        event Action OnClosed;
 
         Item EquippedWeapon { get; }
 
@@ -24,5 +26,7 @@ namespace DungeonShooter
         void Clear();
         void RemoveItem(Item item);
         void UseItem(Item item);
+        void Open();
+        void Close();
     }
 }

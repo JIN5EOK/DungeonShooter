@@ -15,6 +15,8 @@ namespace DungeonShooter
         event Action<Item> OnItemUse;
         event Action<Item> OnSelectionChanged;
         event Action<Item> OnEquippedWeaponChanged;
+        event Action OnOpened;
+        event Action OnClosed;
 
         Item SelectedItem { get; }
         Item EquippedWeapon { get; }
@@ -26,6 +28,8 @@ namespace DungeonShooter
         void EquipSelected();
         void UseSelected();
         void RemoveSelected();
+        void Open();
+        void Close();
 
         IReadOnlyCollection<Item> GetItems();
     }
@@ -41,6 +45,8 @@ namespace DungeonShooter
         public event Action<Item> OnItemUse;
         public event Action<Item> OnSelectionChanged;
         public event Action<Item> OnEquippedWeaponChanged;
+        public event Action OnOpened;
+        public event Action OnClosed;
 
         public Item SelectedItem => _selectedItem;
         public Item EquippedWeapon => _inventory.EquippedWeapon;
@@ -71,7 +77,12 @@ namespace DungeonShooter
             _inventory.OnItemUse += InventoryOnItemUse;
             _inventory.OnWeaponEquipped += InventoryOnWeaponEquipped;
             _inventory.OnWeaponUnequipped += InventoryOnWeaponUnequipped;
+            _inventory.OnOpened += InventoryOnOpened;
+            _inventory.OnClosed += InventoryOnClosed;
         }
+
+        private void InventoryOnOpened() => OnOpened?.Invoke();
+        private void InventoryOnClosed() => OnClosed?.Invoke();
 
         private void InventoryOnItemUse(Item item)
         {
@@ -137,6 +148,9 @@ namespace DungeonShooter
                 return;
             _inventory.RemoveItem(_selectedItem);
         }
+
+        public void Open() => _inventory.Open();
+        public void Close() => _inventory.Close();
 
         public IReadOnlyCollection<Item> GetItems() => _inventory.GetItems();
     }

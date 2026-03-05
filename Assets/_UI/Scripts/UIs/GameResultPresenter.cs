@@ -9,27 +9,18 @@ namespace DungeonShooter
         private readonly IGameExitService _gameExitService;
         private readonly ITableRepository _tableRepository;
 
-        private GameResultView _view;
+        private readonly GameResultView _view;
 
         [Inject]
         public GameResultPresenter(IGameResultService gameResultService, IGameExitService gameExitService,
-            ITableRepository tableRepository)
+            ITableRepository tableRepository, GameResultView view)
         {
             _gameResultService = gameResultService;
             _gameExitService = gameExitService;
             _tableRepository = tableRepository;
+            _view = view;
 
             _gameResultService.OnGameResult += HandleGameResult;
-        }
-
-        public void BindView(GameResultView view)
-        {
-            if (_view != null)
-            {
-                _view.OnExitClickedEvent -= ExitGame;
-            }
-
-            _view = view;
 
             if (_view != null)
             {
