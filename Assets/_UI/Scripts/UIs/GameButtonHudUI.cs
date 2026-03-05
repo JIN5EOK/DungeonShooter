@@ -14,7 +14,7 @@ namespace DungeonShooter
         private Button _inventoryButton;
         [SerializeField]
         private Button _pauseButton;
-        private IInventoryViewModel _inventory;
+        private IInventory _inventory;
         private GamePausePresenter _gamePausePresenter;
 
         [Inject]
@@ -38,6 +38,9 @@ namespace DungeonShooter
             base.OnDestroy();
             if (_inventoryButton != null)
                 _inventoryButton.onClick.RemoveListener(HandleInventoryButtonClicked);
+            
+            if (_pauseButton != null)
+                _pauseButton.onClick.RemoveListener(HandlePauseButtonClicked);
         }
 
         private void HandleInventoryButtonClicked()

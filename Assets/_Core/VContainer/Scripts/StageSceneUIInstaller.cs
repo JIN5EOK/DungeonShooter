@@ -20,7 +20,7 @@ namespace DungeonShooter
             
             // 기타 UI 등록
             builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp, false), Lifetime.Scoped);
-            builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<AlertMessageUI>(UIAddresses.UI_AlertMessage), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<AlertMessageUI>(UIAddresses.UI_AlertMessage, false), Lifetime.Scoped);
             builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<InventoryUI>(UIAddresses.UI_Inventory, false), Lifetime.Scoped);
 
             // 팝업 뷰 등록
@@ -29,6 +29,15 @@ namespace DungeonShooter
 
             // 일괄 관리자
             builder.Register<GameHudGroupUI>(Lifetime.Scoped);
+
+            builder.RegisterBuildCallback(resolver =>
+            {
+                resolver.Resolve<SkillLevelUpUI>();
+                resolver.Resolve<InventoryUI>();
+                resolver.Resolve<AlertMessageUI>();
+                resolver.Resolve<GamePauseView>();
+                resolver.Resolve<GameResultView>();
+            });
         }
     }
 }
