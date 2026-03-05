@@ -1,6 +1,3 @@
-using System;
-using Cysharp.Threading.Tasks;
-using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using UnityEngine.UI;
 using Action = System.Action;
