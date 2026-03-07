@@ -15,6 +15,7 @@ namespace DungeonShooter
     /// </summary>
     public static class RoomDataSerializer
     {
+#if UNITY_EDITOR
         /// <summary>
         /// 에디터에서 배치한 게임 오브젝트를 RoomData로 직렬화합니다.
         /// </summary>
@@ -167,39 +168,7 @@ namespace DungeonShooter
             }
         }
 
-        /// <summary>
-        /// TextAsset에서 RoomData를 역직렬화합니다.
-        /// </summary>
-        public static RoomData DeserializeRoom(TextAsset textAsset)
-        {
-            if (textAsset == null)
-            {
-                LogHandler.LogError(nameof(RoomDataSerializer),"TextAsset이 null입니다.");
-                return null;
-            }
-
-            try
-            {
-                var json = textAsset.text;
-                var serialized = JsonUtility.FromJson<SerializedRoomData>(json);
-                
-                if (serialized == null)
-                {
-                    LogHandler.LogError(nameof(RoomDataSerializer),"역직렬화된 데이터가 null입니다.");
-                    return null;
-                }
-                
-                // RoomData로 변환 (RLE 압축 해제)
-                return serialized.ToRoomData();
-            }
-            catch (Exception e)
-            {
-                LogHandler.LogException(nameof(RoomDataSerializer), e, "역직렬화 실패");
-                return null;
-            }
-        }
-
-        /// <summary>
+                /// <summary>
         /// RoomData를 파일로 저장합니다.
         /// </summary>
         public static void SaveToFile(RoomData roomData, string path)
@@ -233,6 +202,38 @@ namespace DungeonShooter
             catch (Exception e)
             {
                 LogHandler.LogException(nameof(RoomDataSerializer), e, "저장 실패");
+            }
+        }
+#endif
+        /// <summary>
+        /// TextAsset에서 RoomData를 역직렬화합니다.
+        /// </summary>
+        public static RoomData DeserializeRoom(TextAsset textAsset)
+        {
+            if (textAsset == null)
+            {
+                LogHandler.LogError(nameof(RoomDataSerializer),"TextAsset이 null입니다.");
+                return null;
+            }
+
+            try
+            {
+                var json = textAsset.text;
+                var serialized = JsonUtility.FromJson<SerializedRoomData>(json);
+                
+                if (serialized == null)
+                {
+                    LogHandler.LogError(nameof(RoomDataSerializer),"역직렬화된 데이터가 null입니다.");
+                    return null;
+                }
+                
+                // RoomData로 변환 (RLE 압축 해제)
+                return serialized.ToRoomData();
+            }
+            catch (Exception e)
+            {
+                LogHandler.LogException(nameof(RoomDataSerializer), e, "역직렬화 실패");
+                return null;
             }
         }
 

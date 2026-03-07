@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using System.IO;
 using System.Reflection;
@@ -130,3 +131,4 @@ namespace DungeonShooter
         }
     }
 }
+#endif
