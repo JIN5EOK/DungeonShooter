@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
@@ -19,24 +20,15 @@ namespace DungeonShooter
             _sceneResourceProvider = sceneResourceProvider;
         }
 
-        public void PlayOneShot(string address, AudioMixerGroup audioMixerGroup = null)
+        public void PlayOneShot(string address, AudioMixerGroup audioMixerGroup = null, Action<AudioPlayer.PlayResult> onComplete = null)
         {
-            PlayOneShotAsync(address, audioMixerGroup).Forget();
+            var clip = _sceneResourceProvider.GetAssetSync<AudioClip>(address);
+            AudioPlayer.PlayOneShot(clip, audioMixerGroup, onComplete);
         }
 
         public async UniTask<AudioPlayer.PlayResult> PlayOneShotAsync(string address, AudioMixerGroup audioMixerGroup = null)
         {
-            if (string.IsNullOrEmpty(address))
-            {
-                return AudioPlayer.PlayResult.Failed;
-            }
-
             var clip = await _sceneResourceProvider.GetAssetAsync<AudioClip>(address);
-            if (clip == null)
-            {
-                return AudioPlayer.PlayResult.Failed;
-            }
-
             return await AudioPlayer.PlayOneShotAsync(clip, audioMixerGroup);
         }
     }
