@@ -15,13 +15,13 @@ namespace DungeonShooter
             builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<HealthBarHudUI>(UIAddresses.UI_HpHud), Lifetime.Scoped);
             builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<ExpGaugeHudUI>(UIAddresses.UI_ExpHud), Lifetime.Scoped);
             builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<PlayerStatusHudUI>(UIAddresses.UI_PlayerStatusHud), Lifetime.Scoped);
-            builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<SkillCooldownHudUI>(UIAddresses.UI_SkillCooldownHud), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<SkillCooldownHudView>(UIAddresses.UI_SkillCooldownHud), Lifetime.Scoped);
             builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<GameButtonHudUI>(UIAddresses.UI_GameButtonHud), Lifetime.Scoped);
             
             // 기타 UI 등록
             builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp, false), Lifetime.Scoped);
-            builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<AlertMessageUI>(UIAddresses.UI_AlertMessage, false), Lifetime.Scoped);
-            builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<InventoryUI>(UIAddresses.UI_Inventory, false), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<AlertMessageView>(UIAddresses.UI_AlertMessage, false), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<InventoryView>(UIAddresses.UI_Inventory, false), Lifetime.Scoped);
 
             // 팝업 뷰 등록
             builder.Register(resolver => resolver.Resolve<UIManager>().GetSingletonUISync<GamePauseView>(UIAddresses.UI_GamePause, false), Lifetime.Scoped);
@@ -33,8 +33,8 @@ namespace DungeonShooter
             builder.RegisterBuildCallback(resolver =>
             {
                 resolver.Resolve<SkillLevelUpUI>();
-                resolver.Resolve<InventoryUI>();
-                resolver.Resolve<AlertMessageUI>();
+                resolver.Resolve<InventoryView>();
+                resolver.Resolve<AlertMessageView>();
                 resolver.Resolve<GamePauseView>();
                 resolver.Resolve<GameResultView>();
             });

@@ -9,7 +9,7 @@ namespace DungeonShooter
     /// <summary>
     /// 인벤토리 뷰. ViewModel 이벤트를 구독해 슬롯/버튼/정보창만 표시한다.
     /// </summary>
-    public class InventoryUI : PopupUI
+    public class InventoryView : PopupUI
     {
         [SerializeField]
         private RectTransform _content;
@@ -169,7 +169,7 @@ namespace DungeonShooter
             
             if (_content == null || _slotPrefab == null || _viewModel == null)
             {
-                LogHandler.LogError<InventoryUI>("초기화가 완료되지 않았습니다.");
+                LogHandler.LogError<InventoryView>("초기화가 완료되지 않았습니다.");
                 return;
             }
 

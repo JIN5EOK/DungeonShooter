@@ -6,7 +6,7 @@ namespace DungeonShooter
     /// <summary>
     /// 스킬 쿨다운 슬롯들을 표시하는 HUD
     /// </summary>
-    public class SkillCooldownHudUI : HudUI
+    public class SkillCooldownHudView : HudUI
     {
         [Header("레이아웃")]
         [SerializeField] private RectTransform _content;
@@ -50,7 +50,7 @@ namespace DungeonShooter
         {
             if (idx < 0 || idx > _idxToSlots.Length)
             {
-                LogHandler.LogWarning<SkillCooldownHudUI>("스킬 슬롯 범위를 벗어났습니다");
+                LogHandler.LogWarning<SkillCooldownHudView>("스킬 슬롯 범위를 벗어났습니다");
                 return;
             }
 
@@ -64,7 +64,7 @@ namespace DungeonShooter
         {
             if (idx < 0 || idx > _idxToSlots.Length)
             {
-                LogHandler.LogWarning<SkillCooldownHudUI>("슬롯 범위를 벗어났습니다");
+                LogHandler.LogWarning<SkillCooldownHudView>("슬롯 범위를 벗어났습니다");
                 return;
             }
 
@@ -77,7 +77,7 @@ namespace DungeonShooter
         {
             if (idx < 0 || idx > _idxToSlots.Length)
             {
-                LogHandler.LogWarning<SkillCooldownHudUI>("슬롯 범위를 벗어났습니다");
+                LogHandler.LogWarning<SkillCooldownHudView>("슬롯 범위를 벗어났습니다");
                 return;
             }
             

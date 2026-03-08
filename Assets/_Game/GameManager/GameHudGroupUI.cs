@@ -10,7 +10,7 @@ namespace DungeonShooter
         private readonly HealthBarHudUI _healthBarHudUI;
         private readonly ExpGaugeHudUI _expGaugeHudUI;
         private readonly PlayerStatusHudUI _playerStatusHudUI;
-        private readonly SkillCooldownHudUI _skillCooldownHudUI;
+        private readonly SkillCooldownHudView _skillCooldownHudView;
         private readonly GameButtonHudUI _gameButtonHudUI;
 
         [Inject]
@@ -18,13 +18,13 @@ namespace DungeonShooter
             HealthBarHudUI healthBarHudUI,
             ExpGaugeHudUI expGaugeHudUI,
             PlayerStatusHudUI playerStatusHudUI,
-            SkillCooldownHudUI skillCooldownHudUI,
+            SkillCooldownHudView skillCooldownHudView,
             GameButtonHudUI gameButtonHudUI)
         {
             _healthBarHudUI = healthBarHudUI;
             _expGaugeHudUI = expGaugeHudUI;
             _playerStatusHudUI = playerStatusHudUI;
-            _skillCooldownHudUI = skillCooldownHudUI;
+            _skillCooldownHudView = skillCooldownHudView;
             _gameButtonHudUI = gameButtonHudUI;
         }
 
@@ -33,7 +33,7 @@ namespace DungeonShooter
             _healthBarHudUI?.Show();
             _expGaugeHudUI?.Show();
             _playerStatusHudUI?.Show();
-            _skillCooldownHudUI?.Show();
+            _skillCooldownHudView?.Show();
             _gameButtonHudUI?.Show();
         }
 
@@ -42,7 +42,7 @@ namespace DungeonShooter
             _healthBarHudUI?.Hide();
             _expGaugeHudUI?.Hide();
             _playerStatusHudUI?.Hide();
-            _skillCooldownHudUI?.Hide();
+            _skillCooldownHudView?.Hide();
             _gameButtonHudUI?.Hide();
         }
     }

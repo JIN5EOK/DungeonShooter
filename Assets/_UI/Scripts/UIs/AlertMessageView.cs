@@ -17,7 +17,7 @@ namespace DungeonShooter
         }
     }
     
-    public class AlertMessageUI : HudUI
+    public class AlertMessageView : HudUI
     {
         [SerializeField]
         private Image _messagePanel;
