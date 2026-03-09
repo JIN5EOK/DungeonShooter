@@ -47,7 +47,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 21538e0ad3b6c4b6680a02455e900cdd
-    m_Address: UI_TouchInputLayout
+    m_Address: UI_TouchInput
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -321,11 +321,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: eb0f1b106225440efbda60fbb2c505c2
     m_Address: RoomEventTriggerTable
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: efc9dffc693594de0aa8f41aedda2d92
-    m_Address: UI_SkillCooldownHud
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

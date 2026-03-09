@@ -5,6 +5,11 @@ namespace DungeonShooter
     public enum InputActionTypes
     {
         Move,
+        WeaponAttack,
+        Skill1,
+        Skill2,
+        Dash,
+        Interact,
     }
     
     /// <summary> 4 방향을 나타내는 열거형 </summary>

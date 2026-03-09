@@ -15,8 +15,6 @@ namespace DungeonShooter
         [SerializeField]
         private PlayerStatusHudUI _playerStatusHudUI;
         [SerializeField]
-        private SkillCooldownHudView _skillCooldownHudView;
-        [SerializeField]
         private GameButtonHudUI _gameButtonHudUI;
         [SerializeField]
         private TouchInputUI _touchInputUI;
@@ -27,7 +25,6 @@ namespace DungeonShooter
             _healthBarHudUI?.Show();
             _expGaugeHudUI?.Show();
             _playerStatusHudUI?.Show();
-            _skillCooldownHudView?.Show();
             _gameButtonHudUI?.Show();
         }
 
@@ -37,7 +34,6 @@ namespace DungeonShooter
             _healthBarHudUI?.Hide();
             _expGaugeHudUI?.Hide();
             _playerStatusHudUI?.Hide();
-            _skillCooldownHudView?.Hide();
             _gameButtonHudUI?.Hide();
         }
     }
