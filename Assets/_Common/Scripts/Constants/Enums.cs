@@ -2,6 +2,11 @@ using UnityEngine;
 
 namespace DungeonShooter
 {
+    public enum InputActionTypes
+    {
+        Move,
+    }
+    
     /// <summary> 4 방향을 나타내는 열거형 </summary>
     public enum Direction
     {

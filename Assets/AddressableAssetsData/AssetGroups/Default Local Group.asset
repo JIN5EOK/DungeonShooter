@@ -46,6 +46,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 21538e0ad3b6c4b6680a02455e900cdd
+    m_Address: UI_TouchInputLayout
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 242add0a9697f466faebf2f5e725c013
     m_Address: CasterEnemyAI
     m_ReadOnly: 0
@@ -148,6 +153,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 760d40a4fc59049a7a10d9705ca821c5
+    m_Address: UI_InGameHud
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7c4bdfba27ed84a5781dd720a8ccfd2a
     m_Address: SwordSlashYellow_Particle
     m_ReadOnly: 0
@@ -211,6 +221,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9e907f54a0dbf414c91dbb241d0c338a
     m_Address: FireballSkillData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a274205e581c44b9a9a211badecbe516
+    m_Address: GameInputAction
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

@@ -9,11 +9,13 @@ namespace DungeonShooter
     /// </summary>
     public class GlobalLifeTimeScope : LifetimeScope
     {
+        [SerializeField] private InputManager _inputManager;
+        
         protected override void Configure(IContainerBuilder builder)
         {
             base.Configure(builder);
             builder.Register<PauseManager>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<InputManager>(Lifetime.Singleton);
+            builder.RegisterInstance(_inputManager);
             builder.Register<LocalTableRepository>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<EventBus>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<LoadingService>(Lifetime.Singleton).AsImplementedInterfaces();

@@ -2,6 +2,10 @@ using System;
 using UnityEngine;
 using VContainer;
 using Jin5eok;
+using UnityEngine.AddressableAssets;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 
 namespace DungeonShooter
 {
@@ -9,17 +13,17 @@ namespace DungeonShooter
     /// IInputHandler를 사용한 입력 매니저입니다.
     /// 플레이어 입력을 관리하고 이벤트를 제공합니다.
     /// </summary>
-    public class InputManager : IDisposable 
+    public class InputManager : MonoBehaviour 
     {
         // 이동 입력
-        private readonly Vector2InputHandlerOldInputSystem _moveInputHandler;
+        private Vector2InputHandlerOldInputSystem _moveInputHandler;
         
         // 버튼 입력들
-        private readonly ButtonInputHandlerKeyCode _dashInputHandler;
-        private readonly ButtonInputHandlerKeyCode _skill1InputHandler;
-        private readonly ButtonInputHandlerKeyCode _skill2InputHandler;
-        private readonly ButtonInputHandlerKeyCode _skill3InputHandler;
-        private readonly ButtonInputHandlerKeyCode _interactInputHandler;
+        private ButtonInputHandlerKeyCode _dashInputHandler;
+        private ButtonInputHandlerKeyCode _skill1InputHandler;
+        private ButtonInputHandlerKeyCode _skill2InputHandler;
+        private ButtonInputHandlerKeyCode _skill3InputHandler;
+        private ButtonInputHandlerKeyCode _interactInputHandler;
 
         // 이벤트
         public event Action<Vector2> OnMoveInputChanged;
@@ -37,12 +41,15 @@ namespace DungeonShooter
         public bool IsSkill2Pressed => _skill3InputHandler.Value;
         public bool IsInteractPressed => _interactInputHandler.Value;
 
-        public InputManager()
+        private InputAction _moveAction;
+        private void Start()
         {
-            // 이동 입력 (Horizontal, Vertical)
-            _moveInputHandler = new Vector2InputHandlerOldInputSystem("Horizontal", "Vertical", isUsingAxisRaw: true);
-            _moveInputHandler.InputValueChanged += input => OnMoveInputChanged?.Invoke(input);
-
+            var inputAction = gameObject.GetComponent<PlayerInput>();
+            
+            _moveAction = inputAction.actions[nameof(InputActionTypes.Move)];
+            _moveAction.canceled += _ => OnMoveInputChanged?.Invoke(Vector2.zero);
+            _moveAction.performed += (value) => OnMoveInputChanged?.Invoke(value.ReadValue<Vector2>());
+            
             // 구르기 (Space)
             _dashInputHandler = new ButtonInputHandlerKeyCode(KeyCode.Space);
             _dashInputHandler.InputValueChanged += isPressed => { OnDashPressed?.Invoke(isPressed); };
@@ -63,8 +70,8 @@ namespace DungeonShooter
             _interactInputHandler = new ButtonInputHandlerKeyCode(KeyCode.E);
             _interactInputHandler.InputValueChanged += isPressed => { OnInteractPressed?.Invoke(isPressed); };
         }
-        
-        public void Dispose()
+
+        public void OnDestroy()
         {
             _moveInputHandler?.Dispose();
             _dashInputHandler?.Dispose();

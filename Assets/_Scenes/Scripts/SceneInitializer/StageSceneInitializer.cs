@@ -77,7 +77,5 @@ namespace DungeonShooter
             
             _gameHudGroupUI.ShowHud();
         }
-
-        
     }
 }

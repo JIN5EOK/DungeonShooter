@@ -6,9 +6,12 @@ namespace DungeonShooter
         public const string UI_PlayerStatusHud = "UI_PlayerStatusHud";
         public const string UI_SkillCooldownHud = "UI_SkillCooldownHud";
         public const string UI_ExpHud = "UI_ExpHud";
+        public const string UI_GameButtonHud = "UI_GameButtonHud";
+        public const string UI_TouchInputUI = "UI_TouchInputUI";
+        public const string UI_InGameHud = "UI_InGameHud";
         public const string UI_Inventory = "UI_Inventory";
         public const string UI_SkillLevelUp = "UI_SkillLevelUp";
-        public const string UI_GameButtonHud = "UI_GameButtonHud";
+        
         public const string UI_AlertMessage = "UI_AlertMessage";
         public const string GameStartUIAddress = "CharacterSelectUI";
         public const string UI_GameResult = "UI_GameResult";
