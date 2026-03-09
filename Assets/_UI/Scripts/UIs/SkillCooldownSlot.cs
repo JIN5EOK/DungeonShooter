@@ -11,8 +11,6 @@ namespace DungeonShooter
     {
         [SerializeField] private Image _skillIcon;
         [SerializeField] private Image _cooldownOverlay;
-        [SerializeField] private TextMeshProUGUI _cooldownText;
-        
         private Color _readyColor = Color.white;
         
         private float _pulseSpeed = 3f;
@@ -43,17 +41,11 @@ namespace DungeonShooter
                 var pulse = 1f + _pulseIntensity * Mathf.Sin(Time.time * _pulseSpeed);
                     _skillIcon.color = _readyColor * pulse;
                 _cooldownOverlay.fillAmount = 0f;                    
-                _cooldownText.text = "";
             }
             else
             {
                 if (_maxCooldown > 0f)
                     _cooldownOverlay.fillAmount = cooldown / _maxCooldown;
-
-                if (cooldown > 1f)
-                    _cooldownText.text = Mathf.Ceil(cooldown).ToString("F0");
-                else
-                    _cooldownText.text = cooldown.ToString("F1");
             }
         }
 
