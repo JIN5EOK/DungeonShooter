@@ -12,16 +12,16 @@ namespace DungeonShooter
         public void Install(IContainerBuilder builder)
         {
             // HUD 뷰 등록
-            builder.Register(resolver => resolver.Resolve<SceneUIManager>().GetSingletonUISync<GameHudGroupUI>(UIAddresses.UI_InGameHud), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GameHudGroupUI>(UIAddresses.UI_InGameHud), Lifetime.Scoped);
             
             // 기타 UI 등록
-            builder.Register(resolver => resolver.Resolve<SceneUIManager>().GetSingletonUISync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp, false), Lifetime.Scoped);
-            builder.Register(resolver => resolver.Resolve<SceneUIManager>().GetSingletonUISync<AlertMessageView>(UIAddresses.UI_AlertMessage, false), Lifetime.Scoped);
-            builder.Register(resolver => resolver.Resolve<SceneUIManager>().GetSingletonUISync<InventoryView>(UIAddresses.UI_Inventory, false), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp, false), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<AlertMessageView>(UIAddresses.UI_AlertMessage, false), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<InventoryView>(UIAddresses.UI_Inventory, false), Lifetime.Scoped);
 
             // 팝업 뷰 등록
-            builder.Register(resolver => resolver.Resolve<SceneUIManager>().GetSingletonUISync<GamePauseView>(UIAddresses.UI_GamePause, false), Lifetime.Scoped);
-            builder.Register(resolver => resolver.Resolve<SceneUIManager>().GetSingletonUISync<GameResultView>(UIAddresses.UI_GameResult, false), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GamePauseView>(UIAddresses.UI_GamePause, false), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GameResultView>(UIAddresses.UI_GameResult, false), Lifetime.Scoped);
 
             builder.RegisterBuildCallback(resolver =>
             {

@@ -5,11 +5,11 @@ namespace DungeonShooter
 {
     public class MainMenuSceneInitializer : SceneInitializerBase
     {
-        private SceneUIManager _uiManager;
+        private ISceneUIManager _uiManager;
         private GameStartUI _gameStartUI;
 
         [Inject]
-        public void Construct(SceneUIManager uiManager)
+        public void Construct(ISceneUIManager uiManager)
         {
             _uiManager = uiManager;
         }

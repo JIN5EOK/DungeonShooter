@@ -10,7 +10,7 @@ namespace DungeonShooter
     {
         public void Install(IContainerBuilder builder)
         {
-            builder.Register(resolver => resolver.Resolve<GlobalUIManager>().GetSingletonUISync<LoadingView>(UIAddresses.UI_Loading), Lifetime.Singleton);
+            builder.Register(resolver => resolver.Resolve<IGlobalUIManager>().GetSingletonUISync<LoadingView>(UIAddresses.UI_Loading), Lifetime.Singleton);
 
             builder.RegisterBuildCallback(resolver =>
             {
