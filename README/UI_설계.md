@@ -10,7 +10,7 @@ classDiagram
         PopupUI
     }
     
-    class UIManager["UIManager<br>UI생성 및 게임오브젝트 계층구조 담당"]{
+    class IUIManager["IUIManager<br>UI생성 및 게임오브젝트 계층구조 담당"]{
         +GetSingletonUIAsync(string key) UniTask~UIBase~ // 싱글톤 형태로 UI 생성 혹은 기존 UI 반환
         +CreateUIAsync(string key) UniTask~UIBase~ // 항상 새로운 UI 생성
         +RemoveUI(UIBase uiBase) UIBase
@@ -33,19 +33,51 @@ classDiagram
     class HudUI["HudUI<br>스크린 영역에 표시되는 정보표시 UI"]{
 
     }
-    
-    UIManager --> UIType : UI 타입 구분
-    UIManager "1"-->"0..*" UIBase
+
+    IUIManager --> UIType : UI 타입 구분
+    IUIManager "1"-->"0..*" UIBase
     UIBase <|-- PopupUI
     UIBase <|-- HudUI
     PopupUI <|-- 상세UI구현
     HudUI<|-- 상세UI구현
 ```
-* `UIManager` -> UI생성 및 게임오브젝트 계층구조 담당
+* `IUIManager` -> UI생성 및 게임오브젝트 계층구조 담당
   * UI 오브젝트 생성 
   * `UIType`별 캔버스 및 계층구조 생성
     * `UIType`별로 캔버스를 생성한다 
     * 캔버스간 정렬 순서는 UIType에 정의된 순서를 따른다 (HudUI < PopupUI)
+
+## 생명주기별 UIManager 분리 구조 
+```mermaid
+classDiagram
+    class IUIManager{
+        +GetInstanceAsync(string key) UniTask~GameObject~
+        +GetAssetAsync<T>(string key) UniTask~T~
+        +GetInstanceSync(string key) GameObject
+        +GetAssetSync<T>(string key) T
+    }
+
+    class GlobalUIManager{
+
+    }
+
+    class SceneUIManager{
+
+    }
+
+    class UIManagerBase{
+        <<abstract>>
+    }
+
+
+    IUIManager <|.. UIManagerBase : 구체 구현
+    UIManagerBase <|-- GlobalUIManager : 전역 단위 UI 관리, IGlobalResourceProvider 사용
+    UIManagerBase <|-- SceneUIManager : 씬 단위 UI 관리, IScenResourceProvider 사용
+
+```
+- 전역적으로 사용되는 UI는 `GlobalUIManager` 사용
+  - `GlobalUIManager`는 `GlobalResourceProvider`를 사용하며 이 프로바이더는 게임이 끝날 때 까지 로드한 에셋을 해제시키지 않으므로 주의 필요함
+- 씬 단위로 사용되는 UI는 `SceneUIManager` 사용, 씬을 벗어나면 UI 자동 파괴
 
 ## UI 아키텍쳐 패턴 관련
 - 수치, 값, 텍스트를 많이 설정해야 함, 업데이트가 중요한 UI
