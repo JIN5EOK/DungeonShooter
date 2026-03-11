@@ -42,6 +42,7 @@ namespace DungeonShooter
     {
         HudUI,
         PopupUI,
+        LoadingUI,
     }
 
     /// <summary> 로딩 UI 종류. 묵직한 로딩(윈도우) / 가벼운 로딩(스피너) 구분 </summary>

@@ -7,8 +7,9 @@ namespace DungeonShooter
     /// <summary>
     /// 로딩 ViewModel을 구독하여 윈도우/스피너 패널 표시 여부를 갱신하는 뷰. DontDestroyOnLoad로 유지된다.
     /// </summary>
-    public class LoadingView : MonoBehaviour
+    public class LoadingView : UIBase
     {
+        public override UIType Type => UIType.LoadingUI;
         [SerializeField] private GameObject _windowPanel;
         [SerializeField] private GameObject _spinnerPanel;
 
