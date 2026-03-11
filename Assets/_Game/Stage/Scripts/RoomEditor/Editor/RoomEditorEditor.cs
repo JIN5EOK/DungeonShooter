@@ -8,7 +8,6 @@ namespace DungeonShooter
     [CustomEditor(typeof(RoomEditor))]
     public class RoomEditorEditor : Editor
     {
-        private SerializedProperty _resourceProvider;
         private SerializedProperty _groundTileProperty;
         private SerializedProperty _roomSizeXProperty;
         private SerializedProperty _roomSizeYProperty;
@@ -21,7 +20,6 @@ namespace DungeonShooter
 
         private void OnEnable()
         {
-            _resourceProvider = serializedObject.FindProperty("_resourceProvider");
             _groundTileProperty = serializedObject.FindProperty("_groundTile");
             _roomSizeXProperty = serializedObject.FindProperty("_roomSizeX");
             _roomSizeYProperty = serializedObject.FindProperty("_roomSizeY");
@@ -104,7 +102,6 @@ namespace DungeonShooter
             EditorGUILayout.LabelField("Ground 타일은 맵 크기를 보여주기 위한 예시일 뿐 실제 방 파일에 저장되지 않습니다.", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("맵을 수정하려면 Deco 타일을 수정해주세요.", EditorStyles.boldLabel);
             
-            EditorGUILayout.PropertyField(_resourceProvider);
             EditorGUILayout.PropertyField(_groundTileProperty);
             EditorGUILayout.IntSlider(_roomSizeXProperty, RoomConstants.RoomSizeMinX, RoomConstants.RoomSizeMaxX, "방 크기 X");
             EditorGUILayout.IntSlider(_roomSizeYProperty, RoomConstants.RoomSizeMinY, RoomConstants.RoomSizeMaxY, "방 크기 Y");

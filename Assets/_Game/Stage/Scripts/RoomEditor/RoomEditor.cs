@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.Tilemaps;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Serialization;
 
 namespace DungeonShooter
 {
@@ -13,9 +14,8 @@ namespace DungeonShooter
     [ExecuteInEditMode]
     public class RoomEditor : MonoBehaviour
     {
-        [SerializeField]
         [Tooltip("방 에디터 프리셋 리소스 설정")]
-        private SceneResourceProviderEditor _resourceProvider;
+        private IResourceProvider _resourceProvider = new EditorResourceProvider();
 
         [SerializeField]
         [Tooltip("Ground 타일 (방 크기 표시용)")]

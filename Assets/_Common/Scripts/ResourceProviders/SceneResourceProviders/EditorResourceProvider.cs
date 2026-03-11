@@ -15,15 +15,9 @@ namespace DungeonShooter
     /// 에디터에서 사용하는 ResourceProvider
     /// 의존성 주입 없이 Addressables를 직접 사용하여 작동
     /// </summary>
-    [Serializable]
-    public class SceneResourceProviderEditor : SceneResourceProvider
+    public class EditorResourceProvider : IResourceProvider
     {
-        private readonly AddressablesScope _addressablesScope;
-
-        public SceneResourceProviderEditor(IObjectResolver resolver = null) : base(resolver)
-        {
-            _addressablesScope = new AddressablesScope();
-        }
+        private readonly AddressablesScope _addressablesScope = new AddressablesScope();
 
         /// <summary>
         /// 주소에 해당하는 에셋을 동기적으로 가져옵니다.
@@ -35,7 +29,7 @@ namespace DungeonShooter
 
             if (handle.Status != AsyncOperationStatus.Succeeded)
             {
-                Debug.LogWarning($"[{nameof(SceneResourceProviderEditor)}] 에셋 로드 실패: {address}");
+                Debug.LogWarning($"[{nameof(EditorResourceProvider)}] 에셋 로드 실패: {address}");
                 return null;
             }
 
@@ -74,14 +68,14 @@ namespace DungeonShooter
 
             if (prefabHandle.Status != AsyncOperationStatus.Succeeded)
             {
-                Debug.LogWarning($"[{nameof(SceneResourceProviderEditor)}] 프리팹 로드 실패: {address}");
+                Debug.LogWarning($"[{nameof(EditorResourceProvider)}] 프리팹 로드 실패: {address}");
                 return null;
             }
 
             var prefab = prefabHandle.Result;
             if (prefab == null)
             {
-                Debug.LogWarning($"[{nameof(SceneResourceProviderEditor)}] 프리팹이 null입니다: {address}");
+                Debug.LogWarning($"[{nameof(EditorResourceProvider)}] 프리팹이 null입니다: {address}");
                 return null;
             }
 
