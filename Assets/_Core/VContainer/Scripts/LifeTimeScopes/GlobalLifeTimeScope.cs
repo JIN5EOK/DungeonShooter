@@ -15,6 +15,8 @@ namespace DungeonShooter
         {
             base.Configure(builder);
             builder.Register<PauseManager>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<GlobalResourceProvider>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf().DontDestroyOnLoad();
+            builder.RegisterComponentOnNewGameObject<GlobalUIManager>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
             builder.RegisterInstance(_inputManager);
             builder.Register<LocalTableRepository>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<EventBus>(Lifetime.Singleton).AsImplementedInterfaces();

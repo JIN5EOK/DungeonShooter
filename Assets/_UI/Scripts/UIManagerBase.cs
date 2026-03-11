@@ -8,20 +8,20 @@ using VContainer;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 씬별 UI 생성/제거 및 타입별 캔버스/정렬을 담당하는 매니저.
+    /// UI 생성/제거 및 타입별 캔버스/정렬 담당 매니저의 기본 구현 클래스.
     /// </summary>
-    public class UIManager : MonoBehaviour
+    public abstract class UIManagerBase : MonoBehaviour, IUIManager
     {
         private readonly List<UIBase> _uiList = new();
         private readonly Dictionary<string, UIBase> _uniqueUICache = new();
         private readonly Dictionary<string, UniTask<UIBase>> _loadingUniqueUI = new();
         private Dictionary<UIType, Transform> _canvasByType;
-        private ISceneResourceProvider _sceneResourceProvider;
         
-        [Inject]
-        public void Construct(ISceneResourceProvider sceneResourceProvider)
+        protected IResourceProvider _resourceProvider;
+        
+        protected void Initialize(IResourceProvider resourceProvider)
         {
-            _sceneResourceProvider = sceneResourceProvider;
+            _resourceProvider = resourceProvider;
         }
         
         public void Awake()
@@ -112,14 +112,14 @@ namespace DungeonShooter
 
         private T LoadUISync<T>(string addressableKey, bool active) where T : UIBase
         {
-            var instance = _sceneResourceProvider.GetInstanceSync(addressableKey);
+            var instance = _resourceProvider.GetInstanceSync(addressableKey);
             if (instance == null)
                 return null;
 
             var ui = instance.GetComponent<T>();
             if (ui == null)
             {
-                LogHandler.LogError<UIManager>($"프리팹에 UIBase가 없음: {addressableKey}");
+                LogHandler.LogError<UIManagerBase>($"프리팹에 UIBase가 없음: {addressableKey}");
                 Destroy(instance);
                 return null;
             }
@@ -145,11 +145,11 @@ namespace DungeonShooter
 
         private async UniTask<T> LoadUIAsync<T>(string addressableKey, bool active) where T : UIBase
         {
-            var instance = await _sceneResourceProvider.GetInstanceAsync(addressableKey);
+            var instance = await _resourceProvider.GetInstanceAsync(addressableKey);
             var ui = instance.GetComponent<T>();
             if (ui == null)
             {
-                LogHandler.LogError<UIManager>($"프리팹에 UIBase가 없음: {addressableKey}");
+                LogHandler.LogError<UIManagerBase>($"프리팹에 UIBase가 없음: {addressableKey}");
                 Destroy(instance);
                 return null;
             }
