@@ -17,4 +17,8 @@ namespace DungeonShooter
         T GetAssetSync<T>(string address) where T : Object;
         T GetAssetSync<T>(string address, string atlasAddress) where T : Object;
     }
+    
+    public interface IGlobalResourceProvider : IResourceProvider { }
+    public interface ISceneResourceProvider : IResourceProvider { }
+    public interface IFeatureResourceProvider : IResourceProvider { }
 }

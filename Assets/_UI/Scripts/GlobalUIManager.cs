@@ -10,7 +10,7 @@ namespace DungeonShooter
     {
         public override int SortingOrder => (int)BaseSortingOrder.GlobalUI;
         [Inject]
-        public void Construct(GlobalResourceProvider resourceProvider)
+        public void Construct(IGlobalResourceProvider resourceProvider)
         {
             Initialize(resourceProvider);
         }

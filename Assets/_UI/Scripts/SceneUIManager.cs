@@ -9,7 +9,7 @@ namespace DungeonShooter
     {
         public override int SortingOrder => (int)BaseSortingOrder.SceneUI;
         [Inject]
-        public void Construct(IResourceProvider resourceProvider)
+        public void Construct(ISceneResourceProvider resourceProvider)
         {
             Initialize(resourceProvider);
         }
