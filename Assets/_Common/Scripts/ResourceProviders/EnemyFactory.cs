@@ -29,7 +29,7 @@ namespace DungeonShooter
         
         private readonly ITableRepository _tableRepository;
         private readonly StageContext _stageContext;
-        private readonly SceneResourceProvider _sceneResourceProvider;
+        private readonly IResourceProvider _resourceProvider;
         private readonly IEventBus _eventBus;
         private readonly ISkillFactory _skillFactory;
         private readonly ISkillObjectFactory _skillObjectFactory;
@@ -39,11 +39,11 @@ namespace DungeonShooter
         
         
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, SceneResourceProvider sceneResourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
+        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, IResourceProvider resourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
         {
             _tableRepository = tableRepository;
             _stageContext = stageContext;
-            _sceneResourceProvider = sceneResourceProvider;
+            _resourceProvider = resourceProvider;
             _eventBus = eventBus;
             _sceneLifetimeScope = sceneLifeTimeScope;
             _skillFactory = skillFactory;
@@ -160,7 +160,7 @@ namespace DungeonShooter
 
         private EntityBase CreateSync(EnemyConfigTableEntry entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
         {
-            var go = _sceneResourceProvider.GetInstanceSync(entry.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
+            var go = _resourceProvider.GetInstanceSync(entry.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
             var poolKey = GetPoolKey(entry.GameObjectKey);
             EnsurePoolable(go, poolKey);
             return InitializeEnemyInstance(go, entry, true);
@@ -168,7 +168,7 @@ namespace DungeonShooter
         
         private async UniTask<EntityBase> CreateAsync(EnemyConfigTableEntry entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
         {
-            var go = await _sceneResourceProvider.GetInstanceAsync(entry.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
+            var go = await _resourceProvider.GetInstanceAsync(entry.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
             var poolKey = GetPoolKey(entry.GameObjectKey);
             EnsurePoolable(go, poolKey);
             return InitializeEnemyInstance(go, entry,true);
@@ -293,7 +293,7 @@ namespace DungeonShooter
                 activeSkills.Add(skill);
             }
 
-            var aiBT = _sceneResourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
+            var aiBT = _resourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
             entityLifeTimeScope.Container.Resolve<IAIComponent>().Initialize(aiBT, activeSkills);
 
             _eventBus.Publish(new EnemySpawnedEvent { enemy = entity });

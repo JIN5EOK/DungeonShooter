@@ -12,12 +12,12 @@ namespace DungeonShooter
     {
         // 나중에 카메라 타입 추가되면 변경 가능하도록 변경, 지금은 타입이 하나라 이렇게
         private CameraTrackType _cameraTrackType = CameraTrackType.PlayerChaseCamera;
-        private SceneResourceProvider _sceneResourceProvider;
+        private IResourceProvider _resourceProvider;
 
         [Inject]
-        private void Construct(SceneResourceProvider sceneResourceProvider)
+        private void Construct(IResourceProvider resourceProvider)
         {
-            _sceneResourceProvider = sceneResourceProvider;
+            _resourceProvider = resourceProvider;
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace DungeonShooter
                 return;
             }
 
-            var instance = await _sceneResourceProvider.GetInstanceAsync(address);
+            var instance = await _resourceProvider.GetInstanceAsync(address);
             if (instance == null)
             {
                 Debug.LogWarning($"{nameof(CameraTrackComponent)}: 리소스를 찾을 수 없습니다. 주소: {address}");

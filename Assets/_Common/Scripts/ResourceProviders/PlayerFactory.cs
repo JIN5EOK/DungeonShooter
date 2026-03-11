@@ -24,21 +24,21 @@ namespace DungeonShooter
     public class PlayerFactory : IPlayerFactory
     {
         private readonly StageContext _stageContext;
-        private readonly SceneResourceProvider _sceneResourceProvider;
+        private readonly IResourceProvider _resourceProvider;
         private readonly ITableRepository _tableRepository;
         private readonly IPlayerContextManager _playerContextManager;
         private readonly IEventBus _eventBus;
         private readonly LifetimeScope _sceneLifetimeScope;
         [Inject]
         public PlayerFactory(StageContext context
-            , SceneResourceProvider sceneResourceProvider
+            , IResourceProvider resourceProvider
             , ITableRepository tableRepository
             , IEventBus eventBus
             , LifetimeScope sceneLifetimeScope
             , IPlayerContextManager playerContextManager)
         {
             _stageContext = context;
-            _sceneResourceProvider = sceneResourceProvider;
+            _resourceProvider = resourceProvider;
             _tableRepository = tableRepository;
             _eventBus = eventBus;
             _playerContextManager = playerContextManager;
@@ -53,7 +53,7 @@ namespace DungeonShooter
             try
             {
                 var playerAddress = GetPlayerAddress();
-                var playerInstance = await _sceneResourceProvider.GetInstanceAsync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
+                var playerInstance = await _resourceProvider.GetInstanceAsync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
                 var entity = await InitializePlayerInstance(playerInstance);
                 return entity;
             }
@@ -72,7 +72,7 @@ namespace DungeonShooter
             try
             {
                 var playerAddress = GetPlayerAddress();
-                var playerInstance = _sceneResourceProvider.GetInstanceSync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
+                var playerInstance = _resourceProvider.GetInstanceSync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
                 var entity = InitializePlayerInstance(playerInstance).GetAwaiter().GetResult();
                 return entity;
             }
@@ -137,7 +137,7 @@ namespace DungeonShooter
             var cameraTrackComponent = entityLifeTimeScope.Container.Resolve<ICameraTrackComponent>();
             var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
 
-            var interactNotice = await _sceneResourceProvider.GetInstanceAsync(CommonAddresses.InteractNotice);
+            var interactNotice = await _resourceProvider.GetInstanceAsync(CommonAddresses.InteractNotice);
             interactComponent.SetInteractNotice(interactNotice);
 
             await cameraTrackComponent.AttachCameraAsync();

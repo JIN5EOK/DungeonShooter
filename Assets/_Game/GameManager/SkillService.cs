@@ -43,15 +43,15 @@ namespace DungeonShooter
     public class SkillService : ISkillService
     {
         private readonly ITableRepository _tableRepository;
-        private readonly SceneResourceProvider _sceneResourceProvider;
+        private readonly IResourceProvider _resourceProvider;
         private readonly IEventBus _eventBus;
         private readonly ISkillFactory _skillFactory;
 
         [Inject]
-        public SkillService(ITableRepository tableRepository, SceneResourceProvider sceneResourceProvider, IEventBus eventBus, ISkillFactory skillFactory)
+        public SkillService(ITableRepository tableRepository, IResourceProvider resourceProvider, IEventBus eventBus, ISkillFactory skillFactory)
         {
             _tableRepository = tableRepository;
-            _sceneResourceProvider = sceneResourceProvider;
+            _resourceProvider = resourceProvider;
             _eventBus = eventBus;
             _skillFactory = skillFactory;
         }
@@ -102,8 +102,8 @@ namespace DungeonShooter
                 if (nextSkillEntry == null)
                     continue;
 
-                var currentIcon = _sceneResourceProvider.GetAssetSync<Sprite>(skill.SkillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
-                var nextIcon = _sceneResourceProvider.GetAssetSync<Sprite>(nextSkillEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
+                var currentIcon = _resourceProvider.GetAssetSync<Sprite>(skill.SkillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
+                var nextIcon = _resourceProvider.GetAssetSync<Sprite>(nextSkillEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
                 result.Add(new LevelUpableSkillInfo(skill, nextSkillEntry, currentIcon, nextIcon));
             }
 

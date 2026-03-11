@@ -11,12 +11,12 @@ namespace DungeonShooter
         public EntityBase LastHitTarget { get; }
 
         public ISkillObjectFactory SkillObjectFactory { get; }
-        public SceneResourceProvider SceneResourceProvider { get; }
+        public IResourceProvider IResourceProvider { get; }
         public ISoundSfxService SoundSfxService { get; }
 
-        private SkillExecutionContext(EntityBase caster, EntityBase other, SceneResourceProvider sceneResourceProvider, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService)
+        private SkillExecutionContext(EntityBase caster, EntityBase other, IResourceProvider resourceProvider, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService)
         {
-            SceneResourceProvider = sceneResourceProvider;
+            IResourceProvider = resourceProvider;
             Caster = caster;
             LastHitTarget = other;
             SkillObjectFactory = skillObjectFactory;
@@ -32,17 +32,17 @@ namespace DungeonShooter
         /// <summary> 시전자를 설정한 새 컨텍스트를 반환합니다. </summary>
         public SkillExecutionContext WithCaster(EntityBase newCaster)
         {
-            return new SkillExecutionContext(newCaster, LastHitTarget, SceneResourceProvider, SkillObjectFactory, SoundSfxService);
+            return new SkillExecutionContext(newCaster, LastHitTarget, IResourceProvider, SkillObjectFactory, SoundSfxService);
         }
 
         /// <summary> 마지막 피격 대상을 설정한 새 컨텍스트를 반환합니다. </summary>
         public SkillExecutionContext WithLastHitTarget(EntityBase newLastHitTarget)
         {
-            return new SkillExecutionContext(Caster, newLastHitTarget, SceneResourceProvider, SkillObjectFactory, SoundSfxService);
+            return new SkillExecutionContext(Caster, newLastHitTarget, IResourceProvider, SkillObjectFactory, SoundSfxService);
         }
 
         /// <summary> 씬 리소스 제공자를 포함한 새 컨텍스트를 반환합니다. </summary>
-        public SkillExecutionContext WithResourceProvider(SceneResourceProvider newResourceProvider)
+        public SkillExecutionContext WithResourceProvider(IResourceProvider newResourceProvider)
         {
             return new SkillExecutionContext(Caster, LastHitTarget, newResourceProvider, SkillObjectFactory, SoundSfxService);
         }
@@ -50,13 +50,13 @@ namespace DungeonShooter
         /// <summary> 스킬팩토리를 포함한 새 컨텍스트를 반환합니다. </summary>
         public SkillExecutionContext WithSkillObjectFactory(ISkillObjectFactory newSkillObjectFactory)
         {
-            return new SkillExecutionContext(Caster, LastHitTarget, SceneResourceProvider, newSkillObjectFactory, SoundSfxService);
+            return new SkillExecutionContext(Caster, LastHitTarget, IResourceProvider, newSkillObjectFactory, SoundSfxService);
         }
 
         /// <summary> 효과음 서비스를 포함한 새 컨텍스트를 반환합니다. </summary>
         public SkillExecutionContext WithSoundSfxService(ISoundSfxService soundSfxService)
         {
-            return new SkillExecutionContext(Caster, LastHitTarget, SceneResourceProvider, SkillObjectFactory, soundSfxService);
+            return new SkillExecutionContext(Caster, LastHitTarget, IResourceProvider, SkillObjectFactory, soundSfxService);
         }
     }
 }

@@ -12,23 +12,23 @@ namespace DungeonShooter
     /// </summary>
     public class SoundSfxService : ISoundSfxService
     {
-        private readonly SceneResourceProvider _sceneResourceProvider;
+        private readonly IResourceProvider _resourceProvider;
 
         [Inject]
-        public SoundSfxService(SceneResourceProvider sceneResourceProvider)
+        public SoundSfxService(IResourceProvider resourceProvider)
         {
-            _sceneResourceProvider = sceneResourceProvider;
+            _resourceProvider = resourceProvider;
         }
 
         public void PlayOneShot(string address, AudioMixerGroup audioMixerGroup = null, Action<AudioPlayer.PlayResult> onComplete = null)
         {
-            var clip = _sceneResourceProvider.GetAssetSync<AudioClip>(address);
+            var clip = _resourceProvider.GetAssetSync<AudioClip>(address);
             AudioPlayer.PlayOneShot(clip, audioMixerGroup, onComplete);
         }
 
         public async UniTask<AudioPlayer.PlayResult> PlayOneShotAsync(string address, AudioMixerGroup audioMixerGroup = null)
         {
-            var clip = await _sceneResourceProvider.GetAssetAsync<AudioClip>(address);
+            var clip = await _resourceProvider.GetAssetAsync<AudioClip>(address);
             return await AudioPlayer.PlayOneShotAsync(clip, audioMixerGroup);
         }
     }

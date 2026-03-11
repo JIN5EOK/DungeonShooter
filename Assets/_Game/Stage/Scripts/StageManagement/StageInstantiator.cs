@@ -24,13 +24,13 @@ namespace DungeonShooter
     public class StageInstantiator : IStageInstantiator
     {
         private readonly RoomInstantiator _roomInstantiator;
-        private readonly SceneResourceProvider _sceneResourceProvider;
+        private readonly IResourceProvider _resourceProvider;
 
         [Inject]
-        public StageInstantiator(RoomInstantiator roomInstantiator, SceneResourceProvider sceneResourceProvider)
+        public StageInstantiator(RoomInstantiator roomInstantiator, IResourceProvider resourceProvider)
         {
             _roomInstantiator = roomInstantiator;
-            _sceneResourceProvider = sceneResourceProvider;
+            _resourceProvider = resourceProvider;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            if (stageConfigEntry == null || _roomInstantiator == null || _sceneResourceProvider == null)
+            if (stageConfigEntry == null || _roomInstantiator == null || _resourceProvider == null)
             {
                 LogHandler.LogError(nameof(StageInstantiator), "리소스 제공자가 null입니다.");
                 return null;
@@ -62,7 +62,7 @@ namespace DungeonShooter
             // Stage 레벨 타일맵 구조 생성
             _roomInstantiator.GetOrCreateRoomStructure(stageObj.transform);
 
-            var groundTile = await LoadGroundTileAsync(stageConfigEntry, _sceneResourceProvider);
+            var groundTile = await LoadGroundTileAsync(stageConfigEntry, _resourceProvider);
             // 모든 방의 타일과 오브젝트를 Stage 레벨에 배치
             foreach (var room in stage.Rooms.Values)
             {
@@ -93,7 +93,7 @@ namespace DungeonShooter
         /// <summary>
         /// Ground 타일을 로드합니다.
         /// </summary>
-        private async UniTask<TileBase> LoadGroundTileAsync(StageConfigTableEntry stageConfigEntry, SceneResourceProvider sceneResourceProvider)
+        private async UniTask<TileBase> LoadGroundTileAsync(StageConfigTableEntry stageConfigEntry, IResourceProvider resourceProvider)
         {
             if (stageConfigEntry == null || string.IsNullOrEmpty(stageConfigEntry.GroundTileKey))
             {
@@ -101,7 +101,7 @@ namespace DungeonShooter
                 return null;
             }
 
-            return await sceneResourceProvider.GetAssetAsync<TileBase>(stageConfigEntry.GroundTileKey);
+            return await resourceProvider.GetAssetAsync<TileBase>(stageConfigEntry.GroundTileKey);
         }
 
         /// <summary>

@@ -24,15 +24,15 @@ namespace DungeonShooter
         private const string PoolKey = "FieldItem";
         private const float ColliderRadius = 0.5f;
 
-        private readonly SceneResourceProvider _sceneResourceProvider;
+        private readonly IResourceProvider _resourceProvider;
         private readonly IItemFactory _itemFactory;
         private readonly IInventory _inventory;
         private readonly GameObjectPool _pool = new();
 
         [Inject]
-        public FieldItemFactory(SceneResourceProvider sceneResourceProvider, IItemFactory itemFactory, IInventory inventory)
+        public FieldItemFactory(IResourceProvider resourceProvider, IItemFactory itemFactory, IInventory inventory)
         {
-            _sceneResourceProvider = sceneResourceProvider;
+            _resourceProvider = resourceProvider;
             _itemFactory = itemFactory;
             _inventory = inventory;
         }
@@ -57,7 +57,7 @@ namespace DungeonShooter
                 }
             }
 
-            go = await _sceneResourceProvider.GetInstanceAsync(CommonAddresses.FieldItem, position, rotation, parent, instantiateInWorldSpace);
+            go = await _resourceProvider.GetInstanceAsync(CommonAddresses.FieldItem, position, rotation, parent, instantiateInWorldSpace);
             if (go == null)
                 return null;
 

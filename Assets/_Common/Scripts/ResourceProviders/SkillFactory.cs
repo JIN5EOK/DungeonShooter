@@ -16,13 +16,13 @@ namespace DungeonShooter
     /// </summary>
     public class SkillFactory : ISkillFactory
     {
-        private readonly SceneResourceProvider _resourceProvider;
+        private readonly IResourceProvider _resourceProvider;
         private readonly ITableRepository _tableRepository;
         private readonly ISkillObjectFactory _skillObjectFactory;
         private readonly ISoundSfxService _soundSfxService;
 
         [Inject]
-        public SkillFactory(SceneResourceProvider resourceProvider, ITableRepository tableRepository, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService)
+        public SkillFactory(IResourceProvider resourceProvider, ITableRepository tableRepository, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService)
         {
             _resourceProvider = resourceProvider;
             _tableRepository = tableRepository;

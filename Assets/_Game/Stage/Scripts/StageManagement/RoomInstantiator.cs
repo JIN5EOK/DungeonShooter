@@ -14,7 +14,7 @@ namespace DungeonShooter
     {
         private readonly IPlayerFactory _playerFactory;
         private readonly IEnemyFactory _enemyFactory;
-        private readonly SceneResourceProvider _sceneResourceProvider;
+        private readonly IResourceProvider _resourceProvider;
         private readonly ITableRepository _tableRepository;
         private Transform _stageRoot;
 
@@ -25,7 +25,7 @@ namespace DungeonShooter
         {
             _playerFactory = null;
             _enemyFactory = null;
-            _sceneResourceProvider = null;
+            _resourceProvider = null;
             _tableRepository = null;
         }
 
@@ -33,12 +33,12 @@ namespace DungeonShooter
         public RoomInstantiator(
             IPlayerFactory playerFactory,
             IEnemyFactory enemyFactory,
-            SceneResourceProvider sceneResourceProvider,
+            IResourceProvider resourceProvider,
             ITableRepository tableRepository)
         {
             _playerFactory = playerFactory;
             _enemyFactory = enemyFactory;
-            _sceneResourceProvider = sceneResourceProvider;
+            _resourceProvider = resourceProvider;
             _tableRepository = tableRepository;
         }
 
@@ -167,7 +167,7 @@ namespace DungeonShooter
 
         private bool ValidatePlaceAdditionalTiles(RoomData roomData)
         {
-            if (_stageRoot == null || roomData == null || _sceneResourceProvider == null)
+            if (_stageRoot == null || roomData == null || _resourceProvider == null)
             {
                 LogHandler.LogError(nameof(RoomInstantiator), "파라미터가 올바르지 않습니다.");
                 return false;
@@ -181,7 +181,7 @@ namespace DungeonShooter
             foreach (var tileData in roomData.Tiles)
             {
                 var address = roomData.GetAddress(tileData.Index);
-                list.Add(await _sceneResourceProvider.GetAssetAsync<TileBase>(address));
+                list.Add(await _resourceProvider.GetAssetAsync<TileBase>(address));
             }
             return list;
         }
@@ -192,7 +192,7 @@ namespace DungeonShooter
             foreach (var tileData in roomData.Tiles)
             {
                 var address = roomData.GetAddress(tileData.Index);
-                list.Add(_sceneResourceProvider.GetAssetSync<TileBase>(address));
+                list.Add(_resourceProvider.GetAssetSync<TileBase>(address));
             }
             return list;
         }
@@ -302,7 +302,7 @@ namespace DungeonShooter
                 var enemy = await _enemyFactory.GetEnemyByConfigIdAsync(tableId, position, rotation,GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
                 return enemy != null ? enemy.gameObject : null;
             }
-            return await _sceneResourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey, position, rotation, GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
+            return await _resourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey, position, rotation, GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
         }
 
         private GameObject ResolveEnemyEntrySync(int tableId, EnemyConfigTableEntry enemyConfig, Vector3 position, Quaternion rotation)
@@ -312,7 +312,7 @@ namespace DungeonShooter
                 var enemy = _enemyFactory.GetEnemyByConfigIdSync(tableId, position, rotation,GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
                 return enemy != null ? enemy.gameObject : null;
             }
-            return _sceneResourceProvider.GetInstanceSync(enemyConfig.GameObjectKey, position, rotation, GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
+            return _resourceProvider.GetInstanceSync(enemyConfig.GameObjectKey, position, rotation, GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
         }
 
         private async Task<GameObject> ResolveRoomEventTriggerEntryAsync(RoomEventTriggerTableEntry eventTriggerEntry, Vector3 position, Quaternion rotation)

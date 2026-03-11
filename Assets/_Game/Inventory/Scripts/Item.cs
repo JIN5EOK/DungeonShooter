@@ -18,7 +18,7 @@ namespace DungeonShooter
         public int StackCount { get; set; }
 
         private readonly ISkillFactory _skillFactory;
-        private readonly SceneResourceProvider _sceneResourceProvider;
+        private readonly IResourceProvider _resourceProvider;
 
         //// <summary> 아이템 아이콘 </summary>
         public Sprite Icon { get; private set; }
@@ -40,7 +40,7 @@ namespace DungeonShooter
         /// <param name="itemTableEntry">아이템 테이블 엔트리</param>
         /// <param name="skillFactory">스킬 팩토리</param>
         [Inject]
-        public Item(ItemTableEntry itemTableEntry, ISkillFactory skillFactory, SceneResourceProvider sceneResourceProvider)
+        public Item(ItemTableEntry itemTableEntry, ISkillFactory skillFactory, IResourceProvider resourceProvider)
         {
             if (itemTableEntry == null)
             {
@@ -51,7 +51,7 @@ namespace DungeonShooter
             ItemTableEntry = itemTableEntry;
             StackCount = 1;
             _skillFactory = skillFactory;
-            _sceneResourceProvider = sceneResourceProvider;
+            _resourceProvider = resourceProvider;
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace DungeonShooter
 
             try
             {
-                Icon = await _sceneResourceProvider.GetAssetAsync<Sprite>(entry.ItemIcon, SpriteAtlasAddresses.ItemIconAtlas);
+                Icon = await _resourceProvider.GetAssetAsync<Sprite>(entry.ItemIcon, SpriteAtlasAddresses.ItemIconAtlas);
                 // UseSkill 생성 (Consume 전용)
                 if (entry.UseSkillId > 0)
                 {

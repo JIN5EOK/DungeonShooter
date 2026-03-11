@@ -41,7 +41,7 @@ namespace DungeonShooter
         public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
             var position = _spawnPosition == SkillOwner.Caster ? context.Caster.transform.position : context.LastHitTarget.transform.position;
-            var obj = await context.SceneResourceProvider.GetInstanceAsync(SkillObjectAddress, position);
+            var obj = await context.IResourceProvider.GetInstanceAsync(SkillObjectAddress, position);
             
             if(obj == null)
                 return false;

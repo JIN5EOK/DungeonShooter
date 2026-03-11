@@ -13,13 +13,13 @@ namespace DungeonShooter
 
     public class SkillObjectFactory : ISkillObjectFactory
     {
-        private readonly SceneResourceProvider _sceneResourceProvider;
+        private readonly IResourceProvider _resourceProvider;
         private readonly GameObjectPool _pool = new();
 
         [Inject]
-        public SkillObjectFactory(SceneResourceProvider sceneResourceProvider)
+        public SkillObjectFactory(IResourceProvider resourceProvider)
         {
-            _sceneResourceProvider = sceneResourceProvider;
+            _resourceProvider = resourceProvider;
         }
 
         public async UniTask<T> CreateSkillObjectAsync<T>(string key, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true) where T : SkillObjectBase
@@ -33,7 +33,7 @@ namespace DungeonShooter
             }
             else
             {
-                go = await _sceneResourceProvider.GetInstanceAsync(key, position, rotation, parent,
+                go = await _resourceProvider.GetInstanceAsync(key, position, rotation, parent,
                     instantiateInWorldSpace);
                 
                 EnsurePoolable(go, poolKey);
