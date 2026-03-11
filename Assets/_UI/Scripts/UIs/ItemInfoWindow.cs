@@ -19,10 +19,10 @@ namespace DungeonShooter
         [SerializeField] private TextMeshProUGUI _textType;
         [SerializeField] private TextMeshProUGUI _textStats;
         
-        private ISceneResourceProvider _resourceProvider;
+        private SceneResourceProvider _resourceProvider;
         private ITableRepository _tableRepository;
         [Inject]
-        public void Construct(ISceneResourceProvider resourceProvider, ITableRepository tableRepository)
+        public void Construct(SceneResourceProvider resourceProvider, ITableRepository tableRepository)
         {
             _resourceProvider = resourceProvider;
             _tableRepository = tableRepository;

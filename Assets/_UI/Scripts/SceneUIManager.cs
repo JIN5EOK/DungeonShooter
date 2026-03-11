@@ -8,9 +8,9 @@ namespace DungeonShooter
     public class SceneUIManager : UIManagerBase
     {
         [Inject]
-        public void Construct(SceneResourceProvider resourceProvider)
+        public void Construct(SceneResourceProvider resourceProviderTemp)
         {
-            Initialize(resourceProvider);
+            Initialize(resourceProviderTemp);
         }
     }
 }

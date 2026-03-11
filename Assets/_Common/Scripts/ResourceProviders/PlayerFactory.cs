@@ -24,14 +24,14 @@ namespace DungeonShooter
     public class PlayerFactory : IPlayerFactory
     {
         private readonly StageContext _stageContext;
-        private readonly ISceneResourceProvider _sceneResourceProvider;
+        private readonly SceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
         private readonly IPlayerContextManager _playerContextManager;
         private readonly IEventBus _eventBus;
         private readonly LifetimeScope _sceneLifetimeScope;
         [Inject]
         public PlayerFactory(StageContext context
-            , ISceneResourceProvider sceneResourceProvider
+            , SceneResourceProvider sceneResourceProvider
             , ITableRepository tableRepository
             , IEventBus eventBus
             , LifetimeScope sceneLifetimeScope

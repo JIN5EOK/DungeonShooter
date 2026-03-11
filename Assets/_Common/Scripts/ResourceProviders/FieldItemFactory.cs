@@ -24,13 +24,13 @@ namespace DungeonShooter
         private const string PoolKey = "FieldItem";
         private const float ColliderRadius = 0.5f;
 
-        private readonly ISceneResourceProvider _sceneResourceProvider;
+        private readonly SceneResourceProvider _sceneResourceProvider;
         private readonly IItemFactory _itemFactory;
         private readonly IInventory _inventory;
         private readonly GameObjectPool _pool = new();
 
         [Inject]
-        public FieldItemFactory(ISceneResourceProvider sceneResourceProvider, IItemFactory itemFactory, IInventory inventory)
+        public FieldItemFactory(SceneResourceProvider sceneResourceProvider, IItemFactory itemFactory, IInventory inventory)
         {
             _sceneResourceProvider = sceneResourceProvider;
             _itemFactory = itemFactory;

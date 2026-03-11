@@ -12,7 +12,7 @@ namespace DungeonShooter
         private readonly SkillData _skillData;
         private readonly SkillTableEntry _skillTableEntry;
         private readonly Sprite _icon;
-        private readonly ISceneResourceProvider _resourceProvider;
+        private readonly SceneResourceProvider _resourceProvider;
         private readonly ISkillObjectFactory _skillObjectFactory;
         private readonly ISoundSfxService _soundSfxService;
         private readonly ITableRepository _tableRepository;
@@ -27,7 +27,7 @@ namespace DungeonShooter
         public Action<float> OnCooldownChanged { get; set; }
         public Action OnCooldownEnded { get; set; }
 
-        public Skill(SkillTableEntry skillTableEntry, SkillData skillData, Sprite icon, ISceneResourceProvider resourceProvider, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService, ITableRepository tableRepository = null)
+        public Skill(SkillTableEntry skillTableEntry, SkillData skillData, Sprite icon, SceneResourceProvider resourceProvider, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService, ITableRepository tableRepository = null)
         {
             _skillTableEntry = skillTableEntry;
             _skillData = skillData;

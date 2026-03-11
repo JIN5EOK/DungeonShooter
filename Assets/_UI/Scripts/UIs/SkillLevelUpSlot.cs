@@ -19,7 +19,7 @@ namespace DungeonShooter
         [SerializeField] private Button _selectButton;
 
         private Action _onSelect;
-        private ISceneResourceProvider _sceneResourceProvider;
+        private SceneResourceProvider _sceneResourceProvider;
         
         private void Awake()
         {

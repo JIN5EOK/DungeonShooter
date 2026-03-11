@@ -14,9 +14,9 @@ namespace DungeonShooter
     {
         private readonly ITableRepository _tableRepository;
         private readonly ISkillFactory _skillFactory;
-        private readonly ISceneResourceProvider _resourceProvider;
+        private readonly SceneResourceProvider _resourceProvider;
         [Inject]
-        public ItemFactory(ITableRepository tableRepository, ISkillFactory skillFactory, ISceneResourceProvider sceneResourceProvider)
+        public ItemFactory(ITableRepository tableRepository, ISkillFactory skillFactory, SceneResourceProvider sceneResourceProvider)
         {
             _tableRepository = tableRepository;
             _skillFactory = skillFactory;

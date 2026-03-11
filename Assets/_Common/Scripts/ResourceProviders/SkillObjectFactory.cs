@@ -13,11 +13,11 @@ namespace DungeonShooter
 
     public class SkillObjectFactory : ISkillObjectFactory
     {
-        private readonly ISceneResourceProvider _sceneResourceProvider;
+        private readonly SceneResourceProvider _sceneResourceProvider;
         private readonly GameObjectPool _pool = new();
 
         [Inject]
-        public SkillObjectFactory(ISceneResourceProvider sceneResourceProvider)
+        public SkillObjectFactory(SceneResourceProvider sceneResourceProvider)
         {
             _sceneResourceProvider = sceneResourceProvider;
         }

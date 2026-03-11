@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.U2D;
+using VContainer;
 using Object = UnityEngine.Object;
 
 namespace DungeonShooter
@@ -15,15 +16,15 @@ namespace DungeonShooter
     /// 의존성 주입 없이 Addressables를 직접 사용하여 작동
     /// </summary>
     [Serializable]
-    public class SceneResourceProviderEditor : ISceneResourceProvider
+    public class SceneResourceProviderEditor : SceneResourceProvider
     {
         private readonly AddressablesScope _addressablesScope;
-        
-        public SceneResourceProviderEditor()
+
+        public SceneResourceProviderEditor(IObjectResolver resolver = null) : base(resolver)
         {
             _addressablesScope = new AddressablesScope();
         }
-        
+
         /// <summary>
         /// 주소에 해당하는 에셋을 동기적으로 가져옵니다.
         /// </summary>

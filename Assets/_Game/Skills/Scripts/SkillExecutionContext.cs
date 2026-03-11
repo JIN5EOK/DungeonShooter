@@ -11,10 +11,10 @@ namespace DungeonShooter
         public EntityBase LastHitTarget { get; }
 
         public ISkillObjectFactory SkillObjectFactory { get; }
-        public ISceneResourceProvider SceneResourceProvider { get; }
+        public SceneResourceProvider SceneResourceProvider { get; }
         public ISoundSfxService SoundSfxService { get; }
 
-        private SkillExecutionContext(EntityBase caster, EntityBase other, ISceneResourceProvider sceneResourceProvider, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService)
+        private SkillExecutionContext(EntityBase caster, EntityBase other, SceneResourceProvider sceneResourceProvider, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService)
         {
             SceneResourceProvider = sceneResourceProvider;
             Caster = caster;
@@ -42,7 +42,7 @@ namespace DungeonShooter
         }
 
         /// <summary> 씬 리소스 제공자를 포함한 새 컨텍스트를 반환합니다. </summary>
-        public SkillExecutionContext WithResourceProvider(ISceneResourceProvider newResourceProvider)
+        public SkillExecutionContext WithResourceProvider(SceneResourceProvider newResourceProvider)
         {
             return new SkillExecutionContext(Caster, LastHitTarget, newResourceProvider, SkillObjectFactory, SoundSfxService);
         }

@@ -29,7 +29,7 @@ namespace DungeonShooter
         
         private readonly ITableRepository _tableRepository;
         private readonly StageContext _stageContext;
-        private readonly ISceneResourceProvider _sceneResourceProvider;
+        private readonly SceneResourceProvider _sceneResourceProvider;
         private readonly IEventBus _eventBus;
         private readonly ISkillFactory _skillFactory;
         private readonly ISkillObjectFactory _skillObjectFactory;
@@ -39,7 +39,7 @@ namespace DungeonShooter
         
         
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, ISceneResourceProvider sceneResourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
+        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, SceneResourceProvider sceneResourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
         {
             _tableRepository = tableRepository;
             _stageContext = stageContext;

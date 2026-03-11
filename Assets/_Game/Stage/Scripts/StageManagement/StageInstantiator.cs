@@ -24,10 +24,10 @@ namespace DungeonShooter
     public class StageInstantiator : IStageInstantiator
     {
         private readonly RoomInstantiator _roomInstantiator;
-        private readonly ISceneResourceProvider _sceneResourceProvider;
+        private readonly SceneResourceProvider _sceneResourceProvider;
 
         [Inject]
-        public StageInstantiator(RoomInstantiator roomInstantiator, ISceneResourceProvider sceneResourceProvider)
+        public StageInstantiator(RoomInstantiator roomInstantiator, SceneResourceProvider sceneResourceProvider)
         {
             _roomInstantiator = roomInstantiator;
             _sceneResourceProvider = sceneResourceProvider;
@@ -93,7 +93,7 @@ namespace DungeonShooter
         /// <summary>
         /// Ground 타일을 로드합니다.
         /// </summary>
-        private async UniTask<TileBase> LoadGroundTileAsync(StageConfigTableEntry stageConfigEntry, ISceneResourceProvider sceneResourceProvider)
+        private async UniTask<TileBase> LoadGroundTileAsync(StageConfigTableEntry stageConfigEntry, SceneResourceProvider sceneResourceProvider)
         {
             if (stageConfigEntry == null || string.IsNullOrEmpty(stageConfigEntry.GroundTileKey))
             {

@@ -12,10 +12,10 @@ namespace DungeonShooter
     /// </summary>
     public class SoundSfxService : ISoundSfxService
     {
-        private readonly ISceneResourceProvider _sceneResourceProvider;
+        private readonly SceneResourceProvider _sceneResourceProvider;
 
         [Inject]
-        public SoundSfxService(ISceneResourceProvider sceneResourceProvider)
+        public SoundSfxService(SceneResourceProvider sceneResourceProvider)
         {
             _sceneResourceProvider = sceneResourceProvider;
         }

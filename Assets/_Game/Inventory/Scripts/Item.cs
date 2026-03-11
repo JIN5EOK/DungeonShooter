@@ -18,7 +18,7 @@ namespace DungeonShooter
         public int StackCount { get; set; }
 
         private readonly ISkillFactory _skillFactory;
-        private readonly ISceneResourceProvider _sceneResourceProvider;
+        private readonly SceneResourceProvider _sceneResourceProvider;
 
         //// <summary> 아이템 아이콘 </summary>
         public Sprite Icon { get; private set; }
@@ -40,7 +40,7 @@ namespace DungeonShooter
         /// <param name="itemTableEntry">아이템 테이블 엔트리</param>
         /// <param name="skillFactory">스킬 팩토리</param>
         [Inject]
-        public Item(ItemTableEntry itemTableEntry, ISkillFactory skillFactory, ISceneResourceProvider sceneResourceProvider)
+        public Item(ItemTableEntry itemTableEntry, ISkillFactory skillFactory, SceneResourceProvider sceneResourceProvider)
         {
             if (itemTableEntry == null)
             {

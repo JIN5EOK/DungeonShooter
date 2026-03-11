@@ -45,7 +45,7 @@ namespace DungeonShooter
         private GameObject _previewInstance;
         private IGameStartService _gameStartService;
         private ITableRepository _tableRepository;
-        private ISceneResourceProvider _resourceProvider;
+        private SceneResourceProvider _resourceProvider;
 
         /// <summary> 현재 선택된 플레이어 설정 엔트리 </summary>
         public PlayerConfigTableEntry SelectedPlayerConfigEntry => _gameStartService?.SelectedPlayer;
@@ -57,7 +57,7 @@ namespace DungeonShooter
         public event Action<StageConfigTableEntry> OnStageSelected;
 
         [Inject]
-        public void Construct(IGameStartService gameStartService, ITableRepository tableRepository, ISceneResourceProvider resourceProvider)
+        public void Construct(IGameStartService gameStartService, ITableRepository tableRepository, SceneResourceProvider resourceProvider)
         {
             _gameStartService = gameStartService;
             _tableRepository = tableRepository;

@@ -14,7 +14,7 @@ namespace DungeonShooter
     {
         private readonly IPlayerFactory _playerFactory;
         private readonly IEnemyFactory _enemyFactory;
-        private readonly ISceneResourceProvider _sceneResourceProvider;
+        private readonly SceneResourceProvider _sceneResourceProvider;
         private readonly ITableRepository _tableRepository;
         private Transform _stageRoot;
 
@@ -33,7 +33,7 @@ namespace DungeonShooter
         public RoomInstantiator(
             IPlayerFactory playerFactory,
             IEnemyFactory enemyFactory,
-            ISceneResourceProvider sceneResourceProvider,
+            SceneResourceProvider sceneResourceProvider,
             ITableRepository tableRepository)
         {
             _playerFactory = playerFactory;

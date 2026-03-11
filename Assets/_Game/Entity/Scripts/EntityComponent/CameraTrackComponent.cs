@@ -12,10 +12,10 @@ namespace DungeonShooter
     {
         // 나중에 카메라 타입 추가되면 변경 가능하도록 변경, 지금은 타입이 하나라 이렇게
         private CameraTrackType _cameraTrackType = CameraTrackType.PlayerChaseCamera;
-        private ISceneResourceProvider _sceneResourceProvider;
+        private SceneResourceProvider _sceneResourceProvider;
 
         [Inject]
-        private void Construct(ISceneResourceProvider sceneResourceProvider)
+        private void Construct(SceneResourceProvider sceneResourceProvider)
         {
             _sceneResourceProvider = sceneResourceProvider;
         }
