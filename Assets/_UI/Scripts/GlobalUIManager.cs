@@ -8,6 +8,7 @@ namespace DungeonShooter
     /// </summary>
     public class GlobalUIManager : UIManagerBase
     {
+        public override int SortingOrder => (int)BaseSortingOrder.GlobalUI;
         [Inject]
         public void Construct(GlobalResourceProvider resourceProvider)
         {

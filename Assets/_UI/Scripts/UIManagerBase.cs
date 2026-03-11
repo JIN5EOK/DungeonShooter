@@ -12,6 +12,7 @@ namespace DungeonShooter
     /// </summary>
     public abstract class UIManagerBase : MonoBehaviour, IUIManager
     {
+        public abstract int SortingOrder { get; }
         private readonly List<UIBase> _uiList = new();
         private readonly Dictionary<string, UIBase> _uniqueUICache = new();
         private readonly Dictionary<string, UniTask<UIBase>> _loadingUniqueUI = new();
@@ -43,7 +44,7 @@ namespace DungeonShooter
 
                 var canvas = go.AddComponent<Canvas>();
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                canvas.sortingOrder = (int)type;
+                canvas.sortingOrder = (int)type + SortingOrder;
                 var scaler = go.AddComponent<CanvasScaler>();
                 scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
                 scaler.referenceResolution = new Vector2(Constants.ScreenSizeX, Constants.ScreenSizeY);

@@ -7,6 +7,7 @@ namespace DungeonShooter
     /// </summary>
     public class SceneUIManager : UIManagerBase
     {
+        public override int SortingOrder => (int)BaseSortingOrder.SceneUI;
         [Inject]
         public void Construct(SceneResourceProvider resourceProviderTemp)
         {
