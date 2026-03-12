@@ -34,11 +34,6 @@ namespace DungeonShooter
             }
 
             var go = stack.Pop();
-            if (go == null)
-            {
-                return Get(key);
-            }
-
             return go;
         }
 
@@ -61,8 +56,12 @@ namespace DungeonShooter
             }
 
             stack.Push(gameObject);
+
+            if (_poolRoot.transform.parent != _poolRoot)
+            {
+                gameObject.transform.SetParent(_poolRoot);                
+            }
             
-            gameObject.transform.SetParent(_poolRoot);
         }
 
         /// <summary>
