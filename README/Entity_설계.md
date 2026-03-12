@@ -35,29 +35,6 @@ classDiagram
 	EntityBase <-- PlayerFactory : 생성시 EntityContext 주입
 	EntityBase <-- EnemyFactory : 생성시 EntityContext 주입
 ```
-- 플레이어, 적들의 스탯과 스킬 관리 로직이 다르므로 팩토리에서 직접 컨텍스트를 주입한다
-
-### 인벤토리 동작 구조
-``` mermaid
-classDiagram
-	class Inventory["Inventory<br> 아이템 장착, 조건판단, 아이템 장착시 스탯 반영등 기능적인 부분 담당"]{
-		-status : IEntityStatus
-		-skill : IEntitySkills
-		+Items : IReadOnlyCollection<Item>
-		+bool AddItem(Item item)
-		+void RemoveItem(Item item)
-		+bool EquipItem(Item item)
-	}
-	
-	class InventoryModel["InventoryModel<br> 아이템,추가,삭제 등 데이터 컬렉션의 기능 담당"]{
-		+Items : IReadOnlyCollection<Item>
-		+bool AddItem(Item item)
-		+void RemoveItem(Item item)
-	}
-	IInventory <|.. Inventory
-	Inventory --> InventoryModel : 인벤토리 모델에 반영
-	
-```
 ### 관련 문서
 - [스탯시스템_설계.md](%EC%8A%A4%ED%83%AF%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%84%A4%EA%B3%84.md)
 - [스킬시스템_설계.md](%EC%8A%A4%ED%82%AC%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%84%A4%EA%B3%84.md)
