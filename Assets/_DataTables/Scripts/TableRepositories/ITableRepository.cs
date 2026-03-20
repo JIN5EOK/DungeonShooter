@@ -12,37 +12,26 @@ namespace DungeonShooter
         /// <summary>
         /// ID로 테이블 엔트리를 가져옵니다. 타입을 지정하지 않고 엔트리만 조회할 때 사용합니다.
         /// </summary>
-        /// <param name="id">엔트리 ID</param>
-        /// <returns>테이블 엔트리, 없으면 null</returns>
         ITableEntry GetTableEntry(int id);
 
         /// <summary>
         /// ID에 해당하는 테이블 엔트리의 런타임 타입을 반환합니다.
         /// </summary>
-        /// <param name="id">엔트리 ID</param>
-        /// <returns>엔트리 타입, 없으면 null</returns>
         Type GetTableEntryTypeByID(int id);
 
         /// <summary>
         /// 테이블 엔트리를 가져옵니다.
         /// </summary>
-        /// <typeparam name="T">테이블 엔트리 타입</typeparam>
-        /// <param name="id">엔트리 ID</param>
-        /// <returns>테이블 엔트리, 없으면 null</returns>
         T GetTableEntry<T>(int id) where T : class, ITableEntry;
 
         /// <summary>
         /// 지정한 타입의 테이블 엔트리 전체 목록을 가져옵니다.
         /// </summary>
-        /// <typeparam name="T">테이블 엔트리 타입</typeparam>
-        /// <returns>해당 타입의 엔트리 목록 (없으면 빈 목록)</returns>
         IReadOnlyList<T> GetAllTableEntries<T>() where T : class, ITableEntry;
 
         /// <summary>
         /// StringTextTable에서 ID에 해당하는 표시 문자열을 가져옵니다.
         /// </summary>
-        /// <param name="stringId">StringTextTableEntry.Id</param>
-        /// <returns>표시 문자열, 없으면 빈 문자열</returns>
         string GetStringText(int stringId);
     }
 }

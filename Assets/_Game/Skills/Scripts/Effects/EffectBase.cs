@@ -18,7 +18,7 @@ namespace DungeonShooter
         /// <summary>이펙트를 실행합니다. (액티브 스킬 사용 시 호출) </summary>
         public virtual UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
         {
-            if (context.IResourceProvider == null || context.Caster == null || entry == null)
+            if (context.Caster == null || entry == null)
             {
                 LogHandler.LogError<EffectBase>("스킬 사용 실패, 파라미터가 올바르지 않습니다.");
                 return UniTask.FromResult(false);

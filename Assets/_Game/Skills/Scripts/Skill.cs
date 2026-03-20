@@ -12,7 +12,6 @@ namespace DungeonShooter
         private readonly SkillData _skillData;
         private readonly SkillTableEntry _skillTableEntry;
         private readonly Sprite _icon;
-        private readonly IResourceProvider _resourceProvider;
         private readonly ISkillObjectFactory _skillObjectFactory;
         private readonly ISoundSfxService _soundSfxService;
         private readonly ITableRepository _tableRepository;
@@ -27,13 +26,12 @@ namespace DungeonShooter
         public Action<float> OnCooldownChanged { get; set; }
         public Action OnCooldownEnded { get; set; }
 
-        public Skill(SkillTableEntry skillTableEntry, SkillData skillData, Sprite icon, IResourceProvider resourceProvider, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService, ITableRepository tableRepository = null)
+        public Skill(SkillTableEntry skillTableEntry, SkillData skillData, Sprite icon, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService, ITableRepository tableRepository = null)
         {
             _skillTableEntry = skillTableEntry;
             _skillData = skillData;
             _skillObjectFactory = skillObjectFactory;
             _icon = icon;
-            _resourceProvider = resourceProvider;
             _soundSfxService = soundSfxService;
             _tableRepository = tableRepository;
             Cooldown = 0f;
@@ -56,7 +54,6 @@ namespace DungeonShooter
 
             var context = SkillExecutionContext.Create()
                 .WithCaster(caster)
-                .WithResourceProvider(_resourceProvider)
                 .WithSkillObjectFactory(_skillObjectFactory)
                 .WithSoundSfxService(_soundSfxService);
             OnExecute?.Invoke();

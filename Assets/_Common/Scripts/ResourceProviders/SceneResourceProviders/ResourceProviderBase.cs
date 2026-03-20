@@ -15,8 +15,8 @@ namespace DungeonShooter
     /// </summary>
     public abstract class ResourceProviderBase : IResourceProvider, IDisposable
     {
-        protected readonly AddressablesScope _addressablesScope;
-        protected readonly IObjectResolver _resolver;
+        private readonly AddressablesScope _addressablesScope;
+        private readonly IObjectResolver _resolver;
 
         [Inject]
         public ResourceProviderBase(IObjectResolver resolver)

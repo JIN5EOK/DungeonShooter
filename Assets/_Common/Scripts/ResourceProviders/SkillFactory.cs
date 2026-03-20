@@ -38,16 +38,19 @@ namespace DungeonShooter
             try
             {
                 var skillTableEntry = _tableRepository.GetTableEntry<SkillTableEntry>(skillEntryId);
-                var skillData = !String.IsNullOrEmpty(skillTableEntry.SkillDataKey) ? 
-                    _resourceProvider.GetAssetSync<SkillData>(skillTableEntry.SkillDataKey) : null;
-                Sprite icon = await _resourceProvider.GetAssetAsync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
+                var skillData = !string.IsNullOrEmpty(skillTableEntry.SkillDataKey) 
+                    ? await _resourceProvider.GetAssetAsync<SkillData>(skillTableEntry.SkillDataKey)
+                    : null;
+                var icon = !string.IsNullOrEmpty(skillTableEntry.SkillIconKey)
+                    ? await _resourceProvider.GetAssetAsync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas)
+                    : null;
 
-                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory, _soundSfxService, _tableRepository);
+                return new Skill(skillTableEntry, skillData, icon, _skillObjectFactory, _soundSfxService, _tableRepository);
             }
             catch (Exception e)
             {
                 LogHandler.LogException<SkillFactory>(e, "스킬 데이터 로드에 실패했습니다.");
-                throw;
+                return null;
             }
         }
 
@@ -57,16 +60,19 @@ namespace DungeonShooter
             {
                 var skillTableEntry = _tableRepository.GetTableEntry<SkillTableEntry>(skillEntryId);
                 
-                var skillData = !String.IsNullOrEmpty(skillTableEntry.SkillDataKey) ? 
-                    _resourceProvider.GetAssetSync<SkillData>(skillTableEntry.SkillDataKey) : null;
-                Sprite icon = _resourceProvider.GetAssetSync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
+                var skillData = !string.IsNullOrEmpty(skillTableEntry.SkillDataKey) 
+                    ? _resourceProvider.GetAssetSync<SkillData>(skillTableEntry.SkillDataKey)
+                    : null;
+                var icon = !string.IsNullOrEmpty(skillTableEntry.SkillIconKey)
+                    ? _resourceProvider.GetAssetSync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas)
+                    : null;
 
-                return new Skill(skillTableEntry, skillData, icon, _resourceProvider, _skillObjectFactory, _soundSfxService, _tableRepository);
+                return new Skill(skillTableEntry, skillData, icon, _skillObjectFactory, _soundSfxService, _tableRepository);
             }
             catch (Exception e)
             {
                 LogHandler.LogException<SkillFactory>(e, "스킬 데이터 로드에 실패했습니다.");
-                throw;
+                return null;
             }
         }
     }
