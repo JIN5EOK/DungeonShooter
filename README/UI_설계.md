@@ -11,8 +11,8 @@ classDiagram
     }
     
     class IUIManager["IUIManager<br>UI생성 및 게임오브젝트 계층구조 담당"]{
-        +GetSingletonUIAsync(string key) UniTask~UIBase~ // 싱글톤 형태로 UI 생성 혹은 기존 UI 반환
-        +CreateUIAsync(string key) UniTask~UIBase~ // 항상 새로운 UI 생성
+        +GetSingletonUIAsync~T~(string key) UniTask~T~ // 싱글톤 형태로 UI 생성 혹은 기존 UI 반환
+        +CreateUIAsync~T~(string key) UniTask~T~ // 항상 새로운 UI 생성
         +RemoveUI(UIBase uiBase) UIBase
         +GetOrder(UIBase uiBase) int // 정렬순서 조회
         +SetOrder(UIBase uiBase, int order) void // 정렬순서 조절
@@ -52,9 +52,9 @@ classDiagram
 classDiagram
     class IUIManager{
         +GetInstanceAsync(string key) UniTask~GameObject~
-        +GetAssetAsync<T>(string key) UniTask~T~
+        +GetAssetAsync~T~(string key) UniTask~T~
         +GetInstanceSync(string key) GameObject
-        +GetAssetSync<T>(string key) T
+        +GetAssetSync~T~(string key) T
     }
 
     class GlobalUIManager{
