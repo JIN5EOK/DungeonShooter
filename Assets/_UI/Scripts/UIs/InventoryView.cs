@@ -29,7 +29,7 @@ namespace DungeonShooter
 
         private IInventoryViewModel _viewModel;
         private IPauseManager _pauseManager;
-        private readonly Dictionary<Item, InventorySlotUIElement> _slotsDict = new();
+        private readonly Dictionary<InventorySlotViewModel, InventorySlotUIElement> _slotsDict = new();
 
         [Inject]
         public void Construct(IInventoryViewModel viewModel, IPauseManager pauseManager)
@@ -42,10 +42,10 @@ namespace DungeonShooter
             _equipButton.onClick.AddListener(_viewModel.EquipSelected);
             _removeButton.onClick.AddListener(_viewModel.RemoveSelected);
 
-            _viewModel.OnItemAdded += HandleItemAdded;
-            _viewModel.OnItemRemoved += HandleItemRemoved;
-            _viewModel.OnItemStackChanged += HandleItemStackChanged;
-            _viewModel.OnItemUse += HandleItemUse;
+            _viewModel.OnSlotAdded += HandleSlotAdded;
+            _viewModel.OnSlotRemoved += HandleSlotRemoved;
+            _viewModel.OnSlotChanged += HandleSlotChanged;
+            _viewModel.OnSlotUsed += HandleSlotUsed;
             _viewModel.OnSelectionChanged += HandleSelectionChanged;
             _viewModel.OnEquippedWeaponChanged += HandleEquippedWeaponChanged;
 
@@ -76,10 +76,10 @@ namespace DungeonShooter
         {
             if (_viewModel != null)
             {
-                _viewModel.OnItemAdded -= HandleItemAdded;
-                _viewModel.OnItemRemoved -= HandleItemRemoved;
-                _viewModel.OnItemStackChanged -= HandleItemStackChanged;
-                _viewModel.OnItemUse -= HandleItemUse;
+                _viewModel.OnSlotAdded -= HandleSlotAdded;
+                _viewModel.OnSlotRemoved -= HandleSlotRemoved;
+                _viewModel.OnSlotChanged -= HandleSlotChanged;
+                _viewModel.OnSlotUsed -= HandleSlotUsed;
                 _viewModel.OnSelectionChanged -= HandleSelectionChanged;
                 _viewModel.OnEquippedWeaponChanged -= HandleEquippedWeaponChanged;
                 _viewModel.OnOpened -= Show;
@@ -89,21 +89,21 @@ namespace DungeonShooter
             base.OnDestroy();
         }
 
-        private void HandleItemAdded(Item item)
+        private void HandleSlotAdded(InventorySlotViewModel slotVM)
         {
             var slot = Instantiate(_slotPrefab, _content, false);
-            slot.SetItem(item);
-            _slotsDict.Add(item, slot);
+            slot.SetSlot(slotVM);
+            _slotsDict.Add(slotVM, slot);
             slot.OnSlotClicked += OnSlotClicked;
         }
 
-        private void OnSlotClicked(Item item)
+        private void OnSlotClicked(InventorySlotViewModel slotVM)
         {
-            _viewModel.SelectItem(item);
-            _itemInfoPanel.SetItem(item);
+            _viewModel.SelectSlot(slotVM);
+            _itemInfoPanel.SetSlot(slotVM);
         }
 
-        private void HandleSelectionChanged(Item selected)
+        private void HandleSelectionChanged(InventorySlotViewModel selected)
         {
             var isSelected = selected != null;
 
@@ -114,43 +114,43 @@ namespace DungeonShooter
             
             if (isSelected)
             {
-                _itemInfoPanel.SetItem(selected);
+                _itemInfoPanel.SetSlot(selected);
             }
             
             ApplyButtonState();
         }
 
-        private void HandleItemStackChanged(Item item)
+        private void HandleSlotChanged(InventorySlotViewModel slotVM)
         {
-            if (_slotsDict.TryGetValue(item, out var slot))
-                slot.SetItem(item);
+            if (_slotsDict.TryGetValue(slotVM, out var slot))
+                slot.SetSlot(slotVM);
         }
 
-        private void HandleItemUse(Item item)
+        private void HandleSlotUsed(InventorySlotViewModel slotVM)
         {
-            if (_slotsDict.TryGetValue(item, out var slot))
-                slot.SetItem(item);
+            if (_slotsDict.TryGetValue(slotVM, out var slot))
+                slot.SetSlot(slotVM);
 
             RefreshSlots();
             ApplyButtonState();
             _viewModel.Close();
         }
 
-        private void HandleItemRemoved(Item item)
+        private void HandleSlotRemoved(InventorySlotViewModel slotVM)
         {
-            if (!_slotsDict.TryGetValue(item, out var slot))
+            if (!_slotsDict.TryGetValue(slotVM, out var slot))
                 return;
 
-            if (_viewModel.SelectedItem == item)
-                _viewModel.SelectItem(null);
+            if (_viewModel.SelectedSlot == slotVM)
+                _viewModel.SelectSlot(null);
 
-            _slotsDict.Remove(item);
+            _slotsDict.Remove(slotVM);
             slot.OnSlotClicked -= OnSlotClicked;
             Destroy(slot.gameObject);
             RefreshSlots();
         }
 
-        private void HandleEquippedWeaponChanged(Item equipped)
+        private void HandleEquippedWeaponChanged(InventorySlotViewModel equipped)
         {
             foreach (var kv in _slotsDict)
                 kv.Value.SetEquipped(kv.Key == equipped);
@@ -165,7 +165,7 @@ namespace DungeonShooter
 
         private void RefreshSlots()
         {
-            _itemInfoPanel.gameObject.SetActive(_viewModel.SelectedItem != null);
+            _itemInfoPanel.gameObject.SetActive(_viewModel.SelectedSlot != null);
             
             if (_content == null || _slotPrefab == null || _viewModel == null)
             {
@@ -173,20 +173,20 @@ namespace DungeonShooter
                 return;
             }
 
-            var items = _viewModel.GetItems();
-            foreach (var item in items)
+            var slots = _viewModel.GetSlots();
+            foreach (var slotVM in slots)
             {
-                if (!_slotsDict.ContainsKey(item))
-                    HandleItemAdded(item);
+                if (!_slotsDict.ContainsKey(slotVM))
+                    HandleSlotAdded(slotVM);
                 
-                _slotsDict[item].SetItem(item);
+                _slotsDict[slotVM].SetSlot(slotVM);
             }
 
-            var toRemove = _slotsDict.Keys.Where(item => !items.Contains(item)).ToList();
-            foreach (var item in toRemove)
-                HandleItemRemoved(item);
+            var toRemove = _slotsDict.Keys.Where(slotVM => !slots.Contains(slotVM)).ToList();
+            foreach (var slotVM in toRemove)
+                HandleSlotRemoved(slotVM);
 
-            HandleEquippedWeaponChanged(_viewModel.EquippedWeapon);
+            HandleEquippedWeaponChanged(_viewModel.EquippedWeaponSlot);
         }
     }
 }

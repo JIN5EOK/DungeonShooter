@@ -16,13 +16,13 @@ namespace DungeonShooter
         
         [SerializeField] private Button _button;
 
-        private Item _boundItem;
+        private InventorySlotViewModel _boundSlot;
 
-        /// <summary>현재 바인딩된 아이템</summary>
-        public Item BoundItem => _boundItem;
+        /// <summary>현재 바인딩된 슬롯 뷰모델</summary>
+        public InventorySlotViewModel BoundSlot => _boundSlot;
 
-        /// <summary>슬롯 클릭 시 호출 (바인딩된 아이템 전달, 빈 슬롯이면 null)</summary>
-        public event Action<Item> OnSlotClicked;
+        /// <summary>슬롯 클릭 시 호출 (바인딩된 슬롯 전달, 빈 슬롯이면 null)</summary>
+        public event Action<InventorySlotViewModel> OnSlotClicked;
 
         private void Awake()
         {
@@ -36,15 +36,14 @@ namespace DungeonShooter
         }
         
         /// <summary>
-        /// 슬롯에 표시할 아이템을 설정합니다.
+        /// 슬롯에 표시할 뷰모델을 설정합니다.
         /// </summary>
-        public void SetItem(Item item)
+        public void SetSlot(InventorySlotViewModel slot)
         {
-            _boundItem = item;
+            _boundSlot = slot;
             
-            var entry = item.ItemTableEntry;
-            SetIcon(item.Icon);
-            SetStackText(item.StackCount, entry.MaxStackCount);
+            SetIcon(slot.Icon);
+            SetStackText(slot.StackCount, slot.MaxStackCount);
         }
 
         /// <summary>
@@ -77,7 +76,7 @@ namespace DungeonShooter
 
         private void HandleClick()
         {
-            OnSlotClicked?.Invoke(_boundItem);
+            OnSlotClicked?.Invoke(_boundSlot);
         }
         
         private void OnDestroy()

@@ -44,18 +44,18 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 아이템 인스턴스로 표시 내용을 설정합니다.
+        /// 슬롯 뷰모델로 표시 내용을 설정합니다.
         /// </summary>
-        public void SetItem(Item item)
+        public void SetSlot(InventorySlotViewModel slot)
         {
-            if (item == null || item.ItemTableEntry == null)
+            if (slot == null || slot.TableEntry == null)
             {
                 LogHandler.LogError<ItemInfoWindow>("아이템 정보가 올바르지 않습니다.");
                 return;
             }
 
-            SetItemInternal(item.ItemTableEntry);
-            _iconImage.sprite = item.Icon;
+            SetItemInternal(slot.TableEntry);
+            _iconImage.sprite = slot.Icon;
         }
 
         private void SetItemInternal(ItemTableEntry entry)

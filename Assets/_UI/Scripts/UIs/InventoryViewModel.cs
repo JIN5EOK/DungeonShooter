@@ -9,63 +9,82 @@ namespace DungeonShooter
     /// </summary>
     public interface IInventoryViewModel
     {
-        event Action<Item> OnItemAdded;
-        event Action<Item> OnItemRemoved;
-        event Action<Item> OnItemStackChanged;
-        event Action<Item> OnItemUse;
-        event Action<Item> OnSelectionChanged;
-        event Action<Item> OnEquippedWeaponChanged;
+        event Action<InventorySlotViewModel> OnSlotAdded;
+        event Action<InventorySlotViewModel> OnSlotRemoved;
+        event Action<InventorySlotViewModel> OnSlotChanged;
+        event Action<InventorySlotViewModel> OnSlotUsed;
+        event Action<InventorySlotViewModel> OnSelectionChanged;
+        event Action<InventorySlotViewModel> OnEquippedWeaponChanged;
         event Action OnOpened;
         event Action OnClosed;
 
-        Item SelectedItem { get; }
-        Item EquippedWeapon { get; }
+        InventorySlotViewModel SelectedSlot { get; }
+        InventorySlotViewModel EquippedWeaponSlot { get; }
         bool CanEquipSelected { get; }
         bool CanUseSelected { get; }
         bool CanRemoveSelected { get; }
 
-        void SelectItem(Item item);
+        void SelectSlot(InventorySlotViewModel slot);
         void EquipSelected();
         void UseSelected();
         void RemoveSelected();
         void Open();
         void Close();
 
-        IReadOnlyCollection<Item> GetItems();
+        IReadOnlyCollection<InventorySlotViewModel> GetSlots();
     }
 
+    public class InventorySlotViewModel
+    {
+        private readonly Item _item;
+
+        public ItemTableEntry TableEntry => _item.ItemTableEntry;
+        public UnityEngine.Sprite Icon => _item.Icon;
+        public int StackCount => _item.StackCount;
+        public int MaxStackCount => _item.ItemTableEntry.MaxStackCount;
+        public ItemType ItemType => _item.ItemTableEntry.ItemType;
+
+        internal Item GetItem() => _item;
+
+        public InventorySlotViewModel(Item item)
+        {
+            _item = item;
+        }
+    }
+    
     /// <summary>
     /// IInventory 상태를 구독해 인벤토리 뷰에 노출하고, 선택/장착·사용·제거 명령을 처리한다.
     /// </summary>
     public class InventoryViewModel : IInventoryViewModel
     {
-        public event Action<Item> OnItemAdded;
-        public event Action<Item> OnItemRemoved;
-        public event Action<Item> OnItemStackChanged;
-        public event Action<Item> OnItemUse;
-        public event Action<Item> OnSelectionChanged;
-        public event Action<Item> OnEquippedWeaponChanged;
+        public event Action<InventorySlotViewModel> OnSlotAdded;
+        public event Action<InventorySlotViewModel> OnSlotRemoved;
+        public event Action<InventorySlotViewModel> OnSlotChanged;
+        public event Action<InventorySlotViewModel> OnSlotUsed;
+        public event Action<InventorySlotViewModel> OnSelectionChanged;
+        public event Action<InventorySlotViewModel> OnEquippedWeaponChanged;
         public event Action OnOpened;
         public event Action OnClosed;
 
-        public Item SelectedItem => _selectedItem;
-        public Item EquippedWeapon => _inventory.EquippedWeapon;
+        public InventorySlotViewModel SelectedSlot => _selectedSlot;
+        public InventorySlotViewModel EquippedWeaponSlot => GetSlot(_inventory.EquippedWeapon);
 
         public bool CanEquipSelected =>
-            _selectedItem != null &&
-            _selectedItem.ItemTableEntry.ItemType == ItemType.Weapon &&
-            _selectedItem != _inventory.EquippedWeapon;
+            _selectedSlot != null &&
+            _selectedSlot.ItemType == ItemType.Weapon &&
+            _selectedSlot.GetItem() != _inventory.EquippedWeapon;
 
         public bool CanUseSelected =>
-            _selectedItem != null &&
-            _selectedItem.ItemTableEntry.ItemType == ItemType.Consume;
+            _selectedSlot != null &&
+            _selectedSlot.ItemType == ItemType.Consume;
 
         public bool CanRemoveSelected =>
-            _selectedItem != null &&
-            _selectedItem != _inventory.EquippedWeapon;
+            _selectedSlot != null &&
+            _selectedSlot.GetItem() != _inventory.EquippedWeapon;
 
         private readonly IInventory _inventory;
-        private Item _selectedItem;
+        private InventorySlotViewModel _selectedSlot;
+        private readonly Dictionary<Item, InventorySlotViewModel> _slotMap = new();
 
         [Inject]
         public InventoryViewModel(IInventory inventory)
@@ -81,77 +100,107 @@ namespace DungeonShooter
             _inventory.OnClosed += InventoryOnClosed;
         }
 
+        private InventorySlotViewModel GetOrCreateSlot(Item item)
+        {
+            if (item == null) return null;
+            if (!_slotMap.TryGetValue(item, out var slot))
+            {
+                slot = new InventorySlotViewModel(item);
+                _slotMap[item] = slot;
+            }
+            return slot;
+        }
+
+        private InventorySlotViewModel GetSlot(Item item)
+        {
+            if (item == null) return null;
+            return _slotMap.GetValueOrDefault(item);
+        }
+
         private void InventoryOnOpened() => OnOpened?.Invoke();
         private void InventoryOnClosed() => OnClosed?.Invoke();
 
         private void InventoryOnItemUse(Item item)
         {
-            OnItemUse?.Invoke(item);
+            OnSlotUsed?.Invoke(GetSlot(item));
         }
 
         private void InventoryOnItemStackChanged(Item item)
         {
-            OnItemStackChanged?.Invoke(item);
+            OnSlotChanged?.Invoke(GetSlot(item));
         }
 
         private void InventoryOnItemAdded(Item item)
         {
-            OnItemAdded?.Invoke(item);
+            OnSlotAdded?.Invoke(GetOrCreateSlot(item));
         }
 
         private void InventoryOnItemRemoved(Item item)
         {
-            if (_selectedItem == item)
+            if (_slotMap.TryGetValue(item, out var slot))
             {
-                _selectedItem = null;
-                OnSelectionChanged?.Invoke(null);
-            }
+                if (_selectedSlot == slot)
+                {
+                    _selectedSlot = null;
+                    OnSelectionChanged?.Invoke(null);
+                }
 
-            OnItemRemoved?.Invoke(item);
+                _slotMap.Remove(item);
+                OnSlotRemoved?.Invoke(slot);
+            }
         }
 
         private void InventoryOnWeaponEquipped(Item item)
         {
-            OnEquippedWeaponChanged?.Invoke(item);
-            OnSelectionChanged?.Invoke(_selectedItem);
+            OnEquippedWeaponChanged?.Invoke(GetSlot(item));
+            OnSelectionChanged?.Invoke(_selectedSlot);
         }
 
         private void InventoryOnWeaponUnequipped(Item item)
         {
             OnEquippedWeaponChanged?.Invoke(null);
-            OnSelectionChanged?.Invoke(_selectedItem);
+            OnSelectionChanged?.Invoke(_selectedSlot);
         }
 
-        public void SelectItem(Item item)
+        public void SelectSlot(InventorySlotViewModel slot)
         {
-            _selectedItem = item;
-            OnSelectionChanged?.Invoke(item);
+            _selectedSlot = slot;
+            OnSelectionChanged?.Invoke(slot);
         }
 
         public void EquipSelected()
         {
-            if (_selectedItem == null)
+            if (_selectedSlot == null)
                 return;
-            _inventory.EquipItem(_selectedItem);
+            _inventory.EquipItem(_selectedSlot.GetItem());
         }
 
         public void UseSelected()
         {
-            if (_selectedItem == null)
+            if (_selectedSlot == null)
                 return;
-            _inventory.UseItem(_selectedItem);
+            _inventory.UseItem(_selectedSlot.GetItem());
         }
 
         public void RemoveSelected()
         {
-            if (_selectedItem == null)
+            if (_selectedSlot == null)
                 return;
-            _inventory.RemoveItem(_selectedItem);
+            _inventory.RemoveItem(_selectedSlot.GetItem());
         }
 
         public void Open() => _inventory.Open();
         public void Close() => _inventory.Close();
 
-        public IReadOnlyCollection<Item> GetItems() => _inventory.GetItems();
+        public IReadOnlyCollection<InventorySlotViewModel> GetSlots()
+        {
+            var items = _inventory.GetItems();
+            var slots = new List<InventorySlotViewModel>(items.Count);
+            foreach (var item in items)
+            {
+                slots.Add(GetOrCreateSlot(item));
+            }
+            return slots;
+        }
     }
 }
