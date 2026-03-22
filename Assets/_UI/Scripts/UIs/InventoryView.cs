@@ -28,14 +28,12 @@ namespace DungeonShooter
         private Button _equipButton;
 
         private IInventoryViewModel _viewModel;
-        private IPauseManager _pauseManager;
-        private readonly Dictionary<InventorySlotViewModel, InventorySlotUIElement> _slotsDict = new();
+        private readonly Dictionary<IItemViewModel, InventorySlotUIElement> _slotsDict = new();
 
         [Inject]
-        public void Construct(IInventoryViewModel viewModel, IPauseManager pauseManager)
+        public void Construct(IInventoryViewModel viewModel)
         {
             _viewModel = viewModel;
-            _pauseManager = pauseManager;
 
             _closeButton.onClick.AddListener(_viewModel.Close);
             _useButton.onClick.AddListener(_viewModel.UseSelected);
@@ -63,12 +61,10 @@ namespace DungeonShooter
             base.Show();
             RefreshSlots();
             ApplyButtonState();
-            _pauseManager?.PauseRequest(this);
         }
 
         public override void Hide()
         {
-            _pauseManager?.ResumeRequest(this);
             base.Hide();
         }
 
@@ -89,7 +85,7 @@ namespace DungeonShooter
             base.OnDestroy();
         }
 
-        private void HandleSlotAdded(InventorySlotViewModel slotVM)
+        private void HandleSlotAdded(IItemViewModel slotVM)
         {
             var slot = Instantiate(_slotPrefab, _content, false);
             slot.SetSlot(slotVM);
@@ -97,13 +93,13 @@ namespace DungeonShooter
             slot.OnSlotClicked += OnSlotClicked;
         }
 
-        private void OnSlotClicked(InventorySlotViewModel slotVM)
+        private void OnSlotClicked(IItemViewModel slotVM)
         {
             _viewModel.SelectSlot(slotVM);
             _itemInfoPanel.SetSlot(slotVM);
         }
 
-        private void HandleSelectionChanged(InventorySlotViewModel selected)
+        private void HandleSelectionChanged(IItemViewModel selected)
         {
             var isSelected = selected != null;
 
@@ -120,13 +116,13 @@ namespace DungeonShooter
             ApplyButtonState();
         }
 
-        private void HandleSlotChanged(InventorySlotViewModel slotVM)
+        private void HandleSlotChanged(IItemViewModel slotVM)
         {
             if (_slotsDict.TryGetValue(slotVM, out var slot))
                 slot.SetSlot(slotVM);
         }
 
-        private void HandleSlotUsed(InventorySlotViewModel slotVM)
+        private void HandleSlotUsed(IItemViewModel slotVM)
         {
             if (_slotsDict.TryGetValue(slotVM, out var slot))
                 slot.SetSlot(slotVM);
@@ -136,7 +132,7 @@ namespace DungeonShooter
             _viewModel.Close();
         }
 
-        private void HandleSlotRemoved(InventorySlotViewModel slotVM)
+        private void HandleSlotRemoved(IItemViewModel slotVM)
         {
             if (!_slotsDict.TryGetValue(slotVM, out var slot))
                 return;
@@ -150,7 +146,7 @@ namespace DungeonShooter
             RefreshSlots();
         }
 
-        private void HandleEquippedWeaponChanged(InventorySlotViewModel equipped)
+        private void HandleEquippedWeaponChanged(IItemViewModel equipped)
         {
             foreach (var kv in _slotsDict)
                 kv.Value.SetEquipped(kv.Key == equipped);
