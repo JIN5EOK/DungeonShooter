@@ -6,13 +6,12 @@ namespace DungeonShooter
 {
     /// <summary>
     /// 인벤토리 컨테이너 및 아이템 추가/제거/장착 로직을 담당하는 모델.
-    /// 데이터 변경 시 해당 이벤트를 발생시킨다. 스킬/스탯 등 서비스 연동은 하지 않는다.
+    /// 데이터 변경 시 해당 이벤트를 발생시킨다.
     /// </summary>
     public class InventoryModel
     {
-        internal IReadOnlyCollection<Item> Items => _items;
-        internal Item EquippedWeapon => _equippedWeapon;
-
+        public IReadOnlyCollection<Item> Items => _items;
+        public Item EquippedWeapon => _equippedWeapon;
         public event Action<Item> OnItemAdded;
         public event Action<Item> OnItemRemoved;
         public event Action<Item> OnItemStackChanged;

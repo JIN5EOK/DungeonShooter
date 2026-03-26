@@ -20,18 +20,6 @@ namespace DungeonShooter
                 Release();
             }
         }
-
-        public void Release()
-        {
-            if (TryGetComponent(out PoolableComponent poolable))
-            {
-                poolable.Release();
-            }
-            else
-            {
-                Destroy(gameObject);    
-            }
-        }
         
         private void OnDisable()
         {

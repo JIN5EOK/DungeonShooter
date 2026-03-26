@@ -42,8 +42,8 @@ namespace DungeonShooter
             // 전진 이동
             transform.position += transform.right * _speed * Time.deltaTime;
         }
-
-        private void OnTriggerStay2D(Collider2D other)
+        
+        private void OnTriggerEnter2D(Collider2D other)
         {
             if (_appliedTargets.Count >= _targetCount)
             {
