@@ -168,6 +168,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 853ed66d093924182a336810144026d2
+    m_Address: SimpleEnemyAI
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 85ba9cffafc5e47aab3685d1b8a877a5
     m_Address: StageConfigTable
     m_ReadOnly: 0
