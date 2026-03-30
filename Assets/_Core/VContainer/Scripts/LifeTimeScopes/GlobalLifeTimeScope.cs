@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using VContainer;
 using VContainer.Unity;
 
@@ -20,9 +21,12 @@ namespace DungeonShooter
             builder.RegisterInstance(_inputManager);
             builder.Register<LocalTableRepository>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<EventBus>(Lifetime.Singleton).AsImplementedInterfaces();
+            
             builder.Register<ItemFormatter>(Lifetime.Singleton).AsImplementedInterfaces();
+            
             builder.Register<LoadingService>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<LoadingViewModel>(Lifetime.Singleton);
+            
             builder.Register<SceneLoader>(Lifetime.Singleton);
             new GlobalUIInstaller().Install(builder);
         }

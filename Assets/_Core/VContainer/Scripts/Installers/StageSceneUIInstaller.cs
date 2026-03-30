@@ -11,6 +11,12 @@ namespace DungeonShooter
     {
         public void Install(IContainerBuilder builder)
         {
+            builder.Register<SkillSlotViewModel>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<AlertMessageViewModel>(Lifetime.Scoped);
+            builder.Register<GamePausePresenter>(Lifetime.Scoped);
+            builder.Register<GameResultPresenter>(Lifetime.Scoped);
+            builder.Register<InventoryViewModel>(Lifetime.Scoped).AsImplementedInterfaces();
+            
             // HUD 뷰 등록
             builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GameHudGroupUI>(UIAddresses.UI_InGameHud), Lifetime.Scoped);
             

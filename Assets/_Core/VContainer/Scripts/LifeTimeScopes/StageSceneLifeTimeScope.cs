@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using UnityEngine.InputSystem;
 using VContainer;
 using VContainer.Unity;
 
@@ -13,53 +11,20 @@ namespace DungeonShooter
         protected override void Configure(IContainerBuilder builder)
         {
             new CommonSceneInstaller().Install(builder);
-
-            builder.Register<EntityManager>(Lifetime.Scoped);
-            builder.Register<PlayerInputManager>(Lifetime.Scoped);
-            builder.Register<PlayerContextManager>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<SkillSlotService>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<SkillSlotViewModel>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<PlayerLevelService>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<SkillService>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<ItemDropService>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<AlertMessageViewModel>(Lifetime.Scoped);
-            builder.Register<GameMessageService>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<GameExitService>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<GameResultService>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<GamePausePresenter>(Lifetime.Scoped);
-            builder.Register<GameResultPresenter>(Lifetime.Scoped);
-            builder.Register<Inventory>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<InventoryViewModel>(Lifetime.Scoped).AsImplementedInterfaces();
-
-            builder.Register<PlayerFactory>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<EnemyFactory>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<SkillFactory>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<ItemFactory>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<FieldItemFactory>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<SkillObjectFactory>(Lifetime.Scoped).AsImplementedInterfaces();
-
-            builder.Register<RoomDataRepository>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<StageGenerator>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<StageInstantiator>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<RoomInstantiator>(Lifetime.Scoped);
-
+            new StageManagerInstaller().Install(builder);
+            new StageFactoryInstaller().Install(builder);
+            new StageGenerateInstaller().Install(builder);
             new StageSceneUIInstaller().Install(builder);
-            builder.RegisterComponentOnNewGameObject<ObjectCullingManager>(Lifetime.Scoped);
-
-            builder.Register<EntitySkills>(Lifetime.Transient);
-
+            
+            // 씬 초기화 로직
             builder.RegisterComponentOnNewGameObject<StageSceneInitializer>(Lifetime.Scoped);
+            
+            builder.RegisterBuildCallback((resolver) =>
+            {
+                resolver.Resolve<StageSceneInitializer>();
+            });
+            
             base.Configure(builder);
-        }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            Container.Resolve<EntityManager>();
-            Container.Resolve<IItemDropService>();
-            Container.Resolve<PlayerInputManager>();
-            Container.Resolve<ObjectCullingManager>();
-            Container.Resolve<StageSceneInitializer>();
         }
     }
 }
