@@ -1,210 +1,210 @@
-#if UNITY_EDITOR
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-
-namespace DungeonShooter
-{
-    [CustomEditor(typeof(RoomEditor))]
-    public class RoomEditorEditor : Editor
-    {
-        private SerializedProperty _groundTileProperty;
-        private SerializedProperty _roomSizeXProperty;
-        private SerializedProperty _roomSizeYProperty;
-        private SerializedProperty _loadFileProperty;
-        private SerializedProperty _selectedPlaceableTableIdProperty;
-
-        private List<int> _placeableIds = new List<int>();
-        private List<string> _placeableNames = new List<string>();
-        private bool _placeableListDirty = true;
-
-        private void OnEnable()
-        {
-            _groundTileProperty = serializedObject.FindProperty("_groundTile");
-            _roomSizeXProperty = serializedObject.FindProperty("_roomSizeX");
-            _roomSizeYProperty = serializedObject.FindProperty("_roomSizeY");
-            _loadFileProperty = serializedObject.FindProperty("_loadFile");
-            _selectedPlaceableTableIdProperty = serializedObject.FindProperty("_selectedPlaceableTableId");
-            _placeableListDirty = true;
-
-            SceneView.duringSceneGui += OnSceneGUI;
-        }
-
-        private void OnDisable()
-        {
-            SceneView.duringSceneGui -= OnSceneGUI;
-        }
-
-        private void RefreshPlaceableList(RoomEditor roomEditor)
-        {
-            if (!_placeableListDirty)
-            {
-                return;
-            }
-            _placeableIds.Clear();
-            _placeableNames.Clear();
-            var repo = roomEditor.GetOrCreateTableRepository();
-            foreach (var entry in repo.GetAllTableEntries<RoomEventTriggerTableEntry>())
-            {
-                _placeableIds.Add(entry.Id);
-                _placeableNames.Add($"[이벤트트리거] {repo.GetStringText(entry.NameId)} (ID:{entry.Id})");
-            }
-            foreach (var entry in repo.GetAllTableEntries<EnemyConfigTableEntry>())
-            {
-                _placeableIds.Add(entry.Id);
-                _placeableNames.Add($"[Enemy] {repo.GetStringText(entry.NameId)} (ID:{entry.Id})");
-            }
-            if (_placeableIds.Count == 0)
-            {
-                _placeableIds.Add(0);
-                _placeableNames.Add("(배치 가능한 엔트리 없음)");
-            }
-            _placeableListDirty = false;
-        }
-
-        private void OnSceneGUI(SceneView sceneView)
-        {
-            if (target == null || !(target is RoomEditor roomEditor))
-            {
-                return;
-            }
-            if (Application.isPlaying)
-            {
-                return;
-            }
-            var e = Event.current;
-            if (e.type == EventType.MouseDown && e.button == 0 && (e.control || e.command))
-            {
-                var ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-                var plane = new Plane(Vector3.forward, Vector3.zero);
-                if (plane.Raycast(ray, out var enter))
-                {
-                    var worldPos = ray.GetPoint(enter);
-                    var tableId = roomEditor.SelectedPlaceableTableId;
-                    if (tableId != 0)
-                    {
-                        roomEditor.PlaceObjectAt(tableId, worldPos);
-                        e.Use();
-                    }
-                }
-            }
-        }
-
-        public override void OnInspectorGUI()
-        {
-            var roomEditor = (RoomEditor)target;
-            
-            serializedObject.Update();
-            RefreshPlaceableList(roomEditor);
-
-            // 방 크기 설정 섹션
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Ground 타일은 맵 크기를 보여주기 위한 예시일 뿐 실제 방 파일에 저장되지 않습니다.", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("맵을 수정하려면 Deco 타일을 수정해주세요.", EditorStyles.boldLabel);
-            
-            EditorGUILayout.PropertyField(_groundTileProperty);
-            EditorGUILayout.IntSlider(_roomSizeXProperty, RoomConstants.RoomSizeMinX, RoomConstants.RoomSizeMaxX, "방 크기 X");
-            EditorGUILayout.IntSlider(_roomSizeYProperty, RoomConstants.RoomSizeMinY, RoomConstants.RoomSizeMaxY, "방 크기 Y");
-            
-            serializedObject.ApplyModifiedProperties();
-            
-            if (GUILayout.Button("타일 업데이트", GUILayout.Height(25)))
-            {
-                roomEditor.UpdateRoom();
-            }
-
-            // 테이블 ID 기반 오브젝트 배치 섹션
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("오브젝트 배치 (테이블 ID)", EditorStyles.boldLabel);
-            var currentId = _selectedPlaceableTableIdProperty.intValue;
-            var currentIndex = _placeableIds.IndexOf(currentId);
-            if (currentIndex < 0)
-            {
-                currentIndex = 0;
-            }
-            serializedObject.Update();
-            var newIndex = EditorGUILayout.Popup("배치할 오브젝트", currentIndex, _placeableNames.ToArray());
-            _selectedPlaceableTableIdProperty.intValue = _placeableIds[newIndex];
-            serializedObject.ApplyModifiedProperties();
-            EditorGUILayout.HelpBox("배치할 오브젝트를 선택한 뒤, 씬 뷰에서 Ctrl+클릭(맥: Cmd+클릭)으로 해당 위치에 배치합니다.", MessageType.Info);
-
-            // 저장 섹션
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("저장", EditorStyles.boldLabel);
-            
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("저장 경로", GUILayout.Width(80));
-            roomEditor.SetSavePath(EditorGUILayout.TextField(roomEditor.SavePath));
-            
-            if (GUILayout.Button("선택", GUILayout.Width(50)))
-            {
-                var path = EditorUtility.OpenFolderPanel("저장 경로 선택", "Assets", "");
-                if (!string.IsNullOrEmpty(path))
-                {
-                    // Assets 폴더 기준 상대 경로로 변환
-                    if (path.StartsWith(Application.dataPath))
-                    {
-                        path = "Assets" + path.Substring(Application.dataPath.Length);
-                    }
-                    roomEditor.SetSavePath(path);
-                }
-            }
-            EditorGUILayout.EndHorizontal();
-            
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("파일 이름", GUILayout.Width(80));
-            var fileName = EditorGUILayout.TextField(roomEditor.FileName);
-            roomEditor.SetFileName(fileName);
-            EditorGUILayout.EndHorizontal();
-            
-            if (string.IsNullOrEmpty(roomEditor.FileName))
-            {
-                EditorGUILayout.HelpBox("파일 이름이 비어있으면 게임오브젝트 이름이 사용됩니다.", MessageType.Info);
-            }
-            
-            if (GUILayout.Button("방 저장", GUILayout.Height(30)))
-            {
-                roomEditor.SaveMap();
-            }
-
-            EditorGUILayout.Space(10);
-
-            // 로드 섹션
-            EditorGUILayout.LabelField("로드", EditorStyles.boldLabel);
-            
-            serializedObject.Update();
-            EditorGUILayout.PropertyField(_loadFileProperty, new GUIContent("불러올 방 데이터 파일"));
-            serializedObject.ApplyModifiedProperties();
-            
-            if (roomEditor.LoadFile == null)
-            {
-                EditorGUILayout.HelpBox("불러올 방 데이터 파일(TextAsset)을 지정해주세요.", MessageType.Info);
-            }
-            
-            if (GUILayout.Button("방 불러오기", GUILayout.Height(30)))
-            {
-                roomEditor.LoadRoom();
-            }
-
-            // 리셋 섹션
-            EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("리셋", EditorStyles.boldLabel);
-            
-            if (GUILayout.Button("초기 상태로 리셋", GUILayout.Height(30)))
-            {
-                if (EditorUtility.DisplayDialog(
-                    "방 리셋 확인",
-                    "생성된 타일맵과 오브젝트를 모두 제거하고 초기 상태로 돌아갑니다. 계속하시겠습니까?",
-                    "확인",
-                    "취소"))
-                {
-                    roomEditor.ResetRoom();
-                }
-            }
-
-            EditorGUILayout.Space();
-        }
-    }
-}
-#endif
-
+// #if UNITY_EDITOR
+// using System.Collections.Generic;
+// using UnityEngine;
+// using UnityEditor;
+//
+// namespace DungeonShooter
+// {
+//     [CustomEditor(typeof(RoomEditor))]
+//     public class RoomEditorEditor : Editor
+//     {
+//         private SerializedProperty _groundTileProperty;
+//         private SerializedProperty _roomSizeXProperty;
+//         private SerializedProperty _roomSizeYProperty;
+//         private SerializedProperty _loadFileProperty;
+//         private SerializedProperty _selectedPlaceableTableIdProperty;
+//
+//         private List<int> _placeableIds = new List<int>();
+//         private List<string> _placeableNames = new List<string>();
+//         private bool _placeableListDirty = true;
+//
+//         private void OnEnable()
+//         {
+//             _groundTileProperty = serializedObject.FindProperty("_groundTile");
+//             _roomSizeXProperty = serializedObject.FindProperty("_roomSizeX");
+//             _roomSizeYProperty = serializedObject.FindProperty("_roomSizeY");
+//             _loadFileProperty = serializedObject.FindProperty("_loadFile");
+//             _selectedPlaceableTableIdProperty = serializedObject.FindProperty("_selectedPlaceableTableId");
+//             _placeableListDirty = true;
+//
+//             SceneView.duringSceneGui += OnSceneGUI;
+//         }
+//
+//         private void OnDisable()
+//         {
+//             SceneView.duringSceneGui -= OnSceneGUI;
+//         }
+//
+//         private void RefreshPlaceableList(RoomEditor roomEditor)
+//         {
+//             if (!_placeableListDirty)
+//             {
+//                 return;
+//             }
+//             _placeableIds.Clear();
+//             _placeableNames.Clear();
+//             var repo = roomEditor.GetOrCreateTableRepository();
+//             foreach (var entry in repo.GetAllTableEntries<RoomEventTriggerTableEntry>())
+//             {
+//                 _placeableIds.Add(entry.Id);
+//                 _placeableNames.Add($"[이벤트트리거] {repo.GetStringText(entry.NameId)} (ID:{entry.Id})");
+//             }
+//             foreach (var entry in repo.GetAllTableEntries<EnemyConfigTableEntry>())
+//             {
+//                 _placeableIds.Add(entry.Id);
+//                 _placeableNames.Add($"[Enemy] {repo.GetStringText(entry.NameId)} (ID:{entry.Id})");
+//             }
+//             if (_placeableIds.Count == 0)
+//             {
+//                 _placeableIds.Add(0);
+//                 _placeableNames.Add("(배치 가능한 엔트리 없음)");
+//             }
+//             _placeableListDirty = false;
+//         }
+//
+//         private void OnSceneGUI(SceneView sceneView)
+//         {
+//             if (target == null || !(target is RoomEditor roomEditor))
+//             {
+//                 return;
+//             }
+//             if (Application.isPlaying)
+//             {
+//                 return;
+//             }
+//             var e = Event.current;
+//             if (e.type == EventType.MouseDown && e.button == 0 && (e.control || e.command))
+//             {
+//                 var ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+//                 var plane = new Plane(Vector3.forward, Vector3.zero);
+//                 if (plane.Raycast(ray, out var enter))
+//                 {
+//                     var worldPos = ray.GetPoint(enter);
+//                     var tableId = roomEditor.SelectedPlaceableTableId;
+//                     if (tableId != 0)
+//                     {
+//                         roomEditor.PlaceObjectAt(tableId, worldPos);
+//                         e.Use();
+//                     }
+//                 }
+//             }
+//         }
+//
+//         public override void OnInspectorGUI()
+//         {
+//             var roomEditor = (RoomEditor)target;
+//             
+//             serializedObject.Update();
+//             RefreshPlaceableList(roomEditor);
+//
+//             // 방 크기 설정 섹션
+//             EditorGUILayout.Space();
+//             EditorGUILayout.LabelField("Ground 타일은 맵 크기를 보여주기 위한 예시일 뿐 실제 방 파일에 저장되지 않습니다.", EditorStyles.boldLabel);
+//             EditorGUILayout.LabelField("맵을 수정하려면 Deco 타일을 수정해주세요.", EditorStyles.boldLabel);
+//             
+//             EditorGUILayout.PropertyField(_groundTileProperty);
+//             EditorGUILayout.IntSlider(_roomSizeXProperty, RoomConstants.RoomSizeMinX, RoomConstants.RoomSizeMaxX, "방 크기 X");
+//             EditorGUILayout.IntSlider(_roomSizeYProperty, RoomConstants.RoomSizeMinY, RoomConstants.RoomSizeMaxY, "방 크기 Y");
+//             
+//             serializedObject.ApplyModifiedProperties();
+//             
+//             if (GUILayout.Button("타일 업데이트", GUILayout.Height(25)))
+//             {
+//                 roomEditor.UpdateRoom();
+//             }
+//
+//             // 테이블 ID 기반 오브젝트 배치 섹션
+//             EditorGUILayout.Space();
+//             EditorGUILayout.LabelField("오브젝트 배치 (테이블 ID)", EditorStyles.boldLabel);
+//             var currentId = _selectedPlaceableTableIdProperty.intValue;
+//             var currentIndex = _placeableIds.IndexOf(currentId);
+//             if (currentIndex < 0)
+//             {
+//                 currentIndex = 0;
+//             }
+//             serializedObject.Update();
+//             var newIndex = EditorGUILayout.Popup("배치할 오브젝트", currentIndex, _placeableNames.ToArray());
+//             _selectedPlaceableTableIdProperty.intValue = _placeableIds[newIndex];
+//             serializedObject.ApplyModifiedProperties();
+//             EditorGUILayout.HelpBox("배치할 오브젝트를 선택한 뒤, 씬 뷰에서 Ctrl+클릭(맥: Cmd+클릭)으로 해당 위치에 배치합니다.", MessageType.Info);
+//
+//             // 저장 섹션
+//             EditorGUILayout.Space();
+//             EditorGUILayout.LabelField("저장", EditorStyles.boldLabel);
+//             
+//             EditorGUILayout.BeginHorizontal();
+//             EditorGUILayout.LabelField("저장 경로", GUILayout.Width(80));
+//             roomEditor.SetSavePath(EditorGUILayout.TextField(roomEditor.SavePath));
+//             
+//             if (GUILayout.Button("선택", GUILayout.Width(50)))
+//             {
+//                 var path = EditorUtility.OpenFolderPanel("저장 경로 선택", "Assets", "");
+//                 if (!string.IsNullOrEmpty(path))
+//                 {
+//                     // Assets 폴더 기준 상대 경로로 변환
+//                     if (path.StartsWith(Application.dataPath))
+//                     {
+//                         path = "Assets" + path.Substring(Application.dataPath.Length);
+//                     }
+//                     roomEditor.SetSavePath(path);
+//                 }
+//             }
+//             EditorGUILayout.EndHorizontal();
+//             
+//             EditorGUILayout.BeginHorizontal();
+//             EditorGUILayout.LabelField("파일 이름", GUILayout.Width(80));
+//             var fileName = EditorGUILayout.TextField(roomEditor.FileName);
+//             roomEditor.SetFileName(fileName);
+//             EditorGUILayout.EndHorizontal();
+//             
+//             if (string.IsNullOrEmpty(roomEditor.FileName))
+//             {
+//                 EditorGUILayout.HelpBox("파일 이름이 비어있으면 게임오브젝트 이름이 사용됩니다.", MessageType.Info);
+//             }
+//             
+//             if (GUILayout.Button("방 저장", GUILayout.Height(30)))
+//             {
+//                 roomEditor.SaveMap();
+//             }
+//
+//             EditorGUILayout.Space(10);
+//
+//             // 로드 섹션
+//             EditorGUILayout.LabelField("로드", EditorStyles.boldLabel);
+//             
+//             serializedObject.Update();
+//             EditorGUILayout.PropertyField(_loadFileProperty, new GUIContent("불러올 방 데이터 파일"));
+//             serializedObject.ApplyModifiedProperties();
+//             
+//             if (roomEditor.LoadFile == null)
+//             {
+//                 EditorGUILayout.HelpBox("불러올 방 데이터 파일(TextAsset)을 지정해주세요.", MessageType.Info);
+//             }
+//             
+//             if (GUILayout.Button("방 불러오기", GUILayout.Height(30)))
+//             {
+//                 roomEditor.LoadRoom();
+//             }
+//
+//             // 리셋 섹션
+//             EditorGUILayout.Space(10);
+//             EditorGUILayout.LabelField("리셋", EditorStyles.boldLabel);
+//             
+//             if (GUILayout.Button("초기 상태로 리셋", GUILayout.Height(30)))
+//             {
+//                 if (EditorUtility.DisplayDialog(
+//                     "방 리셋 확인",
+//                     "생성된 타일맵과 오브젝트를 모두 제거하고 초기 상태로 돌아갑니다. 계속하시겠습니까?",
+//                     "확인",
+//                     "취소"))
+//                 {
+//                     roomEditor.ResetRoom();
+//                 }
+//             }
+//
+//             EditorGUILayout.Space();
+//         }
+//     }
+// }
+// #endif
+//
