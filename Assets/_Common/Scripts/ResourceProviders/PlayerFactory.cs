@@ -137,6 +137,13 @@ namespace DungeonShooter
             var cameraTrackComponent = entityLifeTimeScope.Container.Resolve<ICameraTrackComponent>();
             var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
 
+            stateMachine.Initialize(
+                entityLifeTimeScope.Container.Resolve<IdleState>(),
+                entityLifeTimeScope.Container.Resolve<MoveState>(),
+                entityLifeTimeScope.Container.Resolve<DashState>(),
+                entityLifeTimeScope.Container.Resolve<SkillState>(),
+                entityLifeTimeScope.Container.Resolve<InteractState>());
+            
             var interactNotice = await _resourceProvider.GetInstanceAsync(CommonAddresses.InteractNotice);
             interactComponent.SetInteractNotice(interactNotice);
 

@@ -282,6 +282,11 @@ namespace DungeonShooter
                 };
             }
             var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
+            stateMachine.Initialize(
+                entityLifeTimeScope.Container.Resolve<IdleState>(),
+                entityLifeTimeScope.Container.Resolve<MoveState>(),
+                entityLifeTimeScope.Container.Resolve<SkillState>());
+
             healthComponent.ResetState();
 
             var activeSkills = new List<Skill>();
