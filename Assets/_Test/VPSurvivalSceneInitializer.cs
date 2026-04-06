@@ -8,15 +8,15 @@ namespace DungeonShooter
     {
         private IPlayerFactory _playerFactory;
         [Inject]
-        public void Construct(IPlayerFactory playerFactory)
+        public void Construct(IPlayerContextManager playerContextManager, IPlayerFactory playerFactory)
         {
-            _playerFactory = playerFactory;
-             
+            playerContextManager.Initialize(12000000);
+            _playerFactory = playerFactory;    
         }
 
         public void Start()
         {
-            _playerFactory.GetPlayerAsync(Vector2.zero);
+            _playerFactory.GetPlayerAsync(12000000, Vector2.zero);
         }
     }
 }

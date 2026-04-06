@@ -13,8 +13,8 @@ namespace DungeonShooter
     /// </summary>
     public interface IPlayerFactory
     {
-        UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        UniTask<EntityBase> GetPlayerAsync(int playerConfigId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        EntityBase GetPlayerSync(int playerConfigId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
 
     /// <summary>
@@ -23,21 +23,18 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerFactory : IPlayerFactory
     {
-        private readonly StageContext _stageContext;
         private readonly IResourceProvider _resourceProvider;
         private readonly ITableRepository _tableRepository;
         private readonly IPlayerContextManager _playerContextManager;
         private readonly IEventBus _eventBus;
         private readonly LifetimeScope _sceneLifetimeScope;
         [Inject]
-        public PlayerFactory(StageContext context
-            , IResourceProvider resourceProvider
+        public PlayerFactory(IResourceProvider resourceProvider
             , ITableRepository tableRepository
             , IEventBus eventBus
             , LifetimeScope sceneLifetimeScope
             , IPlayerContextManager playerContextManager)
         {
-            _stageContext = context;
             _resourceProvider = resourceProvider;
             _tableRepository = tableRepository;
             _eventBus = eventBus;
@@ -48,13 +45,13 @@ namespace DungeonShooter
         /// <summary>
         /// 플레이어 캐릭터를 생성합니다
         /// </summary>
-        public async UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        public async UniTask<EntityBase> GetPlayerAsync(int playerConfigId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             try
             {
-                var playerAddress = GetPlayerAddress();
+                var playerAddress = GetPlayerAddress(playerConfigId);
                 var playerInstance = await _resourceProvider.GetInstanceAsync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
-                var entity = await InitializePlayerInstance(playerInstance);
+                var entity = await InitializePlayerInstance(playerInstance, playerConfigId);
                 return entity;
             }
             catch (Exception e)
@@ -67,13 +64,13 @@ namespace DungeonShooter
         /// <summary>
         /// 플레이어 캐릭터를 동기적으로 생성합니다.
         /// </summary>
-        public EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        public EntityBase GetPlayerSync(int playerConfigId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             try
             {
-                var playerAddress = GetPlayerAddress();
+                var playerAddress = GetPlayerAddress(playerConfigId);
                 var playerInstance = _resourceProvider.GetInstanceSync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
-                var entity = InitializePlayerInstance(playerInstance).GetAwaiter().GetResult();
+                var entity = InitializePlayerInstance(playerInstance, playerConfigId).GetAwaiter().GetResult();
                 return entity;
             }
             catch (Exception e)
@@ -86,18 +83,18 @@ namespace DungeonShooter
         /// <summary>
         /// 플레이어 프리팹 어드레스 추출 및 검증
         /// </summary>
-        private string GetPlayerAddress()
+        private string GetPlayerAddress(int playerConfigId)
         {
-            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
+            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(playerConfigId);
             if (config == null)
             {
-                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.PlayerConfigTableId}");
+                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigTableEntry를 찾을 수 없습니다. ID: {playerConfigId}");
                 return null;
             }
 
             if (string.IsNullOrEmpty(config.GameObjectKey))
             {
-                LogHandler.LogWarning<PlayerFactory>($"플레이어 게임오브젝트 키가 설정되지 않았습니다. ID: {_stageContext.PlayerConfigTableId}");
+                LogHandler.LogWarning<PlayerFactory>($"플레이어 게임오브젝트 키가 설정되지 않았습니다. ID: {playerConfigId}");
                 return null;
             }
 
@@ -107,7 +104,7 @@ namespace DungeonShooter
         /// <summary>
         /// Player 게임오브젝트 초기화, 컴포넌트 부착, 바인딩, UI 연동
         /// </summary>
-        private async UniTask<EntityBase> InitializePlayerInstance(GameObject playerInstance)
+        private async UniTask<EntityBase> InitializePlayerInstance(GameObject playerInstance, int playerConfigId)
         {
             if (playerInstance == null)
             {
@@ -149,7 +146,7 @@ namespace DungeonShooter
 
             await cameraTrackComponent.AttachCameraAsync();
             
-            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
+            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(playerConfigId);
             
             entity.OnDestroyed += (self) =>
             {

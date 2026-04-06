@@ -14,8 +14,6 @@ namespace DungeonShooter
     /// </summary>
     public interface IEnemyFactory
     {
-        UniTask<EntityBase> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        EntityBase GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
         UniTask<EntityBase> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
         EntityBase GetEnemyByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
@@ -28,83 +26,24 @@ namespace DungeonShooter
         private LifetimeScope _sceneLifetimeScope;
         
         private readonly ITableRepository _tableRepository;
-        private readonly StageContext _stageContext;
         private readonly IResourceProvider _resourceProvider;
         private readonly IEventBus _eventBus;
         private readonly ISkillFactory _skillFactory;
         private readonly ISkillObjectFactory _skillObjectFactory;
         private readonly GameObjectPool _pool = new();
-        
-        private List<int> _enemyIds;
-        
+
         
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, IResourceProvider resourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
+        public EnemyFactory(ITableRepository tableRepository, IResourceProvider resourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
         {
             _tableRepository = tableRepository;
-            _stageContext = stageContext;
             _resourceProvider = resourceProvider;
             _eventBus = eventBus;
             _sceneLifetimeScope = sceneLifeTimeScope;
             _skillFactory = skillFactory;
             _skillObjectFactory = skillObjectFactory;
-            Initialize();
         }
-
-        /// <summary>
-        /// StageConfigTableEntry의 EnemyKeys(EnemyConfigTableEntry Id 목록)를 로드하여 저장합니다.
-        /// </summary>
-        private void Initialize()
-        {
-            var stageConfigEntry = _tableRepository.GetTableEntry<StageConfigTableEntry>(_stageContext.StageConfigTableId);
-            if (stageConfigEntry == null)
-            {
-                Debug.LogWarning($"[{nameof(EnemyFactory)}] StageConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.StageConfigTableId}");
-                return;
-            }
-
-            if (stageConfigEntry.EnemyKeys != null && stageConfigEntry.EnemyKeys.Count > 0)
-            {
-                _enemyIds = new List<int>(stageConfigEntry.EnemyKeys);
-            }
-        }
-
-        /// <summary>
-        /// 스테이지에 맞는 랜덤 적을 가져옵니다.
-        /// </summary>
-        public async UniTask<EntityBase> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
-        {
-            var enemyConfig = GetRandomEnemyTableConfig();
-            
-            if (enemyConfig == null)
-                return null;
-            
-            var entity = GetFromPool(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
-            
-            if (entity == null)
-                entity = await CreateAsync(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
-
-            return entity;
-        }
-
-        /// <summary>
-        /// 스테이지에 맞는 랜덤 적을 동기적으로 가져옵니다.
-        /// </summary>
-        public EntityBase GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
-        {
-            var enemyConfig = GetRandomEnemyTableConfig();
-            
-            if (enemyConfig == null)
-                return null;
-            
-            var entity = GetFromPool(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
-            
-            if (entity == null)
-                entity = CreateSync(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
-
-            return entity;
-        }
-
+        
         /// <summary>
         /// 지정한 EnemyConfigTableEntry ID로 적을 비동기 생성합니다.
         /// </summary>
@@ -174,28 +113,6 @@ namespace DungeonShooter
             return InitializeEnemyInstance(go, entry,true);
         }
         
-        /// <summary>
-        /// EnemyKeys에서 랜덤 ID를 선택하고, 해당 EnemyConfigTableEntry의 GameObjectKey(어드레스)를 반환합니다.
-        /// </summary>
-        private EnemyConfigTableEntry GetRandomEnemyTableConfig()
-        {
-            if (_enemyIds == null || _enemyIds.Count == 0)
-            {
-                Debug.LogWarning($"[{nameof(EnemyFactory)}] 적 ID 목록이 비어있습니다.");
-                return null;
-            }
-
-            var enemyId = _enemyIds[Random.Range(0, _enemyIds.Count)];
-            var enemyEntry = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(enemyId);
-            if (enemyEntry == null)
-            {
-                Debug.LogWarning($"[{nameof(EnemyFactory)}] EnemyConfigTableEntry를 찾을 수 없습니다. ID: {enemyId}");
-                return null;
-            }
-
-            return enemyEntry;
-        }
-
         private static string GetPoolKey(string key)
         {
             return $"{nameof(EntityBase)}:{key}";

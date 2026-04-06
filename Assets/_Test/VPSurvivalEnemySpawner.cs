@@ -30,7 +30,7 @@ namespace DungeonShooter
                 
                 var x = Mathf.Cos(angle) * radius;
                 var y = Mathf.Sin(angle) * radius;
-                await _enemyFactory.GetRandomEnemyAsync(_player.transform.position + new Vector3(x, y, 1));
+                await _enemyFactory.GetEnemyByConfigIdAsync(18000000, _player.transform.position + new Vector3(x, y, 1));
             }
         }
     }

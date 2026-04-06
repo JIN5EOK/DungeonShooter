@@ -5,6 +5,7 @@ namespace DungeonShooter
 {
     public interface IPlayerContextManager
     {
+        public void Initialize(int contextId);
         public IEntityContext EntityContext { get; }
         public InventoryModel InventoryModel { get; }
         public UniTask InitializeSkillsAsync();
@@ -23,17 +24,17 @@ namespace DungeonShooter
         private ISkillSlotService _skillSlotService;
         private PlayerConfigTableEntry _playerConfigTableEntry;
         [Inject]
-        public void Initialize(
-            StageContext stageContext,
-            ITableRepository tableRepository,
+        public void Initialize(ITableRepository tableRepository,
             ISkillFactory skillFactory,
             ISkillSlotService skillSlotService)
-        {
-            
-            _tableRepository = tableRepository;
+        { _tableRepository = tableRepository;
             _skillFactory = skillFactory;
             _skillSlotService = skillSlotService;
-            _playerConfigTableEntry = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(stageContext.PlayerConfigTableId);
+        }
+
+        public void Initialize(int contextId)
+        {
+            _playerConfigTableEntry = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(contextId);
 
             var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(_playerConfigTableEntry.StatsId);
             IEntityStats entityStats = new EntityStats();
@@ -47,7 +48,7 @@ namespace DungeonShooter
                 statuses,
                 skillContainer);
         }
-
+        
         /// <summary>
         /// 선택한 플레이어 설정에 따라 스킬을 생성·등록하고, 액티브 슬롯 서비스에 슬롯을 등록합니다.
         /// </summary>
