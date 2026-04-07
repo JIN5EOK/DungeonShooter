@@ -12,7 +12,7 @@ namespace DungeonShooter
         {
             get
             {
-#if DEBUG || UNITY_EDITOR
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
                 return true;
 #else
                 return false;
