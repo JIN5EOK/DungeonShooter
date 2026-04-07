@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: -1826215569132851174, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1471138663655619467, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -59,6 +63,14 @@ PrefabInstance:
     - target: {fileID: 3169616247159687271, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3555458282459299206, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3555458282459299206, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3555458282459299206, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.x
