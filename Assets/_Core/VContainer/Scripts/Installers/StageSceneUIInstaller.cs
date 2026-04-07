@@ -31,6 +31,7 @@ namespace DungeonShooter
 
             builder.RegisterBuildCallback(resolver =>
             {
+                resolver.Resolve<GameHudGroupUI>();
                 resolver.Resolve<SkillLevelUpUI>();
                 resolver.Resolve<InventoryView>();
                 resolver.Resolve<AlertMessageView>();
