@@ -4,13 +4,26 @@ namespace DungeonShooter
 {
     public static class Bootstrap
     {
+        private static bool IsDevelopmentBuild()
+        {
+#if DEVELOPMENT_BUILD
+            return true;
+#else
+            return false;
+#endif
+        }
+
+        private static bool IsEditor() => Application.isEditor;
+        
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Initialize()
         {
-            // 개발빌드 혹은 에디터 환경에서만 띄우기
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-                FPSOverlayInit();
-#endif
+            if (IsDevelopmentBuild() || IsEditor())
+            {
+                FPSOverlayInit(); 
+            }
+            
+            SetFrameRateLimit();
         }
 
         private static void FPSOverlayInit()
@@ -18,6 +31,11 @@ namespace DungeonShooter
             var fpsOverlay = new GameObject(nameof(FpsOverlay));
             fpsOverlay.AddComponent<FpsOverlay>();
             Object.DontDestroyOnLoad(fpsOverlay.gameObject);
+        }
+
+        private static void SetFrameRateLimit()
+        {
+            Application.targetFrameRate = Constants.TargetFrameRate;       
         }
     }
 }
