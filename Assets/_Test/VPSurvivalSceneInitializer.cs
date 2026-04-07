@@ -10,13 +10,13 @@ namespace DungeonShooter
         [Inject]
         public void Construct(IPlayerContextManager playerContextManager, IPlayerFactory playerFactory)
         {
-            playerContextManager.Initialize(12000000);
+            playerContextManager.Initialize(12000001);
             _playerFactory = playerFactory;    
         }
 
         public void Start()
         {
-            _playerFactory.GetPlayerAsync(12000000, Vector2.zero);
+            _playerFactory.GetPlayerAsync(12000001, Vector2.zero);
         }
     }
 }
