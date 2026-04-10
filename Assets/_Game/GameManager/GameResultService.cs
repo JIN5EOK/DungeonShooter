@@ -10,22 +10,18 @@ namespace DungeonShooter
         public event Action<GameResultModel> OnGameResult;
 
         private readonly IPauseManager _pauseManager;
-        private readonly IEventBus _eventBus;
 
         private int _enemyKillCount;
         private float _playTime;
         private bool _isGameOver;
 
         [Inject]
-        public GameResultService(IPauseManager pauseManager, IEventBus eventBus)
+        public GameResultService(IPauseManager pauseManager)
         {
             _pauseManager = pauseManager;
-            _eventBus = eventBus;
-
-            _eventBus.Subscribe<EnemyDeadEvent>(OnEnemyDead);
         }
 
-        private void OnEnemyDead(EnemyDeadEvent ev)
+        internal void OnEnemyDead(EnemyDeadEvent ev)
         {
             if (_isGameOver) return;
             _enemyKillCount++;
@@ -58,10 +54,6 @@ namespace DungeonShooter
         public void Dispose()
         {
             _pauseManager?.ResumeRequest(this);
-            if (_eventBus != null)
-            {
-                _eventBus.Unsubscribe<EnemyDeadEvent>(OnEnemyDead);
-            }
         }
     }
 }

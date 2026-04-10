@@ -9,7 +9,6 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerInputManager : IDisposable
     {
-        private IEventBus _eventBus;
         private InputManager _inputManager;
         private IPauseManager _pauseManager;
         private IEntityInputContext _entityInputContext;
@@ -18,27 +17,23 @@ namespace DungeonShooter
 
         [Inject]
         public PlayerInputManager(InputManager inputManager,
-            IEventBus eventBus,
             IPauseManager pauseManager,
             IInventory inventory,
             ISkillSlotService skillSlotService)
         {
             _inputManager = inputManager;
-            _eventBus = eventBus;
             _pauseManager = pauseManager;
             _inventory = inventory;
             _skillSlotService = skillSlotService;
-            _eventBus.Subscribe<PlayerObjectSpawnEvent>(OnPlayerObjectSpawned);
-            _eventBus.Subscribe<PlayerObjectDestroyEvent>(OnPlayerObjectDestroyed);
             SubscribeToInput();
         }
 
-        private void OnPlayerObjectSpawned(PlayerObjectSpawnEvent playerObjectSpawnEvent)
+        internal void OnPlayerObjectSpawned(PlayerObjectSpawnEvent playerObjectSpawnEvent)
         {
             _entityInputContext = playerObjectSpawnEvent.player.EntityContext.InputContext;
         }
         
-        private void OnPlayerObjectDestroyed(PlayerObjectDestroyEvent playerObjectDestroyEvent)
+        internal void OnPlayerObjectDestroyed(PlayerObjectDestroyEvent playerObjectDestroyEvent)
         {
             _entityInputContext = null;
         }

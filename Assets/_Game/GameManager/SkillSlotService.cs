@@ -1,5 +1,4 @@
 using System;
-using VContainer;
 
 namespace DungeonShooter
 {
@@ -16,24 +15,16 @@ namespace DungeonShooter
     /// <summary>
     /// 액티브 스킬 슬롯 상태를 보관하고, 슬롯 변경 시 UI 등에 알린다.
     /// </summary>
-    public class SkillSlotService : ISkillSlotService, IDisposable
+    public class SkillSlotService : ISkillSlotService
     {
         public event Action<int, Skill> OnSkillSlotChanged;
 
         private readonly Skill[] _activeSkillSlots = new Skill[Constants.SkillSlotMaxCount];
-        private IEventBus _eventBus;
-
-        [Inject]
-        private void Construct(IEventBus eventBus)
-        {
-            _eventBus = eventBus;
-            _eventBus.Subscribe<SkillLevelUpEvent>(OnSkillLevelChanged);
-        }
 
         /// <summary>
         /// 액티브 스킬 슬롯에 등록된 스킬의 레벨 변경 처리
         /// </summary>
-        private void OnSkillLevelChanged(SkillLevelUpEvent skillLevelUpEvent)
+        internal void OnSkillLevelChanged(SkillLevelUpEvent skillLevelUpEvent)
         {
             for (var i = 0; i < _activeSkillSlots.Length; i++)
             {
@@ -69,11 +60,6 @@ namespace DungeonShooter
             }
 
             return _activeSkillSlots[index];
-        }
-
-        public void Dispose()
-        {
-            _eventBus.Unsubscribe<SkillLevelUpEvent>(OnSkillLevelChanged);
         }
     }
 }

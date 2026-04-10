@@ -26,7 +26,6 @@ namespace DungeonShooter
 
         private readonly InventoryModel _model;
         private IPlayerContextManager _playerContextManager;
-        private IEventBus _eventBus;
         private ITableRepository _tableRepository;
         private IGameMessageService _gameMessageService;
 
@@ -36,12 +35,11 @@ namespace DungeonShooter
         private EntityBase _ownerEntity;
 
         [Inject]
-        public Inventory(IEventBus eventBus, IPlayerContextManager playerContextManager,
+        public Inventory(IPlayerContextManager playerContextManager,
             ITableRepository tableRepository, IGameMessageService gameMessageService)
         {
             _model = playerContextManager.InventoryModel;
             _playerContextManager = playerContextManager;
-            _eventBus = eventBus;
             _tableRepository = tableRepository;
             _gameMessageService = gameMessageService;
             _model.OnItemAdded += OnItemAdded;
@@ -49,16 +47,14 @@ namespace DungeonShooter
             _model.OnItemStackChanged += OnItemStackChanged;
             _model.OnWeaponEquipped += OnWeaponEquipped;
             _model.OnWeaponUnequipped += OnWeaponUnequipped;
-            _eventBus.Subscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
-            _eventBus.Subscribe<PlayerObjectDestroyEvent>(PlayerObjectDespawned);
         }
 
-        private void PlayerObjectSpawned(PlayerObjectSpawnEvent playerObjectSpawnEvent)
+        internal void OnPlayerObjectSpawned(PlayerObjectSpawnEvent playerObjectSpawnEvent)
         {
             _ownerEntity = playerObjectSpawnEvent.player;
         }
 
-        private void PlayerObjectDespawned(PlayerObjectDestroyEvent playerObjectDestroyEvent)
+        internal void OnPlayerObjectDespawned(PlayerObjectDestroyEvent playerObjectDestroyEvent)
         {
             _ownerEntity = null;
         }
@@ -223,8 +219,6 @@ namespace DungeonShooter
             _model.OnItemStackChanged -= OnItemStackChanged;
             _model.OnWeaponEquipped -= OnWeaponEquipped;
             _model.OnWeaponUnequipped -= OnWeaponUnequipped;
-            _eventBus.Unsubscribe<PlayerObjectSpawnEvent>(PlayerObjectSpawned);
-            _eventBus.Unsubscribe<PlayerObjectDestroyEvent>(PlayerObjectDespawned);
         }
 
         public void Open() => OnOpened?.Invoke();

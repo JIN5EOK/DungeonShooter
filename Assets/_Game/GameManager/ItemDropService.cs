@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -21,25 +20,22 @@ namespace DungeonShooter
     /// <summary>
     /// 적 사망 이벤트를 구독하여 가중치 기반으로 필드 아이템을 스폰합니다.
     /// </summary>
-    public class ItemDropService : IItemDropService, IDisposable
+    public class ItemDropService : IItemDropService
     {
         /// <summary>
         /// 아이템 드랍 가중치, 10000이면 100%확률 드랍
         /// </summary>
         private const int WeightBase = 10000;
 
-        private readonly IEventBus _eventBus;
         private readonly IFieldItemFactory _fieldItemFactory;
 
         [Inject]
-        public ItemDropService(IEventBus eventBus, IFieldItemFactory fieldItemFactory)
+        public ItemDropService(IFieldItemFactory fieldItemFactory)
         {
-            _eventBus = eventBus;
             _fieldItemFactory = fieldItemFactory;
-            _eventBus.Subscribe<EnemyDeadEvent>(OnEnemyDead);
         }
 
-        private void OnEnemyDead(EnemyDeadEvent ev)
+        internal void OnEnemyDead(EnemyDeadEvent ev)
         {
             if (ev.enemyConfigTableEntry?.DropItemWeights == null || ev.enemyConfigTableEntry.DropItemWeights.Count == 0)
                 return;
@@ -69,11 +65,6 @@ namespace DungeonShooter
                 if (Random.Range(0, WeightBase) < kv.Value)
                     ItemDropAsync(kv.Key, position).Forget();
             }
-        }
-
-        public void Dispose()
-        {
-            _eventBus.Unsubscribe<EnemyDeadEvent>(OnEnemyDead);
         }
     }
 }

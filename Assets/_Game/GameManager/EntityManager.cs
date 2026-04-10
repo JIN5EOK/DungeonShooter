@@ -4,7 +4,7 @@ using VContainer;
 
 namespace DungeonShooter
 {
-    public class EntityManager : IDisposable
+    public class EntityManager
     {
         public int RemainingEnemyCount => _enemies.Count;
         public event Action<int> OnRemainingEnemyCountChanged;
@@ -20,23 +20,20 @@ namespace DungeonShooter
             _eventBus = eventBus;
             _playerLevelService = playerLevelService;
             _gameResultService = gameResultService;
-            _eventBus.Subscribe<EnemySpawnedEvent>(OnEnemySpawned);
-            _eventBus.Subscribe<EnemyDeadEvent>(OnEnemyDestroyed);
-            _eventBus.Subscribe<PlayerDeadEvent>(OnPlayerDead);
         }
 
-        private void OnEnemySpawned(EnemySpawnedEvent ev)
+        internal void OnEnemySpawned(EnemySpawnedEvent ev)
         {
             _enemies.Add(ev.enemy);
             OnRemainingEnemyCountChanged?.Invoke(_enemies.Count);
         }
 
-        private void OnPlayerDead(PlayerDeadEvent ev)
+        internal void OnPlayerDead(PlayerDeadEvent ev)
         {
             _gameResultService.ExecuteGameResult(GameResult.Dead);
         }
 
-        private void OnEnemyDestroyed(EnemyDeadEvent ev)
+        internal void OnEnemyDestroyed(EnemyDeadEvent ev)
         {
             _playerLevelService?.AddExp(ev.enemyConfigTableEntry.Exp);
             _enemies.Remove(ev.enemy);
@@ -49,13 +46,6 @@ namespace DungeonShooter
                 _eventBus.Publish(new AllEnemiesEliminatedEvent());
             }
                 
-        }
-
-        public void Dispose()
-        {
-            _eventBus.Unsubscribe<EnemySpawnedEvent>(OnEnemySpawned);
-            _eventBus.Unsubscribe<EnemyDeadEvent>(OnEnemyDestroyed);
-            _eventBus.Unsubscribe<PlayerDeadEvent>(OnPlayerDead);
         }
     }
 }

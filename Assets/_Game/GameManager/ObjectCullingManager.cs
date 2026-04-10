@@ -1,5 +1,4 @@
 using UnityEngine;
-using VContainer;
 
 namespace DungeonShooter
 {
@@ -18,26 +17,9 @@ namespace DungeonShooter
         /// <summary>프레임마다 체크할 대상 갯수</summary>
         private readonly int _checksPerFrame = 8;
 
-        private IEventBus _eventBus;
         private int _checkIndex;
         private Transform _playerTransform;
         private Transform _cullingObjectsRoot;
-
-        [Inject]
-        public void Construct(IEventBus eventBus)
-        {
-            _eventBus = eventBus;
-            _eventBus.Subscribe<EnemySpawnedEvent>(OnEnemySpawned);
-            _eventBus.Subscribe<PlayerObjectSpawnEvent>(OnPlayerSpawned);
-            _eventBus.Subscribe<PlayerObjectDestroyEvent>(OnPlayerDestroyed);
-        }
-
-        private void OnDestroy()
-        {
-            _eventBus?.Unsubscribe<EnemySpawnedEvent>(OnEnemySpawned);
-            _eventBus?.Unsubscribe<PlayerObjectSpawnEvent>(OnPlayerSpawned);
-            _eventBus?.Unsubscribe<PlayerObjectDestroyEvent>(OnPlayerDestroyed);
-        }
 
         private Transform GetOrCreateCullingObjectsRoot()
         {
@@ -50,17 +32,17 @@ namespace DungeonShooter
             return _cullingObjectsRoot;
         }
 
-        private void OnPlayerSpawned(PlayerObjectSpawnEvent ev)
+        internal void OnPlayerSpawnedForCulling(PlayerObjectSpawnEvent ev)
         {
             _playerTransform = ev.player != null ? ev.player.transform : null;
         }
 
-        private void OnPlayerDestroyed(PlayerObjectDestroyEvent ev)
+        internal void OnPlayerDestroyedForCulling(PlayerObjectDestroyEvent ev)
         {
             _playerTransform = null;
         }
 
-        private void OnEnemySpawned(EnemySpawnedEvent ev)
+        internal void OnEnemySpawnedForCulling(EnemySpawnedEvent ev)
         {
             if (ev.enemy == null)
                 return;

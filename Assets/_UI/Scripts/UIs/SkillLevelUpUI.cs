@@ -16,24 +16,21 @@ namespace DungeonShooter
         private SkillLevelUpSlot _skillLevelUpSlotPrefab;
         private List<SkillLevelUpSlot> _slots = new();
 
-        private IEventBus _eventBus;
         private IPlayerContextManager _playerContextManager;
         private ISkillService _skillService;
         private IPauseManager _pauseManager;
         private ITableRepository _tableRepository;
 
         [Inject]
-        public void Construct(IPlayerContextManager playerContextManager, ISkillService skillService, IEventBus eventBus, IPauseManager pauseManager, ITableRepository tableRepository)
+        public void Construct(IPlayerContextManager playerContextManager, ISkillService skillService, IPauseManager pauseManager, ITableRepository tableRepository)
         {
             _playerContextManager = playerContextManager;
             _skillService = skillService;
-            _eventBus = eventBus;
             _pauseManager = pauseManager;
             _tableRepository = tableRepository;
-            _eventBus.Subscribe<PlayerLevelChangeEvent>(PlayerLevelChanged);
         }
 
-        private void PlayerLevelChanged(PlayerLevelChangeEvent playerLevelChangeEvent)
+        internal void OnPlayerLevelChanged(PlayerLevelChangeEvent playerLevelChangeEvent)
         {
             SetLevelUpSkillAndShow();
         }
