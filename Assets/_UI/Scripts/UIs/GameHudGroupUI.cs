@@ -8,6 +8,12 @@ namespace DungeonShooter
     /// </summary>
     public class GameHudGroupUI : HudUI
     {
+        public HealthBarHudUI HealthBarHudUI => _healthBarHudUI;
+        public ExpGaugeHudUI ExpGaugeHudUI => _expGaugeHudUI;
+        public GameButtonHudUI GameButtonHudUI => _gameButtonHudUI;
+        public PlayerStatusHudUI PlayerStatusHudUI => _playerStatusHudUI;
+        public TouchInputUI TouchInputUI => _touchInputUI;
+        
         [SerializeField]
         private HealthBarHudUI _healthBarHudUI;
         [SerializeField]

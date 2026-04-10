@@ -19,9 +19,10 @@ namespace DungeonShooter
         private readonly IInventory _inventory;
         private readonly ObjectCullingManager _objectCullingManager;
         private readonly EntityManager _entityManager;
-
+        private readonly GameHudGroupUI _gameHudGroupUI;
         [Inject]
         public StageSceneEventMediator(
+            GameHudGroupUI gameHudGroupUI,
             IPlayerFactory playerFactory,
             IEnemyFactory enemyFactory,
             IPlayerLevelService playerLevelService,
@@ -34,6 +35,7 @@ namespace DungeonShooter
             ObjectCullingManager objectCullingManager,
             EntityManager entityManager)
         {
+            _gameHudGroupUI = gameHudGroupUI;
             _playerFactory = playerFactory;
             _enemyFactory = enemyFactory;
             _playerLevelService = playerLevelService;
@@ -49,6 +51,7 @@ namespace DungeonShooter
 
         public void Register()
         {
+            _playerFactory.PlayerSpawned += ForwardPlayerSpawnToHealthHudUI;
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToInput;
             _playerFactory.PlayerDestroyed += ForwardPlayerDespawnToInput;
 
@@ -71,6 +74,7 @@ namespace DungeonShooter
 
         public void Unregister()
         {
+            _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToHealthHudUI;
             _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToInput;
             _playerFactory.PlayerDestroyed -= ForwardPlayerDespawnToInput;
 
@@ -91,6 +95,14 @@ namespace DungeonShooter
             _enemyFactory.EnemyDied -= ForwardEnemyDeadEntity;
         }
 
+        private void ForwardPlayerSpawnToHealthHudUI(EntityBase player, PlayerConfigTableEntry config, Vector3 position)
+        {
+            _gameHudGroupUI.HealthBarHudUI.SetHealth(player.EntityContext.Statuses.GetStatus(StatusType.Hp).GetValue());
+            _gameHudGroupUI.HealthBarHudUI.SetMaxHealth(player.EntityContext.Stat.GetStat(StatType.Hp).GetValue());
+            player.EntityContext.Statuses.GetStatus(StatusType.Hp).OnValueChanged += _gameHudGroupUI.HealthBarHudUI.SetHealth;
+            player.EntityContext.Stat.GetStat(StatType.Hp).OnValueChanged += _gameHudGroupUI.HealthBarHudUI.SetMaxHealth;
+        }
+        
         private void ForwardPlayerSpawnToInput(EntityBase player, PlayerConfigTableEntry config, Vector3 position) =>
             _playerInputManager.BindControlledEntity(player);
 
