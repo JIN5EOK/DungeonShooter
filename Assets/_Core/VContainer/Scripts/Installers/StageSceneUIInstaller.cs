@@ -11,7 +11,6 @@ namespace DungeonShooter
     {
         public void Install(IContainerBuilder builder)
         {
-            builder.Register<SkillSlotViewModel>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<AlertMessageViewModel>(Lifetime.Scoped);
             builder.Register<GamePausePresenter>(Lifetime.Scoped);
             builder.Register<InventoryViewModel>(Lifetime.Scoped).AsImplementedInterfaces();

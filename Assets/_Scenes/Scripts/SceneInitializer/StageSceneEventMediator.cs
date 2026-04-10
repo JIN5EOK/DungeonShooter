@@ -15,12 +15,12 @@ namespace DungeonShooter
         private readonly IPlayerContextManager _playerContextManager;
         private readonly PlayerInputManager _playerInputManager;
         private readonly SkillLevelUpUI _skillLevelUpUI;
-        private readonly ISkillSlotService _skillSlotService;
         private readonly IItemDropService _itemDropService;
         private readonly IInventory _inventory;
         private readonly ObjectCullingManager _objectCullingManager;
         private readonly EntityManager _entityManager;
         private readonly GameHudGroupUI _gameHudGroupUI;
+
         [Inject]
         public StageSceneEventMediator(
             GameHudGroupUI gameHudGroupUI,
@@ -31,7 +31,6 @@ namespace DungeonShooter
             IPlayerContextManager playerContextManager,
             PlayerInputManager playerInputManager,
             SkillLevelUpUI skillLevelUpUI,
-            ISkillSlotService skillSlotService,
             IItemDropService itemDropService,
             IInventory inventory,
             ObjectCullingManager objectCullingManager,
@@ -45,7 +44,6 @@ namespace DungeonShooter
             _playerContextManager = playerContextManager;
             _playerInputManager = playerInputManager;
             _skillLevelUpUI = skillLevelUpUI;
-            _skillSlotService = skillSlotService;
             _itemDropService = itemDropService;
             _inventory = inventory;
             _objectCullingManager = objectCullingManager;
@@ -55,8 +53,10 @@ namespace DungeonShooter
         public void Register()
         {
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToHealthHudUI;
+            _playerFactory.PlayerSpawned += ForwardPlayerSpawnToPlayerStatusHudUI;
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToInput;
             _playerFactory.PlayerDestroyed += ForwardPlayerDespawnToInput;
+            _playerFactory.PlayerDestroyed += ForwardPlayerDestroyedUnbindHud;
 
             _playerLevelService.OnLevelChanged += ForwardPlayerLevelChanged;
 
@@ -73,13 +73,18 @@ namespace DungeonShooter
 
             _enemyFactory.EnemySpawned += ForwardEnemySpawnedEntity;
             _enemyFactory.EnemyDied += ForwardEnemyDeadEntity;
+
+            _entityManager.OnRemainingEnemyCountChanged += ForwardRemainingEnemyCountChanged;
+            _gameHudGroupUI.PlayerStatusHudUI.SetRemainingEnemyCount(_entityManager.RemainingEnemyCount);
         }
 
         public void Unregister()
         {
             _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToHealthHudUI;
+            _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToPlayerStatusHudUI;
             _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToInput;
             _playerFactory.PlayerDestroyed -= ForwardPlayerDespawnToInput;
+            _playerFactory.PlayerDestroyed -= ForwardPlayerDestroyedUnbindHud;
 
             _playerLevelService.OnLevelChanged -= ForwardPlayerLevelChanged;
 
@@ -96,14 +101,34 @@ namespace DungeonShooter
 
             _enemyFactory.EnemySpawned -= ForwardEnemySpawnedEntity;
             _enemyFactory.EnemyDied -= ForwardEnemyDeadEntity;
+
+            _entityManager.OnRemainingEnemyCountChanged -= ForwardRemainingEnemyCountChanged;
         }
 
         private void ForwardPlayerSpawnToHealthHudUI(EntityBase player, PlayerConfigTableEntry config, Vector3 position)
         {
-            _gameHudGroupUI.HealthBarHudUI.SetHealth(player.EntityContext.Statuses.GetStatus(StatusType.Hp).GetValue());
-            _gameHudGroupUI.HealthBarHudUI.SetMaxHealth(player.EntityContext.Stat.GetStat(StatType.Hp).GetValue());
-            player.EntityContext.Statuses.GetStatus(StatusType.Hp).OnValueChanged += _gameHudGroupUI.HealthBarHudUI.SetHealth;
-            player.EntityContext.Stat.GetStat(StatType.Hp).OnValueChanged += _gameHudGroupUI.HealthBarHudUI.SetMaxHealth;
+
+            var hpStatus = player?.EntityContext?.Statuses.GetStatus(StatusType.Hp);
+            var hpStat = player?.EntityContext?.Stat.GetStat(StatType.Hp);
+
+            _gameHudGroupUI.HealthBarHudUI.SetHealth(hpStatus.GetValue());
+            hpStatus.OnValueChanged += _gameHudGroupUI.HealthBarHudUI.SetHealth;
+            _gameHudGroupUI.HealthBarHudUI.SetMaxHealth(hpStat.GetValue());
+            hpStat.OnValueChanged += _gameHudGroupUI.HealthBarHudUI.SetMaxHealth;
+        }
+
+        private void ForwardPlayerSpawnToPlayerStatusHudUI(EntityBase player, PlayerConfigTableEntry config, Vector3 position)
+        {
+            var attack = player?.EntityContext?.Stat?.GetStat(StatType.Attack);
+            var defense = player?.EntityContext?.Stat?.GetStat(StatType.Defense);
+            var moveSpeed = player?.EntityContext?.Stat?.GetStat(StatType.MoveSpeed);
+
+            _gameHudGroupUI.PlayerStatusHudUI.SetAttack(attack.GetValue());
+            attack.OnValueChanged += _gameHudGroupUI.PlayerStatusHudUI.SetAttack;
+            _gameHudGroupUI.PlayerStatusHudUI.SetDefense(defense.GetValue());
+            defense.OnValueChanged += _gameHudGroupUI.PlayerStatusHudUI.SetDefense;
+            _gameHudGroupUI.PlayerStatusHudUI.SetMoveSpeed(moveSpeed.GetValue());
+            moveSpeed.OnValueChanged += _gameHudGroupUI.PlayerStatusHudUI.SetMoveSpeed;
         }
         
         private void ForwardPlayerSpawnToInput(EntityBase player, PlayerConfigTableEntry config, Vector3 position) =>
@@ -111,6 +136,9 @@ namespace DungeonShooter
 
         private void ForwardPlayerDespawnToInput(EntityBase player, Vector3 position) =>
             _playerInputManager.UnbindControlledEntity();
+
+        private void ForwardPlayerDestroyedUnbindHud(EntityBase player, Vector3 position) =>
+            UnbindHudFromPlayer(player);
 
         private void ForwardPlayerLevelChanged(int level)
         {
@@ -124,7 +152,7 @@ namespace DungeonShooter
         }
 
         private void ForwardSkillLeveledUp(Skill beforeSkill, Skill afterSkill) =>
-            _skillSlotService.ReplaceSkillSlot(beforeSkill, afterSkill);
+            _playerContextManager.ReplaceActiveSkillSlot(beforeSkill, afterSkill);
 
         private void ForwardEnemyDeadToDrop(EntityBase enemy, EnemyConfigTableEntry enemyConfigTableEntry, Vector3 position)
         {
@@ -157,6 +185,23 @@ namespace DungeonShooter
         {
             var exp = enemyConfigTableEntry != null ? enemyConfigTableEntry.Exp : 0;
             _entityManager.NotifyEnemyDefeated(enemy, exp);
+        }
+
+        private void ForwardRemainingEnemyCountChanged(int count) =>
+            _gameHudGroupUI.PlayerStatusHudUI.SetRemainingEnemyCount(count);
+
+        private void UnbindHudFromPlayer(EntityBase player)
+        {
+            var statuses = player?.EntityContext?.Statuses;
+            var stat = player?.EntityContext?.Stat;
+
+            var hpStatus = statuses.GetStatus(StatusType.Hp);
+            hpStatus.OnValueChanged -= _gameHudGroupUI.HealthBarHudUI.SetHealth;
+
+            stat.GetStat(StatType.Hp).OnValueChanged -= _gameHudGroupUI.HealthBarHudUI.SetMaxHealth;
+            stat.GetStat(StatType.Attack).OnValueChanged -= _gameHudGroupUI.PlayerStatusHudUI.SetAttack;
+            stat.GetStat(StatType.Defense).OnValueChanged -= _gameHudGroupUI.PlayerStatusHudUI.SetDefense;
+            stat.GetStat(StatType.MoveSpeed).OnValueChanged -= _gameHudGroupUI.PlayerStatusHudUI.SetMoveSpeed;
         }
     }
 }

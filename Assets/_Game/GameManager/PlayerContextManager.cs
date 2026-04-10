@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 using VContainer;
 
 namespace DungeonShooter
@@ -7,6 +8,9 @@ namespace DungeonShooter
     {
         public IEntityContext EntityContext { get; }
         public InventoryModel InventoryModel { get; }
+        public event Action<int, Skill> OnActiveSkillSlotChanged;
+        public Skill GetActiveSkill(int index);
+        public void ReplaceActiveSkillSlot(Skill beforeSkill, Skill afterSkill);
         public void Initialize(int playerConfigTableId);
         public UniTask InitializeSkillsAsync();
     }
@@ -17,22 +21,59 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerContextManager : IPlayerContextManager
     {
+        public event Action<int, Skill> OnActiveSkillSlotChanged;
+
         public IEntityContext EntityContext { get; private set; }
         public InventoryModel InventoryModel { get; } = new InventoryModel();
         private ITableRepository _tableRepository;
         private ISkillFactory _skillFactory;
-        private ISkillSlotService _skillSlotService;
         private PlayerConfigTableEntry _playerConfigTableEntry;
+        private readonly Skill[] _activeSkillSlots = new Skill[Constants.SkillSlotMaxCount];
         
         [Inject]
         public PlayerContextManager(
             ITableRepository tableRepository,
-            ISkillFactory skillFactory,
-            ISkillSlotService skillSlotService)
+            ISkillFactory skillFactory)
         {
             _tableRepository = tableRepository;
             _skillFactory = skillFactory;
-            _skillSlotService = skillSlotService;
+        }
+
+        public Skill GetActiveSkill(int index)
+        {
+            if (index < 0 || index >= Constants.SkillSlotMaxCount)
+            {
+                LogHandler.LogWarning<IPlayerContextManager>($"GetActiveSkill: 잘못된 인덱스 입니다. index: {index}");
+                return null;
+            }
+
+            return _activeSkillSlots[index];
+        }
+
+        private void SetActiveSkillSlot(int index, Skill skill)
+        {
+            if (index < 0 || index >= Constants.SkillSlotMaxCount)
+            {
+                LogHandler.LogWarning<IPlayerContextManager>($"SetActiveSkillSlot: 잘못된 인덱스 입니다. index: {index}");
+                return;
+            }
+
+            _activeSkillSlots[index] = skill;
+            OnActiveSkillSlotChanged?.Invoke(index, skill);
+        }
+
+        public void ReplaceActiveSkillSlot(Skill beforeSkill, Skill afterSkill)
+        {
+            if (beforeSkill == null || afterSkill == null)
+                return;
+
+            for (var i = 0; i < _activeSkillSlots.Length; i++)
+            {
+                if (_activeSkillSlots[i] != beforeSkill)
+                    continue;
+
+                SetActiveSkillSlot(i, afterSkill);
+            }
         }
 
         /// <summary>
@@ -74,8 +115,8 @@ namespace DungeonShooter
             if (skill1 != null)
                 EntityContext?.Skill?.Regist(skill1);
 
-            _skillSlotService.SetActiveSkill(0, skill0);
-            _skillSlotService.SetActiveSkill(1, skill1);
+            SetActiveSkillSlot(0, skill0);
+            SetActiveSkillSlot(1, skill1);
 
             foreach (var acquirableSkillId in _playerConfigTableEntry.AcquirableSkills)
             {

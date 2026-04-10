@@ -10,13 +10,13 @@ namespace DungeonShooter
         [SerializeField] 
         private SkillCooldownSlot _skillCooldownSlot2;
         
-        private ISkillSlotViewModel _skillSlotViewModel;
+        private IPlayerContextManager _playerContextManager;
         
         [Inject]
-        public void Construct(ISkillSlotViewModel skillSlotViewModel)
+        public void Construct(IPlayerContextManager playerContextManager)
         {
-            _skillSlotViewModel = skillSlotViewModel;
-            _skillSlotViewModel.OnSkillSlotChanged += OnSkillSlotChanged; 
+            _playerContextManager = playerContextManager;
+            _playerContextManager.OnActiveSkillSlotChanged += OnSkillSlotChanged; 
         }
 
         private void OnSkillSlotChanged(int idx, Skill skill)
