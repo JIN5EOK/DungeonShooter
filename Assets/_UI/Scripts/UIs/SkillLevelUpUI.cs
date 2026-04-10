@@ -16,13 +16,11 @@ namespace DungeonShooter
         private SkillLevelUpSlot _skillLevelUpSlotPrefab;
         private List<SkillLevelUpSlot> _slots = new();
 
-        private IPauseManager _pauseManager;
         private ITableRepository _tableRepository;
 
         [Inject]
-        public void Construct(IPauseManager pauseManager, ITableRepository tableRepository)
+        public void Construct(ITableRepository tableRepository)
         {
-            _pauseManager = pauseManager;
             _tableRepository = tableRepository;
         }
 
@@ -59,26 +57,13 @@ namespace DungeonShooter
                     Hide();
                 });
             }
-
-            // 레벨업 가능 스킬 슬롯이 1개 이상일때만 UI 표시
-            if (toShowCount > 0)
-            {
-                Show();
-            }
-        }
-
-        public override void Show()
-        {
-            base.Show();
-            _pauseManager?.PauseRequest(this);
         }
 
         public override void Hide()
         {
             foreach (var slot in _slots)
                 slot.gameObject.SetActive(false);
-
-            _pauseManager?.ResumeRequest(this);
+            
             base.Hide();
         }
     }

@@ -70,6 +70,8 @@ namespace DungeonShooter
             _gameHudGroupUI.OnInventoryRequested += _inventory.Open;
             _gameHudGroupUI.OnPauseRequested += _pauseMenuUI.Show;
 
+            _skillLevelUpUI.OnShow += () => _pauseManager.PauseRequest(_skillLevelUpUI);
+            _skillLevelUpUI.OnHide += () => _pauseManager.ResumeRequest(_skillLevelUpUI);
             _gameMessageService.OnAlertMessageRequested += _alertMessageUI.ShowMessage;
             _pauseMenuUI.OnShow += () => _pauseManager.PauseRequest(_pauseMenuUI);
             _pauseMenuUI.OnHide += () => _pauseManager.ResumeRequest(_pauseMenuUI);
@@ -185,10 +187,15 @@ namespace DungeonShooter
             var skills = _playerContextManager?.EntityContext?.Skill?.GetRegistedSkills();
             var levelUpableList = _skillService.GetLevelUpableSkills(skills);
 
-            _skillLevelUpUI.ShowLevelUpSkillOptions(levelUpableList, selectedSkill =>
+            if (levelUpableList.Count > 0)
             {
-                _skillService.TrySkillLevelUp(_playerContextManager?.EntityContext?.Skill, selectedSkill);
-            });
+                _skillLevelUpUI.Show();
+                _skillLevelUpUI.ShowLevelUpSkillOptions(levelUpableList, selectedSkill =>
+                {
+                    _skillService.TrySkillLevelUp(_playerContextManager?.EntityContext?.Skill, selectedSkill);
+                    _skillLevelUpUI.Hide();
+                });    
+            }
         }
 
         private void ForwardPlayerExpChanged(int exp) =>

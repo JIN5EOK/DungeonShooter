@@ -15,7 +15,7 @@ namespace DungeonShooter
         public SkillTableEntry NextLevelEntry { get; }
         public Sprite CurrentIcon { get; }
         public Sprite NextLevelIcon { get; }
-
+        
         public LevelUpableSkillInfo(Skill currentSkill, SkillTableEntry nextLevelEntry, Sprite currentIcon, Sprite nextLevelIcon)
         {
             CurrentSkill = currentSkill;
