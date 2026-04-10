@@ -58,6 +58,8 @@ namespace DungeonShooter
             _playerFactory.PlayerDestroyed += ForwardPlayerDestroyedUnbindHud;
 
             _playerLevelService.OnLevelChanged += ForwardPlayerLevelChanged;
+            _playerLevelService.OnExpChanged += ForwardPlayerExpChanged;
+            _playerLevelService.OnMaxExpChanged += ForwardPlayerMaxExpChanged;
 
             _skillService.OnSkillLeveledUp += ForwardSkillLeveledUp;
 
@@ -75,6 +77,10 @@ namespace DungeonShooter
 
             _entityManager.OnRemainingEnemyCountChanged += ForwardRemainingEnemyCountChanged;
             _gameHudGroupUI.PlayerStatusHudUI.SetRemainingEnemyCount(_entityManager.RemainingEnemyCount);
+
+            _gameHudGroupUI.ExpGaugeHudUI.SetLevel(_playerLevelService.Level);
+            _gameHudGroupUI.ExpGaugeHudUI.SetMaxExp(_playerLevelService.MaxExp);
+            _gameHudGroupUI.ExpGaugeHudUI.SetExp(_playerLevelService.Exp);
         }
 
         public void Unregister()
@@ -85,6 +91,8 @@ namespace DungeonShooter
             _playerFactory.PlayerDestroyed -= ForwardPlayerDestroyedUnbindHud;
 
             _playerLevelService.OnLevelChanged -= ForwardPlayerLevelChanged;
+            _playerLevelService.OnExpChanged -= ForwardPlayerExpChanged;
+            _playerLevelService.OnMaxExpChanged -= ForwardPlayerMaxExpChanged;
 
             _skillService.OnSkillLeveledUp -= ForwardSkillLeveledUp;
 
@@ -135,6 +143,8 @@ namespace DungeonShooter
 
         private void ForwardPlayerLevelChanged(int level)
         {
+            _gameHudGroupUI.ExpGaugeHudUI.SetLevel(level);
+
             var skills = _playerContextManager?.EntityContext?.Skill?.GetRegistedSkills();
             var levelUpableList = _skillService.GetLevelUpableSkills(skills);
 
@@ -143,6 +153,12 @@ namespace DungeonShooter
                 _skillService.TrySkillLevelUp(_playerContextManager?.EntityContext?.Skill, selectedSkill);
             });
         }
+
+        private void ForwardPlayerExpChanged(int exp) =>
+            _gameHudGroupUI.ExpGaugeHudUI.SetExp(exp);
+
+        private void ForwardPlayerMaxExpChanged(int maxExp) =>
+            _gameHudGroupUI.ExpGaugeHudUI.SetMaxExp(maxExp);
 
         private void ForwardSkillLeveledUp(Skill beforeSkill, Skill afterSkill) =>
             _playerContextManager.ReplaceActiveSkillSlot(beforeSkill, afterSkill);

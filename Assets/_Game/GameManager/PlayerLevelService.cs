@@ -36,8 +36,7 @@ namespace DungeonShooter
 
         [Inject]
         public PlayerLevelService()
-        {
-        }
+        { }
         
         public void AddExp(int amount)
         {
