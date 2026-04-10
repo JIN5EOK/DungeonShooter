@@ -18,6 +18,8 @@ namespace DungeonShooter
         private readonly IItemDropService _itemDropService;
         private readonly IInventory _inventory;
         private readonly GamePausePresenter _gamePausePresenter;
+        private readonly IGameMessageService _gameMessageService;
+        private readonly AlertMessageView _alertMessageView;
         private readonly ObjectCullingManager _objectCullingManager;
         private readonly EntityManager _entityManager;
         private readonly GameHudGroupUI _gameHudGroupUI;
@@ -35,6 +37,8 @@ namespace DungeonShooter
             IItemDropService itemDropService,
             IInventory inventory,
             GamePausePresenter gamePausePresenter,
+            IGameMessageService gameMessageService,
+            AlertMessageView alertMessageView,
             ObjectCullingManager objectCullingManager,
             EntityManager entityManager)
         {
@@ -49,6 +53,8 @@ namespace DungeonShooter
             _itemDropService = itemDropService;
             _inventory = inventory;
             _gamePausePresenter = gamePausePresenter;
+            _gameMessageService = gameMessageService;
+            _alertMessageView = alertMessageView;
             _objectCullingManager = objectCullingManager;
             _entityManager = entityManager;
         }
@@ -57,6 +63,8 @@ namespace DungeonShooter
         {
             _gameHudGroupUI.OnInventoryRequested += _inventory.Open;
             _gameHudGroupUI.OnPauseRequested += _gamePausePresenter.PauseGame;
+
+            _gameMessageService.OnAlertMessageRequested += _alertMessageView.ShowMessage;
 
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToHudUI;
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToInput;
@@ -93,6 +101,8 @@ namespace DungeonShooter
         {
             _gameHudGroupUI.OnInventoryRequested -= _inventory.Open;
             _gameHudGroupUI.OnPauseRequested -= _gamePausePresenter.PauseGame;
+
+            _gameMessageService.OnAlertMessageRequested -= _alertMessageView.ShowMessage;
 
             _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToHudUI;
             _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToInput;

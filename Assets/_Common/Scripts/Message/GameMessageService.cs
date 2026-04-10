@@ -1,20 +1,18 @@
+using System;
 using VContainer;
 
 namespace DungeonShooter
 {
     public class GameMessageService : IGameMessageService
     {
-        private readonly AlertMessageViewModel _alertMessageViewModel;
-
-        [Inject]
-        public GameMessageService(AlertMessageViewModel alertMessageViewModel)
-        {
-            _alertMessageViewModel = alertMessageViewModel;
-        }
+        public event Action<string> OnAlertMessageRequested;
 
         public void ShowAlertMessage(string message)
         {
-            _alertMessageViewModel?.SetMessage(message);
+            if (message == null)
+                return;
+
+            OnAlertMessageRequested?.Invoke(message);
         }
     }
 }
