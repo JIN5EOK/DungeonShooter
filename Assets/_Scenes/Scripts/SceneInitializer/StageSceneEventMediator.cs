@@ -52,8 +52,7 @@ namespace DungeonShooter
 
         public void Register()
         {
-            _playerFactory.PlayerSpawned += ForwardPlayerSpawnToHealthHudUI;
-            _playerFactory.PlayerSpawned += ForwardPlayerSpawnToPlayerStatusHudUI;
+            _playerFactory.PlayerSpawned += ForwardPlayerSpawnToHudUI;
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToInput;
             _playerFactory.PlayerDestroyed += ForwardPlayerDespawnToInput;
             _playerFactory.PlayerDestroyed += ForwardPlayerDestroyedUnbindHud;
@@ -80,8 +79,7 @@ namespace DungeonShooter
 
         public void Unregister()
         {
-            _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToHealthHudUI;
-            _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToPlayerStatusHudUI;
+            _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToHudUI;
             _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToInput;
             _playerFactory.PlayerDestroyed -= ForwardPlayerDespawnToInput;
             _playerFactory.PlayerDestroyed -= ForwardPlayerDestroyedUnbindHud;
@@ -105,9 +103,11 @@ namespace DungeonShooter
             _entityManager.OnRemainingEnemyCountChanged -= ForwardRemainingEnemyCountChanged;
         }
 
-        private void ForwardPlayerSpawnToHealthHudUI(EntityBase player, PlayerConfigTableEntry config, Vector3 position)
+        private void ForwardPlayerSpawnToHudUI(EntityBase player, PlayerConfigTableEntry config, Vector3 position)
         {
-
+            var attack = player?.EntityContext?.Stat?.GetStat(StatType.Attack);
+            var defense = player?.EntityContext?.Stat?.GetStat(StatType.Defense);
+            var moveSpeed = player?.EntityContext?.Stat?.GetStat(StatType.MoveSpeed);
             var hpStatus = player?.EntityContext?.Statuses.GetStatus(StatusType.Hp);
             var hpStat = player?.EntityContext?.Stat.GetStat(StatType.Hp);
 
@@ -115,14 +115,7 @@ namespace DungeonShooter
             hpStatus.OnValueChanged += _gameHudGroupUI.HealthBarHudUI.SetHealth;
             _gameHudGroupUI.HealthBarHudUI.SetMaxHealth(hpStat.GetValue());
             hpStat.OnValueChanged += _gameHudGroupUI.HealthBarHudUI.SetMaxHealth;
-        }
-
-        private void ForwardPlayerSpawnToPlayerStatusHudUI(EntityBase player, PlayerConfigTableEntry config, Vector3 position)
-        {
-            var attack = player?.EntityContext?.Stat?.GetStat(StatType.Attack);
-            var defense = player?.EntityContext?.Stat?.GetStat(StatType.Defense);
-            var moveSpeed = player?.EntityContext?.Stat?.GetStat(StatType.MoveSpeed);
-
+            
             _gameHudGroupUI.PlayerStatusHudUI.SetAttack(attack.GetValue());
             attack.OnValueChanged += _gameHudGroupUI.PlayerStatusHudUI.SetAttack;
             _gameHudGroupUI.PlayerStatusHudUI.SetDefense(defense.GetValue());
