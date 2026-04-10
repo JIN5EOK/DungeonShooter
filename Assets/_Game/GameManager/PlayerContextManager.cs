@@ -7,6 +7,7 @@ namespace DungeonShooter
     {
         public IEntityContext EntityContext { get; }
         public InventoryModel InventoryModel { get; }
+        public void Initialize(int playerConfigTableId);
         public UniTask InitializeSkillsAsync();
     }
 
@@ -22,18 +23,28 @@ namespace DungeonShooter
         private ISkillFactory _skillFactory;
         private ISkillSlotService _skillSlotService;
         private PlayerConfigTableEntry _playerConfigTableEntry;
+        
         [Inject]
-        public void Initialize(
-            StageContext stageContext,
+        public PlayerContextManager(
             ITableRepository tableRepository,
             ISkillFactory skillFactory,
             ISkillSlotService skillSlotService)
         {
-            
             _tableRepository = tableRepository;
             _skillFactory = skillFactory;
             _skillSlotService = skillSlotService;
-            _playerConfigTableEntry = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(stageContext.PlayerConfigTableId);
+        }
+
+        /// <summary>
+        /// 스테이지 씬에서 선택된 PlayerConfig 테이블 ID를 반영합니다. <see cref="StageSceneInitializer"/>에서만 호출합니다.
+        /// </summary>
+        public void Initialize(int playerConfigTableId)
+        {
+            _playerConfigTableEntry = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(playerConfigTableId);
+            if (_playerConfigTableEntry == null)
+            {
+                return;
+            }
 
             var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(_playerConfigTableEntry.StatsId);
             IEntityStats entityStats = new EntityStats();

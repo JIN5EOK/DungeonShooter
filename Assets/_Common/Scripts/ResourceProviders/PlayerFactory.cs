@@ -13,8 +13,9 @@ namespace DungeonShooter
     /// </summary>
     public interface IPlayerFactory
     {
-        UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        public void Initialize(int playerConfigTableId);
+        public UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        public EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
 
     /// <summary>
@@ -23,26 +24,31 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerFactory : IPlayerFactory
     {
-        private readonly StageContext _stageContext;
+        private int _playerConfigTableId;
         private readonly IResourceProvider _resourceProvider;
         private readonly ITableRepository _tableRepository;
         private readonly IPlayerContextManager _playerContextManager;
         private readonly IEventBus _eventBus;
         private readonly LifetimeScope _sceneLifetimeScope;
         [Inject]
-        public PlayerFactory(StageContext context
-            , IResourceProvider resourceProvider
+        public PlayerFactory(
+            IResourceProvider resourceProvider
             , ITableRepository tableRepository
             , IEventBus eventBus
             , LifetimeScope sceneLifetimeScope
             , IPlayerContextManager playerContextManager)
         {
-            _stageContext = context;
             _resourceProvider = resourceProvider;
             _tableRepository = tableRepository;
             _eventBus = eventBus;
             _playerContextManager = playerContextManager;
             _sceneLifetimeScope = sceneLifetimeScope;
+        }
+
+        /// <inheritdoc />
+        public void Initialize(int playerConfigTableId)
+        {
+            _playerConfigTableId = playerConfigTableId;
         }
 
         /// <summary>
@@ -88,16 +94,16 @@ namespace DungeonShooter
         /// </summary>
         private string GetPlayerAddress()
         {
-            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
+            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_playerConfigTableId);
             if (config == null)
             {
-                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.PlayerConfigTableId}");
+                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigTableEntry를 찾을 수 없습니다. ID: {_playerConfigTableId}");
                 return null;
             }
 
             if (string.IsNullOrEmpty(config.GameObjectKey))
             {
-                LogHandler.LogWarning<PlayerFactory>($"플레이어 게임오브젝트 키가 설정되지 않았습니다. ID: {_stageContext.PlayerConfigTableId}");
+                LogHandler.LogWarning<PlayerFactory>($"플레이어 게임오브젝트 키가 설정되지 않았습니다. ID: {_playerConfigTableId}");
                 return null;
             }
 
@@ -149,7 +155,7 @@ namespace DungeonShooter
 
             await cameraTrackComponent.AttachCameraAsync();
             
-            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
+            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_playerConfigTableId);
             
             entity.OnDestroyed += (self) =>
             {

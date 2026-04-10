@@ -13,14 +13,15 @@ namespace DungeonShooter
 {
     public interface IRoomDataRepository : IDisposable
     {
-        UniTask<RoomData> GetRandomRoom(RoomType type);
+        public void Initialize(int stageConfigTableId);
+        public UniTask<RoomData> GetRandomRoom(RoomType type);
     }
 
     public class RoomDataRepository : IRoomDataRepository
     {
         private AddressablesScope _addressablesScope = new AddressablesScope();
         private readonly ITableRepository _tableRepository;
-        private readonly StageContext _stageContext;
+        private int _stageConfigTableId;
         private List<string> StartRoomDataAddresses { get; set; }
         private List<string> NormalRoomDataAddresses { get; set; }
         private List<string> BossRoomDataAddresses { get; set; }
@@ -28,10 +29,14 @@ namespace DungeonShooter
         private TaskCompletionSource<bool> _initializationTcs;
 
         [Inject]
-        public RoomDataRepository(ITableRepository tableRepository, StageContext stageContext)
+        public RoomDataRepository(ITableRepository tableRepository)
         {
             _tableRepository = tableRepository;
-            _stageContext = stageContext;
+        }
+
+        public void Initialize(int stageConfigTableId)
+        {
+            _stageConfigTableId = stageConfigTableId;
         }
 
         /// <summary>
@@ -41,10 +46,10 @@ namespace DungeonShooter
         {
             try
             {
-                var stageConfigEntry = _tableRepository.GetTableEntry<StageConfigTableEntry>(_stageContext.StageConfigTableId);
+                var stageConfigEntry = _tableRepository.GetTableEntry<StageConfigTableEntry>(_stageConfigTableId);
                 if (stageConfigEntry == null)
                 {
-                    Debug.LogError($"[{nameof(RoomDataRepository)}] StageConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.StageConfigTableId}");
+                    Debug.LogError($"[{nameof(RoomDataRepository)}] StageConfigTableEntry를 찾을 수 없습니다. ID: {_stageConfigTableId}");
                     initializationTcs.SetResult(false);
                     return;
                 }

@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using VContainer;
 
 namespace DungeonShooter
@@ -17,16 +16,23 @@ namespace DungeonShooter
         private IInventory _inventory;
         private IItemFactory _itemFactory;
         private GameHudGroupUI _gameHudGroupUI;
+        private IPlayerFactory _playerFactory;
+        private IRoomDataRepository _roomDataRepository;
+        private IEnemyFactory _enemyFactory;
 
         [Inject]
-        public void Construct( StageContext stageContext
+        public void Construct(
+            StageContext stageContext
             , ITableRepository tableRepository
             , IStageGenerator stageGenerator
             , IStageInstantiator stageInstantiator
             , IPlayerContextManager playerContextManager
             , IInventory inventory
             , IItemFactory itemFactory
-            , GameHudGroupUI gameHudGroupUI)
+            , GameHudGroupUI gameHudGroupUI
+            , IPlayerFactory playerFactory
+            , IRoomDataRepository roomDataRepository
+            , IEnemyFactory enemyFactory)
         {
             _stageContext = stageContext;
             _tableRepository = tableRepository;
@@ -36,13 +42,28 @@ namespace DungeonShooter
             _inventory = inventory;
             _itemFactory = itemFactory;
             _gameHudGroupUI = gameHudGroupUI;
+            _playerFactory = playerFactory;
+            _roomDataRepository = roomDataRepository;
+            _enemyFactory = enemyFactory;
         }
 
         private async UniTaskVoid Start()
         {
+            SetupStageContext();
             await InitializePlayerData();
             await CreateStageAsync();
             IsSceneInitialized = true;
+        }
+
+        /// <summary>
+        /// 스테이지 씬에 필요한 서비스에 선택 ID만 전달합니다.
+        /// </summary>
+        private void SetupStageContext()
+        {
+            _playerContextManager.Initialize(_stageContext.PlayerConfigTableId);
+            _playerFactory.Initialize(_stageContext.PlayerConfigTableId);
+            _roomDataRepository.Initialize(_stageContext.StageConfigTableId);
+            _enemyFactory.Initialize(_stageContext.StageConfigTableId);
         }
 
         /// <summary>

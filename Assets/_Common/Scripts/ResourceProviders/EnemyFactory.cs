@@ -14,6 +14,7 @@ namespace DungeonShooter
     /// </summary>
     public interface IEnemyFactory
     {
+        void Initialize(int stageConfigTableId);
         UniTask<EntityBase> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
         EntityBase GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
         UniTask<EntityBase> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
@@ -28,7 +29,7 @@ namespace DungeonShooter
         private LifetimeScope _sceneLifetimeScope;
         
         private readonly ITableRepository _tableRepository;
-        private readonly StageContext _stageContext;
+        private int _stageConfigTableId;
         private readonly IResourceProvider _resourceProvider;
         private readonly IEventBus _eventBus;
         private readonly ISkillFactory _skillFactory;
@@ -39,34 +40,22 @@ namespace DungeonShooter
         
         
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, StageContext stageContext, IResourceProvider resourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
+        public EnemyFactory(ITableRepository tableRepository, IResourceProvider resourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
         {
             _tableRepository = tableRepository;
-            _stageContext = stageContext;
             _resourceProvider = resourceProvider;
             _eventBus = eventBus;
             _sceneLifetimeScope = sceneLifeTimeScope;
             _skillFactory = skillFactory;
             _skillObjectFactory = skillObjectFactory;
-            Initialize();
         }
 
-        /// <summary>
-        /// StageConfigTableEntry의 EnemyKeys(EnemyConfigTableEntry Id 목록)를 로드하여 저장합니다.
-        /// </summary>
-        private void Initialize()
+        /// <inheritdoc />
+        public void Initialize(int stageConfigTableId)
         {
-            var stageConfigEntry = _tableRepository.GetTableEntry<StageConfigTableEntry>(_stageContext.StageConfigTableId);
-            if (stageConfigEntry == null)
-            {
-                Debug.LogWarning($"[{nameof(EnemyFactory)}] StageConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.StageConfigTableId}");
-                return;
-            }
-
-            if (stageConfigEntry.EnemyKeys != null && stageConfigEntry.EnemyKeys.Count > 0)
-            {
-                _enemyIds = new List<int>(stageConfigEntry.EnemyKeys);
-            }
+            _stageConfigTableId = stageConfigTableId;
+            var stageConfigEntry = _tableRepository.GetTableEntry<StageConfigTableEntry>(_stageConfigTableId);
+            _enemyIds = new List<int>(stageConfigEntry.EnemyKeys);
         }
 
         /// <summary>
