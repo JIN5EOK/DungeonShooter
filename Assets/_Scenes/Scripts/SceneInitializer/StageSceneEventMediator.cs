@@ -17,6 +17,7 @@ namespace DungeonShooter
         private readonly SkillLevelUpUI _skillLevelUpUI;
         private readonly IItemDropService _itemDropService;
         private readonly IInventory _inventory;
+        private readonly GamePausePresenter _gamePausePresenter;
         private readonly ObjectCullingManager _objectCullingManager;
         private readonly EntityManager _entityManager;
         private readonly GameHudGroupUI _gameHudGroupUI;
@@ -33,6 +34,7 @@ namespace DungeonShooter
             SkillLevelUpUI skillLevelUpUI,
             IItemDropService itemDropService,
             IInventory inventory,
+            GamePausePresenter gamePausePresenter,
             ObjectCullingManager objectCullingManager,
             EntityManager entityManager)
         {
@@ -46,12 +48,16 @@ namespace DungeonShooter
             _skillLevelUpUI = skillLevelUpUI;
             _itemDropService = itemDropService;
             _inventory = inventory;
+            _gamePausePresenter = gamePausePresenter;
             _objectCullingManager = objectCullingManager;
             _entityManager = entityManager;
         }
 
         public void Register()
         {
+            _gameHudGroupUI.OnInventoryRequested += _inventory.Open;
+            _gameHudGroupUI.OnPauseRequested += _gamePausePresenter.PauseGame;
+
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToHudUI;
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToInput;
             _playerFactory.PlayerDestroyed += ForwardPlayerDespawnToInput;
@@ -85,6 +91,9 @@ namespace DungeonShooter
 
         public void Unregister()
         {
+            _gameHudGroupUI.OnInventoryRequested -= _inventory.Open;
+            _gameHudGroupUI.OnPauseRequested -= _gamePausePresenter.PauseGame;
+
             _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToHudUI;
             _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToInput;
             _playerFactory.PlayerDestroyed -= ForwardPlayerDespawnToInput;

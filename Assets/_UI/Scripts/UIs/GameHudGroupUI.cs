@@ -1,5 +1,6 @@
+using System;
 using UnityEngine;
-using VContainer;
+using UnityEngine.UI;
 
 namespace DungeonShooter
 {
@@ -10,7 +11,6 @@ namespace DungeonShooter
     {
         public HealthBarHudUI HealthBarHudUI => _healthBarHudUI;
         public ExpGaugeHudUI ExpGaugeHudUI => _expGaugeHudUI;
-        public GameButtonHudUI GameButtonHudUI => _gameButtonHudUI;
         public PlayerStatusHudUI PlayerStatusHudUI => _playerStatusHudUI;
         public TouchInputUI TouchInputUI => _touchInputUI;
         
@@ -21,9 +21,38 @@ namespace DungeonShooter
         [SerializeField]
         private PlayerStatusHudUI _playerStatusHudUI;
         [SerializeField]
-        private GameButtonHudUI _gameButtonHudUI;
-        [SerializeField]
         private TouchInputUI _touchInputUI;
+
+        [Header("Buttons")]
+        [SerializeField] private Button _inventoryButton;
+        [SerializeField] private Button _pauseButton;
+
+        public event Action OnInventoryRequested;
+        public event Action OnPauseRequested;
+
+        private void Awake()
+        {
+            if (_inventoryButton != null)
+                _inventoryButton.onClick.AddListener(OnInventoryButtonClicked);
+
+            if (_pauseButton != null)
+                _pauseButton.onClick.AddListener(OnPauseButtonClicked);
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            if (_inventoryButton != null)
+                _inventoryButton.onClick.RemoveListener(OnInventoryButtonClicked);
+
+            if (_pauseButton != null)
+                _pauseButton.onClick.RemoveListener(OnPauseButtonClicked);
+        }
+
+        private void OnInventoryButtonClicked() => OnInventoryRequested?.Invoke();
+
+        private void OnPauseButtonClicked() => OnPauseRequested?.Invoke();
 
         public void ShowHud()
         {
@@ -31,7 +60,6 @@ namespace DungeonShooter
             _healthBarHudUI?.Show();
             _expGaugeHudUI?.Show();
             _playerStatusHudUI?.Show();
-            _gameButtonHudUI?.Show();
         }
 
         public void HideHud()
@@ -40,7 +68,6 @@ namespace DungeonShooter
             _healthBarHudUI?.Hide();
             _expGaugeHudUI?.Hide();
             _playerStatusHudUI?.Hide();
-            _gameButtonHudUI?.Hide();
         }
     }
 }
