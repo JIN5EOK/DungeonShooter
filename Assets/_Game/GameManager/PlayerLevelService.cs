@@ -34,12 +34,9 @@ namespace DungeonShooter
             } 
         }
 
-        private IEventBus _eventBus;
-        
         [Inject]
-        public PlayerLevelService(IEventBus eventBus)
+        public PlayerLevelService()
         {
-            _eventBus = eventBus;
         }
         
         public void AddExp(int amount)
@@ -53,8 +50,6 @@ namespace DungeonShooter
                 // 레벨업 이벤트 발행
                 OnLevelChanged?.Invoke(Level);
                 MaxExp = (int)(MaxExp * 1.25f);
-                
-                _eventBus.Publish(new PlayerLevelChangeEvent() {level = Level});
             }
             OnExpChanged?.Invoke(Exp);
         }

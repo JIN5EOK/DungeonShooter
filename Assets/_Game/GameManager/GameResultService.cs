@@ -21,7 +21,7 @@ namespace DungeonShooter
             _pauseManager = pauseManager;
         }
 
-        internal void OnEnemyDead(EnemyDeadEvent ev)
+        public void OnEnemyDead(EnemyDeadEvent ev)
         {
             if (_isGameOver) return;
             _enemyKillCount++;

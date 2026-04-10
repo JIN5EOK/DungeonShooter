@@ -28,5 +28,11 @@ namespace DungeonShooter
         void UseItem(Item item);
         void Open();
         void Close();
+
+        /// <summary>스테이지에서 플레이어 엔티티 스폰 시 소유자 연동 (StageSceneInteractionMediator에서 연결)</summary>
+        void OnPlayerObjectSpawned(PlayerObjectSpawnEvent playerObjectSpawnEvent);
+
+        /// <summary>스테이지에서 플레이어 엔티티 제거 시 소유자 해제 (StageSceneInteractionMediator에서 연결)</summary>
+        void OnPlayerObjectDespawned(PlayerObjectDestroyEvent playerObjectDestroyEvent);
     }
 }

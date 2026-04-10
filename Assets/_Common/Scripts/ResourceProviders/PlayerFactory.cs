@@ -13,6 +13,10 @@ namespace DungeonShooter
     /// </summary>
     public interface IPlayerFactory
     {
+        event Action<PlayerObjectSpawnEvent> PlayerObjectSpawned;
+        event Action<PlayerObjectDestroyEvent> PlayerObjectDestroyed;
+        event Action<PlayerDeadEvent> PlayerDied;
+
         public void Initialize(int playerConfigTableId);
         public UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
         public EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
@@ -24,23 +28,24 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerFactory : IPlayerFactory
     {
+        public event Action<PlayerObjectSpawnEvent> PlayerObjectSpawned;
+        public event Action<PlayerObjectDestroyEvent> PlayerObjectDestroyed;
+        public event Action<PlayerDeadEvent> PlayerDied;
+
         private int _playerConfigTableId;
         private readonly IResourceProvider _resourceProvider;
         private readonly ITableRepository _tableRepository;
         private readonly IPlayerContextManager _playerContextManager;
-        private readonly IEventBus _eventBus;
         private readonly LifetimeScope _sceneLifetimeScope;
         [Inject]
         public PlayerFactory(
             IResourceProvider resourceProvider
             , ITableRepository tableRepository
-            , IEventBus eventBus
             , LifetimeScope sceneLifetimeScope
             , IPlayerContextManager playerContextManager)
         {
             _resourceProvider = resourceProvider;
             _tableRepository = tableRepository;
-            _eventBus = eventBus;
             _playerContextManager = playerContextManager;
             _sceneLifetimeScope = sceneLifetimeScope;
         }
@@ -159,16 +164,16 @@ namespace DungeonShooter
             
             entity.OnDestroyed += (self) =>
             {
-                _eventBus.Publish(new PlayerObjectDestroyEvent {player = self, position = playerInstance.transform.position});
+                PlayerObjectDestroyed?.Invoke(new PlayerObjectDestroyEvent {player = self, position = playerInstance.transform.position});
             };
 
             healthComponent.OnDeath += () =>
             {
                 Object.Destroy(entity.gameObject);
-                _eventBus.Publish(new PlayerDeadEvent() {player = entity, position = playerInstance.transform.position, playerConfigTableEntry = config});
+                PlayerDied?.Invoke(new PlayerDeadEvent() {player = entity, position = playerInstance.transform.position, playerConfigTableEntry = config});
             };
 
-            _eventBus.Publish(new PlayerObjectSpawnEvent{ player = entity, playerConfigTableEntry = config, position = playerInstance.transform.position});
+            PlayerObjectSpawned?.Invoke(new PlayerObjectSpawnEvent{ player = entity, playerConfigTableEntry = config, position = playerInstance.transform.position});
             return entity;
         }
     }

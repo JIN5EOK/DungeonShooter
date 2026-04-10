@@ -19,7 +19,7 @@ namespace DungeonShooter
         private IPlayerFactory _playerFactory;
         private IRoomDataRepository _roomDataRepository;
         private IEnemyFactory _enemyFactory;
-        private StageSceneEventBusBindings _stageEventBusBindings;
+        private StageSceneInteractionMediator _stageSceneInteractionMediator;
 
         [Inject]
         public void Construct(
@@ -34,7 +34,7 @@ namespace DungeonShooter
             , IPlayerFactory playerFactory
             , IRoomDataRepository roomDataRepository
             , IEnemyFactory enemyFactory
-            , StageSceneEventBusBindings stageEventBusBindings)
+            , StageSceneInteractionMediator stageSceneInteractionMediator)
         {
             _stageContext = stageContext;
             _tableRepository = tableRepository;
@@ -47,12 +47,12 @@ namespace DungeonShooter
             _playerFactory = playerFactory;
             _roomDataRepository = roomDataRepository;
             _enemyFactory = enemyFactory;
-            _stageEventBusBindings = stageEventBusBindings;
+            _stageSceneInteractionMediator = stageSceneInteractionMediator;
         }
 
         private void OnDestroy()
         {
-            _stageEventBusBindings?.Unregister();
+            _stageSceneInteractionMediator?.Unregister();
         }
 
         private async UniTask Start()
@@ -60,6 +60,7 @@ namespace DungeonShooter
             SetupStageContext();
             await InitializePlayerData();
             await CreateStageAsync();
+            IsSceneInitialized = true;
         }
 
         /// <summary>

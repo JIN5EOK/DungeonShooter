@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Jin5eok;
@@ -14,6 +15,9 @@ namespace DungeonShooter
     /// </summary>
     public interface IEnemyFactory
     {
+        event Action<EnemySpawnedEvent> EnemySpawned;
+        event Action<EnemyDeadEvent> EnemyDied;
+
         void Initialize(int stageConfigTableId);
         UniTask<EntityBase> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
         EntityBase GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
@@ -26,12 +30,14 @@ namespace DungeonShooter
     /// </summary>
     public class EnemyFactory : IEnemyFactory
     {
+        public event Action<EnemySpawnedEvent> EnemySpawned;
+        public event Action<EnemyDeadEvent> EnemyDied;
+
         private LifetimeScope _sceneLifetimeScope;
         
         private readonly ITableRepository _tableRepository;
         private int _stageConfigTableId;
         private readonly IResourceProvider _resourceProvider;
-        private readonly IEventBus _eventBus;
         private readonly ISkillFactory _skillFactory;
         private readonly ISkillObjectFactory _skillObjectFactory;
         private readonly GameObjectPool _pool = new();
@@ -40,11 +46,10 @@ namespace DungeonShooter
         
         
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, IResourceProvider resourceProvider, IEventBus eventBus, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
+        public EnemyFactory(ITableRepository tableRepository, IResourceProvider resourceProvider, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
         {
             _tableRepository = tableRepository;
             _resourceProvider = resourceProvider;
-            _eventBus = eventBus;
             _sceneLifetimeScope = sceneLifeTimeScope;
             _skillFactory = skillFactory;
             _skillObjectFactory = skillObjectFactory;
@@ -266,7 +271,7 @@ namespace DungeonShooter
                 {
                     var destroyEffectSpawnPos = entity.transform.position;
                     _skillObjectFactory.CreateSkillObjectAsync<ParticleSkillObject>(CommonAddresses.MonsterDeath_Particle, destroyEffectSpawnPos).Forget();
-                    _eventBus.Publish(new EnemyDeadEvent { enemy = entity, enemyConfigTableEntry = configTableEntry });
+                    EnemyDied?.Invoke(new EnemyDeadEvent { enemy = entity, enemyConfigTableEntry = configTableEntry });
                     entity.Release();
                 };
             }
@@ -290,7 +295,7 @@ namespace DungeonShooter
             var aiBT = _resourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
             entityLifeTimeScope.Container.Resolve<IAIComponent>().Initialize(aiBT, activeSkills);
 
-            _eventBus.Publish(new EnemySpawnedEvent { enemy = entity });
+            EnemySpawned?.Invoke(new EnemySpawnedEvent { enemy = entity });
             return entity;
         }
     }

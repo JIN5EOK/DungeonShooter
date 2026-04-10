@@ -15,6 +15,9 @@ namespace DungeonShooter
         /// 아이템 ID와 위치로 필드 아이템을 생성합니다.
         /// </summary>
         UniTask<FieldItem> ItemDropAsync(int itemId, Vector3 position);
+
+        /// <summary>적 사망 시 드랍 처리 (StageSceneInteractionMediator에서 연결)</summary>
+        void OnEnemyDead(EnemyDeadEvent ev);
     }
 
     /// <summary>
@@ -35,7 +38,7 @@ namespace DungeonShooter
             _fieldItemFactory = fieldItemFactory;
         }
 
-        internal void OnEnemyDead(EnemyDeadEvent ev)
+        public void OnEnemyDead(EnemyDeadEvent ev)
         {
             if (ev.enemyConfigTableEntry?.DropItemWeights == null || ev.enemyConfigTableEntry.DropItemWeights.Count == 0)
                 return;

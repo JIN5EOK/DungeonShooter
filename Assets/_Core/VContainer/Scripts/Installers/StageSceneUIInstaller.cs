@@ -29,7 +29,7 @@ namespace DungeonShooter
             builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GamePauseView>(UIAddresses.UI_GamePause, false), Lifetime.Scoped);
             builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GameResultView>(UIAddresses.UI_GameResult, false), Lifetime.Scoped);
 
-            builder.Register<StageSceneEventBusBindings>(Lifetime.Scoped);
+            builder.Register<StageSceneInteractionMediator>(Lifetime.Scoped);
 
             builder.RegisterBuildCallback(resolver =>
             {

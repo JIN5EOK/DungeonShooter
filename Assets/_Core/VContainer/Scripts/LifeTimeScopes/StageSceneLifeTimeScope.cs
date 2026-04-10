@@ -19,7 +19,6 @@ namespace DungeonShooter
             // 씬 초기화 로직
 
             builder.RegisterComponentOnNewGameObject<StageSceneInitializer>(Lifetime.Scoped);
-            builder.Register<StageSceneEventBusBindings>(Lifetime.Scoped);
             
             builder.RegisterBuildCallback((resolver) =>
             {
@@ -28,7 +27,7 @@ namespace DungeonShooter
 
             builder.RegisterBuildCallback(resolver =>
             {
-                resolver.Resolve<StageSceneEventBusBindings>().Register();
+                resolver.Resolve<StageSceneInteractionMediator>().Register();
             });
             
             base.Configure(builder);

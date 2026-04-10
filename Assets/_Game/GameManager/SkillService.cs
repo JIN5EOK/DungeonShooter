@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
@@ -25,6 +26,8 @@ namespace DungeonShooter
 
     public interface ISkillService
     {
+        event Action<SkillLevelUpEvent> OnSkillLeveledUp;
+
         /// <summary>
         /// 보유 스킬 중 다음 레벨이 존재하는 스킬만 필터링하여 반환합니다.
         /// </summary>
@@ -42,17 +45,17 @@ namespace DungeonShooter
     /// </summary>
     public class SkillService : ISkillService
     {
+        public event Action<SkillLevelUpEvent> OnSkillLeveledUp;
+
         private readonly ITableRepository _tableRepository;
         private readonly IResourceProvider _resourceProvider;
-        private readonly IEventBus _eventBus;
         private readonly ISkillFactory _skillFactory;
 
         [Inject]
-        public SkillService(ITableRepository tableRepository, IResourceProvider resourceProvider, IEventBus eventBus, ISkillFactory skillFactory)
+        public SkillService(ITableRepository tableRepository, IResourceProvider resourceProvider, ISkillFactory skillFactory)
         {
             _tableRepository = tableRepository;
             _resourceProvider = resourceProvider;
-            _eventBus = eventBus;
             _skillFactory = skillFactory;
         }
 
@@ -85,7 +88,7 @@ namespace DungeonShooter
                 return false;
             }
 
-            _eventBus.Publish(new SkillLevelUpEvent { beforeSkill = currentSkill, afterSkill = after });
+            OnSkillLeveledUp?.Invoke(new SkillLevelUpEvent { beforeSkill = currentSkill, afterSkill = after });
             after.StartCooldown(currentSkill.Cooldown);
             container.Unregist(currentSkill);
             container.Regist(after);

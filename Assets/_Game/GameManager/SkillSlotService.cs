@@ -10,6 +10,9 @@ namespace DungeonShooter
         public event Action<int, Skill> OnSkillSlotChanged;
         public Skill GetActiveSkill(int index);
         public void SetActiveSkill(int index, Skill skill);
+
+        /// <summary>스킬 레벨업 반영 (StageSceneInteractionMediator에서 연결)</summary>
+        void OnSkillLevelChanged(SkillLevelUpEvent skillLevelUpEvent);
     }
 
     /// <summary>
@@ -24,7 +27,7 @@ namespace DungeonShooter
         /// <summary>
         /// 액티브 스킬 슬롯에 등록된 스킬의 레벨 변경 처리
         /// </summary>
-        internal void OnSkillLevelChanged(SkillLevelUpEvent skillLevelUpEvent)
+        public void OnSkillLevelChanged(SkillLevelUpEvent skillLevelUpEvent)
         {
             for (var i = 0; i < _activeSkillSlots.Length; i++)
             {

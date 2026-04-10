@@ -20,7 +20,6 @@ namespace DungeonShooter
             builder.RegisterComponentOnNewGameObject<GlobalUIManager>(Lifetime.Singleton).DontDestroyOnLoad().AsImplementedInterfaces().AsSelf();
             builder.RegisterInstance(_inputManager);
             builder.Register<LocalTableRepository>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<EventBus>(Lifetime.Singleton).AsImplementedInterfaces();
             
             builder.Register<ItemFormatter>(Lifetime.Singleton).AsImplementedInterfaces();
             

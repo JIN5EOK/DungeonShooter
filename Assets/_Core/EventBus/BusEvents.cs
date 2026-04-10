@@ -33,15 +33,6 @@ namespace DungeonShooter
         public EntityBase enemy;
     }
 
-    public struct AllEnemiesEliminatedEvent
-    {
-    }
-
-    public struct PlayerLevelChangeEvent
-    {
-        public int level;
-    }
-    
     public struct SkillLevelUpEvent
     {
         public Skill beforeSkill;
