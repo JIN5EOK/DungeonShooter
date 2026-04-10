@@ -26,7 +26,6 @@ namespace DungeonShooter
 
             // 팝업 뷰 등록
             builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GamePauseView>(UIAddresses.UI_GamePause, false), Lifetime.Scoped);
-            builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GameResultView>(UIAddresses.UI_GameResult, false), Lifetime.Scoped);
 
             builder.Register<StageSceneEventMediator>(Lifetime.Scoped);
 
@@ -37,7 +36,6 @@ namespace DungeonShooter
                 resolver.Resolve<InventoryView>();
                 resolver.Resolve<AlertMessageView>();
                 resolver.Resolve<GamePauseView>();
-                resolver.Resolve<GameResultView>();
             });
         }
     }

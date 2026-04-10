@@ -30,7 +30,7 @@ namespace DungeonShooter
             _tableRepository = tableRepository;
         }
 
-        internal void OnPlayerLevelChanged(int level)
+        public void OnPlayerLevelChanged(int level)
         {
             SetLevelUpSkillAndShow();
         }
