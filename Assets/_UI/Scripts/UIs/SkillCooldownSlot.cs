@@ -20,10 +20,12 @@ namespace DungeonShooter
         private float _maxCooldown;
         public void SetSkill(Skill skill)
         {
-            if (_skill != null)
-            {
+            if (skill == null)
+                return;
+            
+            // 기존 스킬 바인딩 해제 
+            if(_skill != null)
                 _skill.OnCooldownChanged -= UpdateCooldownVisuals;
-            }
             
             _skill = skill;
             _skillIcon.sprite = _skill.Icon;

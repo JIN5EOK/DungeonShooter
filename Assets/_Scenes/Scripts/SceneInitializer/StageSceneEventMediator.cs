@@ -87,6 +87,10 @@ namespace DungeonShooter
 
             _skillService.OnSkillLeveledUp += ForwardSkillLeveledUp;
 
+            _playerContextManager.OnActiveSkillSlotChanged += ForwardActiveSkillSlotChangedToHud;
+            _gameHudGroupUI.TouchInputUI.SetSkillSlot(0, _playerContextManager.GetActiveSkill(0));
+            _gameHudGroupUI.TouchInputUI.SetSkillSlot(1, _playerContextManager.GetActiveSkill(1));
+
             _enemyFactory.EnemyDied += ForwardEnemyDeadToDrop;
 
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToInventory;
@@ -126,6 +130,8 @@ namespace DungeonShooter
             _playerLevelService.OnMaxExpChanged -= ForwardPlayerMaxExpChanged;
 
             _skillService.OnSkillLeveledUp -= ForwardSkillLeveledUp;
+
+            _playerContextManager.OnActiveSkillSlotChanged -= ForwardActiveSkillSlotChangedToHud;
 
             _enemyFactory.EnemyDied -= ForwardEnemyDeadToDrop;
 
@@ -193,6 +199,9 @@ namespace DungeonShooter
 
         private void ForwardSkillLeveledUp(Skill beforeSkill, Skill afterSkill) =>
             _playerContextManager.ReplaceActiveSkillSlot(beforeSkill, afterSkill);
+
+        private void ForwardActiveSkillSlotChangedToHud(int idx, Skill skill) =>
+            _gameHudGroupUI.TouchInputUI.SetSkillSlot(idx, skill);
 
         private void ForwardEnemyDeadToDrop(EntityBase enemy, EnemyConfigTableEntry enemyConfigTableEntry, Vector3 position)
         {
