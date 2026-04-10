@@ -2,13 +2,11 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using VContainer;
-using Random = UnityEngine.Random;
 
 namespace DungeonShooter
 {
     /// <summary>
-    /// 플레이어 레벨업 시 표시되는 스킬 레벨업 선택 UI. 체력/공격력 패시브와 액티브 스킬 2개 중 다음 레벨이 있는 것만 표시합니다.
-    /// 레벨업 가능 스킬이 3개를 넘으면 3개만 랜덤으로 골라 표시합니다.
+    /// 플레이어 레벨업 시 표시되는 스킬 레벨업 선택 UI
     /// </summary>
     public class SkillLevelUpUI : PopupUI
     {
@@ -36,22 +34,10 @@ namespace DungeonShooter
             if (levelUpableList == null || levelUpableList.Count == 0)
                 return;
 
-            IReadOnlyList<LevelUpableSkillInfo> toDisplay = levelUpableList;
-            if (levelUpableList.Count > MaxDisplayCount)
+            var toShowCount = Mathf.Min(levelUpableList.Count, MaxDisplayCount);
+            for (var slotIndex = 0; slotIndex < toShowCount; slotIndex++)
             {
-                var shuffled = new List<LevelUpableSkillInfo>(levelUpableList);
-                for (var i = shuffled.Count - 1; i > 0; i--)
-                {
-                    var j = Random.Range(0, i + 1);
-                    (shuffled[i], shuffled[j]) = (shuffled[j], shuffled[i]);
-                }
-                shuffled.RemoveRange(MaxDisplayCount, shuffled.Count - MaxDisplayCount);
-                toDisplay = shuffled;
-            }
-
-            var slotIndex = 0;
-            foreach (var info in toDisplay)
-            {
+                var info = levelUpableList[slotIndex];
                 if (_slots.Count <= slotIndex)
                 {
                     var slotInstance = Instantiate(_skillLevelUpSlotPrefab, transform);
@@ -72,12 +58,10 @@ namespace DungeonShooter
                     onSelected?.Invoke(info.CurrentSkill);
                     Hide();
                 });
-
-                slotIndex++;
             }
 
             // 레벨업 가능 스킬 슬롯이 1개 이상일때만 UI 표시
-            if (slotIndex > 0)
+            if (toShowCount > 0)
             {
                 Show();
             }

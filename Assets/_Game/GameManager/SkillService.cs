@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
+using Random = UnityEngine.Random;
 
 namespace DungeonShooter
 {
@@ -109,6 +110,13 @@ namespace DungeonShooter
                 var currentIcon = _resourceProvider.GetAssetSync<Sprite>(skill.SkillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
                 var nextIcon = _resourceProvider.GetAssetSync<Sprite>(nextSkillEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
                 result.Add(new LevelUpableSkillInfo(skill, nextSkillEntry, currentIcon, nextIcon));
+            }
+
+            // 스킬 목록 순서를 랜덤하게 섞어서 반환
+            for (var i = result.Count - 1; i > 0; i--)
+            {
+                var j = Random.Range(0, i + 1);
+                (result[i], result[j]) = (result[j], result[i]);
             }
 
             return result;
