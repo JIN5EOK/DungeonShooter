@@ -17,19 +17,14 @@ namespace DungeonShooter
             new StageSceneUIInstaller().Install(builder);
             
             // 씬 초기화 로직
-
             builder.RegisterComponentOnNewGameObject<StageSceneInitializer>(Lifetime.Scoped);
-            
+            builder.Register<StageSceneEventMediator>(Lifetime.Scoped);
+
             builder.RegisterBuildCallback((resolver) =>
             {
                 resolver.Resolve<StageSceneInitializer>();
             });
 
-            builder.RegisterBuildCallback(resolver =>
-            {
-                resolver.Resolve<StageSceneEventMediator>().Register();
-            });
-            
             base.Configure(builder);
         }
     }

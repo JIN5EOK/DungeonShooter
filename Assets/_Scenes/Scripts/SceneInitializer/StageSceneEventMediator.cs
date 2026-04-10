@@ -210,14 +210,8 @@ namespace DungeonShooter
         private void ForwardActiveSkillSlotChangedToHud(int idx, Skill skill) =>
             _gameHudGroupUI.TouchInputUI.SetSkillSlot(idx, skill);
 
-        private void ForwardEnemyDeadToDrop(EntityBase enemy, EnemyConfigTableEntry enemyConfigTableEntry, Vector3 position)
-        {
-            var weights = enemyConfigTableEntry?.DropItemWeights;
-            if (weights == null || weights.Count == 0)
-                return;
-
-            _itemDropService.TryDropItemsByWeight(weights, position);
-        }
+        private void ForwardEnemyDeadToDrop(EntityBase enemy, EnemyConfigTableEntry enemyConfigTableEntry, Vector3 position) =>
+            _itemDropService.TryDropItemsByWeight(enemyConfigTableEntry?.DropItemWeights, position);
 
         private void ForwardPlayerSpawnToInventory(EntityBase player, PlayerConfigTableEntry config, Vector3 position) =>
             _inventory.BindItemUserEntity(player);

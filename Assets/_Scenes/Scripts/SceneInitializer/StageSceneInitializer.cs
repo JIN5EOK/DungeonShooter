@@ -57,6 +57,7 @@ namespace DungeonShooter
 
         private async UniTask Start()
         {
+            _stageSceneEventMediator?.Register();
             SetupStageContext();
             await InitializePlayerData();
             await CreateStageAsync();

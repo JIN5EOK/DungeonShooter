@@ -23,9 +23,7 @@ namespace DungeonShooter
 
             // 팝업 뷰 등록
             builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<PauseMenuUI>(UIAddresses.UI_GamePause, false), Lifetime.Scoped);
-
-            builder.Register<StageSceneEventMediator>(Lifetime.Scoped);
-
+            
             builder.RegisterBuildCallback(resolver =>
             {
                 resolver.Resolve<GameHudGroupUI>();

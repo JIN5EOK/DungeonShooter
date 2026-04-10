@@ -41,7 +41,7 @@ namespace DungeonShooter
         {
             if (cooldown <= 0f)
                 return string.Empty;
-            return $"쿨다운: {cooldown}초";
+            return $"Cooldown: {cooldown}s";
         }
     }
 }
