@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace DungeonShooter
 {
-    public class GamePauseView : PopupUI
+    public class PauseMenuUI : PopupUI
     {
         [SerializeField] private Button _resumeButton;
         [SerializeField] private Button _exitButton;
@@ -28,15 +28,6 @@ namespace DungeonShooter
         private void OnExitClicked()
         {
             OnExitClickedEvent?.Invoke();
-        }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            if (_resumeButton != null)
-                _resumeButton.onClick.RemoveListener(OnResumeClicked);
-            if (_exitButton != null)
-                _exitButton.onClick.RemoveListener(OnExitClicked);
         }
     }
 }

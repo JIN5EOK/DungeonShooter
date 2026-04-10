@@ -11,7 +11,6 @@ namespace DungeonShooter
     {
         public void Install(IContainerBuilder builder)
         {
-            builder.Register<GamePausePresenter>(Lifetime.Scoped);
             builder.Register<InventoryViewModel>(Lifetime.Scoped).AsImplementedInterfaces();
             
             // HUD 뷰 등록
@@ -19,11 +18,11 @@ namespace DungeonShooter
             
             // 기타 UI 등록
             builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<SkillLevelUpUI>(UIAddresses.UI_SkillLevelUp, false), Lifetime.Scoped);
-            builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<AlertMessageView>(UIAddresses.UI_AlertMessage), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<AlertMessageUI>(UIAddresses.UI_AlertMessage), Lifetime.Scoped);
             builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<InventoryView>(UIAddresses.UI_Inventory, false), Lifetime.Scoped);
 
             // 팝업 뷰 등록
-            builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GamePauseView>(UIAddresses.UI_GamePause, false), Lifetime.Scoped);
+            builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<PauseMenuUI>(UIAddresses.UI_GamePause, false), Lifetime.Scoped);
 
             builder.Register<StageSceneEventMediator>(Lifetime.Scoped);
 
@@ -32,8 +31,8 @@ namespace DungeonShooter
                 resolver.Resolve<GameHudGroupUI>();
                 resolver.Resolve<SkillLevelUpUI>();
                 resolver.Resolve<InventoryView>();
-                resolver.Resolve<AlertMessageView>();
-                resolver.Resolve<GamePauseView>();
+                resolver.Resolve<AlertMessageUI>();
+                resolver.Resolve<PauseMenuUI>();
             });
         }
     }

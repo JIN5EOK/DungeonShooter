@@ -6,7 +6,7 @@ using VContainer;
 
 namespace DungeonShooter
 {
-    public class AlertMessageView : HudUI
+    public class AlertMessageUI : HudUI
     {
         [SerializeField]
         private Image _messagePanel;

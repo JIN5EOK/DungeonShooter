@@ -17,9 +17,11 @@ namespace DungeonShooter
         private readonly SkillLevelUpUI _skillLevelUpUI;
         private readonly IItemDropService _itemDropService;
         private readonly IInventory _inventory;
-        private readonly GamePausePresenter _gamePausePresenter;
+        private readonly IPauseManager _pauseManager;
+        private readonly IGameExitService _gameExitService;
+        private readonly PauseMenuUI _pauseMenuUI;
         private readonly IGameMessageService _gameMessageService;
-        private readonly AlertMessageView _alertMessageView;
+        private readonly AlertMessageUI _alertMessageUI;
         private readonly ObjectCullingManager _objectCullingManager;
         private readonly EntityManager _entityManager;
         private readonly GameHudGroupUI _gameHudGroupUI;
@@ -36,9 +38,11 @@ namespace DungeonShooter
             SkillLevelUpUI skillLevelUpUI,
             IItemDropService itemDropService,
             IInventory inventory,
-            GamePausePresenter gamePausePresenter,
+            IPauseManager pauseManager,
+            IGameExitService gameExitService,
+            PauseMenuUI pauseMenuUI,
             IGameMessageService gameMessageService,
-            AlertMessageView alertMessageView,
+            AlertMessageUI alertMessageUI,
             ObjectCullingManager objectCullingManager,
             EntityManager entityManager)
         {
@@ -52,9 +56,11 @@ namespace DungeonShooter
             _skillLevelUpUI = skillLevelUpUI;
             _itemDropService = itemDropService;
             _inventory = inventory;
-            _gamePausePresenter = gamePausePresenter;
+            _pauseManager = pauseManager;
+            _gameExitService = gameExitService;
+            _pauseMenuUI = pauseMenuUI;
             _gameMessageService = gameMessageService;
-            _alertMessageView = alertMessageView;
+            _alertMessageUI = alertMessageUI;
             _objectCullingManager = objectCullingManager;
             _entityManager = entityManager;
         }
@@ -62,9 +68,13 @@ namespace DungeonShooter
         public void Register()
         {
             _gameHudGroupUI.OnInventoryRequested += _inventory.Open;
-            _gameHudGroupUI.OnPauseRequested += _gamePausePresenter.PauseGame;
+            _gameHudGroupUI.OnPauseRequested += _pauseMenuUI.Show;
 
-            _gameMessageService.OnAlertMessageRequested += _alertMessageView.ShowMessage;
+            _gameMessageService.OnAlertMessageRequested += _alertMessageUI.ShowMessage;
+            _pauseMenuUI.OnShow += () => _pauseManager.PauseRequest(_pauseMenuUI);
+            _pauseMenuUI.OnHide += () => _pauseManager.ResumeRequest(_pauseMenuUI);
+            _pauseMenuUI.OnResumeClickedEvent += _pauseMenuUI.Hide;
+            _pauseMenuUI.OnExitClickedEvent += _gameExitService.ExitToMainMenu;
 
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToHudUI;
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToInput;
@@ -100,10 +110,12 @@ namespace DungeonShooter
         public void Unregister()
         {
             _gameHudGroupUI.OnInventoryRequested -= _inventory.Open;
-            _gameHudGroupUI.OnPauseRequested -= _gamePausePresenter.PauseGame;
+            _gameHudGroupUI.OnPauseRequested -= _pauseMenuUI.Show;
 
-            _gameMessageService.OnAlertMessageRequested -= _alertMessageView.ShowMessage;
-
+            _gameMessageService.OnAlertMessageRequested -= _alertMessageUI.ShowMessage;
+            _pauseMenuUI.OnResumeClickedEvent -= _pauseMenuUI.Hide;
+            _pauseMenuUI.OnExitClickedEvent -= _gameExitService.ExitToMainMenu;
+            
             _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToHudUI;
             _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToInput;
             _playerFactory.PlayerDestroyed -= ForwardPlayerDespawnToInput;
