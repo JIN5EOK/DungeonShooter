@@ -28,12 +28,14 @@ namespace DungeonShooter
             SubscribeToInput();
         }
 
-        internal void OnPlayerObjectSpawned(PlayerObjectSpawnEvent playerObjectSpawnEvent)
+        /// <summary>조작 입력을 전달할 엔티티를 지정합니다.</summary>
+        public void BindControlledEntity(EntityBase entity)
         {
-            _entityInputContext = playerObjectSpawnEvent.player.EntityContext.InputContext;
+            _entityInputContext = entity != null ? entity.EntityContext.InputContext : null;
         }
-        
-        internal void OnPlayerObjectDestroyed(PlayerObjectDestroyEvent playerObjectDestroyEvent)
+
+        /// <summary><see cref="BindControlledEntity"/> 연결을 해제합니다.</summary>
+        public void UnbindControlledEntity()
         {
             _entityInputContext = null;
         }

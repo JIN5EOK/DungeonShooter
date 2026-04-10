@@ -7,21 +7,23 @@ using Random = UnityEngine.Random;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 지정한 아이템을 지정한 위치에 드랍하고 적 사망시 아이템 드랍을 처리하는 서비스
+    /// 지정한 아이템을 지정한 위치에 드랍하고, 가중치 테이블에 따른 랜덤 드랍을 처리하는 서비스
     /// </summary>
     public interface IItemDropService
     {
         /// <summary>
         /// 아이템 ID와 위치로 필드 아이템을 생성합니다.
         /// </summary>
-        UniTask<FieldItem> ItemDropAsync(int itemId, Vector3 position);
+        public UniTask<FieldItem> ItemDropAsync(int itemId, Vector3 position);
 
-        /// <summary>적 사망 시 드랍 처리 (StageSceneInteractionMediator에서 연결)</summary>
-        void OnEnemyDead(EnemyDeadEvent ev);
+        /// <summary>
+        /// 아이템 ID별 가중치로 독립 확률 판정 후, 성공 시 해당 월드 위치에 드랍합니다. (예: 100 = 1%, 10000 = 100%)
+        /// </summary>
+        public void TryDropItemsByWeight(IReadOnlyDictionary<int, int> itemIdWeights, Vector3 worldPosition);
     }
 
     /// <summary>
-    /// 적 사망 이벤트를 구독하여 가중치 기반으로 필드 아이템을 스폰합니다.
+    /// 가중치 기반 필드 아이템 드랍을 담당합니다.
     /// </summary>
     public class ItemDropService : IItemDropService
     {
@@ -38,15 +40,6 @@ namespace DungeonShooter
             _fieldItemFactory = fieldItemFactory;
         }
 
-        public void OnEnemyDead(EnemyDeadEvent ev)
-        {
-            if (ev.enemyConfigTableEntry?.DropItemWeights == null || ev.enemyConfigTableEntry.DropItemWeights.Count == 0)
-                return;
-
-            var position = ev.enemy != null ? ev.enemy.transform.position : Vector3.zero;
-            TryDropItemsByWeight(ev.enemyConfigTableEntry.DropItemWeights, position);
-        }
-
         /// <inheritdoc />
         public UniTask<FieldItem> ItemDropAsync(int itemId, Vector3 position)
         {
@@ -56,7 +49,7 @@ namespace DungeonShooter
         /// <summary>
         /// 가중치를 기준으로 각 아이템을 독립 확률로 판정하고, 성공 시 해당 위치에 드랍합니다. (예: 100 = 1%, 500 = 5%)
         /// </summary>
-        private void TryDropItemsByWeight(Dictionary<int, int> weights, Vector3 position)
+        public void TryDropItemsByWeight(IReadOnlyDictionary<int, int> weights, Vector3 position)
         {
             if (weights == null || weights.Count == 0)
                 return;

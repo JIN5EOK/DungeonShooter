@@ -14,7 +14,6 @@ namespace DungeonShooter
             builder.Register<SkillSlotViewModel>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<AlertMessageViewModel>(Lifetime.Scoped);
             builder.Register<GamePausePresenter>(Lifetime.Scoped);
-            builder.Register<GameResultPresenter>(Lifetime.Scoped);
             builder.Register<InventoryViewModel>(Lifetime.Scoped).AsImplementedInterfaces();
             
             // HUD 뷰 등록
@@ -29,7 +28,7 @@ namespace DungeonShooter
             builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GamePauseView>(UIAddresses.UI_GamePause, false), Lifetime.Scoped);
             builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GameResultView>(UIAddresses.UI_GameResult, false), Lifetime.Scoped);
 
-            builder.Register<StageSceneInteractionMediator>(Lifetime.Scoped);
+            builder.Register<StageSceneEventMediator>(Lifetime.Scoped);
 
             builder.RegisterBuildCallback(resolver =>
             {

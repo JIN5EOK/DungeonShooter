@@ -13,9 +13,9 @@ namespace DungeonShooter
     /// </summary>
     public interface IPlayerFactory
     {
-        event Action<PlayerObjectSpawnEvent> PlayerObjectSpawned;
-        event Action<PlayerObjectDestroyEvent> PlayerObjectDestroyed;
-        event Action<PlayerDeadEvent> PlayerDied;
+        event Action<EntityBase, PlayerConfigTableEntry, Vector3> PlayerSpawned;
+        event Action<EntityBase, Vector3> PlayerDestroyed;
+        event Action<EntityBase, PlayerConfigTableEntry, Vector3> PlayerDied;
 
         public void Initialize(int playerConfigTableId);
         public UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
@@ -28,9 +28,9 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerFactory : IPlayerFactory
     {
-        public event Action<PlayerObjectSpawnEvent> PlayerObjectSpawned;
-        public event Action<PlayerObjectDestroyEvent> PlayerObjectDestroyed;
-        public event Action<PlayerDeadEvent> PlayerDied;
+        public event Action<EntityBase, PlayerConfigTableEntry, Vector3> PlayerSpawned;
+        public event Action<EntityBase, Vector3> PlayerDestroyed;
+        public event Action<EntityBase, PlayerConfigTableEntry, Vector3> PlayerDied;
 
         private int _playerConfigTableId;
         private readonly IResourceProvider _resourceProvider;
@@ -126,7 +126,6 @@ namespace DungeonShooter
                 return null;
             }
 
-            // 기존 플레이어가 있다면 파괴,바인딩 해제
             playerInstance.tag = GameTags.Player;
             playerInstance.layer = PhysicalLayers.Player.LayerIndex;
 
@@ -164,16 +163,16 @@ namespace DungeonShooter
             
             entity.OnDestroyed += (self) =>
             {
-                PlayerObjectDestroyed?.Invoke(new PlayerObjectDestroyEvent {player = self, position = playerInstance.transform.position});
+                PlayerDestroyed?.Invoke(self, playerInstance.transform.position);
             };
 
             healthComponent.OnDeath += () =>
             {
                 Object.Destroy(entity.gameObject);
-                PlayerDied?.Invoke(new PlayerDeadEvent() {player = entity, position = playerInstance.transform.position, playerConfigTableEntry = config});
+                PlayerDied?.Invoke(entity, config, playerInstance.transform.position);
             };
 
-            PlayerObjectSpawned?.Invoke(new PlayerObjectSpawnEvent{ player = entity, playerConfigTableEntry = config, position = playerInstance.transform.position});
+            PlayerSpawned?.Invoke(entity, config, playerInstance.transform.position);
             return entity;
         }
     }

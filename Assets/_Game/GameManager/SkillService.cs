@@ -26,7 +26,8 @@ namespace DungeonShooter
 
     public interface ISkillService
     {
-        event Action<SkillLevelUpEvent> OnSkillLeveledUp;
+        /// <summary>스킬 인스턴스가 레벨업으로 교체되었을 때 (이전, 이후)</summary>
+        event Action<Skill, Skill> OnSkillLeveledUp;
 
         /// <summary>
         /// 보유 스킬 중 다음 레벨이 존재하는 스킬만 필터링하여 반환합니다.
@@ -45,7 +46,7 @@ namespace DungeonShooter
     /// </summary>
     public class SkillService : ISkillService
     {
-        public event Action<SkillLevelUpEvent> OnSkillLeveledUp;
+        public event Action<Skill, Skill> OnSkillLeveledUp;
 
         private readonly ITableRepository _tableRepository;
         private readonly IResourceProvider _resourceProvider;
@@ -88,7 +89,7 @@ namespace DungeonShooter
                 return false;
             }
 
-            OnSkillLeveledUp?.Invoke(new SkillLevelUpEvent { beforeSkill = currentSkill, afterSkill = after });
+            OnSkillLeveledUp?.Invoke(currentSkill, after);
             after.StartCooldown(currentSkill.Cooldown);
             container.Unregist(currentSkill);
             container.Regist(after);

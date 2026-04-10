@@ -32,21 +32,25 @@ namespace DungeonShooter
             return _cullingObjectsRoot;
         }
 
-        internal void OnPlayerSpawnedForCulling(PlayerObjectSpawnEvent ev)
+        /// <summary>거리 컬링 기준으로 삼을 플레이어 엔티티를 설정합니다.</summary>
+        public void SetPlayerDistanceReference(EntityBase player)
         {
-            _playerTransform = ev.player != null ? ev.player.transform : null;
+            _playerTransform = player != null ? player.transform : null;
         }
 
-        internal void OnPlayerDestroyedForCulling(PlayerObjectDestroyEvent ev)
+        /// <summary>플레이어 거리 기준을 해제합니다.</summary>
+        public void ClearPlayerDistanceReference()
         {
             _playerTransform = null;
         }
 
-        internal void OnEnemySpawnedForCulling(EnemySpawnedEvent ev)
+        /// <summary>엔티티를 컬링 루트 하위로 붙여 거리 기반 활성/비활성 대상으로 둡니다.</summary>
+        public void AttachEntityToDistanceCullingRoot(EntityBase entity)
         {
-            if (ev.enemy == null)
+            if (entity == null)
                 return;
-            ev.enemy.transform.SetParent(GetOrCreateCullingObjectsRoot(), true);
+
+            entity.transform.SetParent(GetOrCreateCullingObjectsRoot(), true);
         }
 
         private void Update()

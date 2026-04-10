@@ -49,12 +49,12 @@ namespace DungeonShooter
             _model.OnWeaponUnequipped += OnWeaponUnequipped;
         }
 
-        public void OnPlayerObjectSpawned(PlayerObjectSpawnEvent playerObjectSpawnEvent)
+        public void BindItemUserEntity(EntityBase entity)
         {
-            _ownerEntity = playerObjectSpawnEvent.player;
+            _ownerEntity = entity;
         }
 
-        public void OnPlayerObjectDespawned(PlayerObjectDestroyEvent playerObjectDestroyEvent)
+        public void UnbindItemUserEntity()
         {
             _ownerEntity = null;
         }

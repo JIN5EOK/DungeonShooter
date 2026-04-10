@@ -27,7 +27,7 @@ namespace DungeonShooter
 
             builder.RegisterBuildCallback(resolver =>
             {
-                resolver.Resolve<StageSceneInteractionMediator>().Register();
+                resolver.Resolve<StageSceneEventMediator>().Register();
             });
             
             base.Configure(builder);

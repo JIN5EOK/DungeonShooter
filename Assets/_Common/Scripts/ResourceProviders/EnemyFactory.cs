@@ -15,8 +15,8 @@ namespace DungeonShooter
     /// </summary>
     public interface IEnemyFactory
     {
-        event Action<EnemySpawnedEvent> EnemySpawned;
-        event Action<EnemyDeadEvent> EnemyDied;
+        event Action<EntityBase> EnemySpawned;
+        event Action<EntityBase, EnemyConfigTableEntry, Vector3> EnemyDied;
 
         void Initialize(int stageConfigTableId);
         UniTask<EntityBase> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
@@ -30,8 +30,8 @@ namespace DungeonShooter
     /// </summary>
     public class EnemyFactory : IEnemyFactory
     {
-        public event Action<EnemySpawnedEvent> EnemySpawned;
-        public event Action<EnemyDeadEvent> EnemyDied;
+        public event Action<EntityBase> EnemySpawned;
+        public event Action<EntityBase, EnemyConfigTableEntry, Vector3> EnemyDied;
 
         private LifetimeScope _sceneLifetimeScope;
         
@@ -271,7 +271,7 @@ namespace DungeonShooter
                 {
                     var destroyEffectSpawnPos = entity.transform.position;
                     _skillObjectFactory.CreateSkillObjectAsync<ParticleSkillObject>(CommonAddresses.MonsterDeath_Particle, destroyEffectSpawnPos).Forget();
-                    EnemyDied?.Invoke(new EnemyDeadEvent { enemy = entity, enemyConfigTableEntry = configTableEntry });
+                    EnemyDied?.Invoke(entity, configTableEntry, destroyEffectSpawnPos);
                     entity.Release();
                 };
             }
@@ -295,7 +295,7 @@ namespace DungeonShooter
             var aiBT = _resourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
             entityLifeTimeScope.Container.Resolve<IAIComponent>().Initialize(aiBT, activeSkills);
 
-            EnemySpawned?.Invoke(new EnemySpawnedEvent { enemy = entity });
+            EnemySpawned?.Invoke(entity);
             return entity;
         }
     }

@@ -19,7 +19,7 @@ namespace DungeonShooter
         private IPlayerFactory _playerFactory;
         private IRoomDataRepository _roomDataRepository;
         private IEnemyFactory _enemyFactory;
-        private StageSceneInteractionMediator _stageSceneInteractionMediator;
+        private StageSceneEventMediator _stageSceneEventMediator;
 
         [Inject]
         public void Construct(
@@ -34,7 +34,7 @@ namespace DungeonShooter
             , IPlayerFactory playerFactory
             , IRoomDataRepository roomDataRepository
             , IEnemyFactory enemyFactory
-            , StageSceneInteractionMediator stageSceneInteractionMediator)
+            , StageSceneEventMediator stageSceneEventMediator)
         {
             _stageContext = stageContext;
             _tableRepository = tableRepository;
@@ -47,12 +47,12 @@ namespace DungeonShooter
             _playerFactory = playerFactory;
             _roomDataRepository = roomDataRepository;
             _enemyFactory = enemyFactory;
-            _stageSceneInteractionMediator = stageSceneInteractionMediator;
+            _stageSceneEventMediator = stageSceneEventMediator;
         }
 
         private void OnDestroy()
         {
-            _stageSceneInteractionMediator?.Unregister();
+            _stageSceneEventMediator?.Unregister();
         }
 
         private async UniTask Start()
