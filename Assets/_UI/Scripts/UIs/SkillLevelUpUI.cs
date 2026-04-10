@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using VContainer;
+using Random = UnityEngine.Random;
 
 namespace DungeonShooter
 {
@@ -16,32 +18,23 @@ namespace DungeonShooter
         private SkillLevelUpSlot _skillLevelUpSlotPrefab;
         private List<SkillLevelUpSlot> _slots = new();
 
-        private IPlayerContextManager _playerContextManager;
-        private ISkillService _skillService;
         private IPauseManager _pauseManager;
         private ITableRepository _tableRepository;
 
         [Inject]
-        public void Construct(IPlayerContextManager playerContextManager, ISkillService skillService, IPauseManager pauseManager, ITableRepository tableRepository)
+        public void Construct(IPauseManager pauseManager, ITableRepository tableRepository)
         {
-            _playerContextManager = playerContextManager;
-            _skillService = skillService;
             _pauseManager = pauseManager;
             _tableRepository = tableRepository;
         }
 
-        public void OnPlayerLevelChanged(int level)
-        {
-            SetLevelUpSkillAndShow();
-        }
-        
         /// <summary>
-        /// 지니고 있는 스킬중 레벨업 가능한 스킬을 찾아내어 표시
+        /// 레벨업 가능 스킬 목록을 표시하고, 선택 시 콜백을 호출합니다.
         /// </summary>
-        public void SetLevelUpSkillAndShow()
+        public void ShowLevelUpSkillOptions(IReadOnlyList<LevelUpableSkillInfo> levelUpableList, Action<Skill> onSelected)
         {
-            var skills = _playerContextManager?.EntityContext?.Skill?.GetRegistedSkills();
-            var levelUpableList = _skillService.GetLevelUpableSkills(skills);
+            if (levelUpableList == null || levelUpableList.Count == 0)
+                return;
 
             IReadOnlyList<LevelUpableSkillInfo> toDisplay = levelUpableList;
             if (levelUpableList.Count > MaxDisplayCount)
@@ -76,7 +69,7 @@ namespace DungeonShooter
 
                 slot.SetSelectHandler(() =>
                 {
-                    _skillService.TrySkillLevelUp(_playerContextManager?.EntityContext?.Skill, info.CurrentSkill);
+                    onSelected?.Invoke(info.CurrentSkill);
                     Hide();
                 });
 

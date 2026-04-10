@@ -12,6 +12,7 @@ namespace DungeonShooter
         private readonly IEnemyFactory _enemyFactory;
         private readonly IPlayerLevelService _playerLevelService;
         private readonly ISkillService _skillService;
+        private readonly IPlayerContextManager _playerContextManager;
         private readonly PlayerInputManager _playerInputManager;
         private readonly SkillLevelUpUI _skillLevelUpUI;
         private readonly ISkillSlotService _skillSlotService;
@@ -27,6 +28,7 @@ namespace DungeonShooter
             IEnemyFactory enemyFactory,
             IPlayerLevelService playerLevelService,
             ISkillService skillService,
+            IPlayerContextManager playerContextManager,
             PlayerInputManager playerInputManager,
             SkillLevelUpUI skillLevelUpUI,
             ISkillSlotService skillSlotService,
@@ -40,6 +42,7 @@ namespace DungeonShooter
             _enemyFactory = enemyFactory;
             _playerLevelService = playerLevelService;
             _skillService = skillService;
+            _playerContextManager = playerContextManager;
             _playerInputManager = playerInputManager;
             _skillLevelUpUI = skillLevelUpUI;
             _skillSlotService = skillSlotService;
@@ -55,7 +58,7 @@ namespace DungeonShooter
             _playerFactory.PlayerSpawned += ForwardPlayerSpawnToInput;
             _playerFactory.PlayerDestroyed += ForwardPlayerDespawnToInput;
 
-            _playerLevelService.OnLevelChanged += _skillLevelUpUI.OnPlayerLevelChanged;
+            _playerLevelService.OnLevelChanged += ForwardPlayerLevelChanged;
 
             _skillService.OnSkillLeveledUp += ForwardSkillLeveledUp;
 
@@ -78,7 +81,7 @@ namespace DungeonShooter
             _playerFactory.PlayerSpawned -= ForwardPlayerSpawnToInput;
             _playerFactory.PlayerDestroyed -= ForwardPlayerDespawnToInput;
 
-            _playerLevelService.OnLevelChanged -= _skillLevelUpUI.OnPlayerLevelChanged;
+            _playerLevelService.OnLevelChanged -= ForwardPlayerLevelChanged;
 
             _skillService.OnSkillLeveledUp -= ForwardSkillLeveledUp;
 
@@ -108,6 +111,17 @@ namespace DungeonShooter
 
         private void ForwardPlayerDespawnToInput(EntityBase player, Vector3 position) =>
             _playerInputManager.UnbindControlledEntity();
+
+        private void ForwardPlayerLevelChanged(int level)
+        {
+            var skills = _playerContextManager?.EntityContext?.Skill?.GetRegistedSkills();
+            var levelUpableList = _skillService.GetLevelUpableSkills(skills);
+
+            _skillLevelUpUI.ShowLevelUpSkillOptions(levelUpableList, selectedSkill =>
+            {
+                _skillService.TrySkillLevelUp(_playerContextManager?.EntityContext?.Skill, selectedSkill);
+            });
+        }
 
         private void ForwardSkillLeveledUp(Skill beforeSkill, Skill afterSkill) =>
             _skillSlotService.ReplaceSkillSlot(beforeSkill, afterSkill);
