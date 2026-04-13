@@ -61,18 +61,10 @@ namespace DungeonShooter
         /// </summary>
         public async UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
-            try
-            {
-                var playerAddress = GetPlayerAddress();
-                var playerInstance = await _resourceProvider.GetInstanceAsync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
-                var entity = await InitializePlayerInstance(playerInstance);
-                return entity;
-            }
-            catch (Exception e)
-            {
-                LogHandler.LogException<PlayerFactory>(e, "플레이어를 불러오지 못했습니다.");
-                return null;
-            }
+            var playerAddress = GetPlayerAddress();
+            var playerInstance = await _resourceProvider.GetInstanceAsync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
+            var entity = InitializePlayerInstance(playerInstance);
+            return entity;
         }
 
         /// <summary>
@@ -80,18 +72,10 @@ namespace DungeonShooter
         /// </summary>
         public EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
-            try
-            {
-                var playerAddress = GetPlayerAddress();
-                var playerInstance = _resourceProvider.GetInstanceSync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
-                var entity = InitializePlayerInstance(playerInstance).GetAwaiter().GetResult();
-                return entity;
-            }
-            catch (Exception e)
-            {
-                LogHandler.LogException<PlayerFactory>(e, "플레이어를 불러오지 못했습니다.");
-                return null;
-            }
+            var playerAddress = GetPlayerAddress();
+            var playerInstance = _resourceProvider.GetInstanceSync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
+            var entity = InitializePlayerInstance(playerInstance);
+            return entity;
         }
 
         /// <summary>
@@ -118,7 +102,7 @@ namespace DungeonShooter
         /// <summary>
         /// Player 게임오브젝트 초기화, 컴포넌트 부착, 바인딩, UI 연동
         /// </summary>
-        private async UniTask<EntityBase> InitializePlayerInstance(GameObject playerInstance)
+        private EntityBase InitializePlayerInstance(GameObject playerInstance)
         {
             if (playerInstance == null)
             {
@@ -154,10 +138,10 @@ namespace DungeonShooter
                 entityLifeTimeScope.Container.Resolve<SkillState>(),
                 entityLifeTimeScope.Container.Resolve<InteractState>());
             
-            var interactNotice = await _resourceProvider.GetInstanceAsync(CommonAddresses.InteractNotice);
+            var interactNotice = _resourceProvider.GetInstanceSync(CommonAddresses.InteractNotice);
             interactComponent.SetInteractNotice(interactNotice);
 
-            await cameraTrackComponent.AttachCameraAsync();
+            cameraTrackComponent.AttachCameraAsync().Forget();
             
             var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_playerConfigTableId);
             
