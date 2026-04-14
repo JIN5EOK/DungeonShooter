@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be07d36eed6de4810a0cca1eacdaf6d2, type: 3}
+  m_Script: {fileID: 11500000, guid: c9a6982cb866c4ed797d84c7f34b26e3, type: 3}
   m_Name: New Foo Sample So
   m_EditorClassIdentifier: 
-  _id: 4234
-  _intValue: 342
-  _intList: e55b000014020000b3150000
+  _id: 5
+  _intValue: 5235
+  _intList: 
   _bar:
-    BarA: 34
-    BarB: 4
+    BarA: 23
+    BarB: 32

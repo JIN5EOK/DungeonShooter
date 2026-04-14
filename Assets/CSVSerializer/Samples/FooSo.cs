@@ -11,7 +11,11 @@ namespace DungeonShooter
         [SerializeField] private List<int> _intList = new();
         [SerializeField] private Bar _bar = new();
 
-        public int Id => _id;
+        public int Id
+        {
+            get => _id;
+            set => _id = value;
+        }
 
         public int IntValue
         {

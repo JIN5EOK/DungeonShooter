@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,11 +9,8 @@ namespace DungeonShooter
 {
     public sealed class SoDataSerializerEditorWindow : EditorWindow
     {
-        private int _selectedIndex;
         private string _csvPath;
         private DefaultAsset _soFolder;
-        private List<Type> _dtoTypes;
-        private string[] _dtoTypeNames;
         private bool? _lastResult;
 
         [MenuItem("DungeonShooter/CSV Serializer")]
@@ -23,23 +19,9 @@ namespace DungeonShooter
             GetWindow<SoDataSerializerEditorWindow>("CSV Serializer");
         }
 
-        private void OnEnable()
-        {
-            RefreshDtoTypes();
-        }
-
         private void OnGUI()
         {
-            if (_dtoTypes == null || _dtoTypes.Count == 0)
-            {
-                EditorGUILayout.HelpBox("CsvDtoForAttribute가 붙은 DTO를 찾지 못했습니다.", MessageType.Warning);
-                if (GUILayout.Button("리스트 새로고침"))
-                    RefreshDtoTypes();
-                return;
-            }
-
-            EditorGUILayout.LabelField("DTO 선택", EditorStyles.boldLabel);
-            _selectedIndex = EditorGUILayout.Popup(_selectedIndex, _dtoTypeNames);
+            EditorGUILayout.LabelField("샘플 전용 (FooSo <-> SerializedFoo)", EditorStyles.boldLabel);
 
             EditorGUILayout.Space(8);
             EditorGUILayout.LabelField("경로", EditorStyles.boldLabel);
@@ -59,14 +41,13 @@ namespace DungeonShooter
 
             EditorGUILayout.Space(12);
 
-            var dtoType = _dtoTypes[Mathf.Clamp(_selectedIndex, 0, _dtoTypes.Count - 1)];
             var folderPath = _soFolder != null ? AssetDatabase.GetAssetPath(_soFolder) : string.Empty;
 
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("CSV -> SO"))
                 {
-                    _lastResult = CSVSerializer.CsvToSo(dtoType, _csvPath, folderPath);
+                    _lastResult = CsvToSo_SerializedFoo(_csvPath, folderPath);
                 }
 
                 if (GUILayout.Button("SO -> CSV"))
@@ -74,11 +55,11 @@ namespace DungeonShooter
                     var outputPath = _csvPath;
                     if (string.IsNullOrWhiteSpace(outputPath))
                     {
-                        outputPath = Path.Combine(Application.dataPath, $"{dtoType.Name}.csv");
+                        outputPath = Path.Combine(Application.dataPath, $"{nameof(SerializedFoo)}.csv");
                         outputPath = outputPath.Replace("\\", "/");
                     }
 
-                    _lastResult = CSVSerializer.SoToCsv(dtoType, folderPath, outputPath);
+                    _lastResult = SoToCsv_SerializedFoo(folderPath, outputPath);
                 }
             }
 
@@ -87,28 +68,129 @@ namespace DungeonShooter
                 EditorGUILayout.Space(8);
                 EditorGUILayout.HelpBox(_lastResult.Value ? "성공" : "실패", _lastResult.Value ? MessageType.Info : MessageType.Error);
             }
-
-            EditorGUILayout.Space(12);
-            if (GUILayout.Button("리스트 새로고침"))
-                RefreshDtoTypes();
         }
 
-        private void RefreshDtoTypes()
+        private static bool CsvToSo_SerializedFoo(string csvPath, string writeFolder)
         {
-            _dtoTypes = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .SelectMany(a =>
-                {
-                    try { return a.GetTypes(); }
-                    catch { return Array.Empty<Type>(); }
-                })
-                .Where(t => t != null && t.IsClass && !t.IsAbstract)
-                .Where(t => t.GetCustomAttribute<CsvDtoForAttribute>() != null)
-                .OrderBy(t => t.FullName, StringComparer.Ordinal)
-                .ToList();
+            if (string.IsNullOrWhiteSpace(writeFolder))
+            {
+                LogHandler.LogError(nameof(SoDataSerializerEditorWindow), "SO Folder가 비었습니다.");
+                return false;
+            }
 
-            _dtoTypeNames = _dtoTypes.Select(t => t.FullName).ToArray();
-            _selectedIndex = Mathf.Clamp(_selectedIndex, 0, Math.Max(0, _dtoTypes.Count - 1));
+            var dtos = CSVSerializer.ReadCsv<SerializedFoo>(csvPath);
+            if (dtos.Count == 0)
+            {
+                LogHandler.LogWarning(nameof(SoDataSerializerEditorWindow), "CSV에서 읽은 레코드가 없습니다.");
+                return false;
+            }
+
+            var byId = LoadAllFooSoById(writeFolder);
+            var succeeded = 0;
+            var failed = 0;
+
+            foreach (var dto in dtos)
+            {
+                try
+                {
+                    if (!byId.TryGetValue(dto.Id, out var so) || so == null)
+                    {
+                        so = CreateFooSoAsset(writeFolder, dto.Id);
+                        byId[dto.Id] = so;
+                    }
+
+                    dto.ApplyTo(so);
+                    EditorUtility.SetDirty(so);
+                    succeeded++;
+                }
+                catch (Exception ex)
+                {
+                    failed++;
+                    LogHandler.LogError(nameof(SoDataSerializerEditorWindow), $"CSV->SO 실패 (Id={dto.Id}): {ex.Message}");
+                    LogHandler.LogException(nameof(SoDataSerializerEditorWindow), ex);
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+            LogHandler.Log(nameof(SoDataSerializerEditorWindow), $"CSV->SO 완료. Succeeded={succeeded}, Failed={failed}");
+            return failed == 0;
+        }
+
+        private static bool SoToCsv_SerializedFoo(string readFolder, string csvPath)
+        {
+            if (string.IsNullOrWhiteSpace(readFolder))
+            {
+                LogHandler.LogError(nameof(SoDataSerializerEditorWindow), "SO Folder가 비었습니다.");
+                return false;
+            }
+
+            var assets = LoadAllFooSo(readFolder);
+            var dtos = new List<SerializedFoo>(assets.Count);
+
+            foreach (var so in assets)
+            {
+                var dto = new SerializedFoo();
+                dto.PopulateFromSo(so);
+                dtos.Add(dto);
+            }
+
+            var ok = CSVSerializer.WriteCsv(dtos, csvPath);
+            if (ok)
+                LogHandler.Log(nameof(SoDataSerializerEditorWindow), $"SO->CSV 완료. Count={dtos.Count}, Path={csvPath}");
+            else
+                LogHandler.LogError(nameof(SoDataSerializerEditorWindow), $"SO->CSV 실패. Path={csvPath}");
+
+            AssetDatabase.Refresh();
+            return ok;
+        }
+
+        private static Dictionary<int, FooSo> LoadAllFooSoById(string folder)
+        {
+            var result = new Dictionary<int, FooSo>();
+            foreach (var so in LoadAllFooSo(folder))
+            {
+                result[so.Id] = so;
+            }
+
+            return result;
+        }
+
+        private static List<FooSo> LoadAllFooSo(string folder)
+        {
+            var guids = AssetDatabase.FindAssets($"t:{nameof(FooSo)}", new[] { folder });
+            var list = new List<FooSo>(guids.Length);
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var asset = AssetDatabase.LoadAssetAtPath<FooSo>(path);
+                if (asset != null)
+                    list.Add(asset);
+            }
+
+            return list;
+        }
+
+        private static FooSo CreateFooSoAsset(string folder, int id)
+        {
+            var so = ScriptableObject.CreateInstance<FooSo>();
+
+            so.Id = id;
+
+            var assetPath = CombineAssetPath(folder, $"{nameof(FooSo)}_{id}.asset");
+            AssetDatabase.CreateAsset(so, assetPath);
+            return so;
+        }
+
+        private static string CombineAssetPath(string folder, string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(folder))
+                return fileName;
+
+            var normalized = folder.Replace("\\", "/");
+            if (normalized.EndsWith("/", StringComparison.Ordinal))
+                return normalized + fileName;
+
+            return normalized + "/" + fileName;
         }
     }
 }
