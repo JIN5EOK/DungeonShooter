@@ -10,6 +10,7 @@ namespace DungeonShooter
     /// <summary>
     /// CSV 파일을 파싱하여 테이블 엔트리로 변환하는 파서
     /// 큰따옴표(")로 감싼 필드 안의 쉼표는 셀 구분자로 사용하지 않으며, ""는 하나의 "로 이스케이프됩니다.
+    /// 클래스·구조체는 셀에 "이름:값/이름:값" 형식으로 기입합니다 (public 프로퍼티·필드, 값에 ':'가 있으면 첫 ':'만 구분자).
     /// </summary>
     public static class CSVTableParser
     {
@@ -141,7 +142,9 @@ namespace DungeonShooter
         private static T ParseLine<T>(string[] headers, string[] values) where T : class, new()
         {
             var entry = new T();
-            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var entryType = typeof(T);
+            var properties = entryType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var fields = entryType.GetFields(BindingFlags.Public | BindingFlags.Instance);
 
             for (int i = 0; i < headers.Length; i++)
             {
@@ -151,17 +154,34 @@ namespace DungeonShooter
                 if (string.IsNullOrEmpty(value))
                     continue;
 
+                // 이름과 일치하는 프로퍼티 찾기 시도
                 var property = properties.FirstOrDefault(p => p.Name == headerName && p.CanWrite);
-                if (property == null)
-                    continue;
+                if (property != null)
+                {
+                    try
+                    {
+                        SetPropertyValue(entry, property, value);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHandler.LogWarning(nameof(CSVTableParser), $"속성 '{headerName}' 설정 실패: {ex.Message}");
+                    }
 
-                try
-                {
-                    SetPropertyValue(entry, property, value);
+                    continue;
                 }
-                catch (Exception ex)
+
+                // 이름과 일치하는 필드 찾기 시도
+                var field = fields.FirstOrDefault(f => f.Name == headerName && !f.IsInitOnly);
+                if (field != null)
                 {
-                    LogHandler.LogWarning(nameof(CSVTableParser),$"속성 '{headerName}' 설정 실패: {ex.Message}");
+                    try
+                    {
+                        SetFieldValue(entry, field, value);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHandler.LogWarning(nameof(CSVTableParser), $"필드 '{headerName}' 설정 실패: {ex.Message}");
+                    }
                 }
             }
 
@@ -171,37 +191,160 @@ namespace DungeonShooter
         /// <summary>
         /// 속성에 값을 설정합니다.
         /// </summary>
-        private static void SetPropertyValue<T>(T entry, PropertyInfo property, string value) where T : class
+        private static void SetPropertyValue(object entry, PropertyInfo property, string value)
         {
-            var propertyType = property.PropertyType;
+            AssignParsedValue(property.PropertyType, value, v => property.SetValue(entry, v));
+        }
 
+        /// <summary>
+        /// 필드에 값을 설정합니다.
+        /// </summary>
+        private static void SetFieldValue(object entry, FieldInfo field, string value)
+        {
+            AssignParsedValue(field.FieldType, value, v => field.SetValue(entry, v));
+        }
+
+        /// <summary>
+        /// 문자열을 파싱한 뒤 대상 멤버 타입에 맞게 할당합니다.
+        /// </summary>
+        private static void AssignParsedValue(Type memberType, string value, Action<object> assign)
+        {
             // Dictionary<K,V> 일괄 처리 (예: "key:value/key:value")
-            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            if (memberType.IsGenericType && memberType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                var args = propertyType.GetGenericArguments();
-                property.SetValue(entry, ParseDictionary(value, args[0], args[1]));
+                var args = memberType.GetGenericArguments();
+                assign(ParseDictionary(value, args[0], args[1]));
                 return;
             }
 
             // List<T> 일괄 처리 (예: "18000000/18000001" 또는 "a/b/c")
-            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
+            if (memberType.IsGenericType && memberType.GetGenericTypeDefinition() == typeof(List<>))
             {
-                var elementType = propertyType.GetGenericArguments()[0];
-                property.SetValue(entry, ParseList(value, elementType));
+                var elementType = memberType.GetGenericArguments()[0];
+                assign(ParseList(value, elementType));
                 return;
             }
 
             // enum 타입 처리
-            if (propertyType.IsEnum)
+            if (memberType.IsEnum)
             {
-                var enumValue = Enum.Parse(propertyType, value, ignoreCase: true);
-                property.SetValue(entry, enumValue);
+                assign(Enum.Parse(memberType, value, ignoreCase: true));
+                return;
+            }
+
+            // 클래스·구조체 (예: "MaxHp:100/Attack:10/MoveSpeed:5") — 이름은 CSV·복합 셀과 동일하게 대소문자 구분
+            if (IsCompositePropertyType(memberType))
+            {
+                assign(ParseCompositeObject(value, memberType));
                 return;
             }
 
             // 기본 타입 처리
-            var convertedValue = Convert.ChangeType(value, propertyType);
-            property.SetValue(entry, convertedValue);
+            assign(Convert.ChangeType(value, memberType));
+        }
+
+        /// <summary>
+        /// CSV 셀 하나로 묶어 파싱할 수 있는 단순 타입이면 true (문자열·숫자·날짜 등).
+        /// </summary>
+        private static bool IsSimpleScalarType(Type type)
+        {
+            var underlying = Nullable.GetUnderlyingType(type) ?? type;
+            if (underlying == typeof(string))
+                return true;
+            if (underlying.IsPrimitive)
+                return true;
+            if (underlying == typeof(decimal))
+                return true;
+            if (underlying == typeof(DateTime))
+                return true;
+            if (underlying == typeof(TimeSpan))
+                return true;
+            if (underlying == typeof(Guid))
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// public 프로퍼티·필드를 "이름:값/이름:값" 형식으로 채울 수 있는 복합 타입인지 여부입니다.
+        /// </summary>
+        private static bool IsCompositePropertyType(Type type)
+        {
+            if (type.IsEnum)
+                return false;
+            if (IsSimpleScalarType(type))
+                return false;
+            return true;
+        }
+
+        /// <summary>
+        /// "이름:값/이름:값" 형식 문자열을 대상 타입 인스턴스로 파싱합니다.
+        /// 값에 ':'가 포함되면 첫 번째 ':'만 구분자로 사용합니다.
+        /// </summary>
+        private static object ParseCompositeObject(string data, Type targetType)
+        {
+            var instance = Activator.CreateInstance(targetType);
+            if (string.IsNullOrEmpty(data))
+                return instance;
+
+            var properties = targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var fields = targetType.GetFields(BindingFlags.Public | BindingFlags.Instance);
+
+            try
+            {
+                var segments = data.Split('/');
+                foreach (var segment in segments)
+                {
+                    var trimmed = segment.Trim();
+                    if (string.IsNullOrEmpty(trimmed))
+                        continue;
+
+                    var colonIndex = trimmed.IndexOf(':');
+                    if (colonIndex < 0)
+                        continue;
+
+                    var name = trimmed.Substring(0, colonIndex).Trim();
+                    var fieldValue = trimmed.Substring(colonIndex + 1);
+
+                    if (string.IsNullOrEmpty(name))
+                        continue;
+
+                    var valueTrimmed = fieldValue.Trim();
+
+                    var prop = properties.FirstOrDefault(p => p.Name == name && p.CanWrite);
+                    if (prop != null)
+                    {
+                        try
+                        {
+                            SetPropertyValue(instance, prop, valueTrimmed);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogHandler.LogWarning(nameof(CSVTableParser), $"복합 타입 '{targetType.Name}' 속성 '{name}' 설정 실패: {ex.Message}");
+                        }
+
+                        continue;
+                    }
+
+                    var fld = fields.FirstOrDefault(f => f.Name == name && !f.IsInitOnly);
+                    if (fld == null)
+                        continue;
+
+                    try
+                    {
+                        SetFieldValue(instance, fld, valueTrimmed);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHandler.LogWarning(nameof(CSVTableParser), $"복합 타입 '{targetType.Name}' 필드 '{name}' 설정 실패: {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHandler.LogError(nameof(CSVTableParser), $"복합 타입 파싱 실패: {data}, 타입: {targetType.Name}, 에러: {ex.Message}");
+            }
+
+            return instance;
         }
 
         /// <summary>
