@@ -4,7 +4,7 @@ using UnityEngine;
 namespace DungeonShooter
 {
     [CreateAssetMenu(menuName = "DungeonShooter/CSVSerializer/FooSampleSo")]
-    public class FooSo : ScriptableObject, IIntId
+    public class FooSo : ScriptableObject, ISerializableObject<FooSo, SerializedFoo>, IIntId
     {
         [SerializeField] private int _id;
         [SerializeField] private int _intValue;
@@ -41,6 +41,40 @@ namespace DungeonShooter
             public int BarA;
             public float BarB;
         }
+        
+        
+#if UNITY_EDITOR
+        // 직렬화 데이터 생성
+        public List<SerializedFoo> CreateSerializedDto()
+        {
+            var list = new List<SerializedFoo>();
+            
+            // 루트
+            list.Add(new SerializedFoo (_id, _intValue, null, _bar.BarA, _bar.BarB));
+            
+            for (int i = 0; i < _intList.Count; i++)
+            {
+                var sFoo = new SerializedFoo(_id, null, _intList[i], null,null);
+                list.Add(sFoo);
+            }
+
+            return list;
+        }
+
+        public void ApplyFromSerializedDto(List<SerializedFoo> serializedDto)
+        {
+            _intList.Clear();
+            foreach (var serializedFoo in serializedDto)
+            {
+                _id = serializedFoo.Id;
+                _intValue = serializedFoo.IntValue ?? _intValue;
+                if(serializedFoo.IntListElement != null)
+                    _intList.Add(serializedFoo.IntListElement.Value);
+                _bar.BarA = serializedFoo.BarA ?? _bar.BarA;
+                _bar.BarB = serializedFoo.BarB ?? _bar.BarB;
+            }
+        }
+#endif
     }
 }
 

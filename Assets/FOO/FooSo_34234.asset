@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9a6982cb866c4ed797d84c7f34b26e3, type: 3}
   m_Name: FooSo_34234
   m_EditorClassIdentifier: 
-  _id: 1
-  _intValue: 1
-  _intList: 
+  _id: 18000001
+  _intValue: 31231
+  _intList: 4d010000fd0000009a020000000000004d010000fd0000009a020000000000004d010000fd0000009a020000000000004d010000fd0000009a020000
   _bar:
-    BarA: 0
-    BarB: 0
+    BarA: 2312
+    BarB: 3123

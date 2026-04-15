@@ -9,8 +9,8 @@ namespace DungeonShooter
     public static class SoCsvPipeline
     {
         public static bool CsvToSo<TSo, TSerialized>(string csvPath, string writeFolder)
-            where TSo : ScriptableObject, IIntId
-            where TSerialized : ISerializeSODto<TSo>
+            where TSo : ScriptableObject, ISerializableObject<TSo, TSerialized>, IIntId
+            where TSerialized : class, IIntId, new()
         {
             if (string.IsNullOrWhiteSpace(writeFolder))
             {
@@ -29,24 +29,28 @@ namespace DungeonShooter
             var succeeded = 0;
             var failed = 0;
 
-            foreach (var dto in dtos)
+            var grouped = dtos.GroupBy(d => d.Id).ToList();
+            foreach (var group in grouped)
             {
                 try
                 {
-                    if (!byId.TryGetValue(dto.Id, out var so) || so == null)
+                    var id = group.Key;
+                    var rows = group.ToList();
+
+                    if (!byId.TryGetValue(id, out var so) || so == null)
                     {
-                        so = CreateSoAsset<TSo>(writeFolder, dto.Id);
-                        byId[dto.Id] = so;
+                        so = CreateSoAsset<TSo>(writeFolder, id);
+                        byId[id] = so;
                     }
 
-                    dto.ApplyTo(so);
+                    so.ApplyFromSerializedDto(rows);
                     EditorUtility.SetDirty(so);
                     succeeded++;
                 }
                 catch (Exception ex)
                 {
                     failed++;
-                    LogHandler.LogError(nameof(SoCsvPipeline), $"CSV->SO 실패 (Id={dto.Id}): {ex.Message}");
+                    LogHandler.LogError(nameof(SoCsvPipeline), $"CSV->SO 실패 (Id={group.Key}): {ex.Message}");
                     LogHandler.LogException(nameof(SoCsvPipeline), ex);
                 }
             }
@@ -57,8 +61,8 @@ namespace DungeonShooter
         }
 
         public static bool SoToCsv<TSo, TSerialized>(string readFolder, string csvPath)
-            where TSo : ScriptableObject, IIntId
-            where TSerialized : ISerializeSODto<TSo>
+            where TSo : ScriptableObject, ISerializableObject<TSo, TSerialized>, IIntId
+            where TSerialized : class, IIntId, new()
         {
             if (string.IsNullOrWhiteSpace(readFolder))
             {
@@ -73,12 +77,9 @@ namespace DungeonShooter
                 return false;
             }
 
-            var dtos = assets.Select(so =>
-            {
-                var dto = Activator.CreateInstance<TSerialized>();
-                dto.PopulateFrom(so);
-                return dto;
-            }).ToList();
+            var dtos = new List<TSerialized>();
+            foreach (var so in assets)
+                dtos.AddRange(so.CreateSerializedDto());
 
             var ok = CSVSerializer.WriteCsv(dtos, csvPath);
             if (ok)
