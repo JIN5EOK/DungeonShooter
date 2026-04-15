@@ -6,22 +6,22 @@ using UnityEngine;
 
 namespace DungeonShooter
 {
-    public static class SoCsvPipeline
+    public static class SoCSVPipeline
     {
         public static bool CsvToSo<TSo, TSerialized>(string csvPath, string writeFolder)
-            where TSo : ScriptableObject, ISerializableObject<TSo, TSerialized>, IIntId
+            where TSo : ScriptableObject, ISerializableObject<TSerialized>
             where TSerialized : class, IIntId, new()
         {
             if (string.IsNullOrWhiteSpace(writeFolder))
             {
-                LogHandler.LogError(nameof(SoCsvPipeline), "SO Folder가 비었습니다.");
+                LogHandler.LogError(nameof(SoCSVPipeline), "SO Folder가 비었습니다.");
                 return false;
             }
 
-            var dtos = CSVSerializer.ReadCsv<TSerialized>(csvPath);
+            var dtos = CSVParseHelper.ReadCsv<TSerialized>(csvPath);
             if (dtos.Count == 0)
             {
-                LogHandler.LogWarning(nameof(SoCsvPipeline), "CSV에서 읽은 레코드가 없습니다.");
+                LogHandler.LogWarning(nameof(SoCSVPipeline), "CSV에서 읽은 레코드가 없습니다.");
                 return false;
             }
 
@@ -50,30 +50,30 @@ namespace DungeonShooter
                 catch (Exception ex)
                 {
                     failed++;
-                    LogHandler.LogError(nameof(SoCsvPipeline), $"CSV->SO 실패 (Id={group.Key}): {ex.Message}");
-                    LogHandler.LogException(nameof(SoCsvPipeline), ex);
+                    LogHandler.LogError(nameof(SoCSVPipeline), $"CSV->SO 실패 (Id={group.Key}): {ex.Message}");
+                    LogHandler.LogException(nameof(SoCSVPipeline), ex);
                 }
             }
 
             AssetDatabase.SaveAssets();
-            LogHandler.Log(nameof(SoCsvPipeline), $"CSV->SO 완료. Succeeded={succeeded}, Failed={failed}");
+            LogHandler.Log(nameof(SoCSVPipeline), $"CSV->SO 완료. Succeeded={succeeded}, Failed={failed}");
             return failed == 0;
         }
 
         public static bool SoToCsv<TSo, TSerialized>(string readFolder, string csvPath)
-            where TSo : ScriptableObject, ISerializableObject<TSo, TSerialized>, IIntId
+            where TSo : ScriptableObject, ISerializableObject<TSerialized>
             where TSerialized : class, IIntId, new()
         {
             if (string.IsNullOrWhiteSpace(readFolder))
             {
-                LogHandler.LogError(nameof(SoCsvPipeline), "SO Folder가 비었습니다.");
+                LogHandler.LogError(nameof(SoCSVPipeline), "SO Folder가 비었습니다.");
                 return false;
             }
 
             var assets = LoadAllSo<TSo>(readFolder);
             if (assets.Count == 0)
             {
-                LogHandler.LogWarning(nameof(SoCsvPipeline), "SO 폴더에서 에셋을 찾지 못했습니다.");
+                LogHandler.LogWarning(nameof(SoCSVPipeline), "SO 폴더에서 에셋을 찾지 못했습니다.");
                 return false;
             }
 
@@ -81,11 +81,11 @@ namespace DungeonShooter
             foreach (var so in assets)
                 dtos.AddRange(so.CreateSerializedDto());
 
-            var ok = CSVSerializer.WriteCsv(dtos, csvPath);
+            var ok = CSVParseHelper.WriteCsv(dtos, csvPath);
             if (ok)
-                LogHandler.Log(nameof(SoCsvPipeline), $"SO->CSV 완료. Count={dtos.Count}, Path={csvPath}");
+                LogHandler.Log(nameof(SoCSVPipeline), $"SO->CSV 완료. Count={dtos.Count}, Path={csvPath}");
             else
-                LogHandler.LogError(nameof(SoCsvPipeline), $"SO->CSV 실패. Path={csvPath}");
+                LogHandler.LogError(nameof(SoCSVPipeline), $"SO->CSV 실패. Path={csvPath}");
 
             AssetDatabase.Refresh();
             return ok;
@@ -99,7 +99,7 @@ namespace DungeonShooter
             return result;
         }
 
-        private static List<TSo> LoadAllSo<TSo>(string folder) where TSo : ScriptableObject, IIntId
+        private static List<TSo> LoadAllSo<TSo>(string folder) where TSo : ScriptableObject
         {
             if (string.IsNullOrWhiteSpace(folder) || !AssetDatabase.IsValidFolder(folder))
                 return new List<TSo>();
@@ -118,7 +118,7 @@ namespace DungeonShooter
             return list;
         }
 
-        private static TSo CreateSoAsset<TSo>(string folder, int id) where TSo : ScriptableObject, IIntId
+        private static TSo CreateSoAsset<TSo>(string folder, int id) where TSo : ScriptableObject
         {
             var so = ScriptableObject.CreateInstance<TSo>();
             var assetPath = CombineAssetPath(folder, $"{typeof(TSo).Name}_{id}.asset");

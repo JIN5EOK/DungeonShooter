@@ -4,7 +4,7 @@ using UnityEngine;
 namespace DungeonShooter
 {
     [CreateAssetMenu(menuName = "DungeonShooter/CSVSerializer/FooSampleSo")]
-    public class FooSo : ScriptableObject, ISerializableObject<FooSo, SerializedFoo>, IIntId
+    public class FooSo : ScriptableObject, ISerializableObject<SerializedFoo>
     {
         [SerializeField] private int _id;
         [SerializeField] private int _intValue;
@@ -43,7 +43,6 @@ namespace DungeonShooter
         }
         
         
-#if UNITY_EDITOR
         // 직렬화 데이터 생성
         public List<SerializedFoo> CreateSerializedDto()
         {
@@ -74,7 +73,6 @@ namespace DungeonShooter
                 _bar.BarB = serializedFoo.BarB ?? _bar.BarB;
             }
         }
-#endif
     }
 }
 

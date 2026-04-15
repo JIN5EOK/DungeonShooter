@@ -8,13 +8,13 @@ using CsvHelper.Configuration;
 
 namespace DungeonShooter
 {
-    public static class CSVSerializer
+    public static class CSVParseHelper
     {
         public static List<TDto> ReadCsv<TDto>(string csvPath)
         {
             if (!File.Exists(csvPath))
             {
-                LogHandler.LogError(nameof(CSVSerializer), $"CSV 파일이 존재하지 않습니다: {csvPath}");
+                LogHandler.LogError(nameof(CSVParseHelper), $"CSV 파일이 존재하지 않습니다: {csvPath}");
                 return new List<TDto>();
             }
 
@@ -32,8 +32,8 @@ namespace DungeonShooter
             }
             catch (Exception ex)
             {
-                LogHandler.LogError(nameof(CSVSerializer), $"CSV 읽기 실패: {ex.Message}");
-                LogHandler.LogException(nameof(CSVSerializer), ex);
+                LogHandler.LogError(nameof(CSVParseHelper), $"CSV 읽기 실패: {ex.Message}");
+                LogHandler.LogException(nameof(CSVParseHelper), ex);
                 return new List<TDto>();
             }
         }
@@ -42,13 +42,13 @@ namespace DungeonShooter
         {
             if (records == null)
             {
-                LogHandler.LogError(nameof(CSVSerializer), "records가 null입니다.");
+                LogHandler.LogError(nameof(CSVParseHelper), "records가 null입니다.");
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(csvPath))
             {
-                LogHandler.LogError(nameof(CSVSerializer), "csvPath가 비었습니다.");
+                LogHandler.LogError(nameof(CSVParseHelper), "csvPath가 비었습니다.");
                 return false;
             }
 
@@ -67,8 +67,8 @@ namespace DungeonShooter
             }
             catch (Exception ex)
             {
-                LogHandler.LogError(nameof(CSVSerializer), $"CSV 쓰기 실패: {ex.Message}");
-                LogHandler.LogException(nameof(CSVSerializer), ex);
+                LogHandler.LogError(nameof(CSVParseHelper), $"CSV 쓰기 실패: {ex.Message}");
+                LogHandler.LogException(nameof(CSVParseHelper), ex);
                 return false;
             }
         }

@@ -8,14 +8,12 @@ namespace DungeonShooter
         int Id { get; set; }
     }
 
-    public interface ISerializableObject<TObject, TSerialized>
-        where TObject : ScriptableObject, ISerializableObject<TObject, TSerialized>, IIntId
-        where TSerialized : class, IIntId
+    public interface ISerializableObject<TSerialized> : 
+        IIntId
+        where TSerialized : class
     {
-#if UNITY_EDITOR
         List<TSerialized> CreateSerializedDto();
         void ApplyFromSerializedDto(List<TSerialized> serializedDto);
-#endif
     }
 }
 

@@ -7,8 +7,6 @@ namespace DungeonShooter
 {
     public sealed class SoDataSerializerEditorWindow : EditorWindow
     {
-        private string _importCsvPath;
-        private string _exportCsvPath;
         private DefaultAsset _soFolder;
         private bool? _lastResult;
 
@@ -20,66 +18,63 @@ namespace DungeonShooter
 
         private void OnGUI()
         {
-            EditorGUILayout.LabelField("샘플 전용 (FooSo <-> SerializedFoo)", EditorStyles.boldLabel);
-
+            EditorGUILayout.HelpBox("스크립터블 오브젝트 <-> CSV 파일 변환기", MessageType.None);
+            EditorGUILayout.LabelField($"설정", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("변환시 사용할 스크립터블 오브젝트가 위치한 경로 설정", MessageType.Info);
             EditorGUILayout.Space(8);
-            EditorGUILayout.LabelField("CSV -> SO", EditorStyles.boldLabel);
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                _importCsvPath = EditorGUILayout.TextField("CSV File", _importCsvPath);
-                if (GUILayout.Button("...", GUILayout.Width(28)))
-                {
-                    var picked = EditorUtility.OpenFilePanel("CSV 선택", Application.dataPath, "csv");
-                    if (!string.IsNullOrEmpty(picked))
-                        _importCsvPath = picked;
-                }
-            }
-
-            _soFolder = (DefaultAsset)EditorGUILayout.ObjectField("SO Folder", _soFolder, typeof(DefaultAsset), false);
-
-            EditorGUILayout.Space(12);
-            EditorGUILayout.LabelField("SO -> CSV", EditorStyles.boldLabel);
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                _exportCsvPath = EditorGUILayout.TextField("Save Path", _exportCsvPath);
-                if (GUILayout.Button("...", GUILayout.Width(28)))
-                {
-                    var defaultName = $"{nameof(SerializedFoo)}.csv";
-                    var picked = EditorUtility.SaveFilePanel("CSV 저장", Application.dataPath, defaultName, "csv");
-                    if (!string.IsNullOrEmpty(picked))
-                        _exportCsvPath = picked;
-                }
-            }
-
+            _soFolder = (DefaultAsset)EditorGUILayout.ObjectField("스크립터블 오브젝트 경로", _soFolder, typeof(DefaultAsset), false);
+            EditorGUILayout.Space(8);
+            
+            
             EditorGUILayout.Space(12);
 
-            var folderPath = _soFolder != null ? AssetDatabase.GetAssetPath(_soFolder) : string.Empty;
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                if (GUILayout.Button("CSV -> SO"))
-                {
-                    _lastResult = SoCsvPipeline.CsvToSo<FooSo, SerializedFoo>(_importCsvPath, folderPath);
-                }
-
-                if (GUILayout.Button("SO -> CSV"))
-                {
-                    var outputPath = _exportCsvPath;
-                    if (string.IsNullOrWhiteSpace(outputPath))
-                        outputPath = Path.Combine(Application.dataPath, $"{nameof(SerializedFoo)}.csv").Replace("\\", "/");
-
-                    _lastResult = SoCsvPipeline.SoToCsv<FooSo, SerializedFoo>(folderPath, outputPath);
-                }
-            }
-
+            AddSerializeMenu<FooSo, SerializedFoo>();
+            
             if (_lastResult.HasValue)
             {
                 EditorGUILayout.Space(8);
                 EditorGUILayout.HelpBox(_lastResult.Value ? "성공" : "실패", _lastResult.Value ? MessageType.Info : MessageType.Error);
+            }   
+        }
+        
+        private void AddSerializeMenu<TSo, TSerialized>()
+            where TSo : ScriptableObject, ISerializableObject<TSerialized>
+            where TSerialized : class, IIntId, new()
+        {
+            EditorGUILayout.Space(12);
+            EditorGUILayout.LabelField($"{typeof(TSo).Name} / CSV 변환", EditorStyles.boldLabel);
+
+            EditorGUILayout.Space(12);
+
+            // SOToCSV
+            
+            var folderPath = _soFolder != null ? AssetDatabase.GetAssetPath(_soFolder) : string.Empty;
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button($"CSV -> {typeof(TSo).Name} 변환"))
+                {
+                    var picked = EditorUtility.OpenFilePanel("CSV 선택", Application.dataPath, "csv");
+                    if (string.IsNullOrEmpty(picked))
+                        return;
+
+                    _lastResult = SoCSVPipeline.CsvToSo<TSo, TSerialized>(picked, folderPath);
+                }
+
+                if (GUILayout.Button($"{typeof(TSo).Name} -> CSV 변환"))
+                {
+                    var defaultName = $"{typeof(TSo).Name}.csv";
+                    var picked = EditorUtility.SaveFilePanel("CSV 저장", Application.dataPath, defaultName, "csv");
+                    if (string.IsNullOrEmpty(picked))
+                        return;
+
+                    var outputPath = picked;
+
+                    _lastResult = SoCSVPipeline.SoToCsv<TSo, TSerialized>(folderPath, outputPath);
+                }
             }
         }
     }
+    
 }
 
