@@ -29,7 +29,7 @@ namespace DungeonShooter
             EditorGUILayout.Space(12);
 
             AddSerializeMenu<FooSo, SerializedFoo>();
-            AddSerializeMenu<SkillTableEntrySo, SerializedSkillTableRow>();
+            AddSerializeMenu<SkillTableEntrySo, SerializedSkillTableDto>();
             
             if (_lastResult.HasValue)
             {

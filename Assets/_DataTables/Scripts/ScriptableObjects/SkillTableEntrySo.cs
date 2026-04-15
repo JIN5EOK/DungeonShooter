@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 namespace DungeonShooter
 {
     [CreateAssetMenu(menuName = "DungeonShooter/DataTables/SkillTableEntry")]
-    public sealed class SkillTableEntrySo : ScriptableObject, ISerializableObject<SerializedSkillTableRow>
+    public sealed class SkillTableEntrySo : ScriptableObject, ISerializableObject<SerializedSkillTableDto>
     {
         [Serializable]
         public class SkillLevelData
@@ -41,8 +41,7 @@ namespace DungeonShooter
             get => _id;
             protected set => _id = value;
         }
-#if UNITY_EDITOR
-#endif
+
         public string SkillName => _skillName.GetLocalizedString();
         public string SkillDescription => _skillDescription.GetLocalizedString();
         public AssetReferenceT<Sprite> SkillIconRef => _skillIconRef;
@@ -56,10 +55,10 @@ namespace DungeonShooter
         [SerializeField] private AssetReferenceT<Sprite> _skillIconRef;
         [SerializeField] private List<SkillLevelData> _skillLevels;
         
-        public List<SerializedSkillTableRow> CreateSerializedDto()
+        public List<SerializedSkillTableDto> CreateSerializedDto()
         {
-            var list = new List<SerializedSkillTableRow>();
-            list.Add(new SerializedSkillTableRow(
+            var list = new List<SerializedSkillTableDto>();
+            list.Add(new SerializedSkillTableDto(
                 _id
                 , SoSerializeHelper.SerializeLocalizedString(_skillName)
                 , SoSerializeHelper.SerializeLocalizedString(_skillDescription)
@@ -69,7 +68,7 @@ namespace DungeonShooter
             for (var i = 0; i < _skillLevels.Count; i++)
             {
                 var data = _skillLevels[i];
-                list.Add(new SerializedSkillTableRow(
+                list.Add(new SerializedSkillTableDto(
                     _id, null, null, null
                     , i + 1
                     , SoSerializeHelper.SerializeLocalizedString(data.SkillLevelName)
@@ -82,7 +81,7 @@ namespace DungeonShooter
             return list;
         }
 
-        public void ApplyFromSerializedDto(List<SerializedSkillTableRow> serializedDto)
+        public void ApplyFromSerializedDto(List<SerializedSkillTableDto> serializedDto)
         {
             _skillLevels.Clear();
             foreach (var dto in serializedDto)
