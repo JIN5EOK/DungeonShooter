@@ -14,7 +14,7 @@ namespace DungeonShooter
 
             return string.Join(separator, list);
         }
-
+        
         public static List<int> StringToIntList(string text, string separator = "/")
         {
             if (string.IsNullOrWhiteSpace(text))

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace DungeonShooter
 {
     [CreateAssetMenu(menuName = "DungeonShooter/CSVSerializer/FooSampleSo")]
-    public sealed class FooSo : ScriptableObject
+    public class FooSo : ScriptableObject, IIntId
     {
         [SerializeField] private int _id;
         [SerializeField] private int _intValue;

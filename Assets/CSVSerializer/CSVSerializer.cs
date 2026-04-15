@@ -10,7 +10,7 @@ namespace DungeonShooter
 {
     public static class CSVSerializer
     {
-        public static List<TDto> ReadCsv<TDto>(string csvPath) where TDto : class
+        public static List<TDto> ReadCsv<TDto>(string csvPath)
         {
             if (!File.Exists(csvPath))
             {
@@ -38,7 +38,7 @@ namespace DungeonShooter
             }
         }
 
-        public static bool WriteCsv<TDto>(IEnumerable<TDto> records, string csvPath) where TDto : class
+        public static bool WriteCsv<TDto>(IEnumerable<TDto> records, string csvPath)
         {
             if (records == null)
             {

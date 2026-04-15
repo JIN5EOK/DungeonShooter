@@ -1,8 +1,8 @@
-using DungeonShooter;
+using System.Runtime.Serialization;
+using UnityEngine;
 
 namespace DungeonShooter
 {
-    [CsvDtoFor(typeof(FooSo))]
     public sealed class SerializedFoo : ISerializeSODto<FooSo>
     {
         public int Id { get; set; }
@@ -10,8 +10,8 @@ namespace DungeonShooter
         public string IntList { get; set; }
         public int BarA { get; set; }
         public float BarB { get; set; }
-
-        public void PopulateFromSo(FooSo so)
+        
+        public void PopulateFrom(FooSo so)
         {
             Id = so.Id;
             IntValue = so.IntValue;

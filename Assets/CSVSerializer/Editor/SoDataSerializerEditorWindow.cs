@@ -47,7 +47,7 @@ namespace DungeonShooter
             {
                 if (GUILayout.Button("CSV -> SO"))
                 {
-                    _lastResult = CsvToSo_SerializedFoo(_csvPath, folderPath);
+                    _lastResult = CSVToSo<FooSo, SerializedFoo>(_csvPath, folderPath);
                 }
 
                 if (GUILayout.Button("SO -> CSV"))
@@ -59,7 +59,7 @@ namespace DungeonShooter
                         outputPath = outputPath.Replace("\\", "/");
                     }
 
-                    _lastResult = SoToCsv_SerializedFoo(folderPath, outputPath);
+                    _lastResult = SoToCSV<FooSo, SerializedFoo>(folderPath, outputPath);
                 }
             }
 
@@ -70,7 +70,7 @@ namespace DungeonShooter
             }
         }
 
-        private static bool CsvToSo_SerializedFoo(string csvPath, string writeFolder)
+        private static bool CSVToSo<TSo, TSerialized>(string csvPath, string writeFolder) where TSo : ScriptableObject, IIntId where TSerialized : ISerializeSODto<TSo>
         {
             if (string.IsNullOrWhiteSpace(writeFolder))
             {
@@ -78,14 +78,14 @@ namespace DungeonShooter
                 return false;
             }
 
-            var dtos = CSVSerializer.ReadCsv<SerializedFoo>(csvPath);
+            var dtos = CSVSerializer.ReadCsv<TSerialized>(csvPath);
             if (dtos.Count == 0)
             {
                 LogHandler.LogWarning(nameof(SoDataSerializerEditorWindow), "CSV에서 읽은 레코드가 없습니다.");
                 return false;
             }
 
-            var byId = LoadAllFooSoById(writeFolder);
+            var byId = LoadAllSoById<TSo>(writeFolder);
             var succeeded = 0;
             var failed = 0;
 
@@ -95,7 +95,7 @@ namespace DungeonShooter
                 {
                     if (!byId.TryGetValue(dto.Id, out var so) || so == null)
                     {
-                        so = CreateFooSoAsset(writeFolder, dto.Id);
+                        so = CreateSoAsset<TSo>(writeFolder, dto.Id);
                         byId[dto.Id] = so;
                     }
 
@@ -116,7 +116,7 @@ namespace DungeonShooter
             return failed == 0;
         }
 
-        private static bool SoToCsv_SerializedFoo(string readFolder, string csvPath)
+        private static bool SoToCSV<TSo, TSerialized>(string readFolder, string csvPath) where TSo : ScriptableObject, IIntId where TSerialized : ISerializeSODto<TSo>
         {
             if (string.IsNullOrWhiteSpace(readFolder))
             {
@@ -124,13 +124,13 @@ namespace DungeonShooter
                 return false;
             }
 
-            var assets = LoadAllFooSo(readFolder);
-            var dtos = new List<SerializedFoo>(assets.Count);
+            var assets = LoadAllSo<TSo>(readFolder);
+            var dtos = new List<TSerialized>(assets.Count);
 
             foreach (var so in assets)
             {
-                var dto = new SerializedFoo();
-                dto.PopulateFromSo(so);
+                var dto = Activator.CreateInstance<TSerialized>();
+                dto.PopulateFrom(so);
                 dtos.Add(dto);
             }
 
@@ -144,10 +144,10 @@ namespace DungeonShooter
             return ok;
         }
 
-        private static Dictionary<int, FooSo> LoadAllFooSoById(string folder)
+        private static Dictionary<int, TSo> LoadAllSoById<TSo>(string folder) where TSo : ScriptableObject, IIntId
         {
-            var result = new Dictionary<int, FooSo>();
-            foreach (var so in LoadAllFooSo(folder))
+            var result = new Dictionary<int, TSo>();
+            foreach (var so in LoadAllSo<TSo>(folder))
             {
                 result[so.Id] = so;
             }
@@ -155,14 +155,14 @@ namespace DungeonShooter
             return result;
         }
 
-        private static List<FooSo> LoadAllFooSo(string folder)
+        private static List<TSo> LoadAllSo<TSo>(string folder) where TSo : ScriptableObject, IIntId
         {
-            var guids = AssetDatabase.FindAssets($"t:{nameof(FooSo)}", new[] { folder });
-            var list = new List<FooSo>(guids.Length);
+            var guids = AssetDatabase.FindAssets($"t:{nameof(TSo)}", new[] { folder });
+            var list = new List<TSo>(guids.Length);
             foreach (var guid in guids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
-                var asset = AssetDatabase.LoadAssetAtPath<FooSo>(path);
+                var asset = AssetDatabase.LoadAssetAtPath<TSo>(path);
                 if (asset != null)
                     list.Add(asset);
             }
@@ -170,13 +170,11 @@ namespace DungeonShooter
             return list;
         }
 
-        private static FooSo CreateFooSoAsset(string folder, int id)
+        private static TSo CreateSoAsset<TSo>(string folder, int id) where TSo : ScriptableObject, IIntId
         {
-            var so = ScriptableObject.CreateInstance<FooSo>();
+            var so = CreateInstance<TSo>();
 
-            so.Id = id;
-
-            var assetPath = CombineAssetPath(folder, $"{nameof(FooSo)}_{id}.asset");
+            var assetPath = CombineAssetPath(folder, $"{nameof(TSo)}_{id}.asset");
             AssetDatabase.CreateAsset(so, assetPath);
             return so;
         }
