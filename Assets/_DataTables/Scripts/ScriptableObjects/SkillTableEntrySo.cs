@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Localization;
+using UnityEngine.Serialization;
 
 namespace DungeonShooter
 {
@@ -12,16 +13,26 @@ namespace DungeonShooter
         [Serializable]
         public class SkillLevelData
         {
-            
-            public AssetReferenceT<SkillData> skillDataRef;
-            public int amount;
-            public float cooldown;
+            public string SKillLevelName => _skillLevelName.GetLocalizedString();
+            public LocalizedString SkillLevelName => _skillLevelName;
+            [SerializeField] private LocalizedString _skillLevelName;
+            public string SkillDescription => _skillLevelDescription.GetLocalizedString();
+            public LocalizedString SkillLevelDescription => _skillLevelDescription;
+            [SerializeField] private LocalizedString _skillLevelDescription;
+            public AssetReferenceT<SkillData> SkillDataRef => _skillDataRef;
+            [SerializeField] private AssetReferenceT<SkillData> _skillDataRef;
+            public int Amount => _amount;
+            [SerializeField] private int _amount;
+            public float Cooldown => _cooldown;
+            [SerializeField] private float _cooldown;
 
-            public SkillLevelData(AssetReferenceT<SkillData> skillDataRef, int amount, float cooldown)
+            public SkillLevelData(AssetReferenceT<SkillData> skillDataRef, int amount, float cooldown,LocalizedString skillLevelName , LocalizedString skillLevelDescription)
             {
-                this.skillDataRef = skillDataRef;
-                this.amount = amount;
-                this.cooldown = cooldown;
+                this._skillDataRef = skillDataRef;
+                this._amount = amount;
+                this._cooldown = cooldown;
+                this._skillLevelName = skillLevelName;
+                this._skillLevelDescription = skillLevelDescription;
             }
         }
         
@@ -30,18 +41,21 @@ namespace DungeonShooter
             get => _id;
             protected set => _id = value;
         }
-
+#if UNITY_EDITOR
+#endif
         public string SkillName => _skillName.GetLocalizedString();
         public string SkillDescription => _skillDescription.GetLocalizedString();
         public AssetReferenceT<Sprite> SkillIconRef => _skillIconRef;
         public IReadOnlyList<SkillLevelData> SkillLevels => _skillLevels;
+        
+        [TextArea] [SerializeField] private string _memo;
         
         [SerializeField] private int _id;
         [SerializeField] private LocalizedString _skillName;
         [SerializeField] private LocalizedString _skillDescription;
         [SerializeField] private AssetReferenceT<Sprite> _skillIconRef;
         [SerializeField] private List<SkillLevelData> _skillLevels;
-
+        
         public List<SerializedSkillTableRow> CreateSerializedDto()
         {
             var list = new List<SerializedSkillTableRow>();
@@ -50,7 +64,7 @@ namespace DungeonShooter
                 , SoSerializeHelper.SerializeLocalizedString(_skillName)
                 , SoSerializeHelper.SerializeLocalizedString(_skillDescription)
                 , SoSerializeHelper.SerializeAssetReference(_skillIconRef)
-                , null, null, null, null));
+                , null, null, null, null, null, null, _memo));
             
             for (var i = 0; i < _skillLevels.Count; i++)
             {
@@ -58,8 +72,11 @@ namespace DungeonShooter
                 list.Add(new SerializedSkillTableRow(
                     _id, null, null, null
                     , i + 1
-                    , SoSerializeHelper.SerializeAssetReference(data.skillDataRef)
-                    , data.amount, data.cooldown));
+                    , SoSerializeHelper.SerializeLocalizedString(data.SkillLevelName)
+                    , SoSerializeHelper.SerializeLocalizedString(data.SkillLevelDescription)
+                    , SoSerializeHelper.SerializeAssetReference(data.SkillDataRef)
+                    , data.Amount
+                    , data.Cooldown));
             }
 
             return list;
@@ -70,6 +87,7 @@ namespace DungeonShooter
             _skillLevels.Clear();
             foreach (var dto in serializedDto)
             {
+                _memo = dto.Memo;
                 _id = dto.Id;
                 _skillName = !string.IsNullOrEmpty(dto.SkillName) ? SoSerializeHelper.DeserializeLocalizedString(dto.SkillName) : _skillName;
                 _skillDescription = !string.IsNullOrEmpty(dto.SkillDescription) ? SoSerializeHelper.DeserializeLocalizedString(dto.SkillDescription) : _skillDescription;
@@ -77,7 +95,12 @@ namespace DungeonShooter
                 if (dto.Level != null)
                 {
                     var skillRef = SoSerializeHelper.DeserializeAssetReference<SkillData>(dto.SkillDataKey);
-                    _skillLevels.Add(new SkillLevelData(skillRef, dto.Amount ?? 0, dto.Cooldown ?? 0.0f));
+                    _skillLevels.Add(new SkillLevelData(
+                        skillRef
+                        , dto.Amount ?? 0
+                        , dto.Cooldown ?? 0.0f
+                        , SoSerializeHelper.DeserializeLocalizedString(dto.SkillLevelName)
+                        , SoSerializeHelper.DeserializeLocalizedString(dto.SkillLevelDescription)));
                 }
                     
             }

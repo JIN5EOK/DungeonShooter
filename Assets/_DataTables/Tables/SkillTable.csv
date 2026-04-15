@@ -13,7 +13,7 @@ Memo,Id,SkillNameId,SkillDescriptionId,SkillIconKey,SkillDataKey,FloatAmounts,In
 공격력 증가 패시브 레벨1,14000401,19200037,19200038,AttackUpSkillIcon,AttackUpSkillData,,,25,,14000400
 공격력 증가 패시브 레벨2,14000402,19200039,19200040,AttackUpSkillIcon,AttackUpSkillData,,,45,,14000400
 공격력 증가 패시브 레벨3,14000403,19200041,19200042,AttackUpSkillIcon,AttackUpSkillData,,,50,,14000400
-메테오 스킬 루트,14000500,19200043,19200044,FireballSkillIcon,,,,,,14000500
+메테오 스킬 루트,14000500,19200043,19200044,MeteorSkillIcon,,,,,,14000500
 메테오 레벨1,14000501,19200045,19200046,MeteorSkillIcon,MeteorSkillData,,,150,10,14000500
 메테오 레벨2,14000502,19200047,19200048,MeteorSkillIcon,MeteorSkillData,,,200,8,14000500
 메테오 레벨3,14000503,19200049,19200050,MeteorSkillIcon,MeteorSkillData,,,250,5,14000500

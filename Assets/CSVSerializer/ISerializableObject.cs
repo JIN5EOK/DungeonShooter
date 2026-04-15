@@ -12,8 +12,8 @@ namespace DungeonShooter
         IIntId
         where TSerialized : class
     {
-        List<TSerialized> CreateSerializedDto();
-        void ApplyFromSerializedDto(List<TSerialized> serializedDto);
+        public List<TSerialized> CreateSerializedDto();
+        public void ApplyFromSerializedDto(List<TSerialized> serializedDto);
     }
 }
 
