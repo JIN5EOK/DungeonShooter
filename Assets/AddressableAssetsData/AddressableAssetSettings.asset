@@ -115,7 +115,7 @@ MonoBehaviour:
     - Locale
     - Locale-en
     - Locale-ko
-    - SkillSo
+    - SkillSO
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 8f3f610015f81434d9df3a6bf63ee347, type: 2}

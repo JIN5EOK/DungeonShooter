@@ -1,7 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.ResourceLocations;
+using VContainer;
+using VContainer.Unity;
 
 namespace DungeonShooter
 {
@@ -9,7 +15,7 @@ namespace DungeonShooter
     /// 로컬 CSV 파일을 통해 테이블 데이터를 제공하는 리포지토리
     /// 초기화 시 모든 CSV를 파싱하여 메모리에 캐싱
     /// </summary>
-    public class LocalTableRepository : ITableRepository
+    public class LocalTableRepository : ITableRepository, IAsyncStartable
     {
         private readonly Dictionary<int, ITableEntry> _cache = new();
         
@@ -17,10 +23,10 @@ namespace DungeonShooter
         /// 테이블 리포지토리를 초기화합니다.
         /// 모든 CSV 파일을 로드하고 파싱하여 캐시에 저장합니다.
         /// </summary>
-        
-        public LocalTableRepository()
+
+        public async UniTask StartAsync(CancellationToken cancellation = new CancellationToken())
         {
-            LoadAndCacheTable<SkillTableEntry>("SkillTable");
+            //LoadAndCacheTable<SkillTableEntry>("SkillTable");
             LoadAndCacheTable<ItemTableEntry>("ItemTable");
             LoadAndCacheTable<StageConfigTableEntry>("StageConfigTable");
             LoadAndCacheTable<PlayerConfigTableEntry>("PlayerConfigTable");
@@ -28,8 +34,12 @@ namespace DungeonShooter
             LoadAndCacheTable<EnemyConfigTableEntry>("EnemyConfigTable");
             LoadAndCacheTable<RoomEventTriggerTableEntry>("RoomEventTriggerTable");
             LoadAndCacheTable<StringTextTableEntry>("StringTextTable");
+
+            await Addressables.InitializeAsync().Task;
+            LoadAndCacheTableSO<SkillTableEntrySo>("SkillSO");
         }
 
+        
         /// <summary>
         /// ID로 테이블 엔트리를 가져옵니다. 타입을 지정하지 않고 엔트리만 조회할 때 사용합니다.
         /// </summary>
@@ -110,11 +120,34 @@ namespace DungeonShooter
                 LogHandler.LogError<LocalTableRepository>($"테이블 로드 실패 ({assetPath}): {ex.Message}");
             }
         }
+        
+        private void LoadAndCacheTableSO<T>(string label) where T : ScriptableObject, ITableEntry, new()
+        {
+            try
+            {
+                var handle = Addressables.LoadAssetsAsync<T>((object)label, null);
+                var soList = handle.WaitForCompletion();
+
+                if (soList == null)
+                {
+                    LogHandler.LogError<LocalTableRepository>($"SO 파일을 로드할 수 없습니다: {label}");
+                    return;
+                }
+
+                CacheEntries(soList);
+
+                LogHandler.Log<LocalTableRepository>($"{typeof(T).Name} 테이블 로드 완료: {soList.Count}개 엔트리");
+            }
+            catch (Exception ex)
+            {
+                LogHandler.LogError<LocalTableRepository>($"테이블 로드 실패 ({label}): {ex.Message}");
+            }
+        }
 
         /// <summary>
         /// 엔트리 리스트를 캐시에 저장합니다.
         /// </summary>
-        private void CacheEntries<T>(List<T> entries) where T : class, ITableEntry
+        private void CacheEntries<T>(IList<T> entries) where T : class, ITableEntry
         {
             foreach (var entry in entries)
             {
