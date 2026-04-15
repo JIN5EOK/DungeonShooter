@@ -10,7 +10,7 @@ namespace DungeonShooter
     {
         public static bool CsvToSo<TSo, TSerialized>(string csvPath, string writeFolder)
             where TSo : ScriptableObject, ISerializableObject<TSerialized>
-            where TSerialized : class, IIntId, new()
+            where TSerialized : class, ITableEntry, new()
         {
             if (string.IsNullOrWhiteSpace(writeFolder))
             {
@@ -62,7 +62,7 @@ namespace DungeonShooter
 
         public static bool SoToCsv<TSo, TSerialized>(string readFolder, string csvPath)
             where TSo : ScriptableObject, ISerializableObject<TSerialized>
-            where TSerialized : class, IIntId, new()
+            where TSerialized : class, ITableEntry, new()
         {
             if (string.IsNullOrWhiteSpace(readFolder))
             {
@@ -91,7 +91,7 @@ namespace DungeonShooter
             return ok;
         }
 
-        private static Dictionary<int, TSo> LoadAllSoById<TSo>(string folder) where TSo : ScriptableObject, IIntId
+        private static Dictionary<int, TSo> LoadAllSoById<TSo>(string folder) where TSo : ScriptableObject, ITableEntry
         {
             var result = new Dictionary<int, TSo>();
             foreach (var so in LoadAllSo<TSo>(folder))

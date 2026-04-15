@@ -1,6 +1,6 @@
 namespace DungeonShooter
 {
-    public sealed class SerializedFoo : IIntId
+    public sealed class SerializedFoo : ITableEntry
     {
         public int Id { get; set; }
         public int? IntValue { get; set; }

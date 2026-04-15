@@ -1,6 +1,6 @@
 namespace DungeonShooter
 {
-    public sealed class SerializedSkillTableDto : IIntId
+    public sealed class SerializedSkillTableDto : ITableEntry
     {
         public string Memo { get; set; }
         public int Id { get; set; }

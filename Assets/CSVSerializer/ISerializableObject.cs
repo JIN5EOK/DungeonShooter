@@ -3,13 +3,8 @@ using UnityEngine;
 
 namespace DungeonShooter
 {
-    public interface IIntId
-    {
-        int Id { get;}
-    }
-
     public interface ISerializableObject<TSerialized> : 
-        IIntId
+        ITableEntry
         where TSerialized : class
     {
         public List<TSerialized> CreateSerializedDto();

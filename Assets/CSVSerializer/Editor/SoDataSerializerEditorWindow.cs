@@ -40,7 +40,7 @@ namespace DungeonShooter
         
         private void AddSerializeMenu<TSo, TSerialized>()
             where TSo : ScriptableObject, ISerializableObject<TSerialized>
-            where TSerialized : class, IIntId, new()
+            where TSerialized : class, ITableEntry, new()
         {
             EditorGUILayout.Space(12);
             EditorGUILayout.LabelField($"{typeof(TSo).Name} / CSV 변환", EditorStyles.boldLabel);
