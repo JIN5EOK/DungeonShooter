@@ -13,28 +13,31 @@ MonoBehaviour:
   m_Name: New Skill Table Entry So
   m_EditorClassIdentifier: 
   _id: 17000000
-  _skillNameId: 18000000
-  _skillDescriptionId: 18000001
+  _skillName:
+    m_TableReference:
+      m_TableCollectionName: StringTable
+    m_TableEntryReference:
+      m_KeyId: 622634983432
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  _skillDescription:
+    m_TableReference:
+      m_TableCollectionName: StringTable
+    m_TableEntryReference:
+      m_KeyId: 622634983448
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
   _skillIconRef:
     m_AssetGUID: 6cd82b140799940518d7a2aabc0d294e
     m_SubObjectName: 
     m_SubObjectType: 
     m_SubObjectGUID: 
     m_EditorAssetChanged: 0
-  _skillLevels:
-  - skillDataRef:
-      m_AssetGUID: 958b9c088e3f94a3eb3a12316f5e1413
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_SubObjectGUID: 
-      m_EditorAssetChanged: 0
-    amount: 22
-    cooldown: 4
-  - skillDataRef:
-      m_AssetGUID: 9e907f54a0dbf414c91dbb241d0c338a
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_SubObjectGUID: 
-      m_EditorAssetChanged: 0
-    amount: 4
-    cooldown: 99
+  _skillLevels: []
+  references:
+    version: 2
+    RefIds: []

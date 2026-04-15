@@ -5,7 +5,7 @@ namespace DungeonShooter
 {
     public interface IIntId
     {
-        int Id { get; set; }
+        int Id { get;}
     }
 
     public interface ISerializableObject<TSerialized> : 

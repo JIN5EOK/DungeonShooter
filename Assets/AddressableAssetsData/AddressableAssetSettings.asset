@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: e727023362f784fb398d507d154abd24
   m_currentHash:
     serializedVersion: 2
-    Hash: c11354d247760c1b09d73cafafc16dad
+    Hash: 088080f5e484a626c1c6311bafb56f9b
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -60,9 +60,13 @@ MonoBehaviour:
   m_BuildAddressablesWithPlayerBuild: 0
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
+  - {fileID: 11400000, guid: a815fcb5b0cee432293fafe79fdff424, type: 2}
   - {fileID: 11400000, guid: 643016521a8c34810b6c3bc74535cc87, type: 2}
+  - {fileID: 11400000, guid: 6039c64d448ef421a9436716cc0519b9, type: 2}
   - {fileID: 11400000, guid: 044752183d5304d98aa6b56ddf691a0f, type: 2}
   - {fileID: 11400000, guid: 042e38c48029f421f98f37e964bc996d, type: 2}
+  - {fileID: 11400000, guid: 2345d3c06b7964e8e87f953f33d46519, type: 2}
+  - {fileID: 11400000, guid: 2e3ca17f4ed6443b58009c3075af143f, type: 2}
   - {fileID: 11400000, guid: 17f8ae57d65da432eb2b7e9322a03d21, type: 2}
   m_BuildSettings:
     m_LogResourceManagerExceptions: 1
@@ -107,6 +111,9 @@ MonoBehaviour:
     - Stage001
     - Stage001_Enemy
     - Stage001_StartRoom
+    - Locale
+    - Locale-en
+    - Locale-ko
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 8f3f610015f81434d9df3a6bf63ee347, type: 2}
