@@ -9,7 +9,8 @@ namespace DungeonShooter
 {
     public sealed class SoDataSerializerEditorWindow : EditorWindow
     {
-        private string _csvPath;
+        private string _importCsvPath;
+        private string _exportCsvPath;
         private DefaultAsset _soFolder;
         private bool? _lastResult;
 
@@ -24,20 +25,35 @@ namespace DungeonShooter
             EditorGUILayout.LabelField("샘플 전용 (FooSo <-> SerializedFoo)", EditorStyles.boldLabel);
 
             EditorGUILayout.Space(8);
-            EditorGUILayout.LabelField("경로", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("CSV -> SO", EditorStyles.boldLabel);
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                _csvPath = EditorGUILayout.TextField("CSV Path", _csvPath);
+                _importCsvPath = EditorGUILayout.TextField("CSV File", _importCsvPath);
                 if (GUILayout.Button("...", GUILayout.Width(28)))
                 {
                     var picked = EditorUtility.OpenFilePanel("CSV 선택", Application.dataPath, "csv");
                     if (!string.IsNullOrEmpty(picked))
-                        _csvPath = picked;
+                        _importCsvPath = picked;
                 }
             }
 
             _soFolder = (DefaultAsset)EditorGUILayout.ObjectField("SO Folder", _soFolder, typeof(DefaultAsset), false);
+
+            EditorGUILayout.Space(12);
+            EditorGUILayout.LabelField("SO -> CSV", EditorStyles.boldLabel);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                _exportCsvPath = EditorGUILayout.TextField("Save Path", _exportCsvPath);
+                if (GUILayout.Button("...", GUILayout.Width(28)))
+                {
+                    var defaultName = $"{nameof(SerializedFoo)}.csv";
+                    var picked = EditorUtility.SaveFilePanel("CSV 저장", Application.dataPath, defaultName, "csv");
+                    if (!string.IsNullOrEmpty(picked))
+                        _exportCsvPath = picked;
+                }
+            }
 
             EditorGUILayout.Space(12);
 
@@ -47,17 +63,14 @@ namespace DungeonShooter
             {
                 if (GUILayout.Button("CSV -> SO"))
                 {
-                    _lastResult = CSVToSo<FooSo, SerializedFoo>(_csvPath, folderPath);
+                    _lastResult = CSVToSo<FooSo, SerializedFoo>(_importCsvPath, folderPath);
                 }
 
                 if (GUILayout.Button("SO -> CSV"))
                 {
-                    var outputPath = _csvPath;
+                    var outputPath = _exportCsvPath;
                     if (string.IsNullOrWhiteSpace(outputPath))
-                    {
-                        outputPath = Path.Combine(Application.dataPath, $"{nameof(SerializedFoo)}.csv");
-                        outputPath = outputPath.Replace("\\", "/");
-                    }
+                        outputPath = Path.Combine(Application.dataPath, $"{nameof(SerializedFoo)}.csv").Replace("\\", "/");
 
                     _lastResult = SoToCSV<FooSo, SerializedFoo>(folderPath, outputPath);
                 }
@@ -125,6 +138,11 @@ namespace DungeonShooter
             }
 
             var assets = LoadAllSo<TSo>(readFolder);
+            if (assets.Count == 0)
+            {
+                LogHandler.LogWarning(nameof(SoDataSerializerEditorWindow), "SO 폴더에서 에셋을 찾지 못했습니다.");
+                return false;
+            }
             var dtos = new List<TSerialized>(assets.Count);
 
             foreach (var so in assets)
@@ -157,7 +175,10 @@ namespace DungeonShooter
 
         private static List<TSo> LoadAllSo<TSo>(string folder) where TSo : ScriptableObject, IIntId
         {
-            var guids = AssetDatabase.FindAssets($"t:{nameof(TSo)}", new[] { folder });
+            if (string.IsNullOrWhiteSpace(folder) || !AssetDatabase.IsValidFolder(folder))
+                return new List<TSo>();
+
+            var guids = AssetDatabase.FindAssets($"t:{typeof(TSo).Name}", new[] { folder });
             var list = new List<TSo>(guids.Length);
             foreach (var guid in guids)
             {
@@ -174,7 +195,7 @@ namespace DungeonShooter
         {
             var so = CreateInstance<TSo>();
 
-            var assetPath = CombineAssetPath(folder, $"{nameof(TSo)}_{id}.asset");
+            var assetPath = CombineAssetPath(folder, $"{typeof(TSo).Name}_{id}.asset");
             AssetDatabase.CreateAsset(so, assetPath);
             return so;
         }
