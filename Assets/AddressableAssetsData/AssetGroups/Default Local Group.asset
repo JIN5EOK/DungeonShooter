@@ -25,19 +25,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 0b01011d905fb4cbea08a65af348edc9
-    m_Address: Stage001_0001
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Stage001_NormalRoom
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0c1d859843cb34cf7abd178836d0ce67
     m_Address: DefaultCharacterSpriteLibrary
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 0fb156dbd3e134da988e9aa7ce7b2391
-    m_Address: RandomEnemySpawn
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -56,22 +45,10 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 2a13c0d69cf8e498e9ab111bc29d5ee1
-    m_Address: Stage001_StartRoom
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Stage001_StartRoom
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2af81c5d98efb425f86281073a0858c6
     m_Address: Human_001
     m_ReadOnly: 0
     m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 36b9e7a8dc77e4b55b3e0302990009d6
-    m_Address: Stage001_0002
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Stage001_NormalRoom
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3a305c0cc9284482699de021a9029352
     m_Address: UI_Loading
@@ -128,11 +105,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5e0e56f83045f46b58153059772875e1
-    m_Address: ItemTable
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 61c753c38aa7a450cb5ab59e4b5ff93d
     m_Address: SkillIconAtlas
     m_ReadOnly: 0
@@ -145,11 +117,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 676ca14f427fc4c74a76a8271e618549
     m_Address: Tile_Tree_002
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 68cbc2d8171cd407f81f321629c6e28a
-    m_Address: PlayerSpawnPoint
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -178,17 +145,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 85ba9cffafc5e47aab3685d1b8a877a5
-    m_Address: StageConfigTable
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 8a4d5face077b4eec84984c7e30f619a
-    m_Address: Stage001_0003
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Stage001_NormalRoom
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8cded1c31749c4d0daa49926b19c7dcc
     m_Address: NormalEnemyAI
     m_ReadOnly: 0
@@ -196,11 +152,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9051e82d508094d1989b194fb7b2dd7e
     m_Address: EntityStatsTable
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 90e7fdc4e6fd94340a5d599ac37466e5
-    m_Address: FieldItem
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -307,18 +258,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: cca6752d4f664461da4b400edcc0613d
-    m_Address: UI_Inventory
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cf685c41c9478492f825dabd84d7f8d3
     m_Address: SwordAttackSkillIcon
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d0ae26362f1784485a904c67a3241bbc
-    m_Address: ItemIconAtlas
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -365,11 +306,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f11938e1b96cf48b69061ba7452ce2f3
     m_Address: Tile_Misc_002
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f5237e1a4b00d4fe0a0f4fa9d094686c
-    m_Address: StageConfig_001
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
