@@ -8,7 +8,7 @@ namespace DungeonShooter
     /// </summary>
     public interface IEntityStats
     {
-        public void Initialize(EntityStatsTableEntry entry);
+        public void Initialize(StatsDto statsDto);
         public IEntityStat GetStat(StatType type);
         public void ApplyStatBonus(object key, StatBonus bonus);
         public void RemoveStatBonus(object key);
@@ -20,22 +20,19 @@ namespace DungeonShooter
     public class EntityStats : IEntityStats
     {
         private readonly Dictionary<StatType, EntityStat> _stats = new Dictionary<StatType, EntityStat>();
-        private EntityStatsTableEntry _statsTableEntry;
+        private object _baseStatsKey;
 
-        /// <summary>
-        /// 스탯 테이블 엔트리를 기반으로 기본 스탯(Constant)을 설정합니다.
-        /// </summary>
-        public void Initialize(EntityStatsTableEntry entry)
+        public void Initialize(StatsDto statsDto)
         {
-            if (entry == null) return;
+            if (statsDto == null) return;
 
-            _statsTableEntry = entry;
+            _baseStatsKey = statsDto;
             _stats.Clear();
 
-            GetOrAddStat(StatType.Hp).AddModifier(_statsTableEntry, StatModifierType.Constant, entry.MaxHp);
-            GetOrAddStat(StatType.Attack).AddModifier(_statsTableEntry, StatModifierType.Constant, entry.Attack);
-            GetOrAddStat(StatType.Defense).AddModifier(_statsTableEntry, StatModifierType.Constant, entry.Defense);
-            GetOrAddStat(StatType.MoveSpeed).AddModifier(_statsTableEntry, StatModifierType.Constant, entry.MoveSpeed);
+            GetOrAddStat(StatType.Hp).AddModifier(_baseStatsKey, StatModifierType.Constant, statsDto.MaxHp);
+            GetOrAddStat(StatType.Attack).AddModifier(_baseStatsKey, StatModifierType.Constant, statsDto.Attack);
+            GetOrAddStat(StatType.Defense).AddModifier(_baseStatsKey, StatModifierType.Constant, statsDto.Defense);
+            GetOrAddStat(StatType.MoveSpeed).AddModifier(_baseStatsKey, StatModifierType.Constant, statsDto.MoveSpeed);
         }
 
         public IEntityStat GetStat(StatType type)

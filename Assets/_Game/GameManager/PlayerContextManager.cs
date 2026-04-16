@@ -90,18 +90,10 @@ namespace DungeonShooter
             }
 
             var statsDto = _playerConfigSo.Stats;
-            var statsEntry = new EntityStatsTableEntry
-            {
-                Id = _playerConfigSo.Id,
-                MaxHp = statsDto != null ? statsDto.MaxHp : 0,
-                Attack = statsDto != null ? statsDto.Attack : 0,
-                Defense = statsDto != null ? statsDto.Defense : 0,
-                MoveSpeed = statsDto != null ? statsDto.MoveSpeed : 0,
-            };
             IEntityStats entityStats = new EntityStats();
-            entityStats.Initialize(statsEntry);
+            entityStats.Initialize(statsDto);
 
-            var statuses = new EntityStatuses(statsEntry);
+            var statuses = new EntityStatuses(statsDto);
             var skillContainer = new EntitySkills();
             EntityContext = new EntityContext(
                 new EntityInputContext(),

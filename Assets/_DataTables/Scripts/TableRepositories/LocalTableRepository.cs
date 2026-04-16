@@ -30,7 +30,7 @@ namespace DungeonShooter
             LoadAndCacheTable<ItemTableEntry>("ItemTable");
             LoadAndCacheTable<StageConfigTableEntry>("StageConfigTable");
             //LoadAndCacheTable<PlayerConfigTableEntry>("PlayerConfigTable");
-            LoadAndCacheTable<EntityStatsTableEntry>("EntityStatsTable");
+            //LoadAndCacheTable<EntityStatsTableEntry>("EntityStatsTable");
             //LoadAndCacheTable<EnemyConfigTableEntry>("EnemyConfigTable");
             LoadAndCacheTable<RoomEventTriggerTableEntry>("RoomEventTriggerTable");
             LoadAndCacheTable<StringTextTableEntry>("StringTextTable");

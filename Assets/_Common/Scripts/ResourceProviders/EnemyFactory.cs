@@ -262,22 +262,14 @@ namespace DungeonShooter
 
             var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
             var statsDto = configTableEntry.Stats;
-            var statsEntry = new EntityStatsTableEntry
-            {
-                Id = configTableEntry.Id,
-                MaxHp = statsDto != null ? statsDto.MaxHp : 0,
-                Attack = statsDto != null ? statsDto.Attack : 0,
-                Defense = statsDto != null ? statsDto.Defense : 0,
-                MoveSpeed = statsDto != null ? statsDto.MoveSpeed : 0,
-            };
             var statGroup = new EntityStats();
-            statGroup.Initialize(statsEntry);
+            statGroup.Initialize(statsDto);
 
             var entitySkills = new EntitySkills();
             var context = new EntityContext(
                 new EntityInputContext()
                 , statGroup
-                , new EntityStatuses(statsEntry)
+                , new EntityStatuses(statsDto)
                 , entitySkills);
             entity.SetContext(context);
 

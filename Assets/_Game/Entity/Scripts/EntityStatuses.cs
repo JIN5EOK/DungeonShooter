@@ -9,7 +9,7 @@ namespace DungeonShooter
     /// </summary>
     public interface IEntityStatuses
     {
-        public void Initialize(EntityStatsTableEntry entry);
+        public void Initialize(StatsDto statsDto);
         public IEntityStatus GetStatus(StatusType type);
     }
     
@@ -20,21 +20,20 @@ namespace DungeonShooter
     {
         private readonly Dictionary<StatusType, EntityStatus> _statusValues = new Dictionary<StatusType, EntityStatus>();
 
-        public EntityStatuses(EntityStatsTableEntry entry)
+        public EntityStatuses(StatsDto statsDto)
         {
-            Initialize(entry);
+            Initialize(statsDto);
         }
 
-        public void Initialize(EntityStatsTableEntry entry)
+        public void Initialize(StatsDto statsDto)
         {
-            if (entry == null)
+            if (statsDto == null)
             {
-                LogHandler.LogError<EntityStats>($"{nameof(EntityStatsTableEntry)}가 유효하지 않습니다");
+                LogHandler.LogError<EntityStatuses>($"{nameof(StatsDto)}가 유효하지 않습니다");
                 return;
             }
-                
-            
-            GetOrAddStatus(StatusType.Hp).SetValue(entry.MaxHp);
+
+            GetOrAddStatus(StatusType.Hp).SetValue(statsDto.MaxHp);
         }
 
         public IEntityStatus GetStatus(StatusType type)
