@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Localization;
 
 namespace DungeonShooter
 {
@@ -11,39 +12,84 @@ namespace DungeonShooter
     /// </summary>
     [Serializable]
     [CreateAssetMenu(menuName = "DungeonShooter/DataTables/PlayerConfig")]
-    public class PlayerTableEntrySo : ScriptableObject, ISerializableObject<SerializedPlayerConfigTableDTo>
+    public sealed class PlayerTableEntrySo : ScriptableObject, ISerializableObject<SerializedPlayerConfigTableDto>
     {
-        public int Id { get; set; }
+        public int Id => _id;
 
         /// <summary>플레이어 캐릭터 이름 (StringTextTableEntry.Id)</summary>
-        public int NameId { get; set; }
+        public string NameId => _name.GetLocalizedString();
 
         /// <summary>플레이어 캐릭터 설명 (StringTextTableEntry.Id)</summary>
-        public int DescriptionId { get; set; }
+        public string DescriptionId => _description.GetLocalizedString();
         
         /// <summary> 플레이어 게임오브젝트 어드레서블 주소 </summary>
-        public AssetReferenceGameObject GameObjectRef { get; set; }
+        public AssetReferenceGameObject GameObjectRef => _gameObjectRef;
         
         /// <summary> 1번 액티브 스킬 </summary>
-        public AssetReferenceT<SkillTableEntrySo> Skill1Ref { get; set; }
+        public AssetReferenceT<SkillTableEntrySo> Skill1Ref => _skill1Ref;
         
         /// <summary> 2번 액티브 스킬 </summary>
-        public AssetReferenceT<SkillTableEntrySo> Skill2Ref { get; set; }
+        public AssetReferenceT<SkillTableEntrySo> Skill2Ref => _skill2Ref;
         
         /// <summary> 기본 스탯 </summary>
-        public StatsDto Stats { get; set; }
+        public StatsDto Stats => _stats;
 
-        /// <summary> 기본적으로 지닐 SkillTableEntry.Id 리스트</summary>
-        public List<SkillTableEntrySo> AcquirableSkills { get; set; } = new();
+        [TextArea][SerializeField] private string _memo;
 
-        public List<SerializedPlayerConfigTableDTo> CreateSerializedDto()
+        [SerializeField] private int _id;
+        [SerializeField] private LocalizedString _name;
+        [SerializeField] private LocalizedString _description;
+        [SerializeField] private AssetReferenceGameObject _gameObjectRef;
+        [SerializeField] private AssetReferenceT<SkillTableEntrySo> _skill1Ref;
+        [SerializeField] private AssetReferenceT<SkillTableEntrySo> _skill2Ref;
+        [SerializeField] private StatsDto _stats;
+
+        public List<SerializedPlayerConfigTableDto> CreateSerializedDto()
         {
-            throw new NotImplementedException();
+            var stats = _stats ?? new StatsDto();
+            return new List<SerializedPlayerConfigTableDto>
+            {
+                new(
+                    _id,
+                    SoSerializeHelper.SerializeLocalizedString(_name),
+                    SoSerializeHelper.SerializeLocalizedString(_description),
+                    _gameObjectRef != null ? SoSerializeHelper.SerializeAssetReference(_gameObjectRef) : string.Empty,
+                    _skill1Ref != null ? SoSerializeHelper.SerializeAssetReference(_skill1Ref) : string.Empty,
+                    _skill2Ref != null ? SoSerializeHelper.SerializeAssetReference(_skill2Ref) : string.Empty,
+                    stats.MaxHp,
+                    stats.Attack,
+                    stats.Defense,
+                    stats.MoveSpeed,
+                    _memo)
+            };
         }
 
-        public void ApplyFromSerializedDto(List<SerializedPlayerConfigTableDTo> serializedDto)
+        public void ApplyFromSerializedDto(List<SerializedPlayerConfigTableDto> serializedDto)
         {
-            throw new NotImplementedException();
+            if (serializedDto == null || serializedDto.Count == 0)
+                return;
+
+            var dto = serializedDto[0];
+            _memo = dto.Memo;
+            _id = dto.Id;
+            _name = SoSerializeHelper.DeserializeLocalizedString(dto.Name);
+            _description = SoSerializeHelper.DeserializeLocalizedString(dto.Description);
+
+            _gameObjectRef = string.IsNullOrEmpty(dto.GameObjectKey)
+                ? _gameObjectRef
+                : SoSerializeHelper.DeserializeAssetReferenceGameObject(dto.GameObjectKey);
+
+            _skill1Ref = string.IsNullOrEmpty(dto.Skill1Key)
+                ? _skill1Ref
+                : SoSerializeHelper.DeserializeAssetReference<SkillTableEntrySo>(dto.Skill1Key);
+
+            _skill2Ref = string.IsNullOrEmpty(dto.Skill2Key)
+                ? _skill2Ref
+                : SoSerializeHelper.DeserializeAssetReference<SkillTableEntrySo>(dto.Skill2Key);
+
+            if (_stats == null)
+                _stats = new StatsDto();
+            _stats.Apply(dto.MaxHp, dto.Attack, dto.Defense, dto.MoveSpeed);
         }
     }
 }

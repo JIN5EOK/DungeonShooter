@@ -84,7 +84,7 @@ MonoBehaviour:
       m_WaitForCompletion: 0
       m_LocalVariables: []
     _skillDataRef:
-      m_AssetGUID: 9e907f54a0dbf414c91dbb241d0c338a
+      m_AssetGUID: c2bcd1ebe362d46fb98e01c9c8399e20
       m_SubObjectName: 
       m_SubObjectType: 
       m_SubObjectGUID: 

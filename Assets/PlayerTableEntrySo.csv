@@ -1,0 +1,2 @@
+Memo,Id,Name,Description,GameObjectKey,Skill1Key,Skill2Key,StatsId,MaxHp,Attack,Defense,MoveSpeed
+화염 마법사,0,StringTable/622634983440,StringTable/622634983441,1c540a31334464ba4a5106db508a8412,2a0489ef4afc4467aa726e2d70aa09e0,15306e05d7a7d43a8a5f30d543ad96ca,0,1000,100,10,5

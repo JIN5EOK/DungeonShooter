@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 160cf79d45e54420b5bf0da39ffa4297, type: 3}
+  m_Name: PlayerConfigSO1
+  m_EditorClassIdentifier: 
+  _memo: "\uD654\uC5FC \uB9C8\uBC95\uC0AC"
+  _id: 12000000
+  _name:
+    m_TableReference:
+      m_TableCollectionName: GUID:f0b62ded1cc634670ab88725bf70674a
+    m_TableEntryReference:
+      m_KeyId: 622634983440
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  _description:
+    m_TableReference:
+      m_TableCollectionName: GUID:f0b62ded1cc634670ab88725bf70674a
+    m_TableEntryReference:
+      m_KeyId: 622634983441
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  _gameObjectRef:
+    m_AssetGUID: 1c540a31334464ba4a5106db508a8412
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  _skill1Ref:
+    m_AssetGUID: 2a0489ef4afc4467aa726e2d70aa09e0
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  _skill2Ref:
+    m_AssetGUID: 15306e05d7a7d43a8a5f30d543ad96ca
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  _stats:
+    _maxHp: 1000
+    _attack: 100
+    _defense: 10
+    _moveSpeed: 5
+  references:
+    version: 2
+    RefIds: []

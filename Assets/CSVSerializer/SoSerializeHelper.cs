@@ -26,6 +26,11 @@ namespace DungeonShooter
         {
             return new AssetReferenceT<T>(key);
         }
+
+        public static AssetReferenceGameObject DeserializeAssetReferenceGameObject(string key)
+        {
+            return new AssetReferenceGameObject(key);
+        }
     }
 }
 
