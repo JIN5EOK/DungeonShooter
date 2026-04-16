@@ -1,48 +1,57 @@
 namespace DungeonShooter
 {
-    public sealed class PlayerConfigDto : ITableEntry
+    public sealed class EnemyConfigDto : ITableEntry
     {
         public string Memo { get; set; }
         public int Id { get; set; }
+
+        /// <summary>적 이름 (LocalizedString 직렬화)</summary>
         public string Name { get; set; }
-        public string Description { get; set; }
+
+        /// <summary>적 프리팹 어드레서블 키(GUID)</summary>
         public string GameObjectKey { get; set; }
-        public string Skill1Key { get; set; }
-        public string Skill2Key { get; set; }
-        public string Skills { get; set; }
+
+        /// <summary>AI 동작 타입</summary>
+        public string AITypeKey { get; set; }
+
         public int MaxHp { get; set; }
         public int Attack { get; set; }
         public int Defense { get; set; }
         public int MoveSpeed { get; set; }
 
-        public PlayerConfigDto(
+        /// <summary>처치 시 획득 경험치</summary>
+        public int Exp { get; set; }
+
+        /// <summary>활성 스킬 키(GUID) 목록. 예: "guid1/guid2/guid3"</summary>
+        public string ActiveSkills { get; set; }
+
+        public EnemyConfigDto(
             int id,
             string name,
-            string description,
             string gameObjectKey,
-            string skill1Key,
-            string skill2Key,
+            string aiTypeKey,
             int maxHp,
             int attack,
             int defense,
             int moveSpeed,
-            string skills,
+            int exp,
+            string activeSkills,
             string memo = "")
         {
             Id = id;
             Name = name;
-            Description = description;
             GameObjectKey = gameObjectKey;
-            Skill1Key = skill1Key;
-            Skill2Key = skill2Key;
+            AITypeKey = aiTypeKey;
             MaxHp = maxHp;
             Attack = attack;
             Defense = defense;
             MoveSpeed = moveSpeed;
-            Skills = skills;
+            Exp = exp;
+            ActiveSkills = activeSkills;
             Memo = memo;
         }
 
-        public PlayerConfigDto() { }
+        public EnemyConfigDto() { }
     }
 }
+

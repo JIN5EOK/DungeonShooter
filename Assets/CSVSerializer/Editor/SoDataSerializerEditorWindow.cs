@@ -29,8 +29,10 @@ namespace DungeonShooter
             EditorGUILayout.Space(12);
 
             AddSerializeMenu<FooSo, SerializedFoo>();
-            AddSerializeMenu<SkillTableEntrySo, SerializedSkillTableDto>();
-            AddSerializeMenu<PlayerConfigSo, SerializedPlayerConfigTableDto>();
+            AddSerializeMenu<SkillTableEntrySo, SkillTableDto>();
+            AddSerializeMenu<PlayerConfigSo, PlayerConfigDto>();
+            AddSerializeMenu<EnemyConfigSo, EnemyConfigDto>();
+            TryAddSerializeMenu("DungeonShooter.EnemyConfigSo", "DungeonShooter.SerializedEnemyConfigTableDto");
             
             if (_lastResult.HasValue)
             {
@@ -75,6 +77,21 @@ namespace DungeonShooter
                     _lastResult = SoCSVPipeline.SoToCsv<TSo, TSerialized>(folderPath, outputPath);
                 }
             }
+        }
+
+        private void TryAddSerializeMenu(string soTypeName, string serializedTypeName)
+        {
+            var soType = Type.GetType(soTypeName);
+            var serializedType = Type.GetType(serializedTypeName);
+            if (soType == null || serializedType == null)
+                return;
+
+            var method = GetType().GetMethod("AddSerializeMenu", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            if (method == null)
+                return;
+
+            var generic = method.MakeGenericMethod(soType, serializedType);
+            generic.Invoke(this, null);
         }
     }
     

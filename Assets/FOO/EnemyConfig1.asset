@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 805d482a491d442bcb7e9aebae08c18b, type: 3}
+  m_Name: EnemyConfig1
+  m_EditorClassIdentifier: 
+  _memo: "\uC801 \uC2A4\uCF08\uB808\uD1A4"
+  _id: 18000000
+  _name:
+    m_TableReference:
+      m_TableCollectionName: GUID:f0b62ded1cc634670ab88725bf70674a
+    m_TableEntryReference:
+      m_KeyId: 622634983488
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  _gameObjectRef:
+    m_AssetGUID: 0161f133fe6fc45f7b9fddbcd8b7a6e6
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  _aiType:
+    m_AssetGUID: 8cded1c31749c4d0daa49926b19c7dcc
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 1
+  _stats:
+    _maxHp: 500
+    _attack: 25
+    _defense: 0
+    _moveSpeed: 1
+  _exp: 25
+  _activeSkills:
+  - m_AssetGUID: 097010eed1bb14551989282d529ecf79
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  references:
+    version: 2
+    RefIds: []

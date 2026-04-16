@@ -7,7 +7,7 @@ using UnityEngine.Localization;
 namespace DungeonShooter
 {
     [CreateAssetMenu(menuName = "DungeonShooter/DataTables/Skill")]
-    public sealed class SkillTableEntrySo : ScriptableObject, ISerializableObject<SerializedSkillTableDto>
+    public sealed class SkillTableEntrySo : ScriptableObject, ISerializableObject<SkillTableDto>
     {
         public int Id
         {
@@ -28,10 +28,10 @@ namespace DungeonShooter
         [SerializeField] private AssetReferenceT<Sprite> _skillIconRef;
         [SerializeField] private List<SkillLevelData> _skillLevels;
 
-        public List<SerializedSkillTableDto> CreateSerializedDto()
+        public List<SkillTableDto> CreateSerializedDto()
         {
-            var list = new List<SerializedSkillTableDto>();
-            list.Add(new SerializedSkillTableDto(
+            var list = new List<SkillTableDto>();
+            list.Add(new SkillTableDto(
                 _id
                 , SoSerializeHelper.SerializeLocalizedString(_skillName)
                 , SoSerializeHelper.SerializeLocalizedString(_skillDescription)
@@ -41,7 +41,7 @@ namespace DungeonShooter
             for (var i = 0; i < _skillLevels.Count; i++)
             {
                 var data = _skillLevels[i];
-                list.Add(new SerializedSkillTableDto(
+                list.Add(new SkillTableDto(
                     _id, null, null, null
                     , i + 1
                     , SoSerializeHelper.SerializeLocalizedString(data.SkillLevelName)
@@ -54,7 +54,7 @@ namespace DungeonShooter
             return list;
         }
 
-        public void ApplyFromSerializedDto(List<SerializedSkillTableDto> serializedDto)
+        public void ApplyFromSerializedDto(List<SkillTableDto> serializedDto)
         {
             _skillLevels.Clear();
             foreach (var dto in serializedDto)

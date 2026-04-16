@@ -1,0 +1,4 @@
+Memo,Id,Name,GameObjectKey,AITypeKey,MaxHp,Attack,Defense,MoveSpeed,Exp,ActiveSkills
+적 스켈레톤,18000000,StringTable/622634983488,0161f133fe6fc45f7b9fddbcd8b7a6e6,8cded1c31749c4d0daa49926b19c7dcc,500,25,0,1,25,097010eed1bb14551989282d529ecf79
+적 지니,18000001,StringTable/622634983488,fff10b2218a0f428ab40e2c557927501,242add0a9697f466faebf2f5e725c013,500,25,0,1,25,2a0489ef4afc4467aa726e2d70aa09e0
+,,,,

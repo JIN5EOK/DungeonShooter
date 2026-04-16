@@ -1,6 +1,6 @@
 namespace DungeonShooter
 {
-    public sealed class SerializedSkillTableDto : ITableEntry
+    public sealed class SkillTableDto : ITableEntry
     {
         public string Memo { get; set; }
         public int Id { get; set; }
@@ -14,7 +14,7 @@ namespace DungeonShooter
         public int? Amount { get; set; }
         public float? Cooldown { get; set; }
 
-        public SerializedSkillTableDto(int id, string skillNameId, string skillDescriptionId, string skillIconKey,
+        public SkillTableDto(int id, string skillNameId, string skillDescriptionId, string skillIconKey,
             int? level, string skillLevelName, string skillLevelDescription, string skillDataKey, int? amount, float? cooldown, string memo = "")
         {
             Id = id;
@@ -29,7 +29,7 @@ namespace DungeonShooter
             Cooldown = cooldown;
             Memo = memo;
         }
-        public SerializedSkillTableDto(){}
+        public SkillTableDto(){}
     }
 }
 

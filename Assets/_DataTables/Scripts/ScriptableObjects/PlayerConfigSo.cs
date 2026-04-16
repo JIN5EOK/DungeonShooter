@@ -12,7 +12,7 @@ namespace DungeonShooter
     /// </summary>
     [Serializable]
     [CreateAssetMenu(menuName = "DungeonShooter/DataTables/PlayerConfig")]
-    public sealed class PlayerConfigSo : ScriptableObject, ISerializableObject<SerializedPlayerConfigTableDto>
+    public sealed class PlayerConfigSo : ScriptableObject, ISerializableObject<PlayerConfigDto>
     {
         public int Id => _id;
 
@@ -47,11 +47,11 @@ namespace DungeonShooter
         [SerializeField] private AssetReferenceT<SkillTableEntrySo> _skill2Ref;
         [SerializeField] private StatsDto _stats;
         [SerializeField] private List<AssetReferenceT<SkillTableEntrySo>> _skills;
-        public List<SerializedPlayerConfigTableDto> CreateSerializedDto()
+        public List<PlayerConfigDto> CreateSerializedDto()
         {
             var stats = _stats ?? new StatsDto();
             var skills = _skills != null ? SoSerializeHelper.SerializeAssetReferences(_skills) : string.Empty;
-            return new List<SerializedPlayerConfigTableDto>
+            return new List<PlayerConfigDto>
             {
                 new(
                     _id,
@@ -69,7 +69,7 @@ namespace DungeonShooter
             };
         }
 
-        public void ApplyFromSerializedDto(List<SerializedPlayerConfigTableDto> serializedDto)
+        public void ApplyFromSerializedDto(List<PlayerConfigDto> serializedDto)
         {
             if (serializedDto == null || serializedDto.Count == 0)
                 return;
