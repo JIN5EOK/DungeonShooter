@@ -27,22 +27,5 @@ namespace DungeonShooter
             MoveSpeedAdd = moveSpeedAdd;
             MoveSpeedMultiply = moveSpeedMultiply;
         }
-
-        /// <summary>
-        /// ItemTableEntry에서 StatBonus를 생성합니다.
-        /// </summary>
-        public static StatBonus From(ItemTableEntry entry)
-        {
-            if (entry == null)
-            {
-                return default;
-            }
-
-            return new StatBonus(
-                entry.HpAdd, entry.HpMultiply,
-                entry.AttackAdd, entry.AttackMultiply,
-                entry.DefenseAdd, entry.DefenseMultiply,
-                entry.MoveSpeedAdd, entry.MoveSpeedMultiply);
-        }
     }
 }

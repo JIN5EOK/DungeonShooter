@@ -9,7 +9,6 @@ namespace DungeonShooter
     public interface IPlayerContextManager
     {
         public IEntityContext EntityContext { get; }
-        public InventoryModel InventoryModel { get; }
         public event Action<int, Skill> OnActiveSkillSlotChanged;
         public Skill GetActiveSkill(int index);
         public void ReplaceActiveSkillSlot(Skill beforeSkill, Skill afterSkill);
@@ -26,7 +25,6 @@ namespace DungeonShooter
         public event Action<int, Skill> OnActiveSkillSlotChanged;
 
         public IEntityContext EntityContext { get; private set; }
-        public InventoryModel InventoryModel { get; } = new InventoryModel();
         private ITableRepository _tableRepository;
         private ISkillFactory _skillFactory;
         private PlayerConfigSo _playerConfigSo;

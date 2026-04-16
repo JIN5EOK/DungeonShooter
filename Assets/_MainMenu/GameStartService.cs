@@ -8,9 +8,7 @@ namespace _MainMenu
     public interface IGameStartService
     {
         PlayerConfigSo SelectedPlayer { get; set; }
-        StageConfigTableEntry SelectedStage { get; set; }
         IReadOnlyList<PlayerConfigSo> GetSelectablePlayers();
-        IReadOnlyList<StageConfigTableEntry> GetSelectableStages();
         UniTask GameStart();
     }
 
@@ -20,7 +18,6 @@ namespace _MainMenu
         private readonly SceneLoader _sceneLoader;
 
         public PlayerConfigSo SelectedPlayer { get; set; }
-        public StageConfigTableEntry SelectedStage { get; set; }
 
         [Inject]
         public GameStartService(ITableRepository tableRepository, SceneLoader sceneLoader)
@@ -34,18 +31,13 @@ namespace _MainMenu
             return _tableRepository?.GetAllTableEntries<PlayerConfigSo>() ?? new List<PlayerConfigSo>();
         }
 
-        public IReadOnlyList<StageConfigTableEntry> GetSelectableStages()
-        {
-            return _tableRepository?.GetAllTableEntries<StageConfigTableEntry>() ?? new List<StageConfigTableEntry>();
-        }
-
         public async UniTask GameStart()
         {
-            if (SelectedPlayer == null || SelectedStage == null)
+            if (SelectedPlayer == null)
                 return;
 
-            var context = new StageContext(SelectedPlayer.Id, SelectedStage.Id);
-            await _sceneLoader.LoadScene(SceneNames.StageScene, context);
+            // 스테이지 시스템 제거로 인해 게임 시작 시 별도의 스테이지 씬 전환을 하지 않습니다.
+            await UniTask.CompletedTask;
         }
     }
 }

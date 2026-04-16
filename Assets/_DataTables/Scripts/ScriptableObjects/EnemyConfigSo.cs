@@ -12,7 +12,7 @@ namespace DungeonShooter
     /// </summary>
     [Serializable]
     [CreateAssetMenu(menuName = "DungeonShooter/DataTables/EnemyConfig")]
-    public sealed class EnemyConfigSo : ScriptableObject, ISerializableObject<EnemyConfigDto>
+    public sealed class EnemyConfigSo : ScriptableObject, ITableEntry, ISerializableObject<EnemyConfigDto>
     {
         public int Id => _id;
 

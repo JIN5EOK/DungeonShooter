@@ -7,7 +7,7 @@ using UnityEngine.Localization;
 namespace DungeonShooter
 {
     [CreateAssetMenu(menuName = "DungeonShooter/DataTables/Skill")]
-    public sealed class SkillTableEntrySo : ScriptableObject, ISerializableObject<SkillTableDto>
+    public sealed class SkillTableEntrySo : ScriptableObject, ITableEntry, ISerializableObject<SkillTableDto>
     {
         public int Id
         {

@@ -12,18 +12,15 @@ namespace DungeonShooter
         private InputManager _inputManager;
         private IPauseManager _pauseManager;
         private IEntityInputContext _entityInputContext;
-        private IInventory _inventory;
         private IPlayerContextManager _playerContextManager;
 
         [Inject]
         public PlayerInputManager(InputManager inputManager,
             IPauseManager pauseManager,
-            IInventory inventory,
             IPlayerContextManager playerContextManager)
         {
             _inputManager = inputManager;
             _pauseManager = pauseManager;
-            _inventory = inventory;
             _playerContextManager = playerContextManager;
             SubscribeToInput();
         }
@@ -92,7 +89,7 @@ namespace DungeonShooter
             if (!CanProcessGameInput())
                 return;
 
-            SkillInputInternal(_inventory?.EquippedWeapon?.ActiveSkill, isPressed);
+            SkillInputInternal(_playerContextManager?.GetActiveSkill(0), isPressed);
         }
 
         private void OnSkill1Input(bool isPressed)

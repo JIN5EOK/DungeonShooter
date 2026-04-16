@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
@@ -60,8 +61,11 @@ namespace DungeonShooter
         public void Initialize(int stageConfigTableId)
         {
             _stageConfigTableId = stageConfigTableId;
-            var stageConfigEntry = _tableRepository.GetTableEntry<StageConfigTableEntry>(_stageConfigTableId);
-            _enemyIds = new List<int>(stageConfigEntry.EnemyKeys);
+            // StageConfigTableEntry 기반 스테이지별 적 목록 기능이 제거되어, 전체 EnemyConfigSo에서 랜덤 스폰하도록 변경합니다.
+            _enemyIds = _tableRepository
+                ?.GetAllTableEntries<EnemyConfigSo>()
+                ?.Select(x => x.Id)
+                ?.ToList();
         }
 
         /// <summary>

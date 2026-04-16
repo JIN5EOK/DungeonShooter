@@ -21,22 +21,6 @@ namespace DungeonShooter
         Left
     }
     
-    /// <summary> 방의 타입을 나타내는 열거형 </summary>
-    public enum RoomType
-    {
-        Start,
-        Normal,
-        Boss,
-    }
-    
-    /// <summary> 아이템 타입 </summary>
-    public enum ItemType
-    {
-        Weapon,
-        Passive,
-        Consume
-    }
-    
     /// <summary> Sorting Order 정의 /// </summary>
     public enum BaseSortingOrder
     {

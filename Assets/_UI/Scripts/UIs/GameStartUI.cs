@@ -42,7 +42,6 @@ namespace DungeonShooter
         [SerializeField] private TextMeshProUGUI _infoStats;
 
         private readonly List<Button> _characterButtons = new();
-        private readonly List<Button> _stageButtons = new();
         private GameObject _previewInstance;
         private IGameStartService _gameStartService;
         private ITableRepository _tableRepository;
@@ -50,12 +49,8 @@ namespace DungeonShooter
 
         /// <summary> 현재 선택된 플레이어 설정 엔트리 </summary>
         public PlayerConfigSo SelectedPlayerConfigEntry => _gameStartService?.SelectedPlayer;
-        /// <summary> 현재 선택된 스테이지 설정 엔트리 </summary>
-        public StageConfigTableEntry SelectedStageConfigEntry => _gameStartService?.SelectedStage;
         /// <summary> 캐릭터 선택 시 이벤트 </summary>
         public event Action<PlayerConfigSo> OnCharacterSelected;
-        /// <summary> 스테이지 선택 시 이벤트 </summary>
-        public event Action<StageConfigTableEntry> OnStageSelected;
 
         [Inject]
         public void Construct(IGameStartService gameStartService, ITableRepository tableRepository, IResourceProvider resourceProvider)
@@ -71,14 +66,7 @@ namespace DungeonShooter
                 AddCharacterButton(entry);
             }
 
-            ClearStageButtons();
-            var stageEntries = _gameStartService.GetSelectableStages();
-            foreach (var entry in stageEntries)
-            {
-                AddStageButton(entry);
-            }
-
-            SetCharacterButtonsInteractable(false);
+            SetCharacterButtonsInteractable(true);
             if (_gameStartButton != null)
                 _gameStartButton.interactable = false;
             if (_gameStartButton != null)
@@ -135,55 +123,6 @@ namespace DungeonShooter
             _previewInstance = go;
         }
 
-
-        private void ClearStageButtons()
-        {
-            foreach (var button in _stageButtons)
-            {
-                if (button != null)
-                    Destroy(button.gameObject);
-            }
-            _stageButtons.Clear();
-
-            if (_stageButtonContent == null)
-                return;
-
-            for (var i = _stageButtonContent.childCount - 1; i >= 0; i--)
-            {
-                var child = _stageButtonContent.GetChild(i);
-                Destroy(child.gameObject);
-            }
-        }
-
-        private void AddStageButton(StageConfigTableEntry entry)
-        {
-            if (_stageButtonContent == null || _stageButtonPrefab == null)
-                return;
-
-            var go = Instantiate(_stageButtonPrefab, _stageButtonContent, false);
-            var button = go.GetComponent<Button>();
-            if (button == null)
-                button = go.GetComponentInChildren<Button>(true);
-
-            if (button != null)
-            {
-                var label = go.GetComponentInChildren<TextMeshProUGUI>(true);
-                if (label != null)
-                    label.text = entry != null ? _tableRepository.GetStringText(entry.NameId) : string.Empty;
-
-                var captured = entry;
-                button.onClick.AddListener(() => SelectStage(captured));
-                _stageButtons.Add(button);
-            }
-        }
-
-        private void SelectStage(StageConfigTableEntry entry)
-        {
-            if (_gameStartService != null)
-                _gameStartService.SelectedStage = entry;
-            SetCharacterButtonsInteractable(true);
-            OnStageSelected?.Invoke(entry);
-        }
 
         private void SetCharacterButtonsInteractable(bool interactable)
         {
