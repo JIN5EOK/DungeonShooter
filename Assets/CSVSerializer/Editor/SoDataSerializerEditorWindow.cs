@@ -30,7 +30,7 @@ namespace DungeonShooter
 
             AddSerializeMenu<FooSo, SerializedFoo>();
             AddSerializeMenu<SkillTableEntrySo, SerializedSkillTableDto>();
-            AddSerializeMenu<PlayerTableEntrySo, SerializedPlayerConfigTableDto>();
+            AddSerializeMenu<PlayerConfigSo, SerializedPlayerConfigTableDto>();
             
             if (_lastResult.HasValue)
             {

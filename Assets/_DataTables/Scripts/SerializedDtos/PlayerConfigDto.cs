@@ -9,6 +9,7 @@ namespace DungeonShooter
         public string GameObjectKey { get; set; }
         public string Skill1Key { get; set; }
         public string Skill2Key { get; set; }
+        public string Skills { get; set; }
         public int MaxHp { get; set; }
         public int Attack { get; set; }
         public int Defense { get; set; }
@@ -25,6 +26,7 @@ namespace DungeonShooter
             int attack,
             int defense,
             int moveSpeed,
+            string skills,
             string memo = "")
         {
             Id = id;
@@ -37,6 +39,7 @@ namespace DungeonShooter
             Attack = attack;
             Defense = defense;
             MoveSpeed = moveSpeed;
+            Skills = skills;
             Memo = memo;
         }
 

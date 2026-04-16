@@ -12,7 +12,7 @@ namespace DungeonShooter
     /// </summary>
     [Serializable]
     [CreateAssetMenu(menuName = "DungeonShooter/DataTables/PlayerConfig")]
-    public sealed class PlayerTableEntrySo : ScriptableObject, ISerializableObject<SerializedPlayerConfigTableDto>
+    public sealed class PlayerConfigSo : ScriptableObject, ISerializableObject<SerializedPlayerConfigTableDto>
     {
         public int Id => _id;
 
@@ -34,6 +34,9 @@ namespace DungeonShooter
         /// <summary> 기본 스탯 </summary>
         public StatsDto Stats => _stats;
 
+        public List<AssetReferenceT<SkillTableEntrySo>> Skills => _skills;
+        
+        
         [TextArea][SerializeField] private string _memo;
 
         [SerializeField] private int _id;
@@ -43,10 +46,11 @@ namespace DungeonShooter
         [SerializeField] private AssetReferenceT<SkillTableEntrySo> _skill1Ref;
         [SerializeField] private AssetReferenceT<SkillTableEntrySo> _skill2Ref;
         [SerializeField] private StatsDto _stats;
-
+        [SerializeField] private List<AssetReferenceT<SkillTableEntrySo>> _skills;
         public List<SerializedPlayerConfigTableDto> CreateSerializedDto()
         {
             var stats = _stats ?? new StatsDto();
+            var skills = _skills != null ? SoSerializeHelper.SerializeAssetReferences(_skills) : string.Empty;
             return new List<SerializedPlayerConfigTableDto>
             {
                 new(
@@ -60,6 +64,7 @@ namespace DungeonShooter
                     stats.Attack,
                     stats.Defense,
                     stats.MoveSpeed,
+                    skills,
                     _memo)
             };
         }
@@ -90,6 +95,12 @@ namespace DungeonShooter
             if (_stats == null)
                 _stats = new StatsDto();
             _stats.Apply(dto.MaxHp, dto.Attack, dto.Defense, dto.MoveSpeed);
+
+            if (_skills == null)
+                _skills = new List<AssetReferenceT<SkillTableEntrySo>>();
+
+            if (!string.IsNullOrWhiteSpace(dto.Skills))
+                _skills = SoSerializeHelper.DeserializeAssetReferences<SkillTableEntrySo>(dto.Skills);
         }
     }
 }
