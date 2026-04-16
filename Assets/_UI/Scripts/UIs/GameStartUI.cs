@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using VContainer;
 using _MainMenu;
+using UnityEngine.AddressableAssets;
 
 namespace DungeonShooter
 {
@@ -48,11 +49,11 @@ namespace DungeonShooter
         private IResourceProvider _resourceProvider;
 
         /// <summary> 현재 선택된 플레이어 설정 엔트리 </summary>
-        public PlayerConfigTableEntry SelectedPlayerConfigEntry => _gameStartService?.SelectedPlayer;
+        public PlayerConfigSo SelectedPlayerConfigEntry => _gameStartService?.SelectedPlayer;
         /// <summary> 현재 선택된 스테이지 설정 엔트리 </summary>
         public StageConfigTableEntry SelectedStageConfigEntry => _gameStartService?.SelectedStage;
         /// <summary> 캐릭터 선택 시 이벤트 </summary>
-        public event Action<PlayerConfigTableEntry> OnCharacterSelected;
+        public event Action<PlayerConfigSo> OnCharacterSelected;
         /// <summary> 스테이지 선택 시 이벤트 </summary>
         public event Action<StageConfigTableEntry> OnStageSelected;
 
@@ -108,9 +109,10 @@ namespace DungeonShooter
             }
         }
 
-        private void LoadAndShowPreview(PlayerConfigTableEntry entry)
+        private void LoadAndShowPreview(PlayerConfigSo entry)
         {
-            if (entry == null || string.IsNullOrEmpty(entry.GameObjectKey))
+            var address = GetAddressOrNull(entry?.GameObjectRef);
+            if (string.IsNullOrEmpty(address))
             {
                 DestroyPreviewInstance();
                 return;
@@ -121,7 +123,7 @@ namespace DungeonShooter
 
             DestroyPreviewInstance();
 
-            var go = _resourceProvider.GetInstanceSync(entry.GameObjectKey);
+            var go = _resourceProvider.GetInstanceSync(address);
             if (go == null)
                 return;
 
@@ -192,7 +194,7 @@ namespace DungeonShooter
             }
         }
 
-        private void AddCharacterButton(PlayerConfigTableEntry entry)
+        private void AddCharacterButton(PlayerConfigSo entry)
         {
             if (_characterButtonContent == null || _characterButtonPrefab == null)
                 return;
@@ -206,7 +208,7 @@ namespace DungeonShooter
             {
                 var label = go.GetComponentInChildren<TextMeshProUGUI>(true);
                 if (label != null)
-                    label.text = entry != null ? _tableRepository.GetStringText(entry.NameId) : string.Empty;
+                    label.text = entry != null ? entry.NameId : string.Empty;
 
                 var captured = entry;
                 button.onClick.AddListener(() => SelectCharacter(captured));
@@ -214,7 +216,7 @@ namespace DungeonShooter
             }
         }
 
-        private void SelectCharacter(PlayerConfigTableEntry entry)
+        private void SelectCharacter(PlayerConfigSo entry)
         {
             if (_gameStartService != null)
                 _gameStartService.SelectedPlayer = entry;
@@ -238,14 +240,14 @@ namespace DungeonShooter
                 return;
             }
 
-            SetInfoText(_infoName, _tableRepository.GetStringText(selectedEntry.NameId));
-            SetInfoText(_infoDescription, _tableRepository.GetStringText(selectedEntry.DescriptionId));
+            SetInfoText(_infoName, selectedEntry.NameId);
+            SetInfoText(_infoDescription, selectedEntry.DescriptionId);
 
-            var weaponEntry = _tableRepository?.GetTableEntry<ItemTableEntry>(selectedEntry.StartWeaponId);
-            SetInfoText(_infoStartWeapon, weaponEntry != null ? _tableRepository.GetStringText(weaponEntry.ItemNameId) : string.Empty);
+            // PlayerConfigSo에 무기 정보가 없으므로 표시하지 않음
+            SetInfoText(_infoStartWeapon, string.Empty);
 
-            var skill1 = _tableRepository?.GetTableEntry<SkillTableEntrySo>(selectedEntry.Skill1Id);
-            var skill2 = _tableRepository?.GetTableEntry<SkillTableEntrySo>(selectedEntry.Skill2Id);
+            var skill1 = LoadSkillEntryOrNull(selectedEntry.Skill1Ref);
+            var skill2 = LoadSkillEntryOrNull(selectedEntry.Skill2Ref);
             var skillNames = new List<string>();
             if (skill1 != null)
                 skillNames.Add(skill1.SkillName);
@@ -253,16 +255,30 @@ namespace DungeonShooter
                 skillNames.Add(skill2.SkillName);
             SetInfoText(_infoSkills, string.Join(", ", skillNames));
 
-            var statsEntry = _tableRepository?.GetTableEntry<EntityStatsTableEntry>(selectedEntry.StatsId);
-            if (statsEntry != null)
+            var stats = selectedEntry.Stats;
+            if (stats != null)
             {
-                var statsText = $"체력: {statsEntry.MaxHp}  공격력: {statsEntry.Attack}  방어력: {statsEntry.Defense}  이동속도: {statsEntry.MoveSpeed}";
+                var statsText = $"체력: {stats.MaxHp}  공격력: {stats.Attack}  방어력: {stats.Defense}  이동속도: {stats.MoveSpeed}";
                 SetInfoText(_infoStats, statsText);
             }
             else
             {
                 SetInfoText(_infoStats, string.Empty);
             }
+        }
+
+        private SkillTableEntrySo LoadSkillEntryOrNull(AssetReferenceT<SkillTableEntrySo> entryRef)
+        {
+            var address = GetAddressOrNull(entryRef);
+            return string.IsNullOrEmpty(address) ? null : _resourceProvider.GetAssetSync<SkillTableEntrySo>(address);
+        }
+
+        private static string GetAddressOrNull(AssetReference assetReference)
+        {
+            if (assetReference == null || !assetReference.RuntimeKeyIsValid())
+                return null;
+            var key = assetReference.RuntimeKey.ToString();
+            return string.IsNullOrEmpty(key) ? null : key;
         }
 
         private static void SetInfoText(TextMeshProUGUI textUi, string value)

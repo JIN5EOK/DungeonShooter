@@ -150,7 +150,7 @@ namespace DungeonShooter
             _entityManager.OnRemainingEnemyCountChanged -= ForwardRemainingEnemyCountChanged;
         }
 
-        private void ForwardPlayerSpawnToHudUI(EntityBase player, PlayerConfigTableEntry config, Vector3 position)
+        private void ForwardPlayerSpawnToHudUI(EntityBase player, PlayerConfigSo config, Vector3 position)
         {
             var attack = player?.EntityContext?.Stat?.GetStat(StatType.Attack);
             var defense = player?.EntityContext?.Stat?.GetStat(StatType.Defense);
@@ -171,7 +171,7 @@ namespace DungeonShooter
             moveSpeed.OnValueChanged += _gameHudGroupUI.PlayerStatusHudUI.SetMoveSpeed;
         }
         
-        private void ForwardPlayerSpawnToInput(EntityBase player, PlayerConfigTableEntry config, Vector3 position) =>
+        private void ForwardPlayerSpawnToInput(EntityBase player, PlayerConfigSo config, Vector3 position) =>
             _playerInputManager.BindControlledEntity(player);
 
         private void ForwardPlayerDespawnToInput(EntityBase player, Vector3 position) =>
@@ -213,7 +213,7 @@ namespace DungeonShooter
         private void ForwardEnemyDeadToDrop(EntityBase enemy, EnemyConfigTableEntry enemyConfigTableEntry, Vector3 position) =>
             _itemDropService.TryDropItemsByWeight(enemyConfigTableEntry?.DropItemWeights, position);
 
-        private void ForwardPlayerSpawnToInventory(EntityBase player, PlayerConfigTableEntry config, Vector3 position) =>
+        private void ForwardPlayerSpawnToInventory(EntityBase player, PlayerConfigSo config, Vector3 position) =>
             _inventory.BindItemUserEntity(player);
 
         private void ForwardPlayerDespawnInventory(EntityBase player, Vector3 position) =>
@@ -222,7 +222,7 @@ namespace DungeonShooter
         private void ForwardEnemySpawnedCulling(EntityBase enemy) =>
             _objectCullingManager.AttachEntityToDistanceCullingRoot(enemy);
 
-        private void ForwardPlayerSpawnedCulling(EntityBase player, PlayerConfigTableEntry config, Vector3 position) =>
+        private void ForwardPlayerSpawnedCulling(EntityBase player, PlayerConfigSo config, Vector3 position) =>
             _objectCullingManager.SetPlayerDistanceReference(player);
 
         private void ForwardPlayerDestroyedCulling(EntityBase player, Vector3 position) =>

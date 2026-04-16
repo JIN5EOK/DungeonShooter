@@ -18,7 +18,7 @@ MonoBehaviour:
     m_TableReference:
       m_TableCollectionName: GUID:f0b62ded1cc634670ab88725bf70674a
     m_TableEntryReference:
-      m_KeyId: 622634983440
+      m_KeyId: 622634983442
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
@@ -27,7 +27,7 @@ MonoBehaviour:
     m_TableReference:
       m_TableCollectionName: GUID:f0b62ded1cc634670ab88725bf70674a
     m_TableEntryReference:
-      m_KeyId: 622634983441
+      m_KeyId: 622634983443
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
@@ -55,6 +55,7 @@ MonoBehaviour:
     _attack: 9999
     _defense: 9999
     _moveSpeed: 8
+  _skills: []
   references:
     version: 2
     RefIds: []

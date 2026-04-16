@@ -29,7 +29,7 @@ namespace DungeonShooter
             //LoadAndCacheTable<SkillTableEntry>("SkillTable");
             LoadAndCacheTable<ItemTableEntry>("ItemTable");
             LoadAndCacheTable<StageConfigTableEntry>("StageConfigTable");
-            LoadAndCacheTable<PlayerConfigTableEntry>("PlayerConfigTable");
+            //LoadAndCacheTable<PlayerConfigTableEntry>("PlayerConfigTable");
             LoadAndCacheTable<EntityStatsTableEntry>("EntityStatsTable");
             LoadAndCacheTable<EnemyConfigTableEntry>("EnemyConfigTable");
             LoadAndCacheTable<RoomEventTriggerTableEntry>("RoomEventTriggerTable");
@@ -37,6 +37,7 @@ namespace DungeonShooter
 
             await Addressables.InitializeAsync().Task;
             LoadAndCacheTableSO<SkillTableEntrySo>("SkillSO");
+            LoadAndCacheTableSO<PlayerConfigSo>("PlayerConfigSO");
         }
 
         

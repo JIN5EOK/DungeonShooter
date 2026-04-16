@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using VContainer;
 using VContainer.Unity;
 using Object = UnityEngine.Object;
@@ -13,9 +14,9 @@ namespace DungeonShooter
     /// </summary>
     public interface IPlayerFactory
     {
-        event Action<EntityBase, PlayerConfigTableEntry, Vector3> PlayerSpawned;
+        event Action<EntityBase, PlayerConfigSo, Vector3> PlayerSpawned;
         event Action<EntityBase, Vector3> PlayerDestroyed;
-        event Action<EntityBase, PlayerConfigTableEntry, Vector3> PlayerDied;
+        event Action<EntityBase, PlayerConfigSo, Vector3> PlayerDied;
 
         public void Initialize(int playerConfigTableId);
         public UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
@@ -28,9 +29,9 @@ namespace DungeonShooter
     /// </summary>
     public class PlayerFactory : IPlayerFactory
     {
-        public event Action<EntityBase, PlayerConfigTableEntry, Vector3> PlayerSpawned;
+        public event Action<EntityBase, PlayerConfigSo, Vector3> PlayerSpawned;
         public event Action<EntityBase, Vector3> PlayerDestroyed;
-        public event Action<EntityBase, PlayerConfigTableEntry, Vector3> PlayerDied;
+        public event Action<EntityBase, PlayerConfigSo, Vector3> PlayerDied;
 
         private int _playerConfigTableId;
         private readonly IResourceProvider _resourceProvider;
@@ -62,6 +63,8 @@ namespace DungeonShooter
         public async UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var playerAddress = GetPlayerAddress();
+            if (string.IsNullOrEmpty(playerAddress))
+                return null;
             var playerInstance = await _resourceProvider.GetInstanceAsync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
             var entity = InitializePlayerInstance(playerInstance);
             return entity;
@@ -73,6 +76,8 @@ namespace DungeonShooter
         public EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             var playerAddress = GetPlayerAddress();
+            if (string.IsNullOrEmpty(playerAddress))
+                return null;
             var playerInstance = _resourceProvider.GetInstanceSync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
             var entity = InitializePlayerInstance(playerInstance);
             return entity;
@@ -83,20 +88,21 @@ namespace DungeonShooter
         /// </summary>
         private string GetPlayerAddress()
         {
-            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_playerConfigTableId);
+            var config = _tableRepository.GetTableEntry<PlayerConfigSo>(_playerConfigTableId);
             if (config == null)
             {
-                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigTableEntry를 찾을 수 없습니다. ID: {_playerConfigTableId}");
+                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigSo를 찾을 수 없습니다. ID: {_playerConfigTableId}");
                 return null;
             }
 
-            if (string.IsNullOrEmpty(config.GameObjectKey))
+            var address = GetAddressOrNull(config.GameObjectRef);
+            if (string.IsNullOrEmpty(address))
             {
                 LogHandler.LogWarning<PlayerFactory>($"플레이어 게임오브젝트 키가 설정되지 않았습니다. ID: {_playerConfigTableId}");
                 return null;
             }
 
-            return config.GameObjectKey;
+            return address;
         }
 
         /// <summary>
@@ -143,7 +149,7 @@ namespace DungeonShooter
 
             cameraTrackComponent.AttachCameraAsync().Forget();
             
-            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_playerConfigTableId);
+            var config = _tableRepository.GetTableEntry<PlayerConfigSo>(_playerConfigTableId);
             
             entity.OnDestroyed += (self) =>
             {
@@ -158,6 +164,14 @@ namespace DungeonShooter
 
             PlayerSpawned?.Invoke(entity, config, playerInstance.transform.position);
             return entity;
+        }
+
+        private static string GetAddressOrNull(AssetReference assetReference)
+        {
+            if (assetReference == null || !assetReference.RuntimeKeyIsValid())
+                return null;
+            var key = assetReference.RuntimeKey.ToString();
+            return string.IsNullOrEmpty(key) ? null : key;
         }
     }
 }

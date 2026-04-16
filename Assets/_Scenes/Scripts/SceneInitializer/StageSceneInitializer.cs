@@ -92,18 +92,16 @@ namespace DungeonShooter
 
         private async UniTask InitializePlayerData()
         {
-            var config = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(_stageContext.PlayerConfigTableId);
+            var config = _tableRepository.GetTableEntry<PlayerConfigSo>(_stageContext.PlayerConfigTableId);
             if (config == null)
             {
-                LogHandler.LogError($"[{nameof(StageSceneInitializer)}] PlayerConfigTableEntry를 찾을 수 없습니다. ID: {_stageContext.PlayerConfigTableId}");
+                LogHandler.LogError($"[{nameof(StageSceneInitializer)}] PlayerConfigSo를 찾을 수 없습니다. ID: {_stageContext.PlayerConfigTableId}");
                 return;
             }
             
             await _playerContextManager.InitializeSkillsAsync();
-
-            var weapon = await _itemFactory.CreateItemAsync(config.StartWeaponId);
-            _inventory.AddItem(weapon);
-            _inventory.EquipItem(weapon);
+            
+            // PlayerConfigSo 기반으로 전환되며 시작 무기 정보는 제거됨: 스킵
             
             _gameHudGroupUI.ShowHud();
         }

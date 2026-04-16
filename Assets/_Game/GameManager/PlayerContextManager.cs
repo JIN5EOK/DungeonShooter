@@ -1,5 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System;
+using System.Collections.Generic;
+using UnityEngine.AddressableAssets;
 using VContainer;
 
 namespace DungeonShooter
@@ -27,7 +29,7 @@ namespace DungeonShooter
         public InventoryModel InventoryModel { get; } = new InventoryModel();
         private ITableRepository _tableRepository;
         private ISkillFactory _skillFactory;
-        private PlayerConfigTableEntry _playerConfigTableEntry;
+        private PlayerConfigSo _playerConfigSo;
         private readonly Skill[] _activeSkillSlots = new Skill[Constants.SkillSlotMaxCount];
         
         [Inject]
@@ -81,13 +83,21 @@ namespace DungeonShooter
         /// </summary>
         public void Initialize(int playerConfigTableId)
         {
-            _playerConfigTableEntry = _tableRepository.GetTableEntry<PlayerConfigTableEntry>(playerConfigTableId);
-            if (_playerConfigTableEntry == null)
+            _playerConfigSo = _tableRepository.GetTableEntry<PlayerConfigSo>(playerConfigTableId);
+            if (_playerConfigSo == null)
             {
                 return;
             }
 
-            var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(_playerConfigTableEntry.StatsId);
+            var statsDto = _playerConfigSo.Stats;
+            var statsEntry = new EntityStatsTableEntry
+            {
+                Id = _playerConfigSo.Id,
+                MaxHp = statsDto != null ? statsDto.MaxHp : 0,
+                Attack = statsDto != null ? statsDto.Attack : 0,
+                Defense = statsDto != null ? statsDto.Defense : 0,
+                MoveSpeed = statsDto != null ? statsDto.MoveSpeed : 0,
+            };
             IEntityStats entityStats = new EntityStats();
             entityStats.Initialize(statsEntry);
 
@@ -107,8 +117,11 @@ namespace DungeonShooter
         {
             EntityContext?.Skill?.Clear();
 
-            var skill0 = await _skillFactory.CreateSkillAsync(_playerConfigTableEntry.Skill1Id);
-            var skill1 = await _skillFactory.CreateSkillAsync(_playerConfigTableEntry.Skill2Id);
+            if (_playerConfigSo == null)
+                return;
+
+            var skill0 = await _skillFactory.CreateSkillAsync(_playerConfigSo.Skill1Ref);
+            var skill1 = await _skillFactory.CreateSkillAsync(_playerConfigSo.Skill2Ref);
 
             if (skill0 != null)
                 EntityContext?.Skill?.Regist(skill0);
@@ -118,9 +131,9 @@ namespace DungeonShooter
             SetActiveSkillSlot(0, skill0);
             SetActiveSkillSlot(1, skill1);
 
-            foreach (var acquirableSkillId in _playerConfigTableEntry.AcquirableSkills)
+            foreach (var skillRef in _playerConfigSo?.Skills)
             {
-                var skill = await _skillFactory.CreateSkillAsync(acquirableSkillId);
+                var skill = await _skillFactory.CreateSkillAsync(skillRef);
                 EntityContext?.Skill?.Regist(skill);
             }
         }

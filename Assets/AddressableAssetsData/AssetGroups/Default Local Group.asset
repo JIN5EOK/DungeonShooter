@@ -264,6 +264,18 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b123786e3e8c54cc681a575664c57709
+    m_Address: PlayerConfigSO1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PlayerConfigSO
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b2b800aad30784635bd2f430d3cd26b5
+    m_Address: PlayerConfigSO2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PlayerConfigSO
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b528c903ef49b43e0bc62e916c4108bc
     m_Address: UI_GameResult
     m_ReadOnly: 0

@@ -7,9 +7,9 @@ namespace _MainMenu
 {
     public interface IGameStartService
     {
-        PlayerConfigTableEntry SelectedPlayer { get; set; }
+        PlayerConfigSo SelectedPlayer { get; set; }
         StageConfigTableEntry SelectedStage { get; set; }
-        IReadOnlyList<PlayerConfigTableEntry> GetSelectablePlayers();
+        IReadOnlyList<PlayerConfigSo> GetSelectablePlayers();
         IReadOnlyList<StageConfigTableEntry> GetSelectableStages();
         UniTask GameStart();
     }
@@ -19,7 +19,7 @@ namespace _MainMenu
         private readonly ITableRepository _tableRepository;
         private readonly SceneLoader _sceneLoader;
 
-        public PlayerConfigTableEntry SelectedPlayer { get; set; }
+        public PlayerConfigSo SelectedPlayer { get; set; }
         public StageConfigTableEntry SelectedStage { get; set; }
 
         [Inject]
@@ -29,9 +29,9 @@ namespace _MainMenu
             _sceneLoader = sceneLoader;
         }
 
-        public IReadOnlyList<PlayerConfigTableEntry> GetSelectablePlayers()
+        public IReadOnlyList<PlayerConfigSo> GetSelectablePlayers()
         {
-            return _tableRepository?.GetAllTableEntries<PlayerConfigTableEntry>() ?? new List<PlayerConfigTableEntry>();
+            return _tableRepository?.GetAllTableEntries<PlayerConfigSo>() ?? new List<PlayerConfigSo>();
         }
 
         public IReadOnlyList<StageConfigTableEntry> GetSelectableStages()
