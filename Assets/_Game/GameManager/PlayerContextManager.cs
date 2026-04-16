@@ -12,7 +12,7 @@ namespace DungeonShooter
         public event Action<int, Skill> OnActiveSkillSlotChanged;
         public Skill GetActiveSkill(int index);
         public void ReplaceActiveSkillSlot(Skill beforeSkill, Skill afterSkill);
-        public void Initialize(int playerConfigTableId);
+        public void Initialize(PlayerConfigSo config);
         public UniTask InitializeSkillsAsync();
     }
 
@@ -79,9 +79,9 @@ namespace DungeonShooter
         /// <summary>
         /// 스테이지 씬에서 선택된 PlayerConfig 테이블 ID를 반영합니다. <see cref="StageSceneInitializer"/>에서만 호출합니다.
         /// </summary>
-        public void Initialize(int playerConfigTableId)
+        public void Initialize(PlayerConfigSo configSo)
         {
-            _playerConfigSo = _tableRepository.GetTableEntry<PlayerConfigSo>(playerConfigTableId);
+            _playerConfigSo = configSo;
             if (_playerConfigSo == null)
             {
                 return;

@@ -17,10 +17,8 @@ namespace DungeonShooter
         event Action<EntityBase, PlayerConfigSo, Vector3> PlayerSpawned;
         event Action<EntityBase, Vector3> PlayerDestroyed;
         event Action<EntityBase, PlayerConfigSo, Vector3> PlayerDied;
-
-        public void Initialize(int playerConfigTableId);
-        public UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        public EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        public UniTask<EntityBase> GetPlayerAsync(PlayerConfigSo config, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        public EntityBase GetPlayerSync(PlayerConfigSo config, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
 
     /// <summary>
@@ -33,7 +31,7 @@ namespace DungeonShooter
         public event Action<EntityBase, Vector3> PlayerDestroyed;
         public event Action<EntityBase, PlayerConfigSo, Vector3> PlayerDied;
 
-        private int _playerConfigTableId;
+        private int _playerConfigTableId = 12000001;
         private readonly IResourceProvider _resourceProvider;
         private readonly ITableRepository _tableRepository;
         private readonly IPlayerContextManager _playerContextManager;
@@ -51,18 +49,12 @@ namespace DungeonShooter
             _sceneLifetimeScope = sceneLifetimeScope;
         }
 
-        /// <inheritdoc />
-        public void Initialize(int playerConfigTableId)
-        {
-            _playerConfigTableId = playerConfigTableId;
-        }
-
         /// <summary>
         /// 플레이어 캐릭터를 생성합니다
         /// </summary>
-        public async UniTask<EntityBase> GetPlayerAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        public async UniTask<EntityBase> GetPlayerAsync(PlayerConfigSo config, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
-            var playerAddress = GetPlayerAddress();
+            var playerAddress = GetPlayerAddress(config);
             if (string.IsNullOrEmpty(playerAddress))
                 return null;
             var playerInstance = await _resourceProvider.GetInstanceAsync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
@@ -73,9 +65,9 @@ namespace DungeonShooter
         /// <summary>
         /// 플레이어 캐릭터를 동기적으로 생성합니다.
         /// </summary>
-        public EntityBase GetPlayerSync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        public EntityBase GetPlayerSync(PlayerConfigSo config, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
-            var playerAddress = GetPlayerAddress();
+            var playerAddress = GetPlayerAddress(config);
             if (string.IsNullOrEmpty(playerAddress))
                 return null;
             var playerInstance = _resourceProvider.GetInstanceSync(playerAddress, position, rotation, parent, instantiateInWorldSpace);
@@ -86,22 +78,9 @@ namespace DungeonShooter
         /// <summary>
         /// 플레이어 프리팹 어드레스 추출 및 검증
         /// </summary>
-        private string GetPlayerAddress()
+        private string GetPlayerAddress(PlayerConfigSo config)
         {
-            var config = _tableRepository.GetTableEntry<PlayerConfigSo>(_playerConfigTableId);
-            if (config == null)
-            {
-                LogHandler.LogWarning<PlayerFactory>($"PlayerConfigSo를 찾을 수 없습니다. ID: {_playerConfigTableId}");
-                return null;
-            }
-
             var address = GetAddressOrNull(config.GameObjectRef);
-            if (string.IsNullOrEmpty(address))
-            {
-                LogHandler.LogWarning<PlayerFactory>($"플레이어 게임오브젝트 키가 설정되지 않았습니다. ID: {_playerConfigTableId}");
-                return null;
-            }
-
             return address;
         }
 
