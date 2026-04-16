@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Localization;
-using UnityEngine.Serialization;
 
 namespace DungeonShooter
 {
-    [CreateAssetMenu(menuName = "DungeonShooter/DataTables/SkillTableEntry")]
-    public sealed class SkillTableEntrySo : ScriptableObject, ITableEntry, ISerializableObject<SerializedSkillTableDto>
+    [CreateAssetMenu(menuName = "DungeonShooter/DataTables/Skill")]
+    public sealed class SkillTableEntrySo : ScriptableObject, ISerializableObject<SerializedSkillTableDto>
     {
         public int Id
         {
