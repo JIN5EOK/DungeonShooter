@@ -296,6 +296,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: caf8eaf8e3df44837944360db2d54887
+    m_Address: EnemyConfig2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - EnemyConfigSO
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cbf982a5b2d16440cb558c66cac0f5c9
     m_Address: Skeleton_001
     m_ReadOnly: 0
@@ -350,6 +356,12 @@ MonoBehaviour:
     m_Address: RoomEventTriggerTable
     m_ReadOnly: 0
     m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ed6b7a98e5a174e539cbe1ed8bafc162
+    m_Address: EnemyConfig1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - EnemyConfigSO
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f11938e1b96cf48b69061ba7452ce2f3
     m_Address: Tile_Misc_002

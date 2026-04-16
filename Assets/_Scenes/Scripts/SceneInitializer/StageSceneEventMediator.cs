@@ -210,8 +210,10 @@ namespace DungeonShooter
         private void ForwardActiveSkillSlotChangedToHud(int idx, Skill skill) =>
             _gameHudGroupUI.TouchInputUI.SetSkillSlot(idx, skill);
 
-        private void ForwardEnemyDeadToDrop(EntityBase enemy, EnemyConfigTableEntry enemyConfigTableEntry, Vector3 position) =>
-            _itemDropService.TryDropItemsByWeight(enemyConfigTableEntry?.DropItemWeights, position);
+        private void ForwardEnemyDeadToDrop(EntityBase enemy, EnemyConfigSo enemyConfigSo, Vector3 position)
+        {
+            // EnemyConfigSo 기반으로 전환되며 아이템 드랍 기능은 제거 예정: 스킵
+        }
 
         private void ForwardPlayerSpawnToInventory(EntityBase player, PlayerConfigSo config, Vector3 position) =>
             _inventory.BindItemUserEntity(player);
@@ -231,9 +233,9 @@ namespace DungeonShooter
         private void ForwardEnemySpawnedEntity(EntityBase enemy) =>
             _entityManager.RegisterSpawnedEnemy(enemy);
 
-        private void ForwardEnemyDeadEntity(EntityBase enemy, EnemyConfigTableEntry enemyConfigTableEntry, Vector3 position)
+        private void ForwardEnemyDeadEntity(EntityBase enemy, EnemyConfigSo enemyConfigSo, Vector3 position)
         {
-            var exp = enemyConfigTableEntry != null ? enemyConfigTableEntry.Exp : 0;
+            var exp = enemyConfigSo != null ? enemyConfigSo.Exp : 0;
             _entityManager.NotifyEnemyDefeated(enemy, exp);
         }
 

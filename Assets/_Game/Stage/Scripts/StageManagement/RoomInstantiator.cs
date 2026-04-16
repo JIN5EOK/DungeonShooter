@@ -277,7 +277,7 @@ namespace DungeonShooter
 
             if (entry is RoomEventTriggerTableEntry eventTriggerEntry)
                 return await ResolveRoomEventTriggerEntryAsync(eventTriggerEntry, position, rotation);
-            if (entry is EnemyConfigTableEntry enemyConfig)
+            if (entry is EnemyConfigSo enemyConfig)
                 return await ResolveEnemyEntryAsync(tableId, enemyConfig, position, rotation);
             return null;
         }
@@ -290,29 +290,43 @@ namespace DungeonShooter
             if (entry == null) return null;
             if (entry is RoomEventTriggerTableEntry eventTriggerEntry)
                 return ResolveRoomEventTriggerEntrySync(eventTriggerEntry, position, rotation);
-            if (entry is EnemyConfigTableEntry enemyConfig)
+            if (entry is EnemyConfigSo enemyConfig)
                 return ResolveEnemyEntrySync(tableId, enemyConfig, position, rotation);
             return null;
         }
 
-        private async Task<GameObject> ResolveEnemyEntryAsync(int tableId, EnemyConfigTableEntry enemyConfig, Vector3 position, Quaternion rotation)
+        private async Task<GameObject> ResolveEnemyEntryAsync(int tableId, EnemyConfigSo enemyConfig, Vector3 position, Quaternion rotation)
         {
             if (Application.isPlaying && _enemyFactory != null)
             {
                 var enemy = await _enemyFactory.GetEnemyByConfigIdAsync(tableId, position, rotation,GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
                 return enemy != null ? enemy.gameObject : null;
             }
-            return await _resourceProvider.GetInstanceAsync(enemyConfig.GameObjectKey, position, rotation, GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
+            var address = GetAddressOrNull(enemyConfig.GameObjectRef);
+            return string.IsNullOrEmpty(address)
+                ? null
+                : await _resourceProvider.GetInstanceAsync(address, position, rotation, GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
         }
 
-        private GameObject ResolveEnemyEntrySync(int tableId, EnemyConfigTableEntry enemyConfig, Vector3 position, Quaternion rotation)
+        private GameObject ResolveEnemyEntrySync(int tableId, EnemyConfigSo enemyConfig, Vector3 position, Quaternion rotation)
         {
             if (Application.isPlaying && _enemyFactory != null)
             {
                 var enemy = _enemyFactory.GetEnemyByConfigIdSync(tableId, position, rotation,GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
                 return enemy != null ? enemy.gameObject : null;
             }
-            return _resourceProvider.GetInstanceSync(enemyConfig.GameObjectKey, position, rotation, GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
+            var address = GetAddressOrNull(enemyConfig.GameObjectRef);
+            return string.IsNullOrEmpty(address)
+                ? null
+                : _resourceProvider.GetInstanceSync(address, position, rotation, GetOrCreateChild(_stageRoot, RoomConstants.ObjectsGameObjectName));
+        }
+
+        private static string GetAddressOrNull(UnityEngine.AddressableAssets.AssetReference assetReference)
+        {
+            if (assetReference == null || !assetReference.RuntimeKeyIsValid())
+                return null;
+            var key = assetReference.RuntimeKey.ToString();
+            return string.IsNullOrEmpty(key) ? null : key;
         }
 
         private async Task<GameObject> ResolveRoomEventTriggerEntryAsync(RoomEventTriggerTableEntry eventTriggerEntry, Vector3 position, Quaternion rotation)

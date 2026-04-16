@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using VContainer;
 using VContainer.Unity;
 using Object = UnityEngine.Object;
@@ -16,7 +17,7 @@ namespace DungeonShooter
     public interface IEnemyFactory
     {
         event Action<EntityBase> EnemySpawned;
-        event Action<EntityBase, EnemyConfigTableEntry, Vector3> EnemyDied;
+        event Action<EntityBase, EnemyConfigSo, Vector3> EnemyDied;
 
         void Initialize(int stageConfigTableId);
         UniTask<EntityBase> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
@@ -31,7 +32,7 @@ namespace DungeonShooter
     public class EnemyFactory : IEnemyFactory
     {
         public event Action<EntityBase> EnemySpawned;
-        public event Action<EntityBase, EnemyConfigTableEntry, Vector3> EnemyDied;
+        public event Action<EntityBase, EnemyConfigSo, Vector3> EnemyDied;
 
         private LifetimeScope _sceneLifetimeScope;
         
@@ -104,7 +105,7 @@ namespace DungeonShooter
         /// </summary>
         public async UniTask<EntityBase> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
         {
-            var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(configId);
+            var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigSo>(configId);
             
             if (enemyConfig == null)
                 return null;
@@ -122,7 +123,7 @@ namespace DungeonShooter
         /// </summary>
         public EntityBase GetEnemyByConfigIdSync(int configId,  Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
         {
-            var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(configId);
+            var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigSo>(configId);
             
             if (enemyConfig == null)
                 return null;
@@ -135,9 +136,10 @@ namespace DungeonShooter
             return entity;
         }
 
-        private EntityBase GetFromPool(EnemyConfigTableEntry entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
+        private EntityBase GetFromPool(EnemyConfigSo entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
         {
-            var poolKey = GetPoolKey(entry.GameObjectKey);
+            var address = GetAddressOrNull(entry.GameObjectRef);
+            var poolKey = GetPoolKey(address);
             var go = _pool.Get(poolKey);
             
             if (go != null)
@@ -152,18 +154,26 @@ namespace DungeonShooter
             }
         }
 
-        private EntityBase CreateSync(EnemyConfigTableEntry entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
+        private EntityBase CreateSync(EnemyConfigSo entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
         {
-            var go = _resourceProvider.GetInstanceSync(entry.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
-            var poolKey = GetPoolKey(entry.GameObjectKey);
+            var address = GetAddressOrNull(entry.GameObjectRef);
+            if (string.IsNullOrEmpty(address))
+                return null;
+
+            var go = _resourceProvider.GetInstanceSync(address, position, rotation, parent, instantiateInWorldSpace);
+            var poolKey = GetPoolKey(address);
             EnsurePoolable(go, poolKey);
             return InitializeEnemyInstance(go, entry, true);
         }
         
-        private async UniTask<EntityBase> CreateAsync(EnemyConfigTableEntry entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
+        private async UniTask<EntityBase> CreateAsync(EnemyConfigSo entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
         {
-            var go = await _resourceProvider.GetInstanceAsync(entry.GameObjectKey, position, rotation, parent, instantiateInWorldSpace);
-            var poolKey = GetPoolKey(entry.GameObjectKey);
+            var address = GetAddressOrNull(entry.GameObjectRef);
+            if (string.IsNullOrEmpty(address))
+                return null;
+
+            var go = await _resourceProvider.GetInstanceAsync(address, position, rotation, parent, instantiateInWorldSpace);
+            var poolKey = GetPoolKey(address);
             EnsurePoolable(go, poolKey);
             return InitializeEnemyInstance(go, entry,true);
         }
@@ -171,7 +181,7 @@ namespace DungeonShooter
         /// <summary>
         /// EnemyKeys에서 랜덤 ID를 선택하고, 해당 EnemyConfigTableEntry의 GameObjectKey(어드레스)를 반환합니다.
         /// </summary>
-        private EnemyConfigTableEntry GetRandomEnemyTableConfig()
+        private EnemyConfigSo GetRandomEnemyTableConfig()
         {
             if (_enemyIds == null || _enemyIds.Count == 0)
             {
@@ -180,10 +190,10 @@ namespace DungeonShooter
             }
 
             var enemyId = _enemyIds[Random.Range(0, _enemyIds.Count)];
-            var enemyEntry = _tableRepository.GetTableEntry<EnemyConfigTableEntry>(enemyId);
+            var enemyEntry = _tableRepository.GetTableEntry<EnemyConfigSo>(enemyId);
             if (enemyEntry == null)
             {
-                Debug.LogWarning($"[{nameof(EnemyFactory)}] EnemyConfigTableEntry를 찾을 수 없습니다. ID: {enemyId}");
+                Debug.LogWarning($"[{nameof(EnemyFactory)}] EnemyConfigSo를 찾을 수 없습니다. ID: {enemyId}");
                 return null;
             }
 
@@ -232,11 +242,12 @@ namespace DungeonShooter
         /// <summary>
         /// 인스턴스에 필요한 컴포넌트를 붙이고 초기화합니다
         /// </summary>
-        private EntityBase InitializeEnemyInstance(GameObject enemyInstance, EnemyConfigTableEntry configTableEntry, bool isFirstInit)
+        private EntityBase InitializeEnemyInstance(GameObject enemyInstance, EnemyConfigSo configTableEntry, bool isFirstInit)
         {
             if (enemyInstance == null)
             {
-                Debug.LogWarning($"[{nameof(EnemyFactory)}] 적 인스턴스 생성 실패: {configTableEntry.GameObjectKey}");
+                var address = configTableEntry != null ? GetAddressOrNull(configTableEntry.GameObjectRef) : string.Empty;
+                Debug.LogWarning($"[{nameof(EnemyFactory)}] 적 인스턴스 생성 실패: {address}");
                 return null;
             }
 
@@ -250,10 +261,17 @@ namespace DungeonShooter
             }
 
             var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
-            var statsEntry = _tableRepository.GetTableEntry<EntityStatsTableEntry>(configTableEntry.StatsId);
+            var statsDto = configTableEntry.Stats;
+            var statsEntry = new EntityStatsTableEntry
+            {
+                Id = configTableEntry.Id,
+                MaxHp = statsDto != null ? statsDto.MaxHp : 0,
+                Attack = statsDto != null ? statsDto.Attack : 0,
+                Defense = statsDto != null ? statsDto.Defense : 0,
+                MoveSpeed = statsDto != null ? statsDto.MoveSpeed : 0,
+            };
             var statGroup = new EntityStats();
-            if (statsEntry != null)
-                statGroup.Initialize(statsEntry);
+            statGroup.Initialize(statsEntry);
 
             var entitySkills = new EntitySkills();
             var context = new EntityContext(
@@ -285,18 +303,26 @@ namespace DungeonShooter
 
             var activeSkills = new List<Skill>();
             
-            foreach (var skillId in configTableEntry.ActiveSkills)
+            foreach (var skillRef in configTableEntry.ActiveSkills)
             {
-                var skill = _skillFactory.CreateSkillSync(skillId);
+                var skill = _skillFactory.CreateSkillSync(skillRef);
                 entitySkills.Regist(skill);
                 activeSkills.Add(skill);
             }
 
-            var aiBT = _resourceProvider.GetAssetSync<AiBTBase>(configTableEntry.AIType);
+            var aiBT = _resourceProvider.GetAssetSync<AiBTBase>(GetAddressOrNull(configTableEntry.AIType));
             entityLifeTimeScope.Container.Resolve<IAIComponent>().Initialize(aiBT, activeSkills);
 
             EnemySpawned?.Invoke(entity);
             return entity;
+        }
+
+        private static string GetAddressOrNull(AssetReference assetReference)
+        {
+            if (assetReference == null || !assetReference.RuntimeKeyIsValid())
+                return null;
+            var key = assetReference.RuntimeKey.ToString();
+            return string.IsNullOrEmpty(key) ? null : key;
         }
     }
 }
