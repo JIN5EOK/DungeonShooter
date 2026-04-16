@@ -18,10 +18,10 @@ namespace DungeonShooter
         /// <summary>
         /// 장판 스킬 오브젝트를 초기화합니다.
         /// </summary>
-        public void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
+        public void Initialize(List<EffectBase> effects, SkillLevelData skillLevelData,
             SkillExecutionContext context, float duration, float applyInterval)
         {
-            base.Initialize(effects, skillTableEntry, context);
+            base.Initialize(effects, skillLevelData, context);
 
             _duration = duration;
             _applyInterval = Mathf.Max(0.01f, applyInterval);

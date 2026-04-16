@@ -22,7 +22,7 @@ namespace DungeonShooter
 
         private string ParticlePrefabAddress => _particlePrefab.AssetGUID.ToString();
 
-        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
+        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillLevelData levelData)
         {
             var position = _spawnPosition == SkillOwner.LastHitTarget && context.LastHitTarget != null
                 ? context.LastHitTarget.transform.position

@@ -16,9 +16,9 @@ namespace DungeonShooter
         [Header("테이블의 Amount에 적용할 배율\n0 = 데미지 적용 안됨, 1.0f = 1배율")]
         public float damagePercent = 1.0f;
 
-        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
+        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillLevelData levelData)
         {
-            if (!await base.Execute(context, entry))
+            if (!await base.Execute(context, levelData))
                 return false;
         
             var targetEntity = executeTarget == SkillOwner.Caster
@@ -31,7 +31,7 @@ namespace DungeonShooter
                 return false;
             }
             
-            var tableDamagePercent = entry.Amount;
+            var tableDamagePercent = levelData.Amount;
             var skillDamagePercent = Mathf.RoundToInt(tableDamagePercent * damagePercent);
             
 

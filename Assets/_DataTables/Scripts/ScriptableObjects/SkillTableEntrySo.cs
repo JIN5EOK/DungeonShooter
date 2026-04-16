@@ -8,34 +8,8 @@ using UnityEngine.Serialization;
 namespace DungeonShooter
 {
     [CreateAssetMenu(menuName = "DungeonShooter/DataTables/SkillTableEntry")]
-    public sealed class SkillTableEntrySo : ScriptableObject, ISerializableObject<SerializedSkillTableDto>
+    public sealed class SkillTableEntrySo : ScriptableObject, ITableEntry, ISerializableObject<SerializedSkillTableDto>
     {
-        [Serializable]
-        public class SkillLevelData
-        {
-            public string SKillLevelName => _skillLevelName.GetLocalizedString();
-            public LocalizedString SkillLevelName => _skillLevelName;
-            [SerializeField] private LocalizedString _skillLevelName;
-            public string SkillDescription => _skillLevelDescription.GetLocalizedString();
-            public LocalizedString SkillLevelDescription => _skillLevelDescription;
-            [SerializeField] private LocalizedString _skillLevelDescription;
-            public AssetReferenceT<SkillData> SkillDataRef => _skillDataRef;
-            [SerializeField] private AssetReferenceT<SkillData> _skillDataRef;
-            public int Amount => _amount;
-            [SerializeField] private int _amount;
-            public float Cooldown => _cooldown;
-            [SerializeField] private float _cooldown;
-
-            public SkillLevelData(AssetReferenceT<SkillData> skillDataRef, int amount, float cooldown,LocalizedString skillLevelName , LocalizedString skillLevelDescription)
-            {
-                this._skillDataRef = skillDataRef;
-                this._amount = amount;
-                this._cooldown = cooldown;
-                this._skillLevelName = skillLevelName;
-                this._skillLevelDescription = skillLevelDescription;
-            }
-        }
-        
         public int Id
         {
             get => _id;
@@ -46,15 +20,15 @@ namespace DungeonShooter
         public string SkillDescription => _skillDescription.GetLocalizedString();
         public AssetReferenceT<Sprite> SkillIconRef => _skillIconRef;
         public IReadOnlyList<SkillLevelData> SkillLevels => _skillLevels;
-        
-        [TextArea] [SerializeField] private string _memo;
-        
+
+        [TextArea][SerializeField] private string _memo;
+
         [SerializeField] private int _id;
         [SerializeField] private LocalizedString _skillName;
         [SerializeField] private LocalizedString _skillDescription;
         [SerializeField] private AssetReferenceT<Sprite> _skillIconRef;
         [SerializeField] private List<SkillLevelData> _skillLevels;
-        
+
         public List<SerializedSkillTableDto> CreateSerializedDto()
         {
             var list = new List<SerializedSkillTableDto>();
@@ -64,7 +38,7 @@ namespace DungeonShooter
                 , SoSerializeHelper.SerializeLocalizedString(_skillDescription)
                 , SoSerializeHelper.SerializeAssetReference(_skillIconRef)
                 , null, null, null, null, null, null, _memo));
-            
+
             for (var i = 0; i < _skillLevels.Count; i++)
             {
                 var data = _skillLevels[i];
@@ -101,8 +75,33 @@ namespace DungeonShooter
                         , SoSerializeHelper.DeserializeLocalizedString(dto.SkillLevelName)
                         , SoSerializeHelper.DeserializeLocalizedString(dto.SkillLevelDescription)));
                 }
-                    
+
             }
+        }
+    }
+    [Serializable]
+    public class SkillLevelData
+    {
+        public string SKillLevelName => _skillLevelName.GetLocalizedString();
+        public LocalizedString SkillLevelName => _skillLevelName;
+        [SerializeField] private LocalizedString _skillLevelName;
+        public string SkillDescription => _skillLevelDescription.GetLocalizedString();
+        public LocalizedString SkillLevelDescription => _skillLevelDescription;
+        [SerializeField] private LocalizedString _skillLevelDescription;
+        public AssetReferenceT<SkillData> SkillDataRef => _skillDataRef;
+        [SerializeField] private AssetReferenceT<SkillData> _skillDataRef;
+        public int Amount => _amount;
+        [SerializeField] private int _amount;
+        public float Cooldown => _cooldown;
+        [SerializeField] private float _cooldown;
+
+        public SkillLevelData(AssetReferenceT<SkillData> skillDataRef, int amount, float cooldown, LocalizedString skillLevelName, LocalizedString skillLevelDescription)
+        {
+            _skillDataRef = skillDataRef;
+            _amount = amount;
+            _cooldown = cooldown;
+            _skillLevelName = skillLevelName;
+            _skillLevelDescription = skillLevelDescription;
         }
     }
 }

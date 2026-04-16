@@ -16,10 +16,10 @@ namespace DungeonShooter
         private float _elapsedTime = 0f;
         private readonly HashSet<EntityBase> _appliedTargets = new ();
 
-        public void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
+        public void Initialize(List<EffectBase> effects, SkillLevelData skillLevelData,
             SkillExecutionContext context, int targetCount, float speed, float lifeTime)
         {
-            base.Initialize(effects, skillTableEntry, context);
+            base.Initialize(effects, skillLevelData, context);
 
             _elapsedTime = 0f;
             _appliedTargets.Clear();

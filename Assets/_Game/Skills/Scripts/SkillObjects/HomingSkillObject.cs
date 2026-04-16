@@ -19,10 +19,10 @@ namespace DungeonShooter
         /// <summary>
         /// 스킬 오브젝트를 초기화합니다.
         /// </summary>
-        public void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
+        public void Initialize(List<EffectBase> effects, SkillLevelData skillLevelData,
             SkillExecutionContext context, EntityBase target, float speed, float lifeTime, float hitRadius)
         {
-            base.Initialize(effects, skillTableEntry, context);
+            base.Initialize(effects, skillLevelData, context);
             _target = target;
             _speed = speed;
             _lifeTime = lifeTime;

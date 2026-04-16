@@ -18,9 +18,9 @@ namespace DungeonShooter
 
         private string AudioClipAddress => _audioClipRef.AssetGUID.ToString();
 
-        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
+        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillLevelData levelData)
         {
-            if (!await base.Execute(context, entry))
+            if (!await base.Execute(context, levelData))
                 return false;
 
             if (_audioClipRef == null)

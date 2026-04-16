@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using DungeonShooter;
-using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -38,7 +36,7 @@ namespace DungeonShooter
 
         private string SkillObjectAddress => _skillObject.AssetGUID.ToString();
 
-        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
+        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillLevelData levelData)
         {
             var position = _spawnPosition == SkillOwner.Caster ? context.Caster.transform.position : context.LastHitTarget.transform.position;
             var obj = await context.SkillObjectFactory.CreateSkillObjectAsync<ZoneSkillObject>(SkillObjectAddress, position);
@@ -46,7 +44,7 @@ namespace DungeonShooter
             if(obj == null)
                 return false;
             
-            obj.Initialize(_effects, entry, context, _duration, _applyInterval);
+            obj.Initialize(_effects, levelData, context, _duration, _applyInterval);
 
             return true;
         }

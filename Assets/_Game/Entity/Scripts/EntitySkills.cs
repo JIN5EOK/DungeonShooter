@@ -26,11 +26,9 @@ namespace DungeonShooter
     public class EntitySkills : IEntitySkills
     {
         private readonly HashSet<Skill> _skills = new();
-        private readonly ITableRepository _tableRepository;
 
-        public EntitySkills(ITableRepository tableRepository = null)
+        public EntitySkills()
         {
-            _tableRepository = tableRepository;
         }
 
         public event Action<Skill> OnSkillRegisted;
@@ -59,15 +57,15 @@ namespace DungeonShooter
 
             if (_skills.Contains(skill))
             {
-                var nameText = _tableRepository?.GetStringText(skill.SkillTableEntry.SkillNameId) ?? skill.SkillTableEntry.SkillNameId.ToString();
+                var nameText = skill.SkillTableEntrySo != null ? skill.SkillTableEntrySo.SkillName : string.Empty;
                 LogHandler.LogWarning<EntitySkills>($"이미 등록된 스킬입니다: {nameText}");
                 return;
             }
 
             _skills.Add(skill);
             OnSkillRegisted?.Invoke(skill);
-            var displayName = _tableRepository?.GetStringText(skill.SkillTableEntry.SkillNameId) ?? skill.SkillTableEntry.SkillNameId.ToString();
-            LogHandler.Log<EntitySkills>($"스킬 등록 완료: {skill.SkillTableEntry.Id} ({displayName})");
+            var displayName = skill.SkillTableEntrySo != null ? skill.SkillTableEntrySo.SkillName : string.Empty;
+            LogHandler.Log<EntitySkills>($"스킬 등록 완료: {skill.SkillTableEntrySo?.Id} ({displayName})");
         }
 
         /// <summary>
@@ -83,13 +81,13 @@ namespace DungeonShooter
 
             if (!_skills.Remove(skill))
             {
-                var nameText = skill.SkillTableEntry != null ? (_tableRepository?.GetStringText(skill.SkillTableEntry.SkillNameId) ?? skill.SkillTableEntry.SkillNameId.ToString()) : "null";
+                var nameText = skill.SkillTableEntrySo != null ? skill.SkillTableEntrySo.SkillName : "null";
                 LogHandler.LogWarning<EntitySkills>($"스킬해제 실패: 등록되지 않은 스킬입니다: {nameText}");
                 return;
             }
 
             OnSkillUnregisted?.Invoke(skill);
-            LogHandler.Log<EntitySkills>($"스킬 등록 해제 완료: {skill.SkillTableEntry?.Id}");
+            LogHandler.Log<EntitySkills>($"스킬 등록 해제 완료: {skill.SkillTableEntrySo?.Id}");
         }
         
         /// <summary>

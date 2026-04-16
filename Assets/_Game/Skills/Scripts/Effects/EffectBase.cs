@@ -1,7 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace DungeonShooter
 {
@@ -16,9 +15,9 @@ namespace DungeonShooter
         protected SkillOwner executeTarget;
 
         /// <summary>이펙트를 실행합니다. (액티브 스킬 사용 시 호출) </summary>
-        public virtual UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
+        public virtual UniTask<bool> Execute(SkillExecutionContext context, SkillLevelData levelData)
         {
-            if (context.Caster == null || entry == null)
+            if (context.Caster == null || levelData == null)
             {
                 LogHandler.LogError<EffectBase>("스킬 사용 실패, 파라미터가 올바르지 않습니다.");
                 return UniTask.FromResult(false);
@@ -27,16 +26,16 @@ namespace DungeonShooter
         }
 
         /// <summary>효과를 활성화합니다. (패시브 스킬 등록 시 호출) </summary>
-        public virtual void Activate(EntityBase owner, SkillTableEntry entry)
+        public virtual void Activate(EntityBase owner, SkillLevelData levelData)
         {
-            if (owner == null || entry == null)
+            if (owner == null || levelData == null)
                 throw new ArgumentException("스킬 활성화 실패, 파라미터가 올바르지 않습니다", nameof(EffectBase));
         }
 
         /// <summary>효과를 비활성화합니다. (패시브 스킬 해제 시 호출) </summary>
-        public virtual void Deactivate(EntityBase owner, SkillTableEntry entry)
+        public virtual void Deactivate(EntityBase owner, SkillLevelData levelData)
         {
-            if (owner == null || entry == null)
+            if (owner == null || levelData == null)
                 throw new ArgumentException("스킬 비활성화 실패, 파라미터가 올바르지 않습니다", nameof(EffectBase));
         }
     }

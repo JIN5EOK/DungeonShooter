@@ -7,19 +7,19 @@ using Random = UnityEngine.Random;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 레벨업 가능한 스킬 정보 (현재 스킬 인스턴스 + 다음 레벨 테이블 엔트리 + 표시용 아이콘)
+    /// 레벨업 가능한 스킬 정보 (현재 스킬 인스턴스 + 다음 레벨 데이터 + 표시용 아이콘)
     /// </summary>
     public readonly struct LevelUpableSkillInfo
     {
         public Skill CurrentSkill { get; }
-        public SkillTableEntry NextLevelEntry { get; }
+        public SkillLevelData NextLevelData { get; }
         public Sprite CurrentIcon { get; }
         public Sprite NextLevelIcon { get; }
         
-        public LevelUpableSkillInfo(Skill currentSkill, SkillTableEntry nextLevelEntry, Sprite currentIcon, Sprite nextLevelIcon)
+        public LevelUpableSkillInfo(Skill currentSkill, SkillLevelData nextLevelData, Sprite currentIcon, Sprite nextLevelIcon)
         {
             CurrentSkill = currentSkill;
-            NextLevelEntry = nextLevelEntry;
+            NextLevelData = nextLevelData;
             CurrentIcon = currentIcon;
             NextLevelIcon = nextLevelIcon;
         }
@@ -49,14 +49,12 @@ namespace DungeonShooter
     {
         public event Action<Skill, Skill> OnSkillLeveledUp;
 
-        private readonly ITableRepository _tableRepository;
         private readonly IResourceProvider _resourceProvider;
         private readonly ISkillFactory _skillFactory;
 
         [Inject]
-        public SkillService(ITableRepository tableRepository, IResourceProvider resourceProvider, ISkillFactory skillFactory)
+        public SkillService(IResourceProvider resourceProvider, ISkillFactory skillFactory)
         {
-            _tableRepository = tableRepository;
             _resourceProvider = resourceProvider;
             _skillFactory = skillFactory;
         }
@@ -78,12 +76,15 @@ namespace DungeonShooter
                 return false;
             }
 
-            var nextSkillId = currentSkill.SkillTableEntry.CalculateNextLevelSkillId();
-            var nextSkillEntry = _tableRepository.GetTableEntry<SkillTableEntry>(nextSkillId);
-            if (nextSkillEntry == null)
+            var so = currentSkill.SkillTableEntrySo;
+            if (so?.SkillLevels == null)
                 return false;
 
-            var after = _skillFactory.CreateSkillSync(nextSkillEntry.Id);
+            var nextIndex = currentSkill.SkillLevelIndex + 1;
+            if (nextIndex >= so.SkillLevels.Count)
+                return false;
+
+            var after = _skillFactory.CreateSkillSync(so.Id, nextIndex);
             if (after == null)
             {
                 LogHandler.LogError<SkillService>("다음 레벨 스킬 생성에 실패했습니다.");
@@ -102,14 +103,21 @@ namespace DungeonShooter
             var result = new List<LevelUpableSkillInfo>();
             foreach (var skill in skills)
             {
-                var nextSkillId = skill.SkillTableEntry.CalculateNextLevelSkillId();
-                var nextSkillEntry = _tableRepository.GetTableEntry<SkillTableEntry>(nextSkillId);
-                if (nextSkillEntry == null)
+                var so = skill.SkillTableEntrySo;
+                if (so?.SkillLevels == null)
                     continue;
 
-                var currentIcon = _resourceProvider.GetAssetSync<Sprite>(skill.SkillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
-                var nextIcon = _resourceProvider.GetAssetSync<Sprite>(nextSkillEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas);
-                result.Add(new LevelUpableSkillInfo(skill, nextSkillEntry, currentIcon, nextIcon));
+                var nextIndex = skill.SkillLevelIndex + 1;
+                if (nextIndex >= so.SkillLevels.Count)
+                    continue;
+
+                var nextLevelData = so.SkillLevels[nextIndex];
+                var iconAddress = GetIconAddress(so);
+                var currentIcon = string.IsNullOrEmpty(iconAddress)
+                    ? null
+                    : _resourceProvider.GetAssetSync<Sprite>(iconAddress);
+                var nextIcon = currentIcon;
+                result.Add(new LevelUpableSkillInfo(skill, nextLevelData, currentIcon, nextIcon));
             }
 
             // 스킬 목록 순서를 랜덤하게 섞어서 반환
@@ -120,6 +128,14 @@ namespace DungeonShooter
             }
 
             return result;
+        }
+
+        private static string GetIconAddress(SkillTableEntrySo so)
+        {
+            var iconRef = so.SkillIconRef;
+            if (iconRef == null || !iconRef.RuntimeKeyIsValid())
+                return null;
+            return iconRef.RuntimeKey.ToString();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace DungeonShooter
         protected PoolableComponent poolable;
         protected SkillExecutionContext context;
         protected List<EffectBase> effects;
-        protected SkillTableEntry skillTableEntry;
+        protected SkillLevelData skillLevelData;
 
         protected virtual void Start()
         {
@@ -22,12 +22,12 @@ namespace DungeonShooter
         /// <summary>
         /// 스킬 오브젝트를 초기화합니다.
         /// </summary>
-        protected void Initialize(List<EffectBase> effects, SkillTableEntry skillTableEntry,
+        protected void Initialize(List<EffectBase> effects, SkillLevelData skillLevelData,
             SkillExecutionContext context)
         {
             this.context = context;
             this.effects = effects;
-            this.skillTableEntry = skillTableEntry;
+            this.skillLevelData = skillLevelData;
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace DungeonShooter
             {
                 if (effect != null)
                 {
-                    await effect.Execute(context, skillTableEntry);
+                    await effect.Execute(context, skillLevelData);
                 }
             }
         }

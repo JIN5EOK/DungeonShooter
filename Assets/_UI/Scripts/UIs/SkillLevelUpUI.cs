@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using VContainer;
 
 namespace DungeonShooter
 {
@@ -15,14 +14,6 @@ namespace DungeonShooter
         [SerializeField]
         private SkillLevelUpSlot _skillLevelUpSlotPrefab;
         private List<SkillLevelUpSlot> _slots = new();
-
-        private ITableRepository _tableRepository;
-
-        [Inject]
-        public void Construct(ITableRepository tableRepository)
-        {
-            _tableRepository = tableRepository;
-        }
 
         /// <summary>
         /// 레벨업 가능 스킬 목록을 표시하고, 선택 시 콜백을 호출합니다.
@@ -45,11 +36,13 @@ namespace DungeonShooter
                 var slot = _slots[slotIndex];
                 slot.gameObject.SetActive(true);
 
-                var currentEntry = info.CurrentSkill.SkillTableEntry;
-                slot._currentSkillInfo.SetInfo(_tableRepository.GetStringText(currentEntry.SkillNameId), _tableRepository.GetStringText(currentEntry.SkillDescriptionId), currentEntry.Cooldown, info.CurrentIcon);
+                var currentSkill = info.CurrentSkill;
+                var currentSo = currentSkill.SkillTableEntrySo;
+                var currentLevelData = currentSo.SkillLevels[currentSkill.SkillLevelIndex];
+                slot._currentSkillInfo.SetInfo(currentLevelData.SKillLevelName, currentLevelData.SkillDescription, currentLevelData.Cooldown, info.CurrentIcon);
 
-                var nextEntry = info.NextLevelEntry;
-                slot._nextSkillInfo.SetInfo(_tableRepository.GetStringText(nextEntry.SkillNameId), _tableRepository.GetStringText(nextEntry.SkillDescriptionId), nextEntry.Cooldown, info.NextLevelIcon);
+                var nextLevel = info.NextLevelData;
+                slot._nextSkillInfo.SetInfo(nextLevel.SKillLevelName, nextLevel.SkillDescription, nextLevel.Cooldown, info.NextLevelIcon);
 
                 slot.SetSelectHandler(() =>
                 {

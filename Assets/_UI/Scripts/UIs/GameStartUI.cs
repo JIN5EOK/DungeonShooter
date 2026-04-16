@@ -244,13 +244,13 @@ namespace DungeonShooter
             var weaponEntry = _tableRepository?.GetTableEntry<ItemTableEntry>(selectedEntry.StartWeaponId);
             SetInfoText(_infoStartWeapon, weaponEntry != null ? _tableRepository.GetStringText(weaponEntry.ItemNameId) : string.Empty);
 
-            var skill1 = _tableRepository?.GetTableEntry<SkillTableEntry>(selectedEntry.Skill1Id);
-            var skill2 = _tableRepository?.GetTableEntry<SkillTableEntry>(selectedEntry.Skill2Id);
+            var skill1 = _tableRepository?.GetTableEntry<SkillTableEntrySo>(selectedEntry.Skill1Id);
+            var skill2 = _tableRepository?.GetTableEntry<SkillTableEntrySo>(selectedEntry.Skill2Id);
             var skillNames = new List<string>();
             if (skill1 != null)
-                skillNames.Add(_tableRepository.GetStringText(skill1.SkillNameId));
+                skillNames.Add(skill1.SkillName);
             if (skill2 != null)
-                skillNames.Add(_tableRepository.GetStringText(skill2.SkillNameId));
+                skillNames.Add(skill2.SkillName);
             SetInfoText(_infoSkills, string.Join(", ", skillNames));
 
             var statsEntry = _tableRepository?.GetTableEntry<EntityStatsTableEntry>(selectedEntry.StatsId);

@@ -138,6 +138,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 65aec94b226ad461b897710ad13a8c75
+    m_Address: AttackUpSkillIcon
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 676ca14f427fc4c74a76a8271e618549
     m_Address: Tile_Tree_002
     m_ReadOnly: 0
@@ -159,7 +164,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 76d38a51afb13490db1a529fb1ba34fa
-    m_Address: Assets/_Game/Skills/Images/MeteorSkillIcon.png
+    m_Address: MeteorSkillIcon
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -205,7 +210,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 92a436165918d476992fe8363157c822
-    m_Address: Assets/_Game/Skills/Images/FireballSkillIcon.png
+    m_Address: FireballSkillIcon
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -290,7 +295,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cf685c41c9478492f825dabd84d7f8d3
-    m_Address: Assets/_Game/Skills/Images/SwordAttackSkillIcon.png
+    m_Address: SwordAttackSkillIcon
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

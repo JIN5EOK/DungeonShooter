@@ -255,7 +255,7 @@ namespace DungeonShooter
             if (statsEntry != null)
                 statGroup.Initialize(statsEntry);
 
-            var entitySkills = new EntitySkills(_tableRepository);
+            var entitySkills = new EntitySkills();
             var context = new EntityContext(
                 new EntityInputContext()
                 , statGroup

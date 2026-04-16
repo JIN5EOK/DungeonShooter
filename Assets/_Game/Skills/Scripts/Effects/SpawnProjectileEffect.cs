@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -44,7 +43,7 @@ namespace DungeonShooter
         
         private string SkillObjectAddress => _skillObject.AssetGUID.ToString();
 
-        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
+        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillLevelData levelData)
         {
             var position = _spawnPosition == SkillOwner.Caster ? context.Caster.transform.position : context.LastHitTarget.transform.position;
             Quaternion rotation = Quaternion.identity;
@@ -61,7 +60,7 @@ namespace DungeonShooter
             if (skillObj == null)
                 return false;
             
-            skillObj.Initialize(_effects, entry, context, targetCount, speed, lifeTime);
+            skillObj.Initialize(_effects, levelData, context, targetCount, speed, lifeTime);
 
             return true;
         }

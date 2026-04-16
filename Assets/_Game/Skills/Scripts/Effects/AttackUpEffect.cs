@@ -13,16 +13,16 @@ namespace DungeonShooter
         [SerializeField]
         private float _amountPercent = 1.0f;
 
-        public override UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
+        public override UniTask<bool> Execute(SkillExecutionContext context, SkillLevelData levelData)
         {
             return UniTask.FromResult(false);
         }
 
-        public override void Activate(EntityBase owner, SkillTableEntry entry)
+        public override void Activate(EntityBase owner, SkillLevelData levelData)
         {
-            base.Activate(owner, entry);
+            base.Activate(owner, levelData);
 
-            var percent = Mathf.RoundToInt(entry.Amount * _amountPercent);
+            var percent = Mathf.RoundToInt(levelData.Amount * _amountPercent);
             var attackMultiply = 100 + percent;
             
             var bonus = new StatBonus(0, 100, 0, attackMultiply, 0, 100, 0, 100);
@@ -30,9 +30,9 @@ namespace DungeonShooter
             owner.EntityContext.Stat.ApplyStatBonus(this, bonus);
         }
 
-        public override void Deactivate(EntityBase owner, SkillTableEntry entry)
+        public override void Deactivate(EntityBase owner, SkillLevelData levelData)
         {
-            base.Deactivate(owner, entry);
+            base.Deactivate(owner, levelData);
 
             owner.EntityContext.Stat.RemoveStatBonus(this);
         }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -56,9 +55,9 @@ namespace DungeonShooter
 
         private string SkillObjectAddress => _skillObject.AssetGUID.ToString();
 
-        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
+        public override async UniTask<bool> Execute(SkillExecutionContext context, SkillLevelData levelData)
         {
-            if(!await base.Execute(context, entry))
+            if(!await base.Execute(context, levelData))
                 return false;
 
             var center = _searchCenter == SkillOwner.LastHitTarget && context.LastHitTarget != null ? (Vector2)context.LastHitTarget.transform.position : 
@@ -75,7 +74,7 @@ namespace DungeonShooter
                     return false;
                 
                 context = context.WithLastHitTarget(target);
-                skillObj.Initialize(_effects, entry, context, target, _speed, _lifeTime, _hitRadius);
+                skillObj.Initialize(_effects, levelData, context, target, _speed, _lifeTime, _hitRadius);
             }
 
             return true;

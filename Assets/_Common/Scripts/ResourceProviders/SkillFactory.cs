@@ -1,14 +1,15 @@
 using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using VContainer;
 
 namespace DungeonShooter
 {
     public interface ISkillFactory
     {
-        public UniTask<Skill> CreateSkillAsync(int skillEntryId);
-        public Skill CreateSkillSync(int skillEntryId);
+        public UniTask<Skill> CreateSkillAsync(int skillEntryId, int skillLevelIndex = 0);
+        public Skill CreateSkillSync(int skillEntryId, int skillLevelIndex = 0);
     }
     
     /// <summary>
@@ -31,21 +32,30 @@ namespace DungeonShooter
         }
 
         /// <summary>
-        /// 스킬 ID를 기반으로 Skill을 생성합니다.
+        /// 스킬 ID(공유 루트 Id)와 레벨 인덱스(0부터)로 Skill을 생성합니다.
         /// </summary>
-        public async UniTask<Skill> CreateSkillAsync(int skillEntryId)
+        public async UniTask<Skill> CreateSkillAsync(int skillEntryId, int skillLevelIndex = 0)
         {
             try
             {
-                var skillTableEntry = _tableRepository.GetTableEntry<SkillTableEntry>(skillEntryId);
-                var skillData = !string.IsNullOrEmpty(skillTableEntry.SkillDataKey) 
-                    ? await _resourceProvider.GetAssetAsync<SkillData>(skillTableEntry.SkillDataKey)
+                var entrySo = _tableRepository.GetTableEntry<SkillTableEntrySo>(skillEntryId);
+                if (entrySo?.SkillLevels == null || skillLevelIndex < 0 || skillLevelIndex >= entrySo.SkillLevels.Count)
+                {
+                    LogHandler.LogError<SkillFactory>($"스킬 정의 또는 레벨 인덱스가 유효하지 않습니다. id={skillEntryId}, levelIndex={skillLevelIndex}");
+                    return null;
+                }
+
+                var levelData = entrySo.SkillLevels[skillLevelIndex];
+                var skillDataKey = GetAddressOrNull(levelData.SkillDataRef);
+                var skillData = !string.IsNullOrEmpty(skillDataKey)
+                    ? await _resourceProvider.GetAssetAsync<SkillData>(skillDataKey)
                     : null;
-                var icon = !string.IsNullOrEmpty(skillTableEntry.SkillIconKey)
-                    ? await _resourceProvider.GetAssetAsync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas)
+                var iconKey = GetAddressOrNull(entrySo.SkillIconRef);
+                var icon = !string.IsNullOrEmpty(iconKey)
+                    ? await _resourceProvider.GetAssetAsync<Sprite>(iconKey)
                     : null;
 
-                return new Skill(skillTableEntry, skillData, icon, _skillObjectFactory, _soundSfxService, _tableRepository);
+                return new Skill(entrySo, skillLevelIndex, skillData, icon, _skillObjectFactory, _soundSfxService);
             }
             catch (Exception e)
             {
@@ -54,26 +64,42 @@ namespace DungeonShooter
             }
         }
 
-        public Skill CreateSkillSync(int skillEntryId)
+        public Skill CreateSkillSync(int skillEntryId, int skillLevelIndex = 0)
         {
             try
             {
-                var skillTableEntry = _tableRepository.GetTableEntry<SkillTableEntry>(skillEntryId);
-                
-                var skillData = !string.IsNullOrEmpty(skillTableEntry.SkillDataKey) 
-                    ? _resourceProvider.GetAssetSync<SkillData>(skillTableEntry.SkillDataKey)
+                var entrySo = _tableRepository.GetTableEntry<SkillTableEntrySo>(skillEntryId);
+                if (entrySo?.SkillLevels == null || skillLevelIndex < 0 || skillLevelIndex >= entrySo.SkillLevels.Count)
+                {
+                    LogHandler.LogError<SkillFactory>($"스킬 정의 또는 레벨 인덱스가 유효하지 않습니다. id={skillEntryId}, levelIndex={skillLevelIndex}");
+                    return null;
+                }
+
+                var levelData = entrySo.SkillLevels[skillLevelIndex];
+                var skillDataKey = GetAddressOrNull(levelData.SkillDataRef);
+                var skillData = !string.IsNullOrEmpty(skillDataKey)
+                    ? _resourceProvider.GetAssetSync<SkillData>(skillDataKey)
                     : null;
-                var icon = !string.IsNullOrEmpty(skillTableEntry.SkillIconKey)
-                    ? _resourceProvider.GetAssetSync<Sprite>(skillTableEntry.SkillIconKey, SpriteAtlasAddresses.SkillIconAtlas)
+                var iconKey = GetAddressOrNull(entrySo.SkillIconRef);
+                var icon = !string.IsNullOrEmpty(iconKey)
+                    ? _resourceProvider.GetAssetSync<Sprite>(iconKey)
                     : null;
 
-                return new Skill(skillTableEntry, skillData, icon, _skillObjectFactory, _soundSfxService, _tableRepository);
+                return new Skill(entrySo, skillLevelIndex, skillData, icon, _skillObjectFactory, _soundSfxService);
             }
             catch (Exception e)
             {
                 LogHandler.LogException<SkillFactory>(e, "스킬 데이터 로드에 실패했습니다.");
                 return null;
             }
+        }
+
+        private static string GetAddressOrNull(AssetReference assetReference)
+        {
+            if (assetReference == null || !assetReference.RuntimeKeyIsValid())
+                return null;
+            var key = assetReference.RuntimeKey.ToString();
+            return string.IsNullOrEmpty(key) ? null : key;
         }
     }
 }

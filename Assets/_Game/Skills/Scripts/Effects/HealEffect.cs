@@ -13,11 +13,11 @@ namespace DungeonShooter
         [SerializeField]
         private float _healPercent = 1.0f;
 
-        public override UniTask<bool> Execute(SkillExecutionContext context, SkillTableEntry entry)
+        public override UniTask<bool> Execute(SkillExecutionContext context, SkillLevelData levelData)
         {
-            base.Execute(context, entry);
+            base.Execute(context, levelData);
             
-            var rawHeal = entry.Amount;
+            var rawHeal = levelData.Amount;
             var heal = Mathf.RoundToInt(rawHeal * _healPercent);
             
             var targetEntity = executeTarget == SkillOwner.Caster
