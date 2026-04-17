@@ -7,6 +7,7 @@ namespace DungeonShooter
     {
         public IEntityInputContext InputContext { get; }
         public IEntityStats Stat { get; }
+        public IEntityStatuses Statuses { get; }
         public HealthModel HealthModel { get; }
         public IEntitySkills Skill { get; }
     }
