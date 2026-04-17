@@ -5,21 +5,17 @@ using VContainer;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 대기 상태. 이동 입력이 있으면 Move, 대시/스킬 입력 시 해당 상태로 전환합니다.
+    /// 대기 상태. 이동 입력이 있으면 Move, 스킬 입력 시 Skill 상태로 전환합니다.
     /// </summary>
     public class IdleState : IEntityState
     {
         private IEntityStateMachine _entityStateMachine;
-        private IDashComponent _dashComponent;
         private EntityAnimationHandler _entityAnimationHandler;
-        private IMovementComponent _movementComponent;
 
         [Inject]
-        public IdleState(IDashComponent dashComponent, EntityAnimationHandler entityAnimationHandler, IMovementComponent movementComponent)
+        public IdleState(EntityAnimationHandler entityAnimationHandler)
         {
-            _dashComponent = dashComponent;
             _entityAnimationHandler = entityAnimationHandler;
-            _movementComponent = movementComponent;
         }
         
         public void Initialize(IEntityStateMachine stateMachine)
@@ -31,7 +27,6 @@ namespace DungeonShooter
 
         public void OnEnter()
         {
-            _movementComponent?.Move(Vector2.zero);
             _entityAnimationHandler?.SetMoving(false);
             ApplyFacingDirection();
         }
@@ -45,18 +40,6 @@ namespace DungeonShooter
                 return;
 
             ApplyFacingDirection();
-            
-            if (input.DashInput && _dashComponent != null && _dashComponent.IsReady)
-            {
-                _entityStateMachine?.RequestChangeState(EntityStates.Dash);
-                return;
-            }
-
-            if (input.InteractInput)
-            {
-                _entityStateMachine.RequestChangeState(EntityStates.Interact);
-                return;
-            }
 
             if (input.SkillInput != null)
             {

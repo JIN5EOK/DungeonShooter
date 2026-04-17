@@ -7,7 +7,7 @@ namespace DungeonShooter
     {
         public IEntityInputContext InputContext { get; }
         public IEntityStats Stat { get; }
-        public IEntityStatuses Statuses { get; }
+        public HealthModel HealthModel { get; }
         public IEntitySkills Skill { get; }
     }
     public class EntityContext : IEntityContext
@@ -15,17 +15,20 @@ namespace DungeonShooter
         public IEntityInputContext InputContext { get; }
         public IEntityStats Stat { get; }
         public IEntityStatuses Statuses { get; }
+        public HealthModel HealthModel { get; }
         public IEntitySkills Skill { get; }
 
         public EntityContext(
             IEntityInputContext inputContext,
             IEntityStats stat,
             IEntityStatuses statuses,
+            HealthModel healthModel,
             IEntitySkills skill)
         {
             InputContext = inputContext;
-            Stat = stat;
             Statuses = statuses;
+            Stat = stat;
+            HealthModel = healthModel;
             Skill = skill;
         }
     }

@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.InputSystem;
 using VContainer;
 using VContainer.Unity;
 using Object = UnityEngine.Object;
@@ -34,18 +35,24 @@ namespace DungeonShooter
         private int _playerConfigTableId = 12000001;
         private readonly IResourceProvider _resourceProvider;
         private readonly ITableRepository _tableRepository;
-        private readonly IPlayerContextManager _playerContextManager;
+        private readonly ISkillFactory _skillFactory;
+        private readonly ICameraManager _cameraManager;
+        private readonly PlayerInputManager _playerInputManager;
         private readonly LifetimeScope _sceneLifetimeScope;
         [Inject]
         public PlayerFactory(
             IResourceProvider resourceProvider
             , ITableRepository tableRepository
             , LifetimeScope sceneLifetimeScope
-            , IPlayerContextManager playerContextManager)
+            , ISkillFactory skillFactory
+            , ICameraManager cameraManager
+            , PlayerInputManager inputManager)
         {
             _resourceProvider = resourceProvider;
             _tableRepository = tableRepository;
-            _playerContextManager = playerContextManager;
+            _skillFactory = skillFactory;
+            _cameraManager = cameraManager;
+            _playerInputManager = inputManager;
             _sceneLifetimeScope = sceneLifetimeScope;
         }
 
@@ -106,43 +113,70 @@ namespace DungeonShooter
             }
             
             var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
+
+            var config = _tableRepository.GetTableEntry<PlayerConfigSo>(_playerConfigTableId);
+            var statsDto = config?.Stats ?? new StatsDto();
+            var statGroup = new EntityStats();
+            statGroup.Initialize(statsDto);
+            var statuses = new EntityStatuses(statsDto);
+
+            var entitySkills = new EntitySkills();
+            var context = new EntityContext(
+                new EntityInputContext(),
+                statGroup,
+                statuses,
+                new HealthModel(statGroup.GetStat(StatType.Hp), statuses.GetStatus(StatusType.Hp)),
+                entitySkills);
+            entity.SetContext(context);
             
-            entity.SetContext(_playerContextManager.EntityContext);
+            RegistPlayerSkills(config, entitySkills);
             
-            var movementComponent = entityLifeTimeScope.Container.Resolve<IMovementComponent>();
-            var interactComponent = entityLifeTimeScope.Container.Resolve<IInteractComponent>();
-            var dashComponent = entityLifeTimeScope.Container.Resolve<IDashComponent>();
-            var healthComponent = entityLifeTimeScope.Container.Resolve<IHealthComponent>();
-            var cameraTrackComponent = entityLifeTimeScope.Container.Resolve<ICameraTrackComponent>();
             var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
 
             stateMachine.Initialize(
                 entityLifeTimeScope.Container.Resolve<IdleState>(),
                 entityLifeTimeScope.Container.Resolve<MoveState>(),
-                entityLifeTimeScope.Container.Resolve<DashState>(),
-                entityLifeTimeScope.Container.Resolve<SkillState>(),
-                entityLifeTimeScope.Container.Resolve<InteractState>());
-            
-            var interactNotice = _resourceProvider.GetInstanceSync(CommonAddresses.InteractNotice);
-            interactComponent.SetInteractNotice(interactNotice);
+                entityLifeTimeScope.Container.Resolve<SkillState>());
 
-            cameraTrackComponent.AttachCameraAsync().Forget();
-            
-            var config = _tableRepository.GetTableEntry<PlayerConfigSo>(_playerConfigTableId);
-            
+            _cameraManager?.BindAsync(entity.transform).Forget();
+
             entity.OnDestroyed += (self) =>
             {
                 PlayerDestroyed?.Invoke(self, playerInstance.transform.position);
             };
 
-            healthComponent.OnDeath += () =>
+            entity.OnDeath += () =>
             {
                 Object.Destroy(entity.gameObject);
                 PlayerDied?.Invoke(entity, config, playerInstance.transform.position);
             };
-
+            _playerInputManager.BindControlledEntity(entity);
             PlayerSpawned?.Invoke(entity, config, playerInstance.transform.position);
             return entity;
+        }
+
+        private void RegistPlayerSkills(PlayerConfigSo config, IEntitySkills entitySkills)
+        {
+            if (config == null || entitySkills == null)
+                return;
+
+            var skill1 = _skillFactory.CreateSkillSync(config.Skill1Ref);
+            if (skill1 != null)
+                entitySkills.Regist(skill1);
+
+            var skill2 = _skillFactory.CreateSkillSync(config.Skill2Ref);
+            if (skill2 != null)
+                entitySkills.Regist(skill2);
+
+            if (config.Skills == null)
+                return;
+
+            foreach (var skillRef in config.Skills)
+            {
+                var skill = _skillFactory.CreateSkillSync(skillRef);
+                if (skill != null)
+                    entitySkills.Regist(skill);
+            }
         }
 
         private static string GetAddressOrNull(AssetReference assetReference)

@@ -7,8 +7,6 @@ namespace DungeonShooter
     {
         Idle,
         Move,
-        Skill,
-        Dash,
-        Interact
+        Skill
     }
 }

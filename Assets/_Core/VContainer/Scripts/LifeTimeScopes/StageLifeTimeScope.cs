@@ -8,6 +8,7 @@ namespace DungeonShooter
         protected override void Configure(IContainerBuilder builder)
         {
             builder.Register<SceneResourceProvider>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<CameraManager>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<PlayerFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<EnemyFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SkillFactory>(Lifetime.Scoped).AsImplementedInterfaces();
@@ -15,7 +16,6 @@ namespace DungeonShooter
             builder.RegisterComponentOnNewGameObject<ObjectCullingManager>(Lifetime.Scoped);
             builder.Register<EntityManager>(Lifetime.Scoped);
             builder.Register<PlayerInputManager>(Lifetime.Scoped);
-            builder.Register<PlayerContextManager>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<PlayerLevelService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SkillService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<GameMessageService>(Lifetime.Scoped).AsImplementedInterfaces();

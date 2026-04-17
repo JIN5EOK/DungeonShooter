@@ -11,16 +11,14 @@ namespace DungeonShooter
     public class SkillState : IEntityState
     {
         private IEntityStateMachine _entityStateMachine;
-        private readonly IMovementComponent _movementComponent;
         private readonly EntityAnimationHandler _entityAnimationHandler;
 
         private Skill _executingSkill;
         private bool _executeFinished;
 
         [Inject]
-        public SkillState(IMovementComponent movementComponent, EntityAnimationHandler entityAnimationHandler)
+        public SkillState(EntityAnimationHandler entityAnimationHandler)
         {
-            _movementComponent = movementComponent;
             _entityAnimationHandler = entityAnimationHandler;
         }
 
@@ -49,7 +47,6 @@ namespace DungeonShooter
                 return;
             }
 
-            _movementComponent?.Move(Vector2.zero);
             _entityAnimationHandler?.SetMoving(false);
             ExecuteSkillAsync().Forget();
             inputContext.SkillInput = null;

@@ -5,21 +5,17 @@ using VContainer;
 namespace DungeonShooter
 {
     /// <summary>
-    /// 이동 상태. MovementComponent.Move(input)와 애니메이션을 적용합니다. 입력이 없으면 Idle, 대시/스킬 시 해당 상태로 전환합니다.
+    /// 이동 상태. 입력에 따라 애니메이션을 적용합니다. 입력이 없으면 Idle, 스킬 입력 시 Skill 상태로 전환합니다.
     /// </summary>
     public class MoveState : IEntityState
     {
         private IEntityStateMachine _entityStateMachine;
-        private readonly IMovementComponent _movementComponent;
         private readonly EntityAnimationHandler _entityAnimationHandler;
-        private readonly IDashComponent _dashComponent;
 
         [Inject]
-        public MoveState(IMovementComponent movementComponent, EntityAnimationHandler entityAnimationHandler, IDashComponent dashComponent)
+        public MoveState(EntityAnimationHandler entityAnimationHandler)
         {
-            _movementComponent = movementComponent;
             _entityAnimationHandler = entityAnimationHandler;
-            _dashComponent = dashComponent;
         }
 
         public EntityStates States => EntityStates.Move;
@@ -46,20 +42,8 @@ namespace DungeonShooter
                 return;
             }
 
-            _movementComponent?.Move(input.MoveInput);
+            ApplyMovement(input.MoveInput);
             _entityAnimationHandler?.SetMovementFromInput(input.MoveInput);
-
-            if (input.DashInput && _dashComponent != null && _dashComponent.IsReady)
-            {
-                _entityStateMachine.RequestChangeState(EntityStates.Dash);
-                return;
-            }
-
-            if (input.InteractInput)
-            {
-                _entityStateMachine.RequestChangeState(EntityStates.Interact);
-                return;
-            }
 
             if (input.SkillInput != null)
             {
@@ -71,6 +55,18 @@ namespace DungeonShooter
             {
                 _entityStateMachine.RequestChangeState(EntityStates.Idle);
             }
+        }
+
+        private void ApplyMovement(Vector2 moveInput)
+        {
+            if (_entityStateMachine?.Entity?.EntityContext?.Stat == null)
+                return;
+
+            if (moveInput.ApproximatelyEquals(Vector2.zero, 0.01f))
+                return;
+
+            var speed = _entityStateMachine.Entity.EntityContext.Stat.GetStat(StatType.MoveSpeed).GetValue();
+            _entityStateMachine.Entity.transform.position += (Vector3)(moveInput.normalized * speed * Time.deltaTime);
         }
     }
 }

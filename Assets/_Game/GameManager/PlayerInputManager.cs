@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using VContainer;
 
@@ -12,16 +13,14 @@ namespace DungeonShooter
         private InputManager _inputManager;
         private IPauseManager _pauseManager;
         private IEntityInputContext _entityInputContext;
-        private IPlayerContextManager _playerContextManager;
+        private IEntitySkills _entitySkills;
 
         [Inject]
         public PlayerInputManager(InputManager inputManager,
-            IPauseManager pauseManager,
-            IPlayerContextManager playerContextManager)
+            IPauseManager pauseManager)
         {
             _inputManager = inputManager;
             _pauseManager = pauseManager;
-            _playerContextManager = playerContextManager;
             SubscribeToInput();
         }
 
@@ -29,12 +28,14 @@ namespace DungeonShooter
         public void BindControlledEntity(EntityBase entity)
         {
             _entityInputContext = entity != null ? entity.EntityContext.InputContext : null;
+            _entitySkills = entity != null ? entity.EntityContext.Skill : null;
         }
 
         /// <summary><see cref="BindControlledEntity"/> 연결을 해제합니다.</summary>
         public void UnbindControlledEntity()
         {
             _entityInputContext = null;
+            _entitySkills = null;
         }
 
         private void SubscribeToInput()
@@ -43,11 +44,9 @@ namespace DungeonShooter
                 return;
             
             _inputManager.OnMoveInputChanged += OnHandleMoveInput;
-            _inputManager.OnDashPressed += OnDashInput;
             _inputManager.OnWeaponAttack += OnWeaponAttack;
             _inputManager.OnSkill1Pressed += OnSkill1Input;
             _inputManager.OnSkill2Pressed += OnSkill2Input;
-            _inputManager.OnInteractPressed += OnInteractInput;
         }
 
         public void UnsubscribeFromInput()
@@ -56,11 +55,9 @@ namespace DungeonShooter
                 return;
 
             _inputManager.OnMoveInputChanged -= OnHandleMoveInput;
-            _inputManager.OnDashPressed -= OnDashInput;
             _inputManager.OnWeaponAttack -= OnWeaponAttack;
             _inputManager.OnSkill1Pressed -= OnSkill1Input;
             _inputManager.OnSkill2Pressed -= OnSkill2Input;
-            _inputManager.OnInteractPressed -= OnInteractInput;
         }
 
         private bool CanProcessGameInput()
@@ -76,20 +73,12 @@ namespace DungeonShooter
             }
         }
 
-        private void OnDashInput(bool isPressed)
-        {
-            if (!CanProcessGameInput())
-                return;
-
-            _entityInputContext.DashInput = isPressed;
-        }
-
         private void OnWeaponAttack(bool isPressed)
         {
             if (!CanProcessGameInput())
                 return;
 
-            SkillInputInternal(_playerContextManager?.GetActiveSkill(0), isPressed);
+            SkillInputInternal(GetActiveSkill(0), isPressed);
         }
 
         private void OnSkill1Input(bool isPressed)
@@ -97,7 +86,7 @@ namespace DungeonShooter
             if (!CanProcessGameInput())
                 return;
 
-            SkillInputInternal(_playerContextManager?.GetActiveSkill(0), isPressed);
+            SkillInputInternal(GetActiveSkill(0), isPressed);
         }
 
         private void OnSkill2Input(bool isPressed)
@@ -105,7 +94,18 @@ namespace DungeonShooter
             if (!CanProcessGameInput())
                 return;
 
-            SkillInputInternal(_playerContextManager?.GetActiveSkill(1), isPressed);
+            SkillInputInternal(GetActiveSkill(1), isPressed);
+        }
+
+        private Skill GetActiveSkill(int index)
+        {
+            if (_entitySkills == null)
+                return null;
+
+            return _entitySkills
+                .GetRegistedSkills()
+                .Where(s => s?.SkillData != null && s.SkillData.IsActiveSkill)
+                .ElementAtOrDefault(index);
         }
 
         private void SkillInputInternal(Skill skill, bool isPressed)
@@ -120,13 +120,6 @@ namespace DungeonShooter
             }
         }
         
-        private void OnInteractInput(bool isPressed)
-        {
-            if (!CanProcessGameInput())
-                return;
-
-            _entityInputContext.InteractInput = isPressed;
-        }
 
         public void Dispose()
         {

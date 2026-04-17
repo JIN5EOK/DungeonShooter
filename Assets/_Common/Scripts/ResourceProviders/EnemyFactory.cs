@@ -267,21 +267,22 @@ namespace DungeonShooter
             var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
             var statsDto = configTableEntry.Stats;
             var statGroup = new EntityStats();
+            var statuses = new EntityStatuses(statsDto);
+            var hpModel = new HealthModel(statGroup.GetStat(StatType.Hp), statuses.GetStatus(StatusType.Hp));
             statGroup.Initialize(statsDto);
 
             var entitySkills = new EntitySkills();
             var context = new EntityContext(
                 new EntityInputContext()
                 , statGroup
-                , new EntityStatuses(statsDto)
+                , statuses
+                , hpModel
                 , entitySkills);
             entity.SetContext(context);
 
-            var healthComponent = entityLifeTimeScope.Container.Resolve<IHealthComponent>();
             if (isFirstInit == true)
             {
-                var moveComponent = entityLifeTimeScope.Container.Resolve<IMovementComponent>();
-                healthComponent.OnDeath += () =>
+                entity.OnDeath += () =>
                 {
                     var destroyEffectSpawnPos = entity.transform.position;
                     _skillObjectFactory.CreateSkillObjectAsync<ParticleSkillObject>(CommonAddresses.MonsterDeath_Particle, destroyEffectSpawnPos).Forget();
@@ -295,7 +296,7 @@ namespace DungeonShooter
                 entityLifeTimeScope.Container.Resolve<MoveState>(),
                 entityLifeTimeScope.Container.Resolve<SkillState>());
 
-            healthComponent.ResetState();
+            entity.EntityContext.HealthModel.ResetState();
 
             var activeSkills = new List<Skill>();
             

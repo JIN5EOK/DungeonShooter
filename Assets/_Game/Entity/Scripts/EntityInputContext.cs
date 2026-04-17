@@ -10,8 +10,6 @@ namespace DungeonShooter
     {
         public Vector2 LastMoveDirection { get; }
         public Vector2 MoveInput { get; set; }
-        public bool InteractInput { get; set; }
-        public bool DashInput { get; set; }
         public Skill SkillInput { get; set; }
     }
     
@@ -32,8 +30,6 @@ namespace DungeonShooter
         }
 
         private Vector2 _moveInput;
-        public bool InteractInput { get; set; }
-        public bool DashInput { get; set; }
         public Skill SkillInput { get; set; }
     }
 }

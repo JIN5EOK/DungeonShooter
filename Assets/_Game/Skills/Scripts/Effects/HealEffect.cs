@@ -24,10 +24,9 @@ namespace DungeonShooter
                 ? context.Caster 
                 : context.LastHitTarget;
 
-            var health = targetEntity.GetComponent<IHealthComponent>();
-            if (health != null)
+            if (targetEntity != null)
             {
-                health.Heal(heal);
+                targetEntity?.EntityContext?.HealthModel?.Heal(heal);
                 return UniTask.FromResult(true);
             }
 
