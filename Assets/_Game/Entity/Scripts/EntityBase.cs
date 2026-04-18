@@ -1,10 +1,13 @@
 using System;
-using Jin5eok;
 using UnityEngine;
 
 namespace DungeonShooter
 {
-    public class EntityBase : MonoBehaviour, IHealth
+    public interface IEntity : IHealth, IEntityStats
+    {
+
+    }
+    public class EntityBase : MonoBehaviour, IEntity
     {
         public event Action<EntityBase> OnDestroyed;
         public event Action<int> OnHealthChanged;
@@ -19,7 +22,12 @@ namespace DungeonShooter
         public void TakeDamage(int damage) => EntityContext.HealthModel.TakeDamage(damage);
         public void Heal(int amount) => EntityContext.HealthModel.Heal(amount);
         public void SetCurrentHealth(int value)  => EntityContext.HealthModel.SetCurrentHealth(value);
+        public IEntityStat GetStat(StatType type) => _entityContext.Stat.GetStat(type);
 
+        public void ApplyStatBonus(object key, StatBonus bonus) => _entityContext.Stat.ApplyStatBonus(key, bonus);
+
+        public void RemoveStatBonus(object key) => _entityContext.Stat.RemoveStatBonus(key);
+        
         /// <summary>
         /// 엔티티를 해제 혹은 제거합니다. PoolableComponent가 있으면 풀에 반환하고, 없으면 게임오브젝트를 파괴합니다.
         /// </summary>
@@ -101,6 +109,12 @@ namespace DungeonShooter
         public void TakeDamage(int damage);
         public void Heal(int amount);
         public void SetCurrentHealth(int value);
+    }
+
+    public interface IStatsContainer
+    {
+        public int GetStat(StatType statType);
+        public void SetStat(StatType statType, int value);
     }
     
     public class HealthModel : IHealth

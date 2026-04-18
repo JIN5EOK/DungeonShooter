@@ -8,7 +8,6 @@ namespace DungeonShooter
     /// </summary>
     public interface IEntityStats
     {
-        public void Initialize(StatsDto statsDto);
         public IEntityStat GetStat(StatType type);
         public void ApplyStatBonus(object key, StatBonus bonus);
         public void RemoveStatBonus(object key);
