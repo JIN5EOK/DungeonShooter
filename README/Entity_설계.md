@@ -3,38 +3,10 @@
 
 ---
 ## 컴포넌트 조합 기반 설계
-* 모든 Entity들의 공통 인터페이스 + 기능 역할을 담당하는 `EntityBase` 컴포넌트와 다수의 기능 컴포넌트로 구성
-* 기능 추가는 단일 책임 원칙에 기반한 단일 기능 컴포넌트 추가를 통한 확장 구조를 통해 수행
-	* 예시 
-      * 캐릭터 이동을 담당하는 `MovementComponent`
-      * 체력 연산을 담당하는 `HelathComponent`
-      * AI를 담당하는 `AIComponent`
-* Entity들의 프리팹 자체에는 기능 컴포넌트를 달아두지 않음, 런타임 조합이나 로직에 따라 어떤 프리팹이라도 플레이어, 적으로 만들 수 있도록 함
-  * Player / Enemy에 필요한 컴포넌트와 초기화, 레이어,태그 설정은 `PlayerFactory`/`EnemyFactory`에서 캐릭터를 생성하며 수행
-* 각 컴포넌트간 참조관계는 `EntityLifeTimeScope`를 통한 의존성 주입을 통해 해결한다
+* 모든 Entity들의 공통 인터페이스 + 기능 역할을 담당하는 `EntityBase` 컴포넌트를 기반으로 동작
+  * 단 Entity에 직접적인 기능 구현을 하기보다는 구체적 기능을 구현한 클래스를 만들고 EntityBase는 내부에서 포워딩
+  * 예 : Damage같은 함수는 노출하지만 실제 데미지 구현은 HpModel에 구현하고 호출하도록 함
 
-## 스탯, 스킬 등 데이터 관리, 주입구조
-```mermaid
-classDiagram
-	class EntityBase{
-		+EntityContext : IEntityContext
-		+SetContext(EntityContext context)
-	}
-	
-	class EntityContext{
-		+InputContext : EntityInputContext 
-		// 이동, 공격 등 행동 결정에 필요한 입력정보, 플레이어의 경우 키입력으로 조작
-		// 적의 경우 인공지능 컴포넌트로 조작
-		+Stat : IEntityStats // 최대 체력 등 스탯 수치 관련 클래스
-		+Status : IEntityStatus // 현재 체력 등 현재 상태 수치
-		+Skill : IEntitySkills // 지닌 스킬 관련 클래스
-		// +Inventory : IInventory // 인벤토리 관련 클래스
-	}
-	
-	EntityContext <-- EntityBase : 보유
-	EntityBase <-- PlayerFactory : 생성시 EntityContext 주입
-	EntityBase <-- EnemyFactory : 생성시 EntityContext 주입
-```
 ### 관련 문서
 - [스탯시스템_설계.md](%EC%8A%A4%ED%83%AF%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%84%A4%EA%B3%84.md)
 - [스킬시스템_설계.md](%EC%8A%A4%ED%82%AC%EC%8B%9C%EC%8A%A4%ED%85%9C_%EC%84%A4%EA%B3%84.md)
