@@ -27,12 +27,12 @@ namespace DungeonShooter
             
             var skill = context.ActiveSkills[_skillIndex];
             
-            if (skill == null || skill.IsCooldown)
+            if (skill == null || skill.IsCooldown || skill.SkillTableEntrySo == null)
             {
                 return BTStatus.Failure;
             }
 
-            context.Self.EntityContext.InputContext.SkillInput = skill;
+            context.Self.EntityContext.InputContext.SkillInput = skill.SkillTableEntrySo.Id;
             return BTStatus.Success;
         }
     }

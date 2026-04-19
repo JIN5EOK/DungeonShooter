@@ -5,7 +5,6 @@ namespace DungeonShooter
 {
     public interface IEntity : IHealth, IEntityStats
     {
-
     }
     public class EntityBase : MonoBehaviour, IEntity
     {
@@ -51,7 +50,7 @@ namespace DungeonShooter
         {
             if (_entityContext?.Skill != null)
             {
-                foreach (var s in _entityContext.Skill.GetRegistedSkills())
+                foreach (var s in _entityContext.Skill.GetSkills())
                 {
                     UnapplySkill(s);
                 }
@@ -70,7 +69,7 @@ namespace DungeonShooter
                 context.Skill.OnSkillUnregisted += UnapplySkill;
                 _entityContext.HealthModel.OnHealthChanged += OnHealthChanged;
                 _entityContext.HealthModel.OnDeath += OnDeath;
-                foreach (var s in context.Skill.GetRegistedSkills())
+                foreach (var s in context.Skill.GetSkills())
                 {
                     ApplySkill(s);
                 }
@@ -111,12 +110,6 @@ namespace DungeonShooter
         public void SetCurrentHealth(int value);
     }
 
-    public interface IStatsContainer
-    {
-        public int GetStat(StatType statType);
-        public void SetStat(StatType statType, int value);
-    }
-    
     public class HealthModel : IHealth
     {
         public event Action<int> OnHealthChanged;

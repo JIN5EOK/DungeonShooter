@@ -40,16 +40,21 @@ namespace DungeonShooter
                 return;
             }
 
-            _executingSkill = inputContext.SkillInput;
-            if (_executingSkill == null || _entityStateMachine.Entity == null || _executingSkill.IsCooldown == true)
+            var entity = _entityStateMachine.Entity;
+            var skillEntryId = inputContext.SkillInput;
+            _executingSkill = entity != null && skillEntryId != 0
+                ? entity.EntityContext.Skill.GetSkill(skillEntryId)
+                : null;
+            if (entity == null || _executingSkill == null || _executingSkill.IsCooldown)
             {
+                inputContext.SkillInput = 0;
                 _executeFinished = true;
                 return;
             }
 
             _entityAnimationHandler?.SetMoving(false);
             ExecuteSkillAsync().Forget();
-            inputContext.SkillInput = null;
+            inputContext.SkillInput = 0;
         }
 
         private async UniTaskVoid ExecuteSkillAsync()

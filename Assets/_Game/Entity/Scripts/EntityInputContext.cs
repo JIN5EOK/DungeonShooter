@@ -10,7 +10,8 @@ namespace DungeonShooter
     {
         public Vector2 LastMoveDirection { get; }
         public Vector2 MoveInput { get; set; }
-        public Skill SkillInput { get; set; }
+        /// <summary>사용할 액티브 스킬의 테이블 엔트리 ID. 0이면 스킬 입력 없음.</summary>
+        public int SkillInput { get; set; }
     }
     
     public class EntityInputContext : IEntityInputContext
@@ -30,6 +31,7 @@ namespace DungeonShooter
         }
 
         private Vector2 _moveInput;
-        public Skill SkillInput { get; set; }
+        /// <summary>사용할 액티브 스킬의 테이블 엔트리 ID. 0이면 스킬 입력 없음.</summary>
+        public int SkillInput { get; set; }
     }
 }

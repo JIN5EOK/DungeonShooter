@@ -78,7 +78,7 @@ namespace DungeonShooter
             if (!CanProcessGameInput())
                 return;
 
-            SkillInputInternal(GetActiveSkill(0), isPressed);
+            SkillInputInternal(GetActiveSkillEntryId(0), isPressed);
         }
 
         private void OnSkill1Input(bool isPressed)
@@ -86,7 +86,7 @@ namespace DungeonShooter
             if (!CanProcessGameInput())
                 return;
 
-            SkillInputInternal(GetActiveSkill(0), isPressed);
+            SkillInputInternal(GetActiveSkillEntryId(0), isPressed);
         }
 
         private void OnSkill2Input(bool isPressed)
@@ -94,29 +94,33 @@ namespace DungeonShooter
             if (!CanProcessGameInput())
                 return;
 
-            SkillInputInternal(GetActiveSkill(1), isPressed);
+            SkillInputInternal(GetActiveSkillEntryId(1), isPressed);
         }
 
-        private Skill GetActiveSkill(int index)
+        private int GetActiveSkillEntryId(int index)
         {
             if (_entitySkills == null)
-                return null;
+                return 0;
 
-            return _entitySkills
-                .GetRegistedSkills()
+            var skill = _entitySkills
+                .GetSkills()
                 .Where(s => s?.SkillData != null && s.SkillData.IsActiveSkill)
                 .ElementAtOrDefault(index);
+            return skill?.SkillTableEntrySo?.Id ?? 0;
         }
 
-        private void SkillInputInternal(Skill skill, bool isPressed)
+        private void SkillInputInternal(int skillEntryId, bool isPressed)
         {
-            if (isPressed == true)
+            if (isPressed)
             {
-                _entityInputContext.SkillInput = skill;    
+                if (skillEntryId != 0)
+                {
+                    _entityInputContext.SkillInput = skillEntryId;
+                }
             }
-            else if(_entityInputContext.SkillInput == skill)
+            else if (_entityInputContext.SkillInput == skillEntryId)
             {
-                _entityInputContext.SkillInput = null;
+                _entityInputContext.SkillInput = 0;
             }
         }
         

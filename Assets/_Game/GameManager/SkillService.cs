@@ -93,8 +93,9 @@ namespace DungeonShooter
 
             OnSkillLeveledUp?.Invoke(currentSkill, after);
             after.StartCooldown(currentSkill.Cooldown);
-            container.Unregist(currentSkill);
-            container.Regist(after);
+            var entryId = so.Id;
+            container.UnregistSkill(entryId);
+            container.RegistSkill(after);
             return true;
         }
 

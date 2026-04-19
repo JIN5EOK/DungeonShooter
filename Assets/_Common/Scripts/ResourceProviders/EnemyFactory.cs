@@ -303,7 +303,7 @@ namespace DungeonShooter
             foreach (var skillRef in configTableEntry.ActiveSkills)
             {
                 var skill = _skillFactory.CreateSkillSync(skillRef);
-                entitySkills.Regist(skill);
+                entitySkills.RegistSkill(skill);
                 activeSkills.Add(skill);
             }
 

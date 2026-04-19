@@ -41,7 +41,7 @@ namespace DungeonShooter
 
             ApplyFacingDirection();
 
-            if (input.SkillInput != null)
+            if (input.SkillInput != 0)
             {
                 _entityStateMachine.RequestChangeState(EntityStates.Skill);
                 return;

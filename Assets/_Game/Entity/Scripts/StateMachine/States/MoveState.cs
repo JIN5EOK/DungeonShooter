@@ -45,7 +45,7 @@ namespace DungeonShooter
             ApplyMovement(input.MoveInput);
             _entityAnimationHandler?.SetMovementFromInput(input.MoveInput);
 
-            if (input.SkillInput != null)
+            if (input.SkillInput != 0)
             {
                 _entityStateMachine.RequestChangeState(EntityStates.Skill);
                 return;
