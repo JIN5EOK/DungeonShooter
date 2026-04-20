@@ -11,11 +11,4 @@ namespace DungeonShooter
         MoveSpeed
     }
 
-    /// <summary>
-    /// Entity의 현재 상태 스태이터스
-    /// </summary>
-    public enum StatusType
-    {
-        Hp, // 현재 체력
-    }
 }

@@ -14,7 +14,7 @@ namespace DungeonShooter
         private IEntityState _currentState;
         private Dictionary<EntityStates, IEntityState> _states = new();
         public EntityBase Entity { get; private set; }
-        public IEntityInputContext InputContext => Entity?.EntityContext?.InputContext;
+        public IEntityInputContext InputContext => Entity?.GetContext()?.InputContext;
 
         [Inject]
         private void Construct( EntityBase entityBase)
@@ -37,7 +37,7 @@ namespace DungeonShooter
         
         private void Update()
         {
-            if (Entity?.EntityContext?.InputContext == null)
+            if (Entity?.GetContext()?.InputContext == null)
                 return;
             _currentState?.OnUpdate();
         }

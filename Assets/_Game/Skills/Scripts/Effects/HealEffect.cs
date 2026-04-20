@@ -26,7 +26,7 @@ namespace DungeonShooter
 
             if (targetEntity != null)
             {
-                targetEntity?.EntityContext?.HealthModel?.Heal(heal);
+                targetEntity?.GetContext()?.HealthModel?.Heal(heal);
                 return UniTask.FromResult(true);
             }
 

@@ -59,13 +59,13 @@ namespace DungeonShooter
 
         private void ApplyMovement(Vector2 moveInput)
         {
-            if (_entityStateMachine?.Entity?.EntityContext?.Stat == null)
+            if (_entityStateMachine?.Entity?.GetContext()?.Stat == null)
                 return;
 
             if (moveInput.ApproximatelyEquals(Vector2.zero, 0.01f))
                 return;
 
-            var speed = _entityStateMachine.Entity.EntityContext.Stat.GetStat(StatType.MoveSpeed).GetValue();
+            var speed = _entityStateMachine.Entity.GetContext().Stat.GetStat(StatType.MoveSpeed).GetValue();
             _entityStateMachine.Entity.transform.position += (Vector3)(moveInput.normalized * speed * Time.deltaTime);
         }
     }

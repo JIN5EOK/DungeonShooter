@@ -296,7 +296,7 @@ namespace DungeonShooter
                 entityLifeTimeScope.Container.Resolve<MoveState>(),
                 entityLifeTimeScope.Container.Resolve<SkillState>());
 
-            entity.EntityContext.HealthModel.ResetState();
+            entity.GetContext().HealthModel.ResetState();
 
             var activeSkills = new List<Skill>();
             

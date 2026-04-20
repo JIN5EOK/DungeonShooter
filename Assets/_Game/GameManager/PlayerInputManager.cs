@@ -27,8 +27,8 @@ namespace DungeonShooter
         /// <summary>조작 입력을 전달할 엔티티를 지정합니다.</summary>
         public void BindControlledEntity(EntityBase entity)
         {
-            _entityInputContext = entity != null ? entity.EntityContext.InputContext : null;
-            _entitySkills = entity != null ? entity.EntityContext.Skill : null;
+            _entityInputContext = entity != null ? entity.GetContext().InputContext : null;
+            _entitySkills = entity != null ? entity.GetContext().Skill : null;
         }
 
         /// <summary><see cref="BindControlledEntity"/> 연결을 해제합니다.</summary>

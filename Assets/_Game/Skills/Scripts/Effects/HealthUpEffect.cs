@@ -20,14 +20,14 @@ namespace DungeonShooter
             var percent = Mathf.RoundToInt(levelData.Amount * _amountPercent);
             var multiply = 100 + percent;
             var bonus = new StatBonus(0, multiply, 0, 100, 0, 100, 0, 100);
-            owner.EntityContext.Stat.ApplyStatBonus(this, bonus);
+            owner.GetContext().Stat.ApplyStatBonus(this, bonus);
         }
 
         public override void Deactivate(EntityBase owner, SkillLevelData levelData)
         {
             base.Deactivate(owner, levelData);
 
-            owner.EntityContext.Stat.RemoveStatBonus(this);
+            owner.GetContext().Stat.RemoveStatBonus(this);
         }
     }
 }

@@ -1,32 +1,11 @@
-using System;
 using UnityEngine;
 
 namespace DungeonShooter
 {
-    public interface IEntity : IHealth, IEntityStats
+    public class EntityBase : MonoBehaviour
     {
-    }
-    public class EntityBase : MonoBehaviour, IEntity
-    {
-        public event Action<EntityBase> OnDestroyed;
-        public event Action<int> OnHealthChanged;
-        public event Action OnDeath;
-        public bool IsDead => EntityContext.HealthModel.IsDead;
-        public int CurrentHealth => EntityContext.HealthModel.CurrentHealth;
-        public int MaxHealth => EntityContext.HealthModel.MaxHealth;
-
-        public IEntityContext EntityContext => _entityContext;
+        public IEntityContext GetContext() => _entityContext;
         private IEntityContext _entityContext;
-        
-        public void TakeDamage(int damage) => EntityContext.HealthModel.TakeDamage(damage);
-        public void Heal(int amount) => EntityContext.HealthModel.Heal(amount);
-        public void SetCurrentHealth(int value)  => EntityContext.HealthModel.SetCurrentHealth(value);
-        public IEntityStat GetStat(StatType type) => _entityContext.Stat.GetStat(type);
-
-        public void ApplyStatBonus(object key, StatBonus bonus) => _entityContext.Stat.ApplyStatBonus(key, bonus);
-
-        public void RemoveStatBonus(object key) => _entityContext.Stat.RemoveStatBonus(key);
-        
         /// <summary>
         /// 엔티티를 해제 혹은 제거합니다. PoolableComponent가 있으면 풀에 반환하고, 없으면 게임오브젝트를 파괴합니다.
         /// </summary>
@@ -57,8 +36,6 @@ namespace DungeonShooter
 
                 _entityContext.Skill.OnSkillRegisted -= ApplySkill;
                 _entityContext.Skill.OnSkillUnregisted -= UnapplySkill;
-                _entityContext.HealthModel.OnHealthChanged -= OnHealthChanged;
-                _entityContext.HealthModel.OnDeath -= OnDeath;
             }
 
             _entityContext = context;
@@ -67,8 +44,6 @@ namespace DungeonShooter
             {
                 context.Skill.OnSkillRegisted += ApplySkill;
                 context.Skill.OnSkillUnregisted += UnapplySkill;
-                _entityContext.HealthModel.OnHealthChanged += OnHealthChanged;
-                _entityContext.HealthModel.OnDeath += OnDeath;
                 foreach (var s in context.Skill.GetSkills())
                 {
                     ApplySkill(s);
@@ -89,80 +64,6 @@ namespace DungeonShooter
             if (skill?.SkillData != null && skill.SkillData.IsPassiveSkill)
             {
                 skill.Deactivate(this);
-            }
-        }
-
-        private void OnDestroy()
-        {
-            OnDestroyed?.Invoke(this);
-        }
-    }
-
-    public interface IHealth
-    {
-        public event Action<int> OnHealthChanged;
-        public event Action OnDeath;
-        public bool IsDead { get; }
-        public int CurrentHealth { get; }
-        public int MaxHealth { get; }
-        public void TakeDamage(int damage);
-        public void Heal(int amount);
-        public void SetCurrentHealth(int value);
-    }
-
-    public class HealthModel : IHealth
-    {
-        public event Action<int> OnHealthChanged;
-        public event Action OnDeath;
-        public int CurrentHealth => _hpStatus?.GetValue() ?? 0;
-        public int MaxHealth => _maxHpStat?.GetValue() ?? 0;
-        public bool IsDead => CurrentHealth <= 0;
-
-        private readonly IEntityContext _context;
-        private readonly IEntityStat _maxHpStat;
-        private readonly IEntityStatus _hpStatus;
-
-        public HealthModel(IEntityStat maxHpStat, IEntityStatus hpStatus)
-        {
-            _maxHpStat = maxHpStat;
-            _hpStatus = hpStatus;
-            if (_hpStatus != null)
-            {
-                _hpStatus.OnValueChanged += OnHpStatusChanged;
-            }
-        }
-
-        public void TakeDamage(int damage)
-        {
-            if (IsDead) return;
-            if (damage < 0) damage = 0;
-
-            var newValue = Mathf.Max(0, CurrentHealth - damage);
-            _hpStatus?.SetValue(newValue);
-        }
-
-        public void Heal(int amount)
-        {
-            if (IsDead) return;
-            _hpStatus?.SetValue(Mathf.Min(CurrentHealth + amount, MaxHealth));
-            if (amount < 0) amount = 0;
-        }
-        public void SetCurrentHealth(int value)
-        {
-            _hpStatus?.SetValue(Mathf.Clamp(value, 0, MaxHealth));
-        }
-
-        public void ResetState()
-        {
-            SetCurrentHealth(MaxHealth);
-        }
-
-        private void OnHpStatusChanged(int value)
-        {
-            OnHealthChanged?.Invoke(value);
-            if (value <= 0)
-            {
-                OnDeath?.Invoke();
             }
         }
     }

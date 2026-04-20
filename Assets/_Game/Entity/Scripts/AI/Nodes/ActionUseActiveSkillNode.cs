@@ -32,7 +32,7 @@ namespace DungeonShooter
                 return BTStatus.Failure;
             }
 
-            context.Self.EntityContext.InputContext.SkillInput = skill.SkillTableEntrySo.Id;
+            context.Self.GetContext().InputContext.SkillInput = skill.SkillTableEntrySo.Id;
             return BTStatus.Success;
         }
     }

@@ -5,29 +5,25 @@ namespace DungeonShooter
     /// </summary>
     public interface IEntityContext
     {
-        public IEntityInputContext InputContext { get; }
-        public IEntityStats Stat { get; }
-        public IEntityStatuses Statuses { get; }
         public HealthModel HealthModel { get; }
+        public IEntityStats Stat { get; }
         public IEntitySkills Skill { get; }
+        public IEntityInputContext InputContext { get; }
     }
     public class EntityContext : IEntityContext
     {
         public IEntityInputContext InputContext { get; }
         public IEntityStats Stat { get; }
-        public IEntityStatuses Statuses { get; }
         public HealthModel HealthModel { get; }
         public IEntitySkills Skill { get; }
 
         public EntityContext(
             IEntityInputContext inputContext,
             IEntityStats stat,
-            IEntityStatuses statuses,
             HealthModel healthModel,
             IEntitySkills skill)
         {
             InputContext = inputContext;
-            Statuses = statuses;
             Stat = stat;
             HealthModel = healthModel;
             Skill = skill;

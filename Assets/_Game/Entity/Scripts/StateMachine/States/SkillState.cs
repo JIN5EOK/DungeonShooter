@@ -43,7 +43,7 @@ namespace DungeonShooter
             var entity = _entityStateMachine.Entity;
             var skillEntryId = inputContext.SkillInput;
             _executingSkill = entity != null && skillEntryId != 0
-                ? entity.EntityContext.Skill.GetSkill(skillEntryId)
+                ? entity.GetContext().Skill.GetSkill(skillEntryId)
                 : null;
             if (entity == null || _executingSkill == null || _executingSkill.IsCooldown)
             {
