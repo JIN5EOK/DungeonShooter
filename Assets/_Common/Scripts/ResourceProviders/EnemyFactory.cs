@@ -6,8 +6,6 @@ using Jin5eok;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using VContainer;
-using VContainer.Unity;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace DungeonShooter
@@ -35,8 +33,6 @@ namespace DungeonShooter
         public event Action<EntityBase> EnemySpawned;
         public event Action<EntityBase, EnemyConfigSo, Vector3> EnemyDied;
 
-        private LifetimeScope _sceneLifetimeScope;
-        
         private readonly ITableRepository _tableRepository;
         private int _stageConfigTableId;
         private readonly IResourceProvider _resourceProvider;
@@ -48,11 +44,10 @@ namespace DungeonShooter
         
         
         [Inject]
-        public EnemyFactory(ITableRepository tableRepository, IResourceProvider resourceProvider, LifetimeScope sceneLifeTimeScope, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
+        public EnemyFactory(ITableRepository tableRepository, IResourceProvider resourceProvider, ISkillFactory skillFactory, ISkillObjectFactory skillObjectFactory)
         {
             _tableRepository = tableRepository;
             _resourceProvider = resourceProvider;
-            _sceneLifetimeScope = sceneLifeTimeScope;
             _skillFactory = skillFactory;
             _skillObjectFactory = skillObjectFactory;
         }
@@ -150,7 +145,7 @@ namespace DungeonShooter
             {
                 ApplyTransform(go.transform, position, rotation, parent, instantiateInWorldSpace);
                 go.SetActive(true);
-                return InitializeEnemyInstance(go, entry,false);
+                return InitializeEnemyInstance(go, entry);
             }
             else
             {
@@ -167,7 +162,7 @@ namespace DungeonShooter
             var go = _resourceProvider.GetInstanceSync(address, position, rotation, parent, instantiateInWorldSpace);
             var poolKey = GetPoolKey(address);
             EnsurePoolable(go, poolKey);
-            return InitializeEnemyInstance(go, entry, true);
+            return InitializeEnemyInstance(go, entry);
         }
         
         private async UniTask<EntityBase> CreateAsync(EnemyConfigSo entry, Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
@@ -179,7 +174,7 @@ namespace DungeonShooter
             var go = await _resourceProvider.GetInstanceAsync(address, position, rotation, parent, instantiateInWorldSpace);
             var poolKey = GetPoolKey(address);
             EnsurePoolable(go, poolKey);
-            return InitializeEnemyInstance(go, entry,true);
+            return InitializeEnemyInstance(go, entry);
         }
         
         /// <summary>
@@ -243,10 +238,7 @@ namespace DungeonShooter
             }
         }
 
-        /// <summary>
-        /// 인스턴스에 필요한 컴포넌트를 붙이고 초기화합니다
-        /// </summary>
-        private EntityBase InitializeEnemyInstance(GameObject enemyInstance, EnemyConfigSo configTableEntry, bool isFirstInit)
+        private EntityBase InitializeEnemyInstance(GameObject enemyInstance, EnemyConfigSo configTableEntry)
         {
             if (enemyInstance == null)
             {
@@ -258,47 +250,19 @@ namespace DungeonShooter
             enemyInstance.tag = GameTags.Enemy;
             enemyInstance.layer = PhysicalLayers.Enemy.LayerIndex;
 
-            EntityLifeTimeScope entityLifeTimeScope = null;
-            using (LifetimeScope.EnqueueParent(_sceneLifetimeScope))
-            {
-                entityLifeTimeScope = enemyInstance.AddOrGetComponent<EntityLifeTimeScope>();
-            }
+            var enemy = enemyInstance.AddOrGetComponent<Enemy>();
 
-            var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
-            var statsDto = configTableEntry.Stats;
-            var statGroup = new EntityStats();
-            statGroup.Initialize(statsDto);
-            var hpModel = new EntityHealth(statGroup.GetStat(StatType.Hp));
-            
-
+            var entityStats = new EntityStats();
+            entityStats.Initialize(configTableEntry.Stats);
             var entitySkills = new EntitySkills();
             var context = new EntityContext(
-                new EntityInputContext()
-                , statGroup
-                , hpModel
-                , entitySkills);
-            entity.SetContext(context);
-
-            if (isFirstInit == true)
-            {
-                entity.GetContext().HealthModel.OnDeath += () =>
-                {
-                    var destroyEffectSpawnPos = entity.transform.position;
-                    _skillObjectFactory.CreateSkillObjectAsync<ParticleSkillObject>(CommonAddresses.MonsterDeath_Particle, destroyEffectSpawnPos).Forget();
-                    EnemyDied?.Invoke(entity, configTableEntry, destroyEffectSpawnPos);
-                    entity.ReleaseOrDestroy();
-                };
-            }
-            var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();
-            stateMachine.Initialize(
-                entityLifeTimeScope.Container.Resolve<IdleState>(),
-                entityLifeTimeScope.Container.Resolve<MoveState>(),
-                entityLifeTimeScope.Container.Resolve<SkillState>());
-
-            entity.GetContext().HealthModel.ResetState();
+                new EntityInputContext(),
+                entityStats,
+                new EntityHealth(entityStats.GetStat(StatType.Hp)),
+                entitySkills);
+            enemy.SetContext(context);
 
             var activeSkills = new List<Skill>();
-            
             foreach (var skillRef in configTableEntry.ActiveSkills)
             {
                 var skill = _skillFactory.CreateSkillSync(skillRef);
@@ -307,10 +271,17 @@ namespace DungeonShooter
             }
 
             var aiBT = _resourceProvider.GetAssetSync<AiBTBase>(GetAddressOrNull(configTableEntry.AIType));
-            entityLifeTimeScope.Container.Resolve<IAIComponent>().Initialize(aiBT, activeSkills);
+            enemy.SetAI(new EnemyBTAI(enemy, aiBT));
 
-            EnemySpawned?.Invoke(entity);
-            return entity;
+            enemy.GetContext().HealthModel.OnDeath += () =>
+            {
+                var pos = enemy.transform.position;
+                _skillObjectFactory.CreateSkillObjectAsync<ParticleSkillObject>(CommonAddresses.MonsterDeath_Particle, pos).Forget();
+                EnemyDied?.Invoke(enemy, configTableEntry, pos);
+            };
+
+            EnemySpawned?.Invoke(enemy);
+            return enemy;
         }
 
         private static string GetAddressOrNull(AssetReference assetReference)
