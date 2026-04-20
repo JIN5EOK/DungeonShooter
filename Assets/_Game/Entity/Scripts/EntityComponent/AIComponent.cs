@@ -14,6 +14,11 @@ namespace DungeonShooter
         private AiBTContext _context = new AiBTContext();
         private IBehaviourTreeNode<AiBTContext> _rootNode;
 
+        private void Awake()
+        {
+            _context.Self = GetComponent<EntityBase>();
+        }
+
         [Inject]
         private void Construct(EntityBase entityBase)
         {

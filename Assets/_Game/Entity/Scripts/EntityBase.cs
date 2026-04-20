@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace DungeonShooter
@@ -7,5 +8,7 @@ namespace DungeonShooter
         private IEntityContext _entityContext;
         public IEntityContext GetContext() => _entityContext;
         public void SetContext(IEntityContext context) => _entityContext = context;
+
+        protected virtual void Awake() { }
     }
 }

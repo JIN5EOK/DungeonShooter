@@ -23,6 +23,11 @@ namespace DungeonShooter
 
         private Animator _animator;
 
+        private void Awake()
+        {
+            _animator = GetComponent<Animator>();
+        }
+
         [Inject]
         private void Construct(Animator animator)
         {

@@ -14,6 +14,7 @@ namespace DungeonShooter
         public void TakeDamage(int damage);
         public void Heal(int amount);
         public void SetCurrentHealth(int value);
+        public void ResetState();
     }
 
     public class EntityHealth : IHealth

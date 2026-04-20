@@ -16,10 +16,15 @@ namespace DungeonShooter
         public EntityBase Entity { get; private set; }
         public IEntityInputContext InputContext => Entity?.GetContext()?.InputContext;
 
-        [Inject]
-        private void Construct( EntityBase entityBase)
+        private void Awake()
         {
-            Entity =  entityBase;
+            Entity = GetComponent<EntityBase>();
+        }
+
+        [Inject]
+        private void Construct(EntityBase entityBase)
+        {
+            Entity = entityBase;
         }
 
         public void Initialize(params IEntityState[] states)
