@@ -28,12 +28,6 @@ namespace DungeonShooter
             _animator = GetComponent<Animator>();
         }
 
-        [Inject]
-        private void Construct(Animator animator)
-        {
-            _animator = animator;
-        }
-
         /// <summary>
         /// 이동 입력에 따라 IsWalk와 Direction 파라미터를 한 번에 설정한다.
         /// </summary>

@@ -7,33 +7,27 @@ namespace DungeonShooter
     /// </summary>
     public class ActionUseActiveSkillNode : LeafNode<AiBTContext>
     {
-        private readonly int _skillIndex;
-
-        public ActionUseActiveSkillNode(int skillIndex)
+        private int _skillIdx;
+        public ActionUseActiveSkillNode(int skillIdx)
         {
-            _skillIndex = skillIndex;
+            _skillIdx = skillIdx;
         }
 
         /// <inheritdoc />
         public override BTStatus Execute(AiBTContext context)
         {
-            if (context.Self == null || 
-                context.ActiveSkills == null || 
-                _skillIndex < 0 || 
-                _skillIndex >= context.ActiveSkills.Count)
-            {
-                return BTStatus.Failure;
-            }
-            
-            var skill = context.ActiveSkills[_skillIndex];
-            
-            if (skill == null || skill.IsCooldown || skill.SkillTableEntrySo == null)
-            {
-                return BTStatus.Failure;
-            }
+            var skills = context.Self.GetContext().Skills;
+            var skill = skills?.GetSkills()[_skillIdx];
 
-            context.Self.GetContext().InputContext.SkillInput = skill.SkillTableEntrySo.Id;
-            return BTStatus.Success;
+            if (skill != null && !skill.IsCooldown)
+            {
+                context.Self.GetContext().InputContext.SkillInput = skill.SkillTableEntrySo.Id;
+                return BTStatus.Success;
+            }
+            else
+            {
+                return BTStatus.Failure;
+            }
         }
     }
 }
