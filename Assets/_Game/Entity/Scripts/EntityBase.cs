@@ -6,8 +6,8 @@ namespace DungeonShooter
     public class EntityBase : MonoBehaviour
     {
         private IEntityContext _entityContext;
-        public IEntityContext GetContext() => _entityContext;
-        public void SetContext(IEntityContext context) => _entityContext = context;
+        public virtual IEntityContext GetContext() => _entityContext;
+        public virtual void SetContext(IEntityContext context) => _entityContext = context;
 
         protected virtual void Awake() { }
     }

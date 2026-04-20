@@ -31,8 +31,7 @@ namespace DungeonShooter
             IResourceProvider resourceProvider,
             ITableRepository tableRepository,
             ISkillFactory skillFactory,
-            ICameraManager cameraManager,
-            PlayerInputManager inputManager)
+            ICameraManager cameraManager)
         {
             _resourceProvider = resourceProvider;
             _tableRepository = tableRepository;

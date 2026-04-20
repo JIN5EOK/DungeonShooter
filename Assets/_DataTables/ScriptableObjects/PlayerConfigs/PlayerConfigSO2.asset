@@ -33,11 +33,11 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   _gameObjectRef:
-    m_AssetGUID: 0161f133fe6fc45f7b9fddbcd8b7a6e6
+    m_AssetGUID: 55069b9367ff44e159de14361b5c126f
     m_SubObjectName: 
     m_SubObjectType: 
     m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
+    m_EditorAssetChanged: 1
   _skill1Ref:
     m_AssetGUID: 2a0489ef4afc4467aa726e2d70aa09e0
     m_SubObjectName: 

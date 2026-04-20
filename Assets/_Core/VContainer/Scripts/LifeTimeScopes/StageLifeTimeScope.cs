@@ -15,7 +15,6 @@ namespace DungeonShooter
             builder.Register<SkillObjectFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.RegisterComponentOnNewGameObject<ObjectCullingManager>(Lifetime.Scoped);
             builder.Register<EntityManager>(Lifetime.Scoped);
-            builder.Register<PlayerInputManager>(Lifetime.Scoped);
             builder.Register<PlayerLevelService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SkillService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<GameMessageService>(Lifetime.Scoped).AsImplementedInterfaces();
@@ -25,7 +24,6 @@ namespace DungeonShooter
             builder.RegisterBuildCallback((resolver) =>
             {
                 resolver.Resolve<EntityManager>();
-                resolver.Resolve<PlayerInputManager>();
                 resolver.Resolve<ObjectCullingManager>();
             });
             

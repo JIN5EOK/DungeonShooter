@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 8138635945108642331}
   - component: {fileID: -1826215569132851174}
   m_Layer: 0
-  m_Name: Human
+  m_Name: EntityBase
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

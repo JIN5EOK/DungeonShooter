@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: 7d56d823f1afb4d48bc2e6bafd88f99d
   m_SerializeEntries:
   - m_GUID: 1c540a31334464ba4a5106db508a8412
-    m_Address: Human
+    m_Address: EntityBase
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
