@@ -120,7 +120,7 @@ namespace DungeonShooter
             var context = new EntityContext(
                 new EntityInputContext(),
                 statGroup,
-                new HealthModel(statGroup.GetStat(StatType.Hp)),
+                new EntityHealth(statGroup.GetStat(StatType.Hp)),
                 entitySkills);
             entity.SetContext(context);
             

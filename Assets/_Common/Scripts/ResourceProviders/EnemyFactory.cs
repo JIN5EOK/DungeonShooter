@@ -268,7 +268,7 @@ namespace DungeonShooter
             var statsDto = configTableEntry.Stats;
             var statGroup = new EntityStats();
             statGroup.Initialize(statsDto);
-            var hpModel = new HealthModel(statGroup.GetStat(StatType.Hp));
+            var hpModel = new EntityHealth(statGroup.GetStat(StatType.Hp));
             
 
             var entitySkills = new EntitySkills();

@@ -16,7 +16,7 @@ namespace DungeonShooter
         public void SetCurrentHealth(int value);
     }
 
-    public class HealthModel : IHealth
+    public class EntityHealth : IHealth
     {
         public event Action<int> OnHealthChanged;
         public event Action OnDeath;
@@ -27,7 +27,7 @@ namespace DungeonShooter
         private readonly IEntityContext _context;
         private readonly IEntityStat _maxHpStat;
 
-        public HealthModel(IEntityStat maxHpStat)
+        public EntityHealth(IEntityStat maxHpStat)
         {
             _maxHpStat = maxHpStat;
             OnHealthChanged += HealthChanged;

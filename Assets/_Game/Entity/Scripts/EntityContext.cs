@@ -5,7 +5,7 @@ namespace DungeonShooter
     /// </summary>
     public interface IEntityContext
     {
-        public HealthModel HealthModel { get; }
+        public IHealth HealthModel { get; }
         public IEntityStats Stats { get; }
         public IEntitySkills Skills { get; }
         public IEntityInputContext InputContext { get; }
@@ -14,13 +14,13 @@ namespace DungeonShooter
     {
         public IEntityInputContext InputContext { get; }
         public IEntityStats Stats { get; }
-        public HealthModel HealthModel { get; }
+        public IHealth HealthModel { get; }
         public IEntitySkills Skills { get; }
 
         public EntityContext(
             IEntityInputContext inputContext,
             IEntityStats stats,
-            HealthModel healthModel,
+            IHealth healthModel,
             IEntitySkills skills)
         {
             InputContext = inputContext;
@@ -32,6 +32,11 @@ namespace DungeonShooter
             {
                 Skills.OnSkillRegisted += ActivatePassive;
                 Skills.OnSkillUnregisted += DeactivatePassive;
+                
+                foreach (var skill in Skills.GetSkills())
+                {
+                    ActivatePassive(skill);
+                }
             }
         }
 
