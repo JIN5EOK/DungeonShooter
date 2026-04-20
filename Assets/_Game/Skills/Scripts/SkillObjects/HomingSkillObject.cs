@@ -37,13 +37,13 @@ namespace DungeonShooter
 
             if (_elapsedTime >= _lifeTime)
             {
-                Release();
+                gameObject.ReleaseOrDestroy();
                 return;
             }
 
             if (_target == null)
             {
-                Release();
+                gameObject.ReleaseOrDestroy();
                 return;
             }
 
@@ -100,7 +100,7 @@ namespace DungeonShooter
                 RunEffectsAsync(newContext).Forget();
             }
 
-            Release();
+            gameObject.ReleaseOrDestroy();
         }
     }
 }

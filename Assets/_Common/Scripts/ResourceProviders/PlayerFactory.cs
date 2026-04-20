@@ -16,7 +16,6 @@ namespace DungeonShooter
     public interface IPlayerFactory
     {
         event Action<EntityBase, PlayerConfigSo, Vector3> PlayerSpawned;
-        event Action<EntityBase, Vector3> PlayerDestroyed;
         event Action<EntityBase, PlayerConfigSo, Vector3> PlayerDied;
         public UniTask<EntityBase> GetPlayerAsync(PlayerConfigSo config, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
         public EntityBase GetPlayerSync(PlayerConfigSo config, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
@@ -29,7 +28,6 @@ namespace DungeonShooter
     public class PlayerFactory : IPlayerFactory
     {
         public event Action<EntityBase, PlayerConfigSo, Vector3> PlayerSpawned;
-        public event Action<EntityBase, Vector3> PlayerDestroyed;
         public event Action<EntityBase, PlayerConfigSo, Vector3> PlayerDied;
 
         private int _playerConfigTableId = 12000001;
@@ -118,14 +116,11 @@ namespace DungeonShooter
             var statsDto = config?.Stats ?? new StatsDto();
             var statGroup = new EntityStats();
             statGroup.Initialize(statsDto);
-            var statuses = new EntityStatuses(statsDto);
-
             var entitySkills = new EntitySkills();
             var context = new EntityContext(
                 new EntityInputContext(),
                 statGroup,
-                statuses,
-                new HealthModel(statGroup.GetStat(StatType.Hp), statuses.GetStatus(StatusType.Hp)),
+                new HealthModel(statGroup.GetStat(StatType.Hp)),
                 entitySkills);
             entity.SetContext(context);
             
@@ -140,12 +135,7 @@ namespace DungeonShooter
 
             _cameraManager?.BindAsync(entity.transform).Forget();
 
-            entity.OnDestroyed += (self) =>
-            {
-                PlayerDestroyed?.Invoke(self, playerInstance.transform.position);
-            };
-
-            entity.OnDeath += () =>
+            entity.GetContext().HealthModel.OnDeath += () =>
             {
                 Object.Destroy(entity.gameObject);
                 PlayerDied?.Invoke(entity, config, playerInstance.transform.position);

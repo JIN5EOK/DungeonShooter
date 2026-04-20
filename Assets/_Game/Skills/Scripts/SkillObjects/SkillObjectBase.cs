@@ -9,15 +9,9 @@ namespace DungeonShooter
     /// </summary>
     public abstract class SkillObjectBase : MonoBehaviour
     {
-        protected PoolableComponent poolable;
         protected SkillExecutionContext context;
         protected List<EffectBase> effects;
         protected SkillLevelData skillLevelData;
-
-        protected virtual void Start()
-        {
-            poolable = GetComponent<PoolableComponent>();
-        }
         
         /// <summary>
         /// 스킬 오브젝트를 초기화합니다.
@@ -44,19 +38,5 @@ namespace DungeonShooter
             }
         }
 
-        /// <summary>
-        /// 스킬 오브젝트를 해제합니다. PoolableComponent가 있으면 풀에 반환하고, 없으면 게임오브젝트를 파괴합니다.
-        /// </summary>
-        public void Release()
-        {
-            if (poolable != null)
-            {
-                poolable.Release();
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
     }
 }

@@ -20,42 +20,42 @@ namespace DungeonShooter
     {
         public event Action<int> OnHealthChanged;
         public event Action OnDeath;
-        public int CurrentHealth => _hpStatus?.GetValue() ?? 0;
+        public int CurrentHealth { get; private set; }
         public int MaxHealth => _maxHpStat?.GetValue() ?? 0;
         public bool IsDead => CurrentHealth <= 0;
 
         private readonly IEntityContext _context;
         private readonly IEntityStat _maxHpStat;
-        private readonly IEntityStatus _hpStatus;
 
-        public HealthModel(IEntityStat maxHpStat, IEntityStatus hpStatus)
+        public HealthModel(IEntityStat maxHpStat)
         {
             _maxHpStat = maxHpStat;
-            _hpStatus = hpStatus;
-            if (_hpStatus != null)
-            {
-                _hpStatus.OnValueChanged += OnHpStatusChanged;
-            }
+            OnHealthChanged += HealthChanged;
         }
 
         public void TakeDamage(int damage)
         {
-            if (IsDead) return;
-            if (damage < 0) damage = 0;
+            if (IsDead) 
+                return;
+            if (damage < 0) 
+                damage = 0;
 
             var newValue = Mathf.Max(0, CurrentHealth - damage);
-            _hpStatus?.SetValue(newValue);
+            CurrentHealth = newValue;
         }
 
         public void Heal(int amount)
         {
-            if (IsDead) return;
-            _hpStatus?.SetValue(Mathf.Min(CurrentHealth + amount, MaxHealth));
-            if (amount < 0) amount = 0;
+            if (IsDead) 
+                return;
+            if (amount < 0) 
+                amount = 0;
+            CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
+            
         }
         public void SetCurrentHealth(int value)
         {
-            _hpStatus?.SetValue(Mathf.Clamp(value, 0, MaxHealth));
+            CurrentHealth = Mathf.Clamp(value, 0, MaxHealth); 
         }
 
         public void ResetState()
@@ -63,7 +63,7 @@ namespace DungeonShooter
             SetCurrentHealth(MaxHealth);
         }
 
-        private void OnHpStatusChanged(int value)
+        private void HealthChanged(int value)
         {
             OnHealthChanged?.Invoke(value);
             if (value <= 0)

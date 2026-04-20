@@ -267,27 +267,26 @@ namespace DungeonShooter
             var entity = entityLifeTimeScope.Container.Resolve<EntityBase>();
             var statsDto = configTableEntry.Stats;
             var statGroup = new EntityStats();
-            var statuses = new EntityStatuses(statsDto);
-            var hpModel = new HealthModel(statGroup.GetStat(StatType.Hp), statuses.GetStatus(StatusType.Hp));
             statGroup.Initialize(statsDto);
+            var hpModel = new HealthModel(statGroup.GetStat(StatType.Hp));
+            
 
             var entitySkills = new EntitySkills();
             var context = new EntityContext(
                 new EntityInputContext()
                 , statGroup
-                , statuses
                 , hpModel
                 , entitySkills);
             entity.SetContext(context);
 
             if (isFirstInit == true)
             {
-                entity.OnDeath += () =>
+                entity.GetContext().HealthModel.OnDeath += () =>
                 {
                     var destroyEffectSpawnPos = entity.transform.position;
                     _skillObjectFactory.CreateSkillObjectAsync<ParticleSkillObject>(CommonAddresses.MonsterDeath_Particle, destroyEffectSpawnPos).Forget();
                     EnemyDied?.Invoke(entity, configTableEntry, destroyEffectSpawnPos);
-                    entity.Release();
+                    entity.ReleaseOrDestroy();
                 };
             }
             var stateMachine = entityLifeTimeScope.Container.Resolve<IEntityStateMachine>();

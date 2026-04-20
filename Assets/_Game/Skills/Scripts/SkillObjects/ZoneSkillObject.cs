@@ -35,7 +35,7 @@ namespace DungeonShooter
 
             if (_elapsedTime >= _duration)
             {
-                Release();
+                gameObject.ReleaseOrDestroy();
                 return;
             }
 

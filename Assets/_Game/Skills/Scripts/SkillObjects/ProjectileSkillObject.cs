@@ -35,7 +35,7 @@ namespace DungeonShooter
             // 생명주기 체크
             if (_elapsedTime >= _lifeTime)
             {
-                Release();
+                gameObject.ReleaseOrDestroy();
                 return;
             }
             
@@ -71,7 +71,7 @@ namespace DungeonShooter
 
             if (_appliedTargets.Count >= _targetCount)
             {
-                Release();
+                gameObject.ReleaseOrDestroy();
             }
         }
     }

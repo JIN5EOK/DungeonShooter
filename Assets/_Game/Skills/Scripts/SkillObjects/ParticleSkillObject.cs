@@ -17,7 +17,7 @@ namespace DungeonShooter
         {
             if (_particle.isPlaying == false)
             {
-                Release();
+                gameObject.ReleaseOrDestroy();
             }
         }
         
