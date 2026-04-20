@@ -6,27 +6,45 @@ namespace DungeonShooter
     public interface IEntityContext
     {
         public HealthModel HealthModel { get; }
-        public IEntityStats Stat { get; }
-        public IEntitySkills Skill { get; }
+        public IEntityStats Stats { get; }
+        public IEntitySkills Skills { get; }
         public IEntityInputContext InputContext { get; }
     }
     public class EntityContext : IEntityContext
     {
         public IEntityInputContext InputContext { get; }
-        public IEntityStats Stat { get; }
+        public IEntityStats Stats { get; }
         public HealthModel HealthModel { get; }
-        public IEntitySkills Skill { get; }
+        public IEntitySkills Skills { get; }
 
         public EntityContext(
             IEntityInputContext inputContext,
-            IEntityStats stat,
+            IEntityStats stats,
             HealthModel healthModel,
-            IEntitySkills skill)
+            IEntitySkills skills)
         {
             InputContext = inputContext;
-            Stat = stat;
+            Stats = stats;
             HealthModel = healthModel;
-            Skill = skill;
+            Skills = skills;
+
+            if (Skills != null)
+            {
+                Skills.OnSkillRegisted += ActivatePassive;
+                Skills.OnSkillUnregisted += DeactivatePassive;
+            }
+        }
+
+        private void ActivatePassive(Skill skill)
+        {
+            if (skill?.SkillData?.IsPassiveSkill == true)
+                skill.Activate(this);
+        }
+
+        private void DeactivatePassive(Skill skill)
+        {
+            if (skill?.SkillData?.IsPassiveSkill == true)
+                skill.Deactivate(this);
         }
     }
 }

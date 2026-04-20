@@ -27,44 +27,7 @@ namespace DungeonShooter
         /// </summary>
         public void SetContext(IEntityContext context)
         {
-            if (_entityContext?.Skill != null)
-            {
-                foreach (var s in _entityContext.Skill.GetSkills())
-                {
-                    UnapplySkill(s);
-                }
-
-                _entityContext.Skill.OnSkillRegisted -= ApplySkill;
-                _entityContext.Skill.OnSkillUnregisted -= UnapplySkill;
-            }
-
             _entityContext = context;
-
-            if (context?.Skill != null)
-            {
-                context.Skill.OnSkillRegisted += ApplySkill;
-                context.Skill.OnSkillUnregisted += UnapplySkill;
-                foreach (var s in context.Skill.GetSkills())
-                {
-                    ApplySkill(s);
-                }
-            }
-        }
-
-        private void ApplySkill(Skill skill)
-        {
-            if (skill?.SkillData != null && skill.SkillData.IsPassiveSkill)
-            {
-                skill.Activate(this);
-            }
-        }
-        
-        private void UnapplySkill(Skill skill)
-        {
-            if (skill?.SkillData != null && skill.SkillData.IsPassiveSkill)
-            {
-                skill.Deactivate(this);
-            }
         }
     }
 }

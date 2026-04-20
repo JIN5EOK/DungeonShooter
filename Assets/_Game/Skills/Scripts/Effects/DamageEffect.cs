@@ -37,8 +37,8 @@ namespace DungeonShooter
 
             if (targetEntity != null)
             {
-                var casterAtk = context.Caster.GetContext().Stat.GetStat(StatType.Attack).GetValue();
-                var targetDef = context.LastHitTarget.GetContext().Stat.GetStat(StatType.Defense).GetValue();
+                var casterAtk = context.Caster.GetContext().Stats.GetStat(StatType.Attack).GetValue();
+                var targetDef = context.LastHitTarget.GetContext().Stats.GetStat(StatType.Defense).GetValue();
                 var finalDamage = EntityStatsHelper.CalculatePercentDamage(casterAtk, targetDef, skillDamagePercent);
 
                 targetEntity?.GetContext()?.HealthModel?.TakeDamage(finalDamage);

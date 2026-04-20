@@ -28,7 +28,7 @@ namespace DungeonShooter
         public void BindControlledEntity(EntityBase entity)
         {
             _entityInputContext = entity != null ? entity.GetContext().InputContext : null;
-            _entitySkills = entity != null ? entity.GetContext().Skill : null;
+            _entitySkills = entity != null ? entity.GetContext().Skills : null;
         }
 
         /// <summary><see cref="BindControlledEntity"/> 연결을 해제합니다.</summary>

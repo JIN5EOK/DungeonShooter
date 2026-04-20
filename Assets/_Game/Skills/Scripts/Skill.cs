@@ -105,9 +105,9 @@ namespace DungeonShooter
         /// <summary>
         /// 패시브 효과를 활성화합니다.
         /// </summary>
-        public void Activate(EntityBase owner)
+        public void Activate(IEntityContext context)
         {
-            if (_skillData == null || owner == null || _skillTableEntrySo == null)
+            if (_skillData == null || context == null || _skillTableEntrySo == null)
                 return;
 
             var levelData = _skillTableEntrySo.SkillLevels[_skillLevelIndex];
@@ -117,16 +117,16 @@ namespace DungeonShooter
                 if (effect == null)
                     continue;
 
-                effect.Activate(owner, levelData);
+                effect.Activate(context, levelData);
             }
         }
 
         /// <summary>
         /// 패시브 효과를 비활성화합니다.
         /// </summary>
-        public void Deactivate(EntityBase owner)
+        public void Deactivate(IEntityContext context)
         {
-            if (_skillData == null || owner == null || _skillTableEntrySo == null)
+            if (_skillData == null || context == null || _skillTableEntrySo == null)
                 return;
 
             var levelData = _skillTableEntrySo.SkillLevels[_skillLevelIndex];
@@ -136,7 +136,7 @@ namespace DungeonShooter
                 if (effect == null)
                     continue;
 
-                effect.Deactivate(owner, levelData);
+                effect.Deactivate(context, levelData);
             }
         }
 

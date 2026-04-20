@@ -18,23 +18,21 @@ namespace DungeonShooter
             return UniTask.FromResult(false);
         }
 
-        public override void Activate(EntityBase owner, SkillLevelData levelData)
+        public override void Activate(IEntityContext context, SkillLevelData levelData)
         {
-            base.Activate(owner, levelData);
+            base.Activate(context, levelData);
 
             var percent = Mathf.RoundToInt(levelData.Amount * _amountPercent);
             var attackMultiply = 100 + percent;
-            
             var bonus = new StatBonus(0, 100, 0, attackMultiply, 0, 100, 0, 100);
-            
-            owner.GetContext().Stat.ApplyStatBonus(this, bonus);
+            context.Stats.ApplyStatBonus(this, bonus);
         }
 
-        public override void Deactivate(EntityBase owner, SkillLevelData levelData)
+        public override void Deactivate(IEntityContext context, SkillLevelData levelData)
         {
-            base.Deactivate(owner, levelData);
+            base.Deactivate(context, levelData);
 
-            owner.GetContext().Stat.RemoveStatBonus(this);
+            context.Stats.RemoveStatBonus(this);
         }
     }
 }
