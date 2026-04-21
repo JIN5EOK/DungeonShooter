@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -126,44 +127,46 @@ namespace DungeonShooter
 
         private async UniTask<Skill> CreateSkillAsyncInternal(SkillTableEntrySo entrySo, int skillEntryIdForLog, int skillLevelIndex)
         {
-            if (entrySo?.SkillLevels == null || skillLevelIndex < 0 || skillLevelIndex >= entrySo.SkillLevels.Count)
+            if (entrySo?.SkillLevels == null || entrySo.SkillLevels.Count == 0
+                || skillLevelIndex < 0 || skillLevelIndex >= entrySo.SkillLevels.Count)
             {
                 LogHandler.LogError<SkillFactory>($"스킬 정의 또는 레벨 인덱스가 유효하지 않습니다. id={skillEntryIdForLog}, levelIndex={skillLevelIndex}");
                 return null;
             }
 
-            var levelData = entrySo.SkillLevels[skillLevelIndex];
-            var skillDataKey = GetAddressOrNull(levelData.SkillDataRef);
-            var skillData = !string.IsNullOrEmpty(skillDataKey)
-                ? await _resourceProvider.GetAssetAsync<SkillData>(skillDataKey)
-                : null;
-            var iconKey = GetAddressOrNull(entrySo.SkillIconRef);
-            var icon = !string.IsNullOrEmpty(iconKey)
-                ? await _resourceProvider.GetAssetAsync<Sprite>(iconKey)
-                : null;
+            var allLevelData = new List<SkillData>(entrySo.SkillLevels.Count);
+            foreach (var level in entrySo.SkillLevels)
+            {
+                var key = GetAddressOrNull(level.SkillDataRef);
+                allLevelData.Add(!string.IsNullOrEmpty(key) ? await _resourceProvider.GetAssetAsync<SkillData>(key) : null);
+            }
 
-            return new Skill(entrySo, skillLevelIndex, skillData, icon, _skillObjectFactory, _soundSfxService);
+            var iconKey = GetAddressOrNull(entrySo.SkillIconRef);
+            var icon = !string.IsNullOrEmpty(iconKey) ? await _resourceProvider.GetAssetAsync<Sprite>(iconKey) : null;
+
+            return new Skill(entrySo, skillLevelIndex, allLevelData, icon, _skillObjectFactory, _soundSfxService);
         }
 
         private Skill CreateSkillSyncInternal(SkillTableEntrySo entrySo, int skillEntryIdForLog, int skillLevelIndex)
         {
-            if (entrySo?.SkillLevels == null || skillLevelIndex < 0 || skillLevelIndex >= entrySo.SkillLevels.Count)
+            if (entrySo?.SkillLevels == null || entrySo.SkillLevels.Count == 0
+                || skillLevelIndex < 0 || skillLevelIndex >= entrySo.SkillLevels.Count)
             {
                 LogHandler.LogError<SkillFactory>($"스킬 정의 또는 레벨 인덱스가 유효하지 않습니다. id={skillEntryIdForLog}, levelIndex={skillLevelIndex}");
                 return null;
             }
 
-            var levelData = entrySo.SkillLevels[skillLevelIndex];
-            var skillDataKey = GetAddressOrNull(levelData.SkillDataRef);
-            var skillData = !string.IsNullOrEmpty(skillDataKey)
-                ? _resourceProvider.GetAssetSync<SkillData>(skillDataKey)
-                : null;
-            var iconKey = GetAddressOrNull(entrySo.SkillIconRef);
-            var icon = !string.IsNullOrEmpty(iconKey)
-                ? _resourceProvider.GetAssetSync<Sprite>(iconKey)
-                : null;
+            var allLevelData = new List<SkillData>(entrySo.SkillLevels.Count);
+            foreach (var level in entrySo.SkillLevels)
+            {
+                var key = GetAddressOrNull(level.SkillDataRef);
+                allLevelData.Add(!string.IsNullOrEmpty(key) ? _resourceProvider.GetAssetSync<SkillData>(key) : null);
+            }
 
-            return new Skill(entrySo, skillLevelIndex, skillData, icon, _skillObjectFactory, _soundSfxService);
+            var iconKey = GetAddressOrNull(entrySo.SkillIconRef);
+            var icon = !string.IsNullOrEmpty(iconKey) ? _resourceProvider.GetAssetSync<Sprite>(iconKey) : null;
+
+            return new Skill(entrySo, skillLevelIndex, allLevelData, icon, _skillObjectFactory, _soundSfxService);
         }
 
         private static string GetAddressOrNull(AssetReference assetReference)

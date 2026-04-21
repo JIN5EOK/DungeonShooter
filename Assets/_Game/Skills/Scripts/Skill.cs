@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -10,35 +11,55 @@ namespace DungeonShooter
     public class Skill
     {
         private readonly SkillTableEntrySo _skillTableEntrySo;
-        private readonly int _skillLevelIndex;
-        private readonly SkillData _skillData;
+        private readonly IReadOnlyList<SkillData> _levelDatas;
         private readonly Sprite _icon;
         private readonly ISkillObjectFactory _skillObjectFactory;
         private readonly ISoundSfxService _soundSfxService;
+
+        private int _skillLevelIndex;
+        private SkillData _skillData;
 
         public SkillData SkillData => _skillData;
         public SkillTableEntrySo SkillTableEntrySo => _skillTableEntrySo;
         public int SkillLevelIndex => _skillLevelIndex;
         public Sprite Icon => _icon;
+        public bool CanLevelUp => _skillTableEntrySo?.SkillLevels != null
+            && _skillLevelIndex + 1 < _skillTableEntrySo.SkillLevels.Count
+            && _skillLevelIndex + 1 < _levelDatas.Count;
         public bool IsCooldown { get; private set; }
         public float Cooldown { get; private set; }
         public float MaxCooldown => _skillTableEntrySo != null && _skillTableEntrySo.SkillLevels != null && _skillLevelIndex >= 0 && _skillLevelIndex < _skillTableEntrySo.SkillLevels.Count
             ? _skillTableEntrySo.SkillLevels[_skillLevelIndex].Cooldown
             : 0f;
         public event Action OnExecute;
+        public event Action OnLeveledUp;
         public Action<float> OnCooldownChanged { get; set; }
         public Action OnCooldownEnded { get; set; }
 
-        public Skill(SkillTableEntrySo skillTableEntrySo, int skillLevelIndex, SkillData skillData, Sprite icon, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService)
+        public Skill(SkillTableEntrySo skillTableEntrySo, int skillLevelIndex, IReadOnlyList<SkillData> levelDatas, Sprite icon, ISkillObjectFactory skillObjectFactory, ISoundSfxService soundSfxService)
         {
             _skillTableEntrySo = skillTableEntrySo;
+            _levelDatas = levelDatas;
             _skillLevelIndex = skillLevelIndex;
-            _skillData = skillData;
+            _skillData = levelDatas != null && skillLevelIndex < levelDatas.Count ? levelDatas[skillLevelIndex] : null;
             _skillObjectFactory = skillObjectFactory;
             _icon = icon;
             _soundSfxService = soundSfxService;
             Cooldown = 0f;
             IsCooldown = false;
+        }
+
+        /// <summary>
+        /// 스킬을 다음 레벨로 올립니다. 최대 레벨이면 false를 반환합니다.
+        /// </summary>
+        public bool LevelUp()
+        {
+            if (!CanLevelUp)
+                return false;
+            _skillLevelIndex++;
+            _skillData = _levelDatas[_skillLevelIndex];
+            OnLeveledUp?.Invoke();
+            return true;
         }
 
         /// <summary>
