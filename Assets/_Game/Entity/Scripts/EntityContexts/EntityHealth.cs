@@ -21,7 +21,22 @@ namespace DungeonShooter
     {
         public event Action<int> OnHealthChanged;
         public event Action OnDeath;
-        public int CurrentHealth { get; private set; }
+
+        public int CurrentHealth
+        {
+            get => _currentHealth;
+            private set
+            {
+                _currentHealth = value;
+                OnHealthChanged?.Invoke(value);
+                if (value <= 0)
+                {
+                    OnDeath?.Invoke();
+                }
+            }
+        }
+
+        private int _currentHealth;
         public int MaxHealth => _maxHpStat?.GetValue() ?? 0;
         public bool IsDead => CurrentHealth <= 0;
 
@@ -31,7 +46,6 @@ namespace DungeonShooter
         public EntityHealth(IEntityStat maxHpStat)
         {
             _maxHpStat = maxHpStat;
-            OnHealthChanged += HealthChanged;
         }
 
         public void TakeDamage(int damage)
@@ -52,7 +66,6 @@ namespace DungeonShooter
             if (amount < 0) 
                 amount = 0;
             CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
-            
         }
         public void SetCurrentHealth(int value)
         {
@@ -62,15 +75,6 @@ namespace DungeonShooter
         public void ResetState()
         {
             SetCurrentHealth(MaxHealth);
-        }
-
-        private void HealthChanged(int value)
-        {
-            OnHealthChanged?.Invoke(value);
-            if (value <= 0)
-            {
-                OnDeath?.Invoke();
-            }
         }
     }
 }

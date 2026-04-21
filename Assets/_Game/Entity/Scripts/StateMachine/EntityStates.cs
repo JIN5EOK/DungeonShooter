@@ -6,7 +6,6 @@ namespace DungeonShooter
     public enum EntityStates
     {
         Idle,
-        Move,
-        Skill
+        Move
     }
 }

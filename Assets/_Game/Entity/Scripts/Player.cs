@@ -9,6 +9,7 @@ namespace DungeonShooter
     public class Player : EntityBase
     {
         [Inject] private ICameraManager _cameraManager;
+        private AutoSkillCaster _autoSkillCaster = new();
         protected override void Awake()
         {
             base.Awake();
@@ -18,8 +19,7 @@ namespace DungeonShooter
 
             stateMachine.Initialize(
                 new IdleState(animationHandler),
-                new MoveState(animationHandler),
-                new SkillState(animationHandler));
+                new MoveState(animationHandler));
         }
 
         public override void SetContext(IEntityContext context)
@@ -38,6 +38,11 @@ namespace DungeonShooter
         private void OnDeath()
         {
             gameObject.ReleaseOrDestroy();
+        }
+
+        private void Update()
+        {
+            _autoSkillCaster?.Tick(GetContext(), this);
         }
 
         public void OnMove(InputValue context)

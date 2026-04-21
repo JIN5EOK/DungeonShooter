@@ -22,8 +22,7 @@ namespace DungeonShooter
             var animationHandler = GetComponent<EntityAnimationHandler>();
             GetComponent<IEntityStateMachine>()?.Initialize(
                 new IdleState(animationHandler),
-                new MoveState(animationHandler),
-                new SkillState(animationHandler));
+                new MoveState(animationHandler));
 
             context.HealthModel.OnDeath += OnDeath;
             base.SetContext(context);

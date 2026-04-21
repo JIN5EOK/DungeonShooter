@@ -15,12 +15,6 @@ namespace DungeonShooter
     /// </summary>
     public interface IEnemyFactory
     {
-        event Action<EntityBase> EnemySpawned;
-        event Action<EntityBase, EnemyConfigSo, Vector3> EnemyDied;
-
-        void Initialize(int stageConfigTableId);
-        UniTask<EntityBase> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
-        EntityBase GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
         UniTask<EntityBase> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
         EntityBase GetEnemyByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
@@ -30,11 +24,7 @@ namespace DungeonShooter
     /// </summary>
     public class EnemyFactory : IEnemyFactory
     {
-        public event Action<EntityBase> EnemySpawned;
-        public event Action<EntityBase, EnemyConfigSo, Vector3> EnemyDied;
-
         private readonly ITableRepository _tableRepository;
-        private int _stageConfigTableId;
         private readonly IResourceProvider _resourceProvider;
         private readonly ISkillFactory _skillFactory;
         private readonly ISkillObjectFactory _skillObjectFactory;
@@ -50,53 +40,6 @@ namespace DungeonShooter
             _resourceProvider = resourceProvider;
             _skillFactory = skillFactory;
             _skillObjectFactory = skillObjectFactory;
-        }
-
-        /// <inheritdoc />
-        public void Initialize(int stageConfigTableId)
-        {
-            _stageConfigTableId = stageConfigTableId;
-            // StageConfigTableEntry 기반 스테이지별 적 목록 기능이 제거되어, 전체 EnemyConfigSo에서 랜덤 스폰하도록 변경합니다.
-            _enemyIds = _tableRepository
-                ?.GetAllTableEntries<EnemyConfigSo>()
-                ?.Select(x => x.Id)
-                ?.ToList();
-        }
-
-        /// <summary>
-        /// 스테이지에 맞는 랜덤 적을 가져옵니다.
-        /// </summary>
-        public async UniTask<EntityBase> GetRandomEnemyAsync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
-        {
-            var enemyConfig = GetRandomEnemyTableConfig();
-            
-            if (enemyConfig == null)
-                return null;
-            
-            var entity = GetFromPool(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
-            
-            if (entity == null)
-                entity = await CreateAsync(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
-
-            return entity;
-        }
-
-        /// <summary>
-        /// 스테이지에 맞는 랜덤 적을 동기적으로 가져옵니다.
-        /// </summary>
-        public EntityBase GetRandomEnemySync(Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
-        {
-            var enemyConfig = GetRandomEnemyTableConfig();
-            
-            if (enemyConfig == null)
-                return null;
-            
-            var entity = GetFromPool(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
-            
-            if (entity == null)
-                entity = CreateSync(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
-
-            return entity;
         }
 
         /// <summary>
@@ -277,10 +220,8 @@ namespace DungeonShooter
             {
                 var pos = enemy.transform.position;
                 _skillObjectFactory.CreateSkillObjectAsync<ParticleSkillObject>(CommonAddresses.MonsterDeath_Particle, pos).Forget();
-                EnemyDied?.Invoke(enemy, configTableEntry, pos);
             };
 
-            EnemySpawned?.Invoke(enemy);
             return enemy;
         }
 

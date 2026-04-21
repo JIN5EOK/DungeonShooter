@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Jin5eok;
 
 namespace DungeonShooter
@@ -21,13 +22,11 @@ namespace DungeonShooter
 
             if (skill != null && !skill.IsCooldown)
             {
-                context.Self.GetContext().InputContext.SkillInput = skill.SkillTableEntrySo.Id;
+                skills.ExecuteSkillAsync(skill.SkillTableEntrySo.Id, context.Self).Forget();
                 return BTStatus.Success;
             }
-            else
-            {
-                return BTStatus.Failure;
-            }
+
+            return BTStatus.Failure;
         }
     }
 }
