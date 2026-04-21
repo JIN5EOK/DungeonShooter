@@ -9,9 +9,9 @@ namespace DungeonShooter
     public interface ISkillFactory
     {
         public UniTask<Skill> CreateSkillAsync(int skillEntryId, int skillLevelIndex = 0);
-        public UniTask<Skill> CreateSkillAsync(AssetReferenceT<SkillTableEntrySo> skillEntryRef, int skillLevelIndex = 0);
+        public UniTask<Skill> CreateSkillAsync(SkillTableEntrySo entrySo, int skillLevelIndex = 0);
         public Skill CreateSkillSync(int skillEntryId, int skillLevelIndex = 0);
-        public Skill CreateSkillSync(AssetReferenceT<SkillTableEntrySo> skillEntryRef, int skillLevelIndex = 0);
+        public Skill CreateSkillSync(SkillTableEntrySo entrySo, int skillLevelIndex = 0);
     }
     
     /// <summary>
@@ -90,6 +90,32 @@ namespace DungeonShooter
                     ? _resourceProvider.GetAssetSync<SkillTableEntrySo>(key)
                     : null;
                 return CreateSkillSyncInternal(entrySo, 0, skillLevelIndex);
+            }
+            catch (Exception e)
+            {
+                LogHandler.LogException<SkillFactory>(e, "스킬 데이터 로드에 실패했습니다.");
+                return null;
+            }
+        }
+
+        public Skill CreateSkillSync(SkillTableEntrySo entrySo, int skillLevelIndex = 0)
+        {
+            try
+            {
+                return CreateSkillSyncInternal(entrySo, 0, skillLevelIndex);
+            }
+            catch (Exception e)
+            {
+                LogHandler.LogException<SkillFactory>(e, "스킬 데이터 로드에 실패했습니다.");
+                return null;
+            }
+        }
+
+        public async UniTask<Skill> CreateSkillAsync(SkillTableEntrySo entrySo, int skillLevelIndex = 0)
+        {
+            try
+            {
+                return await CreateSkillAsyncInternal(entrySo, 0, skillLevelIndex);
             }
             catch (Exception e)
             {

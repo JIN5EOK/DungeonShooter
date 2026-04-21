@@ -107,11 +107,11 @@ namespace DungeonShooter
             if (config == null || entitySkills == null)
                 return;
 
-            var skill1 = _skillFactory.CreateSkillSync(config.Skill1Ref);
+            var skill1 = _skillFactory.CreateSkillSync(config.Skill1);
             if (skill1 != null)
                 entitySkills.RegistSkill(skill1);
 
-            var skill2 = _skillFactory.CreateSkillSync(config.Skill2Ref);
+            var skill2 = _skillFactory.CreateSkillSync(config.Skill2);
             if (skill2 != null)
                 entitySkills.RegistSkill(skill2);
 

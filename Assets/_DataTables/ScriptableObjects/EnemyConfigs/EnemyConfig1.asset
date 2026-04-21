@@ -42,11 +42,7 @@ MonoBehaviour:
     _moveSpeed: 1
   _exp: 25
   _activeSkills:
-  - m_AssetGUID: 097010eed1bb14551989282d529ecf79
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
+  - {fileID: 11400000, guid: 097010eed1bb14551989282d529ecf79, type: 2}
   references:
     version: 2
     RefIds: []

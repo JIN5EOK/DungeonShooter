@@ -31,7 +31,7 @@ namespace DungeonShooter
         public int Exp => _exp;
 
         /// <summary>활성 스킬 레퍼런스 목록</summary>
-        public List<AssetReferenceT<SkillTableEntrySo>> ActiveSkills => _activeSkills;
+        public List<SkillTableEntrySo> ActiveSkills => _activeSkills;
 
         [TextArea][SerializeField] private string _memo;
 
@@ -41,14 +41,17 @@ namespace DungeonShooter
         [SerializeField] private AssetReferenceT<AiBTBase> _aiType;
         [SerializeField] private StatsDto _stats;
         [SerializeField] private int _exp;
-        [SerializeField] private List<AssetReferenceT<SkillTableEntrySo>> _activeSkills;
+        [SerializeField] private List<SkillTableEntrySo> _activeSkills;
 
         public List<EnemyConfigDto> CreateSerializedDto()
         {
             var stats = _stats ?? new StatsDto();
-            var activeSkills = _activeSkills != null
-                ? SoSerializeHelper.SerializeAssetReferences(_activeSkills)
-                : string.Empty;
+            var skillIds = new List<string>();
+            if (_activeSkills != null)
+                foreach (var s in _activeSkills)
+                    if (s != null)
+                        skillIds.Add(s.Id.ToString());
+            var activeSkills = SoSerializeHelper.SerializeStrings(skillIds);
 
             return new List<EnemyConfigDto>
             {
@@ -86,12 +89,6 @@ namespace DungeonShooter
             if (_stats == null)
                 _stats = new StatsDto();
             _stats.Apply(dto.MaxHp, dto.Attack, dto.Defense, dto.MoveSpeed);
-
-            if (_activeSkills == null)
-                _activeSkills = new List<AssetReferenceT<SkillTableEntrySo>>();
-            _activeSkills = string.IsNullOrWhiteSpace(dto.ActiveSkills)
-                ? new List<AssetReferenceT<SkillTableEntrySo>>()
-                : SoSerializeHelper.DeserializeAssetReferences<SkillTableEntrySo>(dto.ActiveSkills);
         }
     }
 }

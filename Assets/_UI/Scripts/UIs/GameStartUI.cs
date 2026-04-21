@@ -185,8 +185,8 @@ namespace DungeonShooter
             // PlayerConfigSo에 무기 정보가 없으므로 표시하지 않음
             SetInfoText(_infoStartWeapon, string.Empty);
 
-            var skill1 = LoadSkillEntryOrNull(selectedEntry.Skill1Ref);
-            var skill2 = LoadSkillEntryOrNull(selectedEntry.Skill2Ref);
+            var skill1 = selectedEntry.Skill1;
+            var skill2 = selectedEntry.Skill2;
             var skillNames = new List<string>();
             if (skill1 != null)
                 skillNames.Add(skill1.SkillName);
@@ -204,12 +204,6 @@ namespace DungeonShooter
             {
                 SetInfoText(_infoStats, string.Empty);
             }
-        }
-
-        private SkillTableEntrySo LoadSkillEntryOrNull(AssetReferenceT<SkillTableEntrySo> entryRef)
-        {
-            var address = GetAddressOrNull(entryRef);
-            return string.IsNullOrEmpty(address) ? null : _resourceProvider.GetAssetSync<SkillTableEntrySo>(address);
         }
 
         private static string GetAddressOrNull(AssetReference assetReference)

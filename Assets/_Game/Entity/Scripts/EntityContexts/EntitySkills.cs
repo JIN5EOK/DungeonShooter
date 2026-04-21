@@ -37,11 +37,7 @@ namespace DungeonShooter
     public class EntitySkills : IEntitySkills
     {
         private readonly Dictionary<int, Skill> _skillsByEntryId = new();
-
-        public EntitySkills()
-        {
-        }
-
+        
         public event Action<Skill> OnSkillRegisted;
         public event Action<Skill> OnSkillUnregisted;
 

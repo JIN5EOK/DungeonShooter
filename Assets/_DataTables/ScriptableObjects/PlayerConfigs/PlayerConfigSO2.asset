@@ -38,24 +38,16 @@ MonoBehaviour:
     m_SubObjectType: 
     m_SubObjectGUID: 
     m_EditorAssetChanged: 1
-  _skill1Ref:
-    m_AssetGUID: 2a0489ef4afc4467aa726e2d70aa09e0
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
-  _skill2Ref:
-    m_AssetGUID: 15306e05d7a7d43a8a5f30d543ad96ca
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
+  skill1: {fileID: 11400000, guid: 097010eed1bb14551989282d529ecf79, type: 2}
+  skill2: {fileID: 11400000, guid: 2a0489ef4afc4467aa726e2d70aa09e0, type: 2}
   _stats:
     _maxHp: 9999
     _attack: 9999
     _defense: 9999
     _moveSpeed: 8
-  _skills: []
+  _skills:
+  - {fileID: 11400000, guid: 097010eed1bb14551989282d529ecf79, type: 2}
+  - {fileID: 11400000, guid: 2a0489ef4afc4467aa726e2d70aa09e0, type: 2}
   references:
     version: 2
     RefIds: []
