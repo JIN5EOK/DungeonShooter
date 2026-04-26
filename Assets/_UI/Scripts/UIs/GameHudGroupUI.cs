@@ -11,7 +11,6 @@ namespace DungeonShooter
     {
         public HealthBarHudUI HealthBarHudUI => _healthBarHudUI;
         public ExpGaugeHudUI ExpGaugeHudUI => _expGaugeHudUI;
-        public PlayerStatusHudUI PlayerStatusHudUI => _playerStatusHudUI;
         public TouchInputUI TouchInputUI => _touchInputUI;
         
         [SerializeField]
@@ -19,22 +18,15 @@ namespace DungeonShooter
         [SerializeField]
         private ExpGaugeHudUI _expGaugeHudUI;
         [SerializeField]
-        private PlayerStatusHudUI _playerStatusHudUI;
-        [SerializeField]
         private TouchInputUI _touchInputUI;
 
         [Header("Buttons")]
-        [SerializeField] private Button _inventoryButton;
         [SerializeField] private Button _pauseButton;
 
-        public event Action OnInventoryRequested;
         public event Action OnPauseRequested;
 
         private void Awake()
         {
-            if (_inventoryButton != null)
-                _inventoryButton.onClick.AddListener(OnInventoryButtonClicked);
-
             if (_pauseButton != null)
                 _pauseButton.onClick.AddListener(OnPauseButtonClicked);
         }
@@ -43,14 +35,9 @@ namespace DungeonShooter
         {
             base.OnDestroy();
 
-            if (_inventoryButton != null)
-                _inventoryButton.onClick.RemoveListener(OnInventoryButtonClicked);
-
             if (_pauseButton != null)
                 _pauseButton.onClick.RemoveListener(OnPauseButtonClicked);
         }
-
-        private void OnInventoryButtonClicked() => OnInventoryRequested?.Invoke();
 
         private void OnPauseButtonClicked() => OnPauseRequested?.Invoke();
 
@@ -59,7 +46,6 @@ namespace DungeonShooter
             _touchInputUI?.Show();
             _healthBarHudUI?.Show();
             _expGaugeHudUI?.Show();
-            _playerStatusHudUI?.Show();
         }
 
         public void HideHud()
@@ -67,7 +53,6 @@ namespace DungeonShooter
             _touchInputUI?.Hide();
             _healthBarHudUI?.Hide();
             _expGaugeHudUI?.Hide();
-            _playerStatusHudUI?.Hide();
         }
     }
 }
