@@ -34,7 +34,7 @@ namespace DungeonShooter
     /// <summary>
     /// 스킬 관련 기획 비즈니스 로직(레벨업 가능 여부 판정 등)을 담당합니다.
     /// </summary>
-    public class SkillService : ISkillService
+    public class SkillHelper : ISkillService
     {
         public IReadOnlyList<LevelUpableSkillInfo> GetLevelUpableSkills(IReadOnlyList<Skill> skills)
         {

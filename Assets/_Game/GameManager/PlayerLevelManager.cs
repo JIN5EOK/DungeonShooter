@@ -14,7 +14,7 @@ namespace DungeonShooter
         public void AddExp(int exp);
     }
     
-    public class PlayerLevelService : IPlayerLevelService
+    public class PlayerLevelManager : IPlayerLevelService
     {
         public event Action<int> OnLevelChanged;
         public event Action<int> OnExpChanged;
@@ -33,10 +33,6 @@ namespace DungeonShooter
                 OnMaxExpChanged?.Invoke(_maxExp);
             } 
         }
-
-        [Inject]
-        public PlayerLevelService()
-        { }
         
         public void AddExp(int amount)
         {

@@ -13,20 +13,12 @@ namespace DungeonShooter
             builder.Register<EnemyFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SkillFactory>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SkillObjectFactory>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.RegisterComponentOnNewGameObject<ObjectCullingManager>(Lifetime.Scoped);
-            builder.Register<EntityManager>(Lifetime.Scoped);
-            builder.Register<PlayerLevelService>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.Register<SkillService>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<PlayerLevelManager>(Lifetime.Scoped).AsImplementedInterfaces();
+            builder.Register<SkillHelper>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<GameMessageService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<GameExitService>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.RegisterComponentOnNewGameObject<SceneUIManager>(Lifetime.Scoped).AsImplementedInterfaces();
             builder.Register<SoundSfxService>(Lifetime.Scoped).AsImplementedInterfaces();
-            builder.RegisterBuildCallback((resolver) =>
-            {
-                resolver.Resolve<EntityManager>();
-                resolver.Resolve<ObjectCullingManager>();
-            });
-            
             
             // HUD 뷰 등록
             builder.Register(resolver => resolver.Resolve<ISceneUIManager>().GetSingletonUISync<GameHudGroupUI>(UIAddresses.UI_InGameHud), Lifetime.Scoped);
