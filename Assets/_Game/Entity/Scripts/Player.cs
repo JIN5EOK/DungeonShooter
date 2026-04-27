@@ -8,8 +8,15 @@ namespace DungeonShooter
 {
     public class Player : EntityBase
     {
-        [Inject] private ICameraManager _cameraManager;
+        private ICameraManager _cameraManager;
         private AutoSkillCaster _autoSkillCaster = new();
+
+        [Inject]
+        public void Construct(ICameraManager cameraManager)
+        {
+            Debug.Log("CameraManager");
+            _cameraManager = cameraManager;
+        }
         protected override void Awake()
         {
             base.Awake();
@@ -29,8 +36,7 @@ namespace DungeonShooter
             {
                 beforeContext.HealthModel.OnDeath -= OnDeath;
             }
-            
-            _cameraManager?.BindAsync(transform).Forget();
+            _cameraManager?.SetTarget(transform);
             context.HealthModel.OnDeath += OnDeath;
             base.SetContext(context);
         }
@@ -47,8 +53,10 @@ namespace DungeonShooter
 
         public void OnMove(InputValue context)
         {
+            if (GetContext() == null)
+                return;
+            
             var contextVal = context.Get<Vector2>();
-            LogHandler.Log<Player>(contextVal.ToString());
             GetContext().InputContext.MoveInput = contextVal;
         }
     }

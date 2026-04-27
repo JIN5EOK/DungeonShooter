@@ -5,7 +5,7 @@ namespace DungeonShooter
 {
     public interface ICameraManager
     {
-        public UniTask BindAsync(Transform target);
+        public void SetTarget(Transform target);
     }
 }
 

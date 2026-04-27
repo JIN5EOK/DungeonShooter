@@ -17,6 +17,7 @@ namespace DungeonShooter
     {
         UniTask<EntityBase> GetEnemyByConfigIdAsync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
         EntityBase GetEnemyByConfigIdSync(int configId, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
+        EntityBase GetEnemyByConfigSync(EnemyConfigSo config, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true);
     }
     
     /// <summary>
@@ -66,14 +67,30 @@ namespace DungeonShooter
         public EntityBase GetEnemyByConfigIdSync(int configId,  Vector3 position = default, Quaternion rotation = default, Transform parent = null,  bool instantiateInWorldSpace = true)
         {
             var enemyConfig = _tableRepository.GetTableEntry<EnemyConfigSo>(configId);
-            
+
             if (enemyConfig == null)
                 return null;
-            
+
             var entity = GetFromPool(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
-            
+
             if (entity == null)
                 entity = CreateSync(enemyConfig, position, rotation, parent, instantiateInWorldSpace);
+
+            return entity;
+        }
+
+        /// <summary>
+        /// EnemyConfigSo를 직접 받아 적을 동기 생성합니다.
+        /// </summary>
+        public EntityBase GetEnemyByConfigSync(EnemyConfigSo config, Vector3 position = default, Quaternion rotation = default, Transform parent = null, bool instantiateInWorldSpace = true)
+        {
+            if (config == null)
+                return null;
+
+            var entity = GetFromPool(config, position, rotation, parent, instantiateInWorldSpace);
+
+            if (entity == null)
+                entity = CreateSync(config, position, rotation, parent, instantiateInWorldSpace);
 
             return entity;
         }

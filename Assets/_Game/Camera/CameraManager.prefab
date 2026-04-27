@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3329273028447110466}
   - component: {fileID: 4520028546756601044}
   m_Layer: 0
-  m_Name: PlayerChaseCamera
+  m_Name: CameraManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

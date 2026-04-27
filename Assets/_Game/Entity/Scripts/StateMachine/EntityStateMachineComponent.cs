@@ -20,13 +20,7 @@ namespace DungeonShooter
         {
             Entity = GetComponent<EntityBase>();
         }
-
-        [Inject]
-        private void Construct(EntityBase entityBase)
-        {
-            Entity = entityBase;
-        }
-
+        
         public void Initialize(params IEntityState[] states)
         {
             foreach (var s in states)

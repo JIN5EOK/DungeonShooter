@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9562656bf438847c5aa4f069311843a5, type: 3}
+  m_Name: StageConfig
+  m_EditorClassIdentifier: 
+  <StageDuration>k__BackingField: 1800
+  <PlayerConfig>k__BackingField: {fileID: 11400000, guid: b123786e3e8c54cc681a575664c57709, type: 2}
+  <SpawnInfos>k__BackingField:
+  - <TriggerTime>k__BackingField: 0
+    <Rule>k__BackingField:
+      <SpawnInterval>k__BackingField: 0.1
+      <MaxActiveCount>k__BackingField: 200
+      _enemies:
+      - Config: {fileID: 11400000, guid: ed6b7a98e5a174e539cbe1ed8bafc162, type: 2}
+        Weight: 99
+  - <TriggerTime>k__BackingField: 5
+    <Rule>k__BackingField:
+      <SpawnInterval>k__BackingField: 0.1
+      <MaxActiveCount>k__BackingField: 200
+      _enemies:
+      - Config: {fileID: 11400000, guid: caf8eaf8e3df44837944360db2d54887, type: 2}
+        Weight: 99

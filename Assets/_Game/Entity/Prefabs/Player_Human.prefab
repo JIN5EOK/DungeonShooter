@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3073406401155221875, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
       propertyPath: m_Name
-      value: Player
+      value: Player_Human
       objectReference: {fileID: 0}
     - target: {fileID: 3169616247159687271, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
       propertyPath: m_LocalPosition.x
@@ -59,6 +59,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3073406401155221875, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7281577878225530904}
+    - targetCorrespondingSourceObject: {fileID: 3073406401155221875, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5907103108064190714}
   m_SourcePrefab: {fileID: 100100000, guid: 1c540a31334464ba4a5106db508a8412, type: 3}
 --- !u!1 &7631710466741929579 stripped
 GameObject:
@@ -92,6 +95,18 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: bc6d5c19-e08f-44b6-a629-207100c74270
+  m_DefaultActionMap: Touch
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &5907103108064190714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7631710466741929579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd4ef7051a211465d91f426ada47c40a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -1,4 +1,5 @@
 using Jin5eok;
+using VContainer;
 
 namespace DungeonShooter
 {
