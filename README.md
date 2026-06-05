@@ -30,17 +30,6 @@
 무기 공격 : J
 스킬 1, 2 : K,L
 
-# 프로젝트 폴더 구조
-```
-Assets/
-├── Game/ # 인 게임 씬 관련 (Stage, Player, Enemy, Skills, UI, Inventory 등)
-├── Common/ # 공용 (ResourceProviders, SceneLoad, 파사드 등)
-├── Core/ # VContainer LifetimeScope, Bootstrap
-├── DataTables/ # CSV 파서, TableRepository, 테이블 엔트리 타입
-├── Scenes/ # MainMenu, Stage, RoomEditor 등
-└── MainMenu/ # 메인 메뉴 씬 관련
-```
-
 # 스크린샷
 - 스킬 데이터 테이블 CSV 파일
   - ![img_1.png](img_1.png)
