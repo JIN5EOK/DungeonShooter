@@ -29,8 +29,9 @@ https://youtu.be/WwtcdcYTLns
 
 # 조작방법
 이동 : WASD
-구르기 : 스페이스 바 
+
 무기 공격 : J
+
 스킬 1, 2 : K,L
 
 # 스크린샷
